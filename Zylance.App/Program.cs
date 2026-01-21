@@ -1,5 +1,6 @@
 ﻿using Photino.NET;
 using Photino.NET.Server;
+using Zylance.App.Extensions;
 
 namespace Zylance.App;
 
@@ -12,6 +13,7 @@ public static class Program
     private static void Main()
     {
         var appUrl = GetServerUrl();
+        var appBridge = new AppBridge();
 
         // Creating a new PhotinoWindow instance with the fluent API
         var window = new PhotinoWindow()
@@ -19,23 +21,13 @@ public static class Program
             .SetUseOsDefaultLocation(true)
             .SetUseOsDefaultSize(true)
             .SetResizable(true)
-            // Most event handlers can be registered after the
-            // PhotinoWindow was instantiated by calling a registration
-            // method like the following RegisterWebMessageReceivedHandler.
-            // This could be added in the PhotinoWindowOptions if preferred.
+            .SetDevToolsEnabled(IsDebugMode())
+            .RegisterJsonMessageHandler(AppBridge.HandleJsonMessage)
             .RegisterWebMessageReceivedHandler((sender, message) =>
             {
-                if (sender is null) return;
-
-                var window = (PhotinoWindow)sender;
-
-                // The message argument is coming in from sendMessage.
-                // "window.external.sendMessage(message: string)"
-                var response = $"Received message: \"{message}\"";
-
-                // Send a message back the to JavaScript event handler.
-                // "window.external.receiveMessage(callback: Function)"
-                window.SendWebMessage(response);
+                Console.WriteLine($"Received message: {message}");
+                var window = (PhotinoWindow)sender!;
+                window.SendWebMessage($"Echo: {message}");
             })
             // Can be used with relative path strings or "new URI()" instance to load a website.
             .Load(appUrl);

@@ -24,4 +24,8 @@
     <ItemGroup>
         <Folder Include="Resources\"/>
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Resources\src\Global.d.ts.cs" />
+    </ItemGroup>
 </Project>
