@@ -1,0 +1,19 @@
+{
+  "projectName": "zylance",
+  "mode": "file-router",
+  "typescript": true,
+  "tailwind": true,
+  "packageManager": "yarn",
+  "addOnOptions": {},
+  "git": true,
+  "version": 1,
+  "framework": "react-cra",
+  "chosenAddOns": [
+    "biome",
+    "compiler",
+    "form",
+    "table",
+    "t3env",
+    "tanstack-query"
+  ]
+}

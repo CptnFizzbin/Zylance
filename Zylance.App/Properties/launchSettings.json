@@ -1,0 +1,17 @@
+{
+  "profiles": {
+    "Devlopment": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ZYLANCE_DEBUG": "true",
+        "ZYLANCE_SERVER": "http://localhost:3000"
+      }
+    },
+    "Production": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ZYLANCE_DEBUG": "false"
+      }
+    }
+  }
+}
