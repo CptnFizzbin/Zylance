@@ -15,6 +15,41 @@ export interface FileRef {
   readOnly: boolean;
 }
 
+export interface FileFilter {
+  name: string;
+  extensions: string[];
+}
+
+/** === File Operation Messages === */
+export interface SelectFileReq {
+  title?: string | undefined;
+  filters: FileFilter[];
+  readOnly: boolean;
+}
+
+export interface CreateFileReq {
+  title?: string | undefined;
+  filename?: string | undefined;
+  filters: FileFilter[];
+}
+
+export interface SaveFileReq {
+  fileRef: FileRef | undefined;
+  content: string;
+}
+
+export interface GetFileReq {
+  path: string;
+}
+
+export interface FileExistsRes {
+  exists: boolean;
+}
+
+export interface FileContentRes {
+  content: string;
+}
+
 /** === Protocol Messages === */
 export interface GatewayEnvelope {
   messageId: string;
@@ -98,6 +133,245 @@ export const FileRef: MessageFns<FileRef> = {
     message.id = object.id ?? "";
     message.filename = object.filename ?? "";
     message.readOnly = object.readOnly ?? false;
+    return message;
+  },
+};
+
+function createBaseFileFilter(): FileFilter {
+  return { name: "", extensions: [] };
+}
+
+export const FileFilter: MessageFns<FileFilter> = {
+  fromJSON(object: any): FileFilter {
+    return {
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      extensions: globalThis.Array.isArray(object?.extensions)
+        ? object.extensions.map((e: any) => globalThis.String(e))
+        : [],
+    };
+  },
+
+  toJSON(message: FileFilter): unknown {
+    const obj: any = {};
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.extensions?.length) {
+      obj.extensions = message.extensions;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FileFilter>, I>>(base?: I): FileFilter {
+    return FileFilter.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<FileFilter>, I>>(object: I): FileFilter {
+    const message = createBaseFileFilter();
+    message.name = object.name ?? "";
+    message.extensions = object.extensions?.map((e) => e) || [];
+    return message;
+  },
+};
+
+function createBaseSelectFileReq(): SelectFileReq {
+  return { title: undefined, filters: [], readOnly: false };
+}
+
+export const SelectFileReq: MessageFns<SelectFileReq> = {
+  fromJSON(object: any): SelectFileReq {
+    return {
+      title: isSet(object.title) ? globalThis.String(object.title) : undefined,
+      filters: globalThis.Array.isArray(object?.filters) ? object.filters.map((e: any) => FileFilter.fromJSON(e)) : [],
+      readOnly: isSet(object.readOnly)
+        ? globalThis.Boolean(object.readOnly)
+        : isSet(object.read_only)
+        ? globalThis.Boolean(object.read_only)
+        : false,
+    };
+  },
+
+  toJSON(message: SelectFileReq): unknown {
+    const obj: any = {};
+    if (message.title !== undefined) {
+      obj.title = message.title;
+    }
+    if (message.filters?.length) {
+      obj.filters = message.filters.map((e) => FileFilter.toJSON(e));
+    }
+    if (message.readOnly !== false) {
+      obj.readOnly = message.readOnly;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SelectFileReq>, I>>(base?: I): SelectFileReq {
+    return SelectFileReq.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<SelectFileReq>, I>>(object: I): SelectFileReq {
+    const message = createBaseSelectFileReq();
+    message.title = object.title ?? undefined;
+    message.filters = object.filters?.map((e) => FileFilter.fromPartial(e)) || [];
+    message.readOnly = object.readOnly ?? false;
+    return message;
+  },
+};
+
+function createBaseCreateFileReq(): CreateFileReq {
+  return { title: undefined, filename: undefined, filters: [] };
+}
+
+export const CreateFileReq: MessageFns<CreateFileReq> = {
+  fromJSON(object: any): CreateFileReq {
+    return {
+      title: isSet(object.title) ? globalThis.String(object.title) : undefined,
+      filename: isSet(object.filename) ? globalThis.String(object.filename) : undefined,
+      filters: globalThis.Array.isArray(object?.filters) ? object.filters.map((e: any) => FileFilter.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: CreateFileReq): unknown {
+    const obj: any = {};
+    if (message.title !== undefined) {
+      obj.title = message.title;
+    }
+    if (message.filename !== undefined) {
+      obj.filename = message.filename;
+    }
+    if (message.filters?.length) {
+      obj.filters = message.filters.map((e) => FileFilter.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreateFileReq>, I>>(base?: I): CreateFileReq {
+    return CreateFileReq.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreateFileReq>, I>>(object: I): CreateFileReq {
+    const message = createBaseCreateFileReq();
+    message.title = object.title ?? undefined;
+    message.filename = object.filename ?? undefined;
+    message.filters = object.filters?.map((e) => FileFilter.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseSaveFileReq(): SaveFileReq {
+  return { fileRef: undefined, content: "" };
+}
+
+export const SaveFileReq: MessageFns<SaveFileReq> = {
+  fromJSON(object: any): SaveFileReq {
+    return {
+      fileRef: isSet(object.fileRef)
+        ? FileRef.fromJSON(object.fileRef)
+        : isSet(object.file_ref)
+        ? FileRef.fromJSON(object.file_ref)
+        : undefined,
+      content: isSet(object.content) ? globalThis.String(object.content) : "",
+    };
+  },
+
+  toJSON(message: SaveFileReq): unknown {
+    const obj: any = {};
+    if (message.fileRef !== undefined) {
+      obj.fileRef = FileRef.toJSON(message.fileRef);
+    }
+    if (message.content !== "") {
+      obj.content = message.content;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SaveFileReq>, I>>(base?: I): SaveFileReq {
+    return SaveFileReq.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<SaveFileReq>, I>>(object: I): SaveFileReq {
+    const message = createBaseSaveFileReq();
+    message.fileRef = (object.fileRef !== undefined && object.fileRef !== null)
+      ? FileRef.fromPartial(object.fileRef)
+      : undefined;
+    message.content = object.content ?? "";
+    return message;
+  },
+};
+
+function createBaseGetFileReq(): GetFileReq {
+  return { path: "" };
+}
+
+export const GetFileReq: MessageFns<GetFileReq> = {
+  fromJSON(object: any): GetFileReq {
+    return { path: isSet(object.path) ? globalThis.String(object.path) : "" };
+  },
+
+  toJSON(message: GetFileReq): unknown {
+    const obj: any = {};
+    if (message.path !== "") {
+      obj.path = message.path;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetFileReq>, I>>(base?: I): GetFileReq {
+    return GetFileReq.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetFileReq>, I>>(object: I): GetFileReq {
+    const message = createBaseGetFileReq();
+    message.path = object.path ?? "";
+    return message;
+  },
+};
+
+function createBaseFileExistsRes(): FileExistsRes {
+  return { exists: false };
+}
+
+export const FileExistsRes: MessageFns<FileExistsRes> = {
+  fromJSON(object: any): FileExistsRes {
+    return { exists: isSet(object.exists) ? globalThis.Boolean(object.exists) : false };
+  },
+
+  toJSON(message: FileExistsRes): unknown {
+    const obj: any = {};
+    if (message.exists !== false) {
+      obj.exists = message.exists;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FileExistsRes>, I>>(base?: I): FileExistsRes {
+    return FileExistsRes.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<FileExistsRes>, I>>(object: I): FileExistsRes {
+    const message = createBaseFileExistsRes();
+    message.exists = object.exists ?? false;
+    return message;
+  },
+};
+
+function createBaseFileContentRes(): FileContentRes {
+  return { content: "" };
+}
+
+export const FileContentRes: MessageFns<FileContentRes> = {
+  fromJSON(object: any): FileContentRes {
+    return { content: isSet(object.content) ? globalThis.String(object.content) : "" };
+  },
+
+  toJSON(message: FileContentRes): unknown {
+    const obj: any = {};
+    if (message.content !== "") {
+      obj.content = message.content;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FileContentRes>, I>>(base?: I): FileContentRes {
+    return FileContentRes.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<FileContentRes>, I>>(object: I): FileContentRes {
+    const message = createBaseFileContentRes();
+    message.content = object.content ?? "";
     return message;
   },
 };

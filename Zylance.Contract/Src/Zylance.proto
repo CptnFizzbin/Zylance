@@ -10,6 +10,41 @@ message FileRef {
   bool read_only = 3;
 }
 
+message FileFilter {
+  string name = 1;
+  repeated string extensions = 2;
+}
+
+// === File Operation Messages ===
+message SelectFileReq {
+  optional string title = 1;
+  repeated FileFilter filters = 2;
+  bool read_only = 3;
+}
+
+message CreateFileReq {
+  optional string title = 1;
+  optional string filename = 2;
+  repeated FileFilter filters = 3;
+}
+
+message SaveFileReq {
+  FileRef file_ref = 1;
+  string content = 2;
+}
+
+message GetFileReq {
+  string path = 1;
+}
+
+message FileExistsRes {
+  bool exists = 1;
+}
+
+message FileContentRes {
+  string content = 1;
+}
+
 // === Protocol Messages ===
 message GatewayEnvelope {
   string message_id = 1;

@@ -6,20 +6,14 @@ namespace Zylance.Gateway;
 ///     Gateway service that wraps IFileProvider and enforces read-only rules through its own registry.
 ///     Provides an additional security layer by tracking file access permissions independently.
 /// </summary>
-public class FileService : IFileProvider
+public class FileService(IFileProvider fileProvider)
 {
-    private readonly IFileProvider _fileProvider;
     private readonly Lock _lock = new();
     private readonly Dictionary<string, bool> _readOnlyRegistry = new();
 
-    public FileService(IFileProvider fileProvider)
-    {
-        _fileProvider = fileProvider;
-    }
-
     public bool Exists(string path)
     {
-        return _fileProvider.Exists(path);
+        return fileProvider.Exists(path);
     }
 
     public FileRef SelectFile(
@@ -28,9 +22,7 @@ public class FileService : IFileProvider
         bool readOnly = true
     )
     {
-        var fileRef = _fileProvider.SelectFile(title, filters, readOnly);
-
-        // Register the file's read-only status in our registry
+        var fileRef = fileProvider.SelectFile(title, filters, readOnly);
         RegisterFileRef(fileRef);
 
         return fileRef;
@@ -42,9 +34,7 @@ public class FileService : IFileProvider
         (string Name, string[] Extensions)[]? filters = null
     )
     {
-        var fileRef = _fileProvider.CreateFile(title, filename, filters);
-
-        // Register newly created files (they're always writable)
+        var fileRef = fileProvider.CreateFile(title, filename, filters);
         RegisterFileRef(fileRef);
 
         return fileRef;
@@ -52,30 +42,26 @@ public class FileService : IFileProvider
 
     public Stream OpenFile(FileRef fileRef)
     {
-        // Enforce our registry's read-only status
-        ValidateFileRefExists(fileRef);
+        AssertFileRegistered(fileRef);
 
-        return _fileProvider.OpenFile(fileRef);
+        return fileProvider.OpenFile(fileRef);
     }
 
     public void SaveFile(FileRef fileRef, Stream content)
     {
-        // Strictly enforce read-only through our registry
-        ValidateFileRefExists(fileRef);
-        EnforceWriteAccess(fileRef);
+        AssertFileRegistered(fileRef);
+        AssertFileWritable(fileRef);
 
-        _fileProvider.SaveFile(fileRef, content);
+        fileProvider.SaveFile(fileRef, content);
     }
 
     public void DeleteFile(FileRef fileRef)
     {
-        // Strictly enforce read-only through our registry
-        ValidateFileRefExists(fileRef);
-        EnforceWriteAccess(fileRef);
+        AssertFileRegistered(fileRef);
+        AssertFileWritable(fileRef);
 
-        _fileProvider.DeleteFile(fileRef);
+        fileProvider.DeleteFile(fileRef);
 
-        // Remove from our registry after successful deletion
         lock (_lock)
         {
             _readOnlyRegistry.Remove(fileRef.Id);
@@ -84,21 +70,15 @@ public class FileService : IFileProvider
 
     public FileRef GetTempFile(string path)
     {
-        var fileRef = _fileProvider.GetTempFile(path);
-
-        // Register temp files (always writable)
+        var fileRef = fileProvider.GetTempFile(path);
         RegisterFileRef(fileRef);
-
         return fileRef;
     }
 
     public FileRef GetAppDataFile(string path)
     {
-        var fileRef = _fileProvider.GetAppDataFile(path);
-
-        // Register app data files (always writable)
+        var fileRef = fileProvider.GetAppDataFile(path);
         RegisterFileRef(fileRef);
-
         return fileRef;
     }
 
@@ -117,7 +97,7 @@ public class FileService : IFileProvider
     ///     Validates that a FileRef exists in our registry.
     ///     Throws if the FileRef is not registered (potentially tampered with or from another session).
     /// </summary>
-    private void ValidateFileRefExists(FileRef fileRef)
+    private void AssertFileRegistered(FileRef fileRef)
     {
         lock (_lock)
         {
@@ -133,7 +113,7 @@ public class FileService : IFileProvider
     ///     Enforces write access by checking our registry's read-only status.
     ///     Throws if either our registry or the FileRef indicates read-only.
     /// </summary>
-    private void EnforceWriteAccess(FileRef fileRef)
+    private void AssertFileWritable(FileRef fileRef)
     {
         bool isReadOnlyInRegistry;
 
@@ -142,7 +122,6 @@ public class FileService : IFileProvider
             isReadOnlyInRegistry = _readOnlyRegistry.TryGetValue(fileRef.Id, out var registryValue) && registryValue;
         }
 
-        // Check both our registry AND the FileRef itself
         if (isReadOnlyInRegistry || fileRef.ReadOnly)
             throw new UnauthorizedAccessException(
                 $"Cannot modify read-only file: {fileRef.Filename}. "
