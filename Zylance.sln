@@ -1,6 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.App", "Zylance.App\Zylance.App.csproj", "{E39B0693-39E5-41F6-8542-87594D671E65}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Desktop", "Zylance.Desktop\Zylance.Desktop.csproj", "{E39B0693-39E5-41F6-8542-87594D671E65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Core", "Zylance.Core\Zylance.Core.csproj", "{9C67CCBB-568C-41A4-89C8-6492DB4C1BD2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.UI", "Zylance.UI\Zylance.UI.csproj", "{81D3D7C1-7583-43A6-93D2-654196A533E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Contract", "Zylance.Contract\Zylance.Contract.csproj", "{FA266739-4CFF-4AD7-997A-50D257B68832}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Core", "Zylance.Vault.Core\Zylance.Vault.Core.csproj", "{5001C624-A0B3-4C9A-9D3C-02D1CE5ECA5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Gateway", "Zylance.Gateway\Zylance.Gateway.csproj", "{826483A7-0AEC-4942-B8BE-65288DE661A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Local", "Zylance.Vault.Local\Zylance.Vault.Local.csproj", "{8C7FD4B8-FB87-4674-BC5E-4FA3AB8F5357}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +24,29 @@ Global
 		{E39B0693-39E5-41F6-8542-87594D671E65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E39B0693-39E5-41F6-8542-87594D671E65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E39B0693-39E5-41F6-8542-87594D671E65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C67CCBB-568C-41A4-89C8-6492DB4C1BD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C67CCBB-568C-41A4-89C8-6492DB4C1BD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C67CCBB-568C-41A4-89C8-6492DB4C1BD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C67CCBB-568C-41A4-89C8-6492DB4C1BD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81D3D7C1-7583-43A6-93D2-654196A533E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81D3D7C1-7583-43A6-93D2-654196A533E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81D3D7C1-7583-43A6-93D2-654196A533E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81D3D7C1-7583-43A6-93D2-654196A533E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA266739-4CFF-4AD7-997A-50D257B68832}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA266739-4CFF-4AD7-997A-50D257B68832}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA266739-4CFF-4AD7-997A-50D257B68832}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA266739-4CFF-4AD7-997A-50D257B68832}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5001C624-A0B3-4C9A-9D3C-02D1CE5ECA5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5001C624-A0B3-4C9A-9D3C-02D1CE5ECA5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5001C624-A0B3-4C9A-9D3C-02D1CE5ECA5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5001C624-A0B3-4C9A-9D3C-02D1CE5ECA5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{826483A7-0AEC-4942-B8BE-65288DE661A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{826483A7-0AEC-4942-B8BE-65288DE661A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{826483A7-0AEC-4942-B8BE-65288DE661A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{826483A7-0AEC-4942-B8BE-65288DE661A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C7FD4B8-FB87-4674-BC5E-4FA3AB8F5357}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C7FD4B8-FB87-4674-BC5E-4FA3AB8F5357}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C7FD4B8-FB87-4674-BC5E-4FA3AB8F5357}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C7FD4B8-FB87-4674-BC5E-4FA3AB8F5357}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

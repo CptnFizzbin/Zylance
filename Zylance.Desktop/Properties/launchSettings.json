@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "Development": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ZYLANCE_DEVTOOLS": "true",
+        "ZYLANCE_UI_MODE": "external",
+        "ZYLANCE_UI_URL": "http://localhost:3000"
+      }
+    },
+    "Production": {
+      "commandName": "Project"
+    }
+  }
+}

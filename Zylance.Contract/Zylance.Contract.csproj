@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(AppData)\fnm\node-versions\v24.5.0\installation\yarn.cmd</YarnExe>
+        <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows'))">$(HOME)/.local/share/fnm/node-versions/v24.5.0/installation/bin/yarn</YarnExe>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Google.Protobuf" Version="3.34.0-rc1"/>
+        <PackageReference Include="Grpc.Tools" Version="2.76.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="Src\Zylance.proto" GrpcServices="None"/>
+    </ItemGroup>
+
+    <Target Name="GenerateTS" AfterTargets="Build">
+        <Exec Command="$(YarnExe) build"/>
+    </Target>
+</Project>

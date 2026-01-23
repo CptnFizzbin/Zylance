@@ -1,0 +1,59 @@
+﻿syntax = "proto3";
+package tutorial;
+
+option csharp_namespace = "Zylance.Contract";
+
+// === Models ===
+message FileRef {
+  string id = 1;
+  string filename = 2;
+}
+
+// === Protocol Messages ===
+message GatewayEnvelope {
+  string message_id = 1;
+
+  oneof payload {
+    RequestPayload request = 2;
+    ResponsePayload response = 3;
+    EventPayload event = 4;
+    ErrorPayload error = 5;
+  }
+}
+
+message RequestPayload {
+  string request_id = 1;
+  string action = 2;
+  optional string data_json = 3;
+}
+
+message ResponsePayload {
+  string request_id = 1;
+  string status = 2;
+  optional string data_json = 3;
+}
+
+message EventPayload {
+  string event = 1;
+  optional string data_json = 2;
+}
+
+message ErrorPayload {
+  optional string request_id = 1;
+  string type = 2;
+  string details = 3;
+}
+
+// === Message ===
+
+message GetStatusRes {
+  string status = 1;
+}
+
+message EchoReq {
+  string message = 1;
+}
+
+message EchoRes {
+  string echoed = 1;
+}
