@@ -12,6 +12,7 @@ export const protobufPackage = "tutorial";
 export interface FileRef {
   id: string;
   filename: string;
+  readOnly: boolean;
 }
 
 /** === Protocol Messages === */
@@ -59,7 +60,7 @@ export interface EchoRes {
 }
 
 function createBaseFileRef(): FileRef {
-  return { id: "", filename: "" };
+  return { id: "", filename: "", readOnly: false };
 }
 
 export const FileRef: MessageFns<FileRef> = {
@@ -67,6 +68,11 @@ export const FileRef: MessageFns<FileRef> = {
     return {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
       filename: isSet(object.filename) ? globalThis.String(object.filename) : "",
+      readOnly: isSet(object.readOnly)
+        ? globalThis.Boolean(object.readOnly)
+        : isSet(object.read_only)
+        ? globalThis.Boolean(object.read_only)
+        : false,
     };
   },
 
@@ -78,6 +84,9 @@ export const FileRef: MessageFns<FileRef> = {
     if (message.filename !== "") {
       obj.filename = message.filename;
     }
+    if (message.readOnly !== false) {
+      obj.readOnly = message.readOnly;
+    }
     return obj;
   },
 
@@ -88,6 +97,7 @@ export const FileRef: MessageFns<FileRef> = {
     const message = createBaseFileRef();
     message.id = object.id ?? "";
     message.filename = object.filename ?? "";
+    message.readOnly = object.readOnly ?? false;
     return message;
   },
 };

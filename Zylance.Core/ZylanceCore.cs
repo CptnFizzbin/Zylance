@@ -44,9 +44,8 @@ public class ZylanceCore
         };
     }
 
-    public static void Listen(ITransport transport)
+    public static void Listen(ZylanceGateway gateway)
     {
-        var gateway = new ZylanceGateway(transport);
         _ = new ZylanceCore(gateway);
     }
 }

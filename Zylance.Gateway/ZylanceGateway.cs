@@ -4,13 +4,20 @@ namespace Zylance.Gateway;
 
 public class ZylanceGateway
 {
+    private readonly FileService _fileService;
     private readonly Dictionary<string, Func<RequestPayload, ResponsePayload>> _requestHandlers = new();
     private readonly ITransport _transport;
 
-    public ZylanceGateway(ITransport transport)
+    public ZylanceGateway(ITransport transport, IFileProvider fileProvider)
     {
         _transport = transport;
+        _fileService = new FileService(fileProvider);
         _transport.Receive(HandleMessage);
+    }
+
+    public FileService GetFileService()
+    {
+        return _fileService;
     }
 
     public void OnRequest(string action, Func<RequestPayload, ResponsePayload> handler)

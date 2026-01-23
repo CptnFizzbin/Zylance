@@ -1,6 +1,7 @@
 ﻿using Photino.NET;
 using Photino.NET.Server;
 using Zylance.Core;
+using Zylance.Gateway;
 
 namespace Zylance.Desktop;
 
@@ -22,8 +23,12 @@ public static class Program
             .SetDevToolsEnabled(DevToolsEnabled())
             .Load(appUrl);
 
-        var transport = new PhotinoTransport(window);
-        ZylanceCore.Listen(transport);
+        ZylanceCore.Listen(
+            new ZylanceGateway(
+                new PhotinoTransport(window),
+                new DesktopFileProvider(window)
+            )
+        );
 
         Console.WriteLine($"Starting {WindowTitle} application...");
         window.WaitForClose();
