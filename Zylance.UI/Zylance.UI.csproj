@@ -6,4 +6,17 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+
+    <PropertyGroup>
+        <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(AppData)\fnm\node-versions\v24.5.0\installation\yarn.cmd</YarnExe>
+        <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows'))">$(HOME)/.local/share/fnm/node-versions/v24.5.0/installation/bin/yarn</YarnExe>
+    </PropertyGroup>
+
+    <Target Name="YarnTscDev" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+        <Exec Command="$(YarnExe) tsc" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
+    </Target>
+
+    <Target Name="YarnBuildProd" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+        <Exec Command="$(YarnExe) build" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
+    </Target>
 </Project>

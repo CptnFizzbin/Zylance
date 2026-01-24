@@ -1,52 +1,50 @@
-import { createFileRoute } from '@tanstack/react-router';
-import logo from '../logo.svg';
-import { useState } from 'react';
-import { useZylance } from '@/Lib/ZylanceContext';
+import { createFileRoute } from "@tanstack/react-router"
+import logo from "../logo.svg"
+import { useState } from "react"
+import { useZylance } from "@/Lib/ZylanceContext"
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: App,
-});
+})
 
 function App () {
-  const zylanceApi = useZylance();
-  const [lastMessage, setLastMessage] = useState('');
-  const [selectedFile, setSelectedFile] = useState('');
-  const [openedVault, setOpenedVault] = useState<string | null>(null);
+  const zylanceApi = useZylance()
+  const [lastMessage, setLastMessage] = useState("")
+  const [selectedFile, setSelectedFile] = useState("")
+  const [openedVault, setOpenedVault] = useState<string | null>(null)
 
   const onBtnClick = async () => {
-    const res = await zylanceApi.EchoMessage({ message: 'Hello from Zylence!' });
-    setLastMessage(res.echoed);
-  };
+    const res = await zylanceApi.EchoMessage({ message: "Hello from Zylence!" })
+    setLastMessage(res.echoed)
+  }
 
   const onSelectFileClick = async () => {
     try {
       const fileRef = await zylanceApi.files.select({
-        title: 'Select a text file',
+        title: "Select a text file",
         filters: [
-          { name: 'Text Files', extensions: ['txt', 'md'] },
-          { name: 'All Files', extensions: ['*'] },
+          { name: "Text Files", extensions: ["txt", "md"] },
+          { name: "All Files", extensions: ["*"] },
         ],
         readOnly: true,
-      });
+      })
 
-      setSelectedFile(fileRef.filename);
+      setSelectedFile(fileRef.filename)
     } catch (error) {
-      console.error('File selection error:', error);
-      setSelectedFile('Error selecting file');
+      console.error("File selection error:", error)
+      setSelectedFile("Error selecting file")
     }
-  };
+  }
 
   const onOpenVaultClick = async () => {
     try {
-      const res = await zylanceApi.vault.open();
-      if (res.vault) {
-        setOpenedVault(res.vault.id);
-      }
+      const vaultRef = await zylanceApi.vault.open()
+      setOpenedVault(vaultRef.id)
     } catch (error) {
-      console.error('Vault open error:', error);
-      setOpenedVault('Error opening vault');
+      console.error("Vault open error:", error)
+      setOpenedVault("Error opening vault")
     }
-  };
+  }
 
   return (
     <div className="text-center">
@@ -111,5 +109,5 @@ function App () {
         </a>
       </header>
     </div>
-  );
+  )
 }

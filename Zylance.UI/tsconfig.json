@@ -4,6 +4,7 @@
     "**/*.tsx"
   ],
   "compilerOptions": {
+    "incremental": true,
     "target": "ES2022",
     "jsx": "react-jsx",
     "module": "ESNext",

@@ -1,40 +1,46 @@
-﻿import { ZylanceClient } from '@/Lib/ZylanceClient';
-import type { CreateFileReq, FileRef, SelectFileReq } from '@/Generated/Messages/Files';
-import type { VaultOpenRes } from '@/Generated/Messages/Vault';
+﻿import { type Endpoint, MessageError, ZylanceClient } from "@/Lib/ZylanceClient"
+import type { CreateFileReq, FileRef, SelectFileReq } from "@/Generated/Messages/Files"
+import type { VaultOpenRes, VaultRef } from "@/Generated/Messages/Vault"
+import type { CreateFileRes, SelectFileRes } from "@/Generated/Messages/File"
+import type { GetStatusRes } from "@/Generated/Messages/Status"
+import type { EchoReq, EchoRes } from "@/Generated/Messages/Echo"
 
 export interface ZylanceApi {
-  GetStatus: () => Promise<{ status: string }>;
-  EchoMessage: (data: { message: string }) => Promise<{ echoed: string }>;
+  GetStatus: Endpoint<"Status:GetStatus", void, GetStatusRes>;
+  EchoMessage: Endpoint<"Echo:EchoMessage", EchoReq, EchoRes>;
 
   files: {
-    select: (req?: Partial<SelectFileReq>) => Promise<FileRef>;
-    create: (req?: Partial<CreateFileReq>) => Promise<FileRef>;
+    select: Endpoint<"File:SelectFile", SelectFileReq, SelectFileRes, FileRef>;
+    create: Endpoint<"File:CreateFile", CreateFileReq, CreateFileRes, FileRef>;
   };
 
   vault: {
-    open: () => Promise<VaultOpenRes>;
+    open: Endpoint<"Vault:OpenVault", void, VaultOpenRes, VaultRef>;
   };
 }
 
 export function createZylanceApi (): ZylanceApi {
-  const client = new ZylanceClient();
+  const client = new ZylanceClient()
 
   return {
-    GetStatus: client.createEndpoint<void, { status: string }>('Status:GetStatus'),
-    EchoMessage: client.createEndpoint<{ message: string }, { echoed: string }>('Echo:EchoMessage'),
+    GetStatus: client.createEndpoint("Status:GetStatus"),
+    EchoMessage: client.createEndpoint("Echo:EchoMessage"),
 
     files: {
-      select: client.createEndpoint<Partial<SelectFileReq> | undefined, FileRef>('File:SelectFile'),
-      create: client.createEndpoint<Partial<CreateFileReq> | undefined, FileRef>('File:CreateFile'),
+      select: client.createEndpoint("File:SelectFile", async res => {
+        return res.fileRef || MessageError.throw("No fileRef in response")
+      }),
+      create: client.createEndpoint("File:CreateFile", async res => {
+        return res.fileRef || MessageError.throw("No fileRef in response")
+      }),
     },
 
     vault: {
-      open: () => {
-        const endpoint = client.createEndpoint<void, VaultOpenRes>('Vault:OpenVault');
-        const vaultRef = endpoint();
-        client.sendEvent('Vault/Opened', { vaultRef });
-        return vaultRef;
-      },
+      open: client.createEndpoint("Vault:OpenVault", async ({ vaultRef }) => {
+        if (!vaultRef) throw new MessageError("No vaultRef in response")
+        client.sendEvent("Vault/Opened", { vaultRef })
+        return vaultRef
+      }),
     },
-  };
+  }
 }

@@ -33,6 +33,8 @@ export default defineConfig({
 
   build: {
     outDir: path.join(ZYLANCE_DESKTOP_DIR, 'Resources', 'wwwroot'),
+    emptyOutDir: true,
+    sourcemap: true
   },
 
   resolve: {

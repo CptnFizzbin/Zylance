@@ -1,8 +1,8 @@
-import { useStore } from '@tanstack/react-form'
+import { useStore } from "@tanstack/react-form"
 
-import { useFieldContext, useFormContext } from '@/hooks/demo.form-context'
+import { useFieldContext, useFormContext } from "@/Hooks/demo.form-context"
 
-export function SubscribeButton({ label }: { label: string }) {
+export function SubscribeButton ({ label }: { label: string }) {
   const form = useFormContext()
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
@@ -19,7 +19,7 @@ export function SubscribeButton({ label }: { label: string }) {
   )
 }
 
-function ErrorMessages({
+function ErrorMessages ({
   errors,
 }: {
   errors: Array<string | { message: string }>
@@ -28,17 +28,17 @@ function ErrorMessages({
     <>
       {errors.map((error) => (
         <div
-          key={typeof error === 'string' ? error : error.message}
+          key={typeof error === "string" ? error : error.message}
           className="text-red-500 mt-1 font-bold"
         >
-          {typeof error === 'string' ? error : error.message}
+          {typeof error === "string" ? error : error.message}
         </div>
       ))}
     </>
   )
 }
 
-export function TextField({
+export function TextField ({
   label,
   placeholder,
 }: {
@@ -65,7 +65,7 @@ export function TextField({
   )
 }
 
-export function TextArea({
+export function TextArea ({
   label,
   rows = 3,
 }: {
@@ -92,7 +92,7 @@ export function TextArea({
   )
 }
 
-export function Select({
+export function Select ({
   label,
   values,
 }: {
