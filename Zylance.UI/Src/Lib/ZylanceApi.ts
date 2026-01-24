@@ -20,17 +20,17 @@ export function createZylanceApi (): ZylanceApi {
   const client = new ZylanceClient();
 
   return {
-    GetStatus: client.createEndpoint<void, { status: string }>('Status/GetStatus'),
-    EchoMessage: client.createEndpoint<{ message: string }, { echoed: string }>('Echo/Echo'),
+    GetStatus: client.createEndpoint<void, { status: string }>('Status:GetStatus'),
+    EchoMessage: client.createEndpoint<{ message: string }, { echoed: string }>('Echo:EchoMessage'),
 
     files: {
-      select: client.createEndpoint<Partial<SelectFileReq> | undefined, FileRef>('file:selectFile'),
-      create: client.createEndpoint<Partial<CreateFileReq> | undefined, FileRef>('file:createFile'),
+      select: client.createEndpoint<Partial<SelectFileReq> | undefined, FileRef>('File:SelectFile'),
+      create: client.createEndpoint<Partial<CreateFileReq> | undefined, FileRef>('File:CreateFile'),
     },
 
     vault: {
       open: () => {
-        const endpoint = client.createEndpoint<void, VaultOpenRes>('vault:openVault');
+        const endpoint = client.createEndpoint<void, VaultOpenRes>('Vault:OpenVault');
         const vaultRef = endpoint();
         client.sendEvent('Vault/Opened', { vaultRef });
         return vaultRef;

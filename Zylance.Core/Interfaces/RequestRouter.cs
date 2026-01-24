@@ -40,7 +40,9 @@ public class RequestRouter
         TController>(TController controller) where TController : notnull
     {
         var controllerType = typeof(TController);
+        Console.WriteLine($"[RequestRouter] UseController called for {controllerType.Name}");
         var methods = controllerType.GetMethods(Default | Instance | Public | NonPublic);
+        Console.WriteLine($"[RequestRouter] Found {methods.Length} total methods in {controllerType.Name}");
 
         foreach (var method in methods)
         {
@@ -48,6 +50,7 @@ public class RequestRouter
             if (attribute == null) continue;
 
             var parameters = method.GetParameters();
+            Console.WriteLine($"[RequestRouter] Registering handler: {attribute.Action} -> {method.Name}");
 
             // Determine handler type based on method signature
             if (IsTypedRequestResponseHandler(method, parameters))
@@ -82,15 +85,6 @@ public class RequestRouter
             && param1Type.GetGenericTypeDefinition() == typeof(ZyRequest<>)
             && param2Type.IsGenericType
             && param2Type.GetGenericTypeDefinition() == typeof(ZyResponse<>);
-    }
-
-    private bool IsActionOnlyHandler(MethodInfo method, ParameterInfo[] parameters)
-    {
-        if (parameters.Length != 1) return false;
-        if (method.ReturnType != typeof(Task)) return false;
-
-        var param1Type = parameters[0].ParameterType;
-        return param1Type.IsGenericType && param1Type.GetGenericTypeDefinition() == typeof(ZyRequest<>);
     }
 
     private bool IsGenericHandler(MethodInfo method, ParameterInfo[] parameters)

@@ -3,6 +3,7 @@ using Zylance.Core.Models;
 
 namespace Zylance.Core.Controllers;
 
+[RequestController]
 public class StatusController
 {
     [RequestHandler("Status:GetStatus")]

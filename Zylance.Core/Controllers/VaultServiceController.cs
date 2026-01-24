@@ -5,6 +5,7 @@ using Zylance.Core.Services;
 
 namespace Zylance.Core.Controllers;
 
+[RequestController]
 public class VaultController(VaultService vaultService)
 {
     [RequestHandler("Vault:OpenVault")]

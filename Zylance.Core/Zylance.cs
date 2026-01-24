@@ -10,6 +10,10 @@ namespace Zylance.Core;
 /// </summary>
 public class Zylance
 {
+    private readonly IServiceProvider _serviceProvider;
+    
+    public Gateway Gateway { get; }
+
     /// <summary>
     ///     Initializes a new instance of Zylance with platform-specific implementations.
     ///     The DI container is managed internally.
@@ -23,6 +27,8 @@ public class Zylance
         IVaultProvider vaultProvider
     )
     {
+        Console.WriteLine("[Zylance] Initializing...");
+        
         // Build the internal DI container
         var services = new ServiceCollection();
 
@@ -32,11 +38,15 @@ public class Zylance
         services.AddSingleton(vaultProvider);
 
         // Register all core Zylance services
+        Console.WriteLine("[Zylance] Calling AddZylance()...");
         services.AddZylance();
 
-        IServiceProvider serviceProvider = services.BuildServiceProvider();
+        Console.WriteLine("[Zylance] Building service provider...");
+        _serviceProvider = services.BuildServiceProvider();
 
         // Resolve and cache the gateway
-        serviceProvider.GetRequiredService<Gateway>();
+        Console.WriteLine("[Zylance] Resolving Gateway...");
+        Gateway = _serviceProvider.GetRequiredService<Gateway>();
+        Console.WriteLine("[Zylance] Initialization complete!");
     }
 }

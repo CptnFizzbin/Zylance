@@ -9,6 +9,7 @@ namespace Zylance.Core.Controllers;
 ///     Handles all file-related requests for the Gateway.
 ///     Routes file: prefixed actions to the FileService.
 /// </summary>
+[RequestController]
 public class FileController(FileService fileService)
 {
     [RequestHandler("File:SelectFile")]

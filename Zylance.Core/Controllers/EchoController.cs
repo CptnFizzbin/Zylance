@@ -4,6 +4,7 @@ using Zylance.Core.Models;
 
 namespace Zylance.Core.Controllers;
 
+[RequestController]
 public class EchoController
 {
     [RequestHandler("Echo:EchoMessage")]
