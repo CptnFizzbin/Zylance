@@ -1,5 +1,5 @@
-﻿using Zylance.Contract.Messages.File;
-using Zylance.Core.Interfaces;
+using Zylance.Contract.Messages.File;
+using Zylance.Core.Attributes;
 using Zylance.Core.Models;
 using Zylance.Core.Services;
 
@@ -9,33 +9,16 @@ namespace Zylance.Core.Controllers;
 ///     Handles all file-related requests for the Gateway.
 ///     Routes file: prefixed actions to the FileService.
 /// </summary>
-public class FileController
+public class FileController(FileService fileService)
 {
-    private const string Name = "File";
-
-    private readonly FileService _fileService;
-    private readonly RequestRouter _router;
-
-    public FileController(FileService fileService)
-    {
-        _fileService = fileService;
-        _router = new RequestRouter()
-            .Use<SelectFileReq, SelectFileRes>($"{Name}:SelectFile", SelectFile)
-            .Use<CreateFileReq, CreateFileRes>($"{Name}:CreateFile", CreateFile);
-    }
-
-    public Task<ZyResponse> HandleRequest(ZyRequest zyRequest, ZyResponse zyResponse)
-    {
-        return _router.MessageReceived(zyRequest, zyResponse);
-    }
-
+    [RequestHandler("File:SelectFile")]
     private Task<ZyResponse<SelectFileRes>> SelectFile(ZyRequest<SelectFileReq> req, ZyResponse<SelectFileRes> res)
     {
         var data = req.GetData();
 
         var filters = data.Filters?.Select(f => (f.Name, f.Extensions.ToArray())).ToArray();
 
-        var fileRef = _fileService.SelectFile(
+        var fileRef = fileService.SelectFile(
             data.Title,
             filters,
             data.ReadOnly
@@ -45,13 +28,14 @@ public class FileController
         return Task.FromResult(res);
     }
 
+    [RequestHandler("File:CreateFile")]
     private Task<ZyResponse<CreateFileRes>> CreateFile(ZyRequest<CreateFileReq> req, ZyResponse<CreateFileRes> res)
     {
         var data = req.GetData();
 
         var filters = data.Filters?.Select(f => (f.Name, f.Extensions.ToArray())).ToArray();
 
-        var fileRef = _fileService.CreateFile(
+        var fileRef = fileService.CreateFile(
             data.Title,
             data.Filename,
             filters

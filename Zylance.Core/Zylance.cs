@@ -1,31 +1,42 @@
-﻿using Zylance.Core.Controllers;
-using Zylance.Core.Handlers;
-using Zylance.Core.Providers;
-using Zylance.Core.Services;
-using Zylance.Core.Transports;
-using EchoController = Zylance.Core.Controllers.EchoController;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Zylance.Core.Extensions;
+using Zylance.Core.Interfaces;
 
 namespace Zylance.Core;
 
+/// <summary>
+///     Main application class that coordinates the Gateway and controllers.
+///     Manages dependency injection internally for a clean API surface.
+/// </summary>
 public class Zylance
 {
-    private readonly FileService _fileService;
-    private readonly Gateway? _gateway;
-    private readonly VaultService _vaultService;
-
+    /// <summary>
+    ///     Initializes a new instance of Zylance with platform-specific implementations.
+    ///     The DI container is managed internally.
+    /// </summary>
+    /// <param name="transport">The transport implementation for communication.</param>
+    /// <param name="fileProvider">The file provider implementation.</param>
+    /// <param name="vaultProvider">The vault provider implementation.</param>
     public Zylance(
         ITransport transport,
         IFileProvider fileProvider,
         IVaultProvider vaultProvider
     )
     {
-        _fileService = new FileService(fileProvider);
-        _vaultService = new VaultService(vaultProvider);
+        // Build the internal DI container
+        var services = new ServiceCollection();
 
-        _gateway = new Gateway(transport)
-            .AddRequestHandler(new FileController(_fileService).HandleRequest)
-            .AddRequestHandler(new VaultController(_vaultService).HandleRequest)
-            .AddRequestHandler(new EchoController().HandleRequest)
-            .AddRequestHandler(new StatusController().HandleRequest);
+        // Register platform-specific implementations
+        services.AddSingleton(transport);
+        services.AddSingleton(fileProvider);
+        services.AddSingleton(vaultProvider);
+
+        // Register all core Zylance services
+        services.AddZylance();
+
+        IServiceProvider serviceProvider = services.BuildServiceProvider();
+
+        // Resolve and cache the gateway
+        serviceProvider.GetRequiredService<Gateway>();
     }
 }

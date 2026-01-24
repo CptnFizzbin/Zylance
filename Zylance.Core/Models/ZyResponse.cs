@@ -8,7 +8,7 @@ public class ZyResponse
     public required ResponsePayload Payload { get; init; }
     public string Status => Payload.Status;
 
-    public ZyResponse SetSatus(string status)
+    public ZyResponse SetStatus(string status)
     {
         Payload.Status = status;
         return this;

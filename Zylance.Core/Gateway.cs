@@ -1,22 +1,22 @@
-﻿using Zylance.Contract.Envelope;
+using Zylance.Contract.Envelope;
 using Zylance.Core.Delegates;
 using Zylance.Core.Handlers;
 using Zylance.Core.Interfaces;
 using Zylance.Core.Models;
 using Zylance.Core.Serializers;
-using Zylance.Core.Transports;
 
 namespace Zylance.Core;
 
 public class Gateway
 {
     private readonly HashSet<AsyncZyEventHandler> _eventHandlers = [];
-    private readonly HashSet<AsyncZyRequestHandler> _requestHandlers = [];
+    private readonly RequestRouter _router;
     private readonly ITransport _transport;
 
-    public Gateway(ITransport transport)
+    public Gateway(ITransport transport, RequestRouter router)
     {
         _transport = transport;
+        _router = router;
         _transport.Receive(message => _ = HandleMessage(message));
     }
 
@@ -77,18 +77,6 @@ public class Gateway
         }
     }
 
-    public Gateway AddRequestHandler(AsyncZyRequestHandler handler)
-    {
-        _requestHandlers.Add(handler);
-        return this;
-    }
-
-    public Gateway AddEventHandler(AsyncZyEventHandler handler)
-    {
-        _eventHandlers.Add(handler);
-        return this;
-    }
-
     private async Task HandleMessage(RequestPayload reqPayload)
     {
         Console.WriteLine($"==> Req[{reqPayload.RequestId}]: {reqPayload.Action} - {reqPayload.DataJson}");
@@ -97,8 +85,8 @@ public class Gateway
         var request = new ZyRequest { Payload = reqPayload };
         var response = new ZyResponse { Payload = resPayload };
 
-        foreach (var handler in _requestHandlers)
-            response = await handler(request, response);
+        // Route the request through the centralized router
+        response = await _router.MessageReceived(request, response);
 
         Send(response.Payload);
     }

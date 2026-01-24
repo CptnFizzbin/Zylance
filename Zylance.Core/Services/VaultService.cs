@@ -1,6 +1,6 @@
 ﻿using Zylance.Contract.Messages.Vault;
+using Zylance.Core.Interfaces;
 using Zylance.Core.Models;
-using Zylance.Core.Providers;
 
 namespace Zylance.Core.Services;
 

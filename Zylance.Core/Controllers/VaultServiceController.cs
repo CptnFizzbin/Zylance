@@ -1,40 +1,24 @@
-﻿using Zylance.Contract.Messages.Vault;
-using Zylance.Core.Interfaces;
+using Zylance.Contract.Messages.Vault;
+using Zylance.Core.Attributes;
 using Zylance.Core.Models;
 using Zylance.Core.Services;
 
 namespace Zylance.Core.Controllers;
 
-public class VaultController
+public class VaultController(VaultService vaultService)
 {
-    private const string Name = "Vault";
-    private readonly RequestRouter _router;
-
-    private readonly VaultService _vaultService;
-
-    public VaultController(VaultService vaultService)
-    {
-        _vaultService = vaultService;
-        _router = new RequestRouter()
-            .Use<VaultOpenReq, VaultOpenRes>($"{Name}:OpenVault", OpenVault)
-            .Use<VaultCreateReq, VaultCreateRes>($"{Name}:CreateVault", CreateVault);
-    }
-
-    public Task<ZyResponse> HandleRequest(ZyRequest zyRequest, ZyResponse zyResponse)
-    {
-        return _router.MessageReceived(zyRequest, zyResponse);
-    }
-
+    [RequestHandler("Vault:OpenVault")]
     private Task<ZyResponse<VaultOpenRes>> OpenVault(ZyRequest<VaultOpenReq> req, ZyResponse<VaultOpenRes> res)
     {
-        var vaultRef = _vaultService.OpenVault();
+        var vaultRef = vaultService.OpenVault();
         res.SetData(new VaultOpenRes { VaultRef = vaultRef });
         return Task.FromResult(res);
     }
 
+    [RequestHandler("Vault:CreateVault")]
     private Task<ZyResponse<VaultCreateRes>> CreateVault(ZyRequest<VaultCreateReq> req, ZyResponse<VaultCreateRes> res)
     {
-        var vaultRef = _vaultService.CreateVault();
+        var vaultRef = vaultService.CreateVault();
         res.SetData(new VaultCreateRes { VaultRef = vaultRef });
         return Task.FromResult(res);
     }

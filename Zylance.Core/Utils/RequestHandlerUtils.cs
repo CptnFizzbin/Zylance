@@ -6,15 +6,6 @@ namespace Zylance.Core.Utils;
 public static class RequestHandlerUtils
 {
     /// <summary>
-    /// Returns a no-op handler that simply returns the response unchanged.
-    /// Useful for skipping optional middleware handlers.
-    /// </summary>
-    public static AsyncZyRequestHandler Skip()
-    {
-        return (_, res) => Task.FromResult(res);
-    }
-
-    /// <summary>
     /// Wraps a strongly-typed handler into a generic AsyncZyRequestHandler.
     /// Handles the type conversions automatically.
     /// </summary>

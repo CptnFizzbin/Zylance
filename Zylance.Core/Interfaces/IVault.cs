@@ -1,4 +1,4 @@
-﻿namespace Zylance.Core.Models;
+﻿namespace Zylance.Core.Interfaces;
 
 public interface IVault
 {

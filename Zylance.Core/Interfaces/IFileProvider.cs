@@ -1,6 +1,6 @@
 ﻿using Zylance.Contract.Messages.File;
 
-namespace Zylance.Core.Providers;
+namespace Zylance.Core.Interfaces;
 
 public interface IFileProvider
 {

@@ -1,5 +1,5 @@
 ﻿using Zylance.Contract.Messages.File;
-using Zylance.Core.Providers;
+using Zylance.Core.Interfaces;
 
 namespace Zylance.Core.Services;
 
