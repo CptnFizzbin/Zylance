@@ -1,6 +1,7 @@
-﻿using Zylance.Contract;
+﻿using Zylance.Contract.Messages.File;
+using Zylance.Lib.Providers;
 
-namespace Zylance.Gateway;
+namespace Zylance.Gateway.Services;
 
 /// <summary>
 ///     Gateway service that wraps IFileProvider and enforces read-only rules through its own registry.

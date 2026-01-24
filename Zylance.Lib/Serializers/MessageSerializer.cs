@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Zylance.Contract;
+namespace Zylance.Lib.Serializers;
 
 public static class MessageSerializer
 {

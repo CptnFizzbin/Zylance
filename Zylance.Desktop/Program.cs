@@ -14,6 +14,7 @@ public static class Program
     private static void Main()
     {
         var appUrl = GetServerUrl();
+        var zylance = new ZylanceCore();
 
         var window = new PhotinoWindow()
             .SetTitle(WindowTitle)
@@ -23,12 +24,12 @@ public static class Program
             .SetDevToolsEnabled(DevToolsEnabled())
             .Load(appUrl);
 
-        ZylanceCore.Listen(
-            new ZylanceGateway(
-                new PhotinoTransport(window),
-                new DesktopFileProvider(window)
-            )
-        );
+        var transport = new PhotinoTransport(window);
+        var fileProvider = new DesktopFileProvider(window);
+        var vaultProvider = new DesktopVaultProvider(fileProvider);
+
+        var gateway = new ZylanceGateway(transport, fileProvider, vaultProvider);
+        zylance.Listen(gateway);
 
         Console.WriteLine($"Starting {WindowTitle} application...");
         window.WaitForClose();

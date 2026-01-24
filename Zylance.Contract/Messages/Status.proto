@@ -1,0 +1,8 @@
+﻿syntax = "proto3";
+package zylance.contract;
+
+option csharp_namespace = "Zylance.Contract.Messages.Status";
+
+message GetStatusRes {
+  string status = 1;
+}

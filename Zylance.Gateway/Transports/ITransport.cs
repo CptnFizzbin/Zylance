@@ -1,4 +1,4 @@
-﻿namespace Zylance.Gateway;
+﻿namespace Zylance.Gateway.Transports;
 
 public interface ITransport
 {

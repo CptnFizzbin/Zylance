@@ -1,0 +1,25 @@
+﻿syntax = "proto3";
+package zylance.contract;
+
+option csharp_namespace = "Zylance.Contract.Messages.Vault";
+
+message VaultRef {
+  string id = 1;
+  bool unlocked = 2;
+}
+
+// === Vault Operation Messages ===
+message VaultOpenReq {
+}
+
+message VaultOpenRes {
+  VaultRef vault = 1;
+}
+
+message VaultCreateReq {
+}
+
+message VaultCreateRes {
+  VaultRef vault = 1;
+}
+

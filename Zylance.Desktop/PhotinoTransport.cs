@@ -1,5 +1,5 @@
 ﻿using Photino.NET;
-using Zylance.Gateway;
+using Zylance.Gateway.Transports;
 
 namespace Zylance.Desktop;
 

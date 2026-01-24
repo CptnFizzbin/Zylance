@@ -1,30 +1,38 @@
-﻿using Zylance.Contract;
+﻿using Zylance.Contract.Envelope;
+using Zylance.Gateway.Handlers;
+using Zylance.Gateway.Services;
+using Zylance.Gateway.Transports;
+using Zylance.Lib.Providers;
+using Zylance.Lib.Serializers;
 
 namespace Zylance.Gateway;
 
 public class ZylanceGateway
 {
-    private readonly FileService _fileService;
-    private readonly FileServiceHandler _fileServiceHandler;
-    private readonly Dictionary<string, Func<RequestPayload, ResponsePayload>> _requestHandlers = new();
+    private readonly List<IRequestHandler> _requestHandlers = [];
     private readonly ITransport _transport;
+    public readonly ActionHandler ActionHandler = new();
+    public readonly EventMessageHandler EventHandler = new();
 
-    public ZylanceGateway(ITransport transport, IFileProvider fileProvider)
+    public readonly FileService FileService;
+    public readonly VaultService VaultService;
+
+    public ZylanceGateway(
+        ITransport transport,
+        IFileProvider fileProvider,
+        IVaultProvider vaultProvider
+    )
     {
         _transport = transport;
-        _fileService = new FileService(fileProvider);
-        _fileServiceHandler = new FileServiceHandler(_fileService);
         _transport.Receive(HandleMessage);
-    }
 
-    public FileService GetFileService()
-    {
-        return _fileService;
-    }
+        FileService = new FileService(fileProvider);
+        _requestHandlers.Add(new FileServiceHandler(FileService));
 
-    public void OnRequest(string action, Func<RequestPayload, ResponsePayload> handler)
-    {
-        _requestHandlers[action] = handler;
+        VaultService = new VaultService(vaultProvider);
+        _requestHandlers.Add(new VaultServiceHandler(VaultService));
+
+        _requestHandlers.Add(ActionHandler);
     }
 
     public void Send(ResponsePayload response)
@@ -43,7 +51,12 @@ public class ZylanceGateway
 
     public void Send(ErrorPayload errorPayload)
     {
-        Console.WriteLine($"<== ERROR: {errorPayload.Type} - {errorPayload.Details}");
+        Console.WriteLine(
+            errorPayload.HasRequestId
+                ? $"<== ERR[{errorPayload.RequestId}]: {errorPayload.Type} - {errorPayload.Details}"
+                : $"<== ERR: {errorPayload.Type} - {errorPayload.Details}"
+        );
+
         var envelope = new GatewayEnvelope { Error = errorPayload };
         Send(envelope);
     }
@@ -59,9 +72,11 @@ public class ZylanceGateway
                     HandleRequest(message.Request);
                     break;
                 case GatewayEnvelope.PayloadOneofCase.Event:
-                case GatewayEnvelope.PayloadOneofCase.None:
+                    EventHandler.HandleEvent(message.Event);
+                    break;
                 case GatewayEnvelope.PayloadOneofCase.Response:
                 case GatewayEnvelope.PayloadOneofCase.Error:
+                case GatewayEnvelope.PayloadOneofCase.None:
                 default:
                     throw new NotSupportedException("Unsupported message type received.");
             }
@@ -79,21 +94,11 @@ public class ZylanceGateway
     private void HandleRequest(RequestPayload request)
     {
         Console.WriteLine($"==> Req[{request.RequestId}]: {request.Action} - {request.DataJson}");
-        var action = request.Action;
+        var handler = _requestHandlers.FirstOrDefault(h => h.IsRequestHandled(request));
+        if (handler is null)
+            throw new NotSupportedException($"No handler for request action '{request.Action}'.");
 
-        if (action.StartsWith("file:", StringComparison.OrdinalIgnoreCase))
-        {
-            var response = _fileServiceHandler.HandleFileRequest(request);
-            Send(response);
-        }
-        else if (_requestHandlers.TryGetValue(action, out var handler))
-        {
-            Send(handler.Invoke(request));
-        }
-        else
-        {
-            throw new NotSupportedException($"No handler for action '{action}' found.");
-        }
+        Send(handler.HandleRequest(request));
     }
 
     /// <summary>

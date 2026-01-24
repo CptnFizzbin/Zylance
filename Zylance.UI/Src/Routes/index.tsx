@@ -11,6 +11,7 @@ function App () {
   const zylanceApi = useZylance();
   const [lastMessage, setLastMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState('');
+  const [openedVault, setOpenedVault] = useState<string | null>(null);
 
   const onBtnClick = async () => {
     const res = await zylanceApi.EchoMessage({ message: 'Hello from Zylence!' });
@@ -32,6 +33,18 @@ function App () {
     } catch (error) {
       console.error('File selection error:', error);
       setSelectedFile('Error selecting file');
+    }
+  };
+
+  const onOpenVaultClick = async () => {
+    try {
+      const res = await zylanceApi.vault.open();
+      if (res.vault) {
+        setOpenedVault(res.vault.id);
+      }
+    } catch (error) {
+      console.error('Vault open error:', error);
+      setOpenedVault('Error opening vault');
     }
   };
 
@@ -63,6 +76,19 @@ function App () {
           {selectedFile && (
             <div className="mt-2">
               <p>Selected file: {selectedFile}</p>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={onOpenVaultClick}
+            className="mx-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded"
+          >
+            Open Vault
+          </button>
+          {openedVault && (
+            <div className="mt-2">
+              <p>Opened vault: {openedVault}</p>
             </div>
           )}
         </div>

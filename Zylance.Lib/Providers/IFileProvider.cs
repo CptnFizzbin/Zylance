@@ -1,6 +1,6 @@
-﻿using Zylance.Contract;
+﻿using Zylance.Contract.Messages.File;
 
-namespace Zylance.Gateway;
+namespace Zylance.Lib.Providers;
 
 public interface IFileProvider
 {
@@ -23,4 +23,9 @@ public interface IFileProvider
     public void DeleteFile(FileRef fileRef);
     public FileRef GetTempFile(string path);
     public FileRef GetAppDataFile(string path);
+}
+
+public interface ILocalFileProvider : IFileProvider
+{
+    public string GetFilePath(FileRef fileRef);
 }

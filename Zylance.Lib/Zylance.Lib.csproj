@@ -10,7 +10,10 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Zylance.Contract\Zylance.Contract.csproj"/>
-        <ProjectReference Include="..\Zylance.Lib\Zylance.Lib.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0"/>
     </ItemGroup>
 
 </Project>

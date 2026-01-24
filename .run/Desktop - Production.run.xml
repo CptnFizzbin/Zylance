@@ -13,7 +13,6 @@
     <option name="MIXED_MODE_DEBUG" value="0" />
     <method v="2">
       <option name="Build" />
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="UI - Build" run_configuration_type="js.build_tools.npm" />
     </method>
   </configuration>
 </component>

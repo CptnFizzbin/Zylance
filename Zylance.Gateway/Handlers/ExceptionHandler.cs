@@ -1,6 +1,6 @@
-﻿using Zylance.Contract;
+﻿using Zylance.Contract.Envelope;
 
-namespace Zylance.Gateway;
+namespace Zylance.Gateway.Handlers;
 
 /// <summary>
 ///     Provides exception wrapping into ErrorPayload for the Gateway.
@@ -13,11 +13,15 @@ public static class ExceptionHandler
     /// </summary>
     public static ErrorPayload WrapException(Exception ex, string? requestId = null)
     {
-        return new ErrorPayload
+        var payload = new ErrorPayload
         {
-            RequestId = requestId,
             Type = ex.GetType().Name,
             Details = ex.Message,
         };
+
+        if (requestId is not null)
+            payload.RequestId = requestId;
+
+        return payload;
     }
 }

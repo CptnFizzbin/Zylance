@@ -1,0 +1,12 @@
+﻿syntax = "proto3";
+package zylance.contract;
+
+option csharp_namespace = "Zylance.Contract.Messages.Echo";
+
+message EchoReq {
+  string message = 1;
+}
+
+message EchoRes {
+  string echoed = 1;
+}

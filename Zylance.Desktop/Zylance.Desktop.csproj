@@ -27,5 +27,6 @@
     <ItemGroup>
         <ProjectReference Include="..\Zylance.Core\Zylance.Core.csproj"/>
         <ProjectReference Include="..\Zylance.Gateway\Zylance.Gateway.csproj"/>
+        <ProjectReference Include="..\Zylance.Vault.Local\Zylance.Vault.Local.csproj"/>
     </ItemGroup>
 </Project>

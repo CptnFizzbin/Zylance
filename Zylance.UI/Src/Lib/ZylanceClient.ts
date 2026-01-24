@@ -1,12 +1,12 @@
 ﻿import { v7 as uuidv7 } from 'uuid';
-import { getTransport, type ITransport } from '@/Generated/ITransport';
+import { getTransport, type ITransport } from '@/Lib/ITransport';
 import {
   type ErrorPayload,
   type EventPayload,
   GatewayEnvelope,
   type RequestPayload,
   type ResponsePayload,
-} from '@/Generated/Src/Zylance';
+} from '@/Generated/Envelope/Envelope';
 
 type PendingRequest = {
   resolve: (data: any) => void,
@@ -30,8 +30,7 @@ export class ZylanceClient {
     return (data: TData) => this.makeRequest<TData, TResponse>(action, data);
   }
 
-  public on (event: 'error', handler: (data: { type: string; details: string }) => void): Unsubscribe;
-  public on<TData> (event: string, handler: (data: any) => TData): Unsubscribe {
+  public on<TData> (event: string, handler: (data: unknown) => TData): Unsubscribe {
     let handlers = this.eventHandlers.get(event);
     if (!handlers) {
       handlers = new Set();
@@ -46,17 +45,10 @@ export class ZylanceClient {
     };
   }
 
-  private emit (event: string, data: any) {
-    const handlers = this.eventHandlers.get(event);
-    if (!handlers || handlers.size === 0) return;
-
-    handlers.forEach(handler => {
-      try {
-        handler(data);
-      } catch (err) {
-        console.error(err);
-      }
-    });
+  public sendEvent<TData = void> (event: string, data?: TData) {
+    const eventPayload: EventPayload = { event };
+    if (data) { eventPayload.dataJson = JSON.stringify(data); }
+    this.sendMessage({ event: eventPayload });
   }
 
   private sendMessage (payload: { request: RequestPayload } | { event: EventPayload }) {
@@ -94,7 +86,17 @@ export class ZylanceClient {
 
   private onEventReceived ({ event, dataJson }: EventPayload) {
     const data = dataJson ? JSON.parse(dataJson) : undefined;
-    this.emit(event, data);
+
+    const handlers = this.eventHandlers.get(event);
+    if (!handlers || handlers.size === 0) return;
+
+    handlers.forEach(handler => {
+      try {
+        handler(data);
+      } catch (err) {
+        console.error(err);
+      }
+    });
   }
 
   private onErrorReceived ({ requestId, type, details }: ErrorPayload) {
@@ -105,7 +107,7 @@ export class ZylanceClient {
         pending.reject(new Error(`Error of type ${type} received. Details: ${details}`));
       }
     } else {
-      this.emit('error', { type, details });
+      this.onEventReceived({ event: 'error', dataJson: JSON.stringify({ type, details }) });
     }
   }
 

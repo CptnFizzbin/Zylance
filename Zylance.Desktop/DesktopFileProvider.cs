@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Photino.NET;
-using Zylance.Contract;
-using Zylance.Gateway;
+using Zylance.Contract.Messages.File;
+using Zylance.Lib.Providers;
 
 namespace Zylance.Desktop;
 
@@ -9,7 +9,7 @@ namespace Zylance.Desktop;
 ///     Desktop implementation of IFileProvider using Photino's cross-platform file dialogs.
 ///     Works on Windows, macOS, and Linux using native file dialogs on each platform.
 /// </summary>
-public class DesktopFileProvider(PhotinoWindow window) : IFileProvider, IDisposable
+public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDisposable
 {
     // Store file references in memory - maps FileRef IDs to actual file paths
     private readonly Dictionary<string, string> _fileReferences = new();
@@ -90,7 +90,7 @@ public class DesktopFileProvider(PhotinoWindow window) : IFileProvider, IDisposa
 
         return string.IsNullOrEmpty(filePath)
             ? throw new OperationCanceledException("File creation was cancelled by the user.")
-            : CreateFileReference(filePath, false);
+            : CreateFileReference(filePath);
     }
 
     public Stream OpenFile(FileRef fileRef)
@@ -164,7 +164,7 @@ public class DesktopFileProvider(PhotinoWindow window) : IFileProvider, IDisposa
         if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
             Directory.CreateDirectory(directory);
 
-        return CreateFileReference(tempPath, false);
+        return CreateFileReference(tempPath);
     }
 
     public FileRef GetAppDataFile(string path)
@@ -181,7 +181,21 @@ public class DesktopFileProvider(PhotinoWindow window) : IFileProvider, IDisposa
         if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
             Directory.CreateDirectory(directory);
 
-        return CreateFileReference(fullPath, false);
+        return CreateFileReference(fullPath);
+    }
+
+    /// <summary>
+    ///     Retrieves the actual file path from a FileRef.
+    /// </summary>
+    public string GetFilePath(FileRef fileRef)
+    {
+        lock (_lock)
+        {
+            if (_fileReferences.TryGetValue(fileRef.Id, out var filePath))
+                return filePath;
+        }
+
+        throw new ArgumentException($"Invalid FileRef ID: {fileRef.Id}", nameof(fileRef));
     }
 
     /// <summary>
@@ -202,19 +216,5 @@ public class DesktopFileProvider(PhotinoWindow window) : IFileProvider, IDisposa
         }
 
         return fileRef;
-    }
-
-    /// <summary>
-    ///     Retrieves the actual file path from a FileRef.
-    /// </summary>
-    private string GetFilePath(FileRef fileRef)
-    {
-        lock (_lock)
-        {
-            if (_fileReferences.TryGetValue(fileRef.Id, out var filePath))
-                return filePath;
-        }
-
-        throw new ArgumentException($"Invalid FileRef ID: {fileRef.Id}", nameof(fileRef));
     }
 }

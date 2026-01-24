@@ -1,4 +1,4 @@
-﻿using Zylance.Contract;
+﻿using Zylance.Contract.Messages.Echo;
 
 namespace Zylance.Core.Controllers;
 

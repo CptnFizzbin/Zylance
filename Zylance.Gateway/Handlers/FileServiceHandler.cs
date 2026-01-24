@@ -1,19 +1,29 @@
-﻿using Zylance.Contract;
+﻿using Zylance.Contract.Envelope;
+using Zylance.Contract.Messages.File;
+using Zylance.Gateway.Services;
+using Zylance.Lib.Serializers;
 
-namespace Zylance.Gateway;
+namespace Zylance.Gateway.Handlers;
 
 /// <summary>
 ///     Handles all file-related requests for the Gateway.
 ///     Routes file: prefixed actions to the FileService.
 /// </summary>
-public class FileServiceHandler(FileService fileService)
+public class FileServiceHandler(FileService fileService) : IRequestHandler
 {
+    private const string Prefix = "file:";
+
+    public bool IsRequestHandled(RequestPayload request)
+    {
+        return request.Action.StartsWith(Prefix);
+    }
+
     /// <summary>
     ///     Handles a file request by routing to the appropriate file operation.
     /// </summary>
-    public ResponsePayload HandleFileRequest(RequestPayload request)
+    public ResponsePayload HandleRequest(RequestPayload request)
     {
-        var action = request.Action["file:".Length..]; // Remove "file:" prefix
+        var action = request.Action[Prefix.Length..]; // Remove "file:" prefix
 
         return action switch
         {

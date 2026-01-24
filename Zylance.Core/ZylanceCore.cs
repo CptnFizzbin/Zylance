@@ -1,22 +1,46 @@
-﻿using Zylance.Contract;
+﻿using Zylance.Contract.Envelope;
+using Zylance.Contract.Events.Vault;
+using Zylance.Contract.Messages.Echo;
 using Zylance.Core.Controllers;
 using Zylance.Gateway;
+using Zylance.Lib.Models;
+using Zylance.Lib.Serializers;
 
 namespace Zylance.Core;
 
 public class ZylanceCore
 {
-    private ZylanceCore(ZylanceGateway gateway)
+    private ZylanceGateway? _gateway;
+    private IVault? _vault;
+
+    public void Listen(ZylanceGateway gateway)
     {
-        gateway.OnRequest(
+        _gateway = gateway;
+
+        gateway.ActionHandler.OnRequest(
             "Status/GetStatus",
             req => Respond(req.RequestId, StatusController.GetStatus())
         );
 
-        gateway.OnRequest(
+        gateway.ActionHandler.OnRequest(
             "Echo/Echo",
             req => Respond(req.RequestId, EchoController.Echo(GetRequestData<EchoReq>(req)))
         );
+
+        gateway.EventHandler.OnEvent(
+            "Vault/Opened",
+            payload =>
+            {
+                var vaultRef = GetEventData<VaultOpenedEvt>(payload).Vault;
+                _vault = _gateway.VaultService.GetVault(vaultRef);
+            }
+        );
+    }
+
+    private static TData GetEventData<TData>(EventPayload request)
+    {
+        return MessageSerializer.Deserialize<TData>(request.DataJson)
+            ?? throw new ArgumentException($"Event payload is invalid: {request.DataJson}");
     }
 
     private static TData GetRequestData<TData>(RequestPayload request)
@@ -42,10 +66,5 @@ public class ZylanceCore
             Status = response.Status,
             DataJson = MessageSerializer.Serialize(response.Data),
         };
-    }
-
-    public static void Listen(ZylanceGateway gateway)
-    {
-        _ = new ZylanceCore(gateway);
     }
 }
