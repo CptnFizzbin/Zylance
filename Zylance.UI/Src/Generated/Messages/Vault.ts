@@ -18,14 +18,14 @@ export interface VaultOpenReq {
 }
 
 export interface VaultOpenRes {
-  vault: VaultRef | undefined;
+  vaultRef: VaultRef | undefined;
 }
 
 export interface VaultCreateReq {
 }
 
 export interface VaultCreateRes {
-  vault: VaultRef | undefined;
+  vaultRef: VaultRef | undefined;
 }
 
 function createBaseVaultRef(): VaultRef {
@@ -86,18 +86,24 @@ export const VaultOpenReq: MessageFns<VaultOpenReq> = {
 };
 
 function createBaseVaultOpenRes(): VaultOpenRes {
-  return { vault: undefined };
+  return { vaultRef: undefined };
 }
 
 export const VaultOpenRes: MessageFns<VaultOpenRes> = {
   fromJSON(object: any): VaultOpenRes {
-    return { vault: isSet(object.vault) ? VaultRef.fromJSON(object.vault) : undefined };
+    return {
+      vaultRef: isSet(object.vaultRef)
+        ? VaultRef.fromJSON(object.vaultRef)
+        : isSet(object.vault_ref)
+        ? VaultRef.fromJSON(object.vault_ref)
+        : undefined,
+    };
   },
 
   toJSON(message: VaultOpenRes): unknown {
     const obj: any = {};
-    if (message.vault !== undefined) {
-      obj.vault = VaultRef.toJSON(message.vault);
+    if (message.vaultRef !== undefined) {
+      obj.vaultRef = VaultRef.toJSON(message.vaultRef);
     }
     return obj;
   },
@@ -107,8 +113,8 @@ export const VaultOpenRes: MessageFns<VaultOpenRes> = {
   },
   fromPartial<I extends Exact<DeepPartial<VaultOpenRes>, I>>(object: I): VaultOpenRes {
     const message = createBaseVaultOpenRes();
-    message.vault = (object.vault !== undefined && object.vault !== null)
-      ? VaultRef.fromPartial(object.vault)
+    message.vaultRef = (object.vaultRef !== undefined && object.vaultRef !== null)
+      ? VaultRef.fromPartial(object.vaultRef)
       : undefined;
     return message;
   },
@@ -138,18 +144,24 @@ export const VaultCreateReq: MessageFns<VaultCreateReq> = {
 };
 
 function createBaseVaultCreateRes(): VaultCreateRes {
-  return { vault: undefined };
+  return { vaultRef: undefined };
 }
 
 export const VaultCreateRes: MessageFns<VaultCreateRes> = {
   fromJSON(object: any): VaultCreateRes {
-    return { vault: isSet(object.vault) ? VaultRef.fromJSON(object.vault) : undefined };
+    return {
+      vaultRef: isSet(object.vaultRef)
+        ? VaultRef.fromJSON(object.vaultRef)
+        : isSet(object.vault_ref)
+        ? VaultRef.fromJSON(object.vault_ref)
+        : undefined,
+    };
   },
 
   toJSON(message: VaultCreateRes): unknown {
     const obj: any = {};
-    if (message.vault !== undefined) {
-      obj.vault = VaultRef.toJSON(message.vault);
+    if (message.vaultRef !== undefined) {
+      obj.vaultRef = VaultRef.toJSON(message.vaultRef);
     }
     return obj;
   },
@@ -159,8 +171,8 @@ export const VaultCreateRes: MessageFns<VaultCreateRes> = {
   },
   fromPartial<I extends Exact<DeepPartial<VaultCreateRes>, I>>(object: I): VaultCreateRes {
     const message = createBaseVaultCreateRes();
-    message.vault = (object.vault !== undefined && object.vault !== null)
-      ? VaultRef.fromPartial(object.vault)
+    message.vaultRef = (object.vaultRef !== undefined && object.vaultRef !== null)
+      ? VaultRef.fromPartial(object.vaultRef)
       : undefined;
     return message;
   },

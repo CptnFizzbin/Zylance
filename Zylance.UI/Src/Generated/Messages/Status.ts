@@ -8,9 +8,35 @@
 
 export const protobufPackage = "zylance.contract";
 
+export interface GetStatusReq {
+}
+
 export interface GetStatusRes {
   status: string;
 }
+
+function createBaseGetStatusReq(): GetStatusReq {
+  return {};
+}
+
+export const GetStatusReq: MessageFns<GetStatusReq> = {
+  fromJSON(_: any): GetStatusReq {
+    return {};
+  },
+
+  toJSON(_: GetStatusReq): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetStatusReq>, I>>(base?: I): GetStatusReq {
+    return GetStatusReq.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetStatusReq>, I>>(_: I): GetStatusReq {
+    const message = createBaseGetStatusReq();
+    return message;
+  },
+};
 
 function createBaseGetStatusRes(): GetStatusRes {
   return { status: "" };

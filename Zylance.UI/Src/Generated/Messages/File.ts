@@ -27,10 +27,18 @@ export interface SelectFileReq {
   readOnly: boolean;
 }
 
+export interface SelectFileRes {
+  fileRef: FileRef | undefined;
+}
+
 export interface CreateFileReq {
   title?: string | undefined;
   filename?: string | undefined;
   filters: FileFilter[];
+}
+
+export interface CreateFileRes {
+  fileRef: FileRef | undefined;
 }
 
 export interface SaveFileReq {
@@ -172,6 +180,41 @@ export const SelectFileReq: MessageFns<SelectFileReq> = {
   },
 };
 
+function createBaseSelectFileRes(): SelectFileRes {
+  return { fileRef: undefined };
+}
+
+export const SelectFileRes: MessageFns<SelectFileRes> = {
+  fromJSON(object: any): SelectFileRes {
+    return {
+      fileRef: isSet(object.fileRef)
+        ? FileRef.fromJSON(object.fileRef)
+        : isSet(object.file_ref)
+        ? FileRef.fromJSON(object.file_ref)
+        : undefined,
+    };
+  },
+
+  toJSON(message: SelectFileRes): unknown {
+    const obj: any = {};
+    if (message.fileRef !== undefined) {
+      obj.fileRef = FileRef.toJSON(message.fileRef);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SelectFileRes>, I>>(base?: I): SelectFileRes {
+    return SelectFileRes.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<SelectFileRes>, I>>(object: I): SelectFileRes {
+    const message = createBaseSelectFileRes();
+    message.fileRef = (object.fileRef !== undefined && object.fileRef !== null)
+      ? FileRef.fromPartial(object.fileRef)
+      : undefined;
+    return message;
+  },
+};
+
 function createBaseCreateFileReq(): CreateFileReq {
   return { title: undefined, filename: undefined, filters: [] };
 }
@@ -207,6 +250,41 @@ export const CreateFileReq: MessageFns<CreateFileReq> = {
     message.title = object.title ?? undefined;
     message.filename = object.filename ?? undefined;
     message.filters = object.filters?.map((e) => FileFilter.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseCreateFileRes(): CreateFileRes {
+  return { fileRef: undefined };
+}
+
+export const CreateFileRes: MessageFns<CreateFileRes> = {
+  fromJSON(object: any): CreateFileRes {
+    return {
+      fileRef: isSet(object.fileRef)
+        ? FileRef.fromJSON(object.fileRef)
+        : isSet(object.file_ref)
+        ? FileRef.fromJSON(object.file_ref)
+        : undefined,
+    };
+  },
+
+  toJSON(message: CreateFileRes): unknown {
+    const obj: any = {};
+    if (message.fileRef !== undefined) {
+      obj.fileRef = FileRef.toJSON(message.fileRef);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreateFileRes>, I>>(base?: I): CreateFileRes {
+    return CreateFileRes.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreateFileRes>, I>>(object: I): CreateFileRes {
+    const message = createBaseCreateFileRes();
+    message.fileRef = (object.fileRef !== undefined && object.fileRef !== null)
+      ? FileRef.fromPartial(object.fileRef)
+      : undefined;
     return message;
   },
 };

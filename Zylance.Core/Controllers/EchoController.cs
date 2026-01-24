@@ -1,17 +1,29 @@
 ﻿using Zylance.Contract.Messages.Echo;
+using Zylance.Core.Interfaces;
+using Zylance.Core.Models;
 
 namespace Zylance.Core.Controllers;
 
-public static class EchoController
+public class EchoController
 {
-    public static ResponseWithData<EchoRes> Echo(EchoReq message)
+    private const string Name = "Echo";
+    private readonly RequestRouter _router;
+
+    public EchoController()
     {
-        return new ResponseWithData<EchoRes>
-        {
-            Data = new EchoRes
-            {
-                Echoed = message.Message,
-            },
-        };
+        _router = new RequestRouter()
+            .Use<EchoReq, EchoRes>($"{Name}:EchoMessage", EchoMessage);
+    }
+
+    public Task<ZyResponse> HandleRequest(ZyRequest zyRequest, ZyResponse zyResponse)
+    {
+        return _router.MessageReceived(zyRequest, zyResponse);
+    }
+
+    private Task<ZyResponse<EchoRes>> EchoMessage(ZyRequest<EchoReq> req, ZyResponse<EchoRes> res)
+    {
+        var message = req.GetData().Message;
+        res.SetData(new EchoRes { Echoed = message });
+        return Task.FromResult(res);
     }
 }

@@ -1,5 +1,5 @@
-﻿using Zylance.Lib.Models;
-using Zylance.Lib.Providers;
+﻿using Zylance.Core.Models;
+using Zylance.Core.Providers;
 using Zylance.Vault.Local;
 
 namespace Zylance.Desktop;

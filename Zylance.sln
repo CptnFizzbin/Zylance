@@ -8,11 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.UI", "Zylance.UI\Zy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Contract", "Zylance.Contract\Zylance.Contract.csproj", "{FA266739-4CFF-4AD7-997A-50D257B68832}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Gateway", "Zylance.Gateway\Zylance.Gateway.csproj", "{826483A7-0AEC-4942-B8BE-65288DE661A2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Local", "Zylance.Vault.Local\Zylance.Vault.Local.csproj", "{8C7FD4B8-FB87-4674-BC5E-4FA3AB8F5357}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Lib", "Zylance.Lib\Zylance.Lib.csproj", "{7E8598B1-E6F4-4FED-B194-1BCA4A8EB5FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,17 +32,9 @@ Global
 		{FA266739-4CFF-4AD7-997A-50D257B68832}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA266739-4CFF-4AD7-997A-50D257B68832}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA266739-4CFF-4AD7-997A-50D257B68832}.Release|Any CPU.Build.0 = Release|Any CPU
-		{826483A7-0AEC-4942-B8BE-65288DE661A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{826483A7-0AEC-4942-B8BE-65288DE661A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{826483A7-0AEC-4942-B8BE-65288DE661A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{826483A7-0AEC-4942-B8BE-65288DE661A2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8C7FD4B8-FB87-4674-BC5E-4FA3AB8F5357}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8C7FD4B8-FB87-4674-BC5E-4FA3AB8F5357}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C7FD4B8-FB87-4674-BC5E-4FA3AB8F5357}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C7FD4B8-FB87-4674-BC5E-4FA3AB8F5357}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7E8598B1-E6F4-4FED-B194-1BCA4A8EB5FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7E8598B1-E6F4-4FED-B194-1BCA4A8EB5FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7E8598B1-E6F4-4FED-B194-1BCA4A8EB5FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7E8598B1-E6F4-4FED-B194-1BCA4A8EB5FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

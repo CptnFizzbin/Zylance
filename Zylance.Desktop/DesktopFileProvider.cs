@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Photino.NET;
 using Zylance.Contract.Messages.File;
-using Zylance.Lib.Providers;
+using Zylance.Core.Providers;
 
 namespace Zylance.Desktop;
 

@@ -22,10 +22,18 @@ message SelectFileReq {
   bool read_only = 3;
 }
 
+message SelectFileRes {
+  FileRef file_ref = 1;
+}
+
 message CreateFileReq {
   optional string title = 1;
   optional string filename = 2;
   repeated FileFilter filters = 3;
+}
+
+message CreateFileRes {
+  FileRef file_ref = 1;
 }
 
 message SaveFileReq {

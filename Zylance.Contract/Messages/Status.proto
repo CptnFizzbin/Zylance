@@ -3,6 +3,10 @@ package zylance.contract;
 
 option csharp_namespace = "Zylance.Contract.Messages.Status";
 
+message GetStatusReq {
+
+}
+
 message GetStatusRes {
   string status = 1;
 }

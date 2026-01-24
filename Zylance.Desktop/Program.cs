@@ -1,7 +1,5 @@
-﻿using Photino.NET;
+using Photino.NET;
 using Photino.NET.Server;
-using Zylance.Core;
-using Zylance.Gateway;
 
 namespace Zylance.Desktop;
 
@@ -14,7 +12,6 @@ public static class Program
     private static void Main()
     {
         var appUrl = GetServerUrl();
-        var zylance = new ZylanceCore();
 
         var window = new PhotinoWindow()
             .SetTitle(WindowTitle)
@@ -28,8 +25,7 @@ public static class Program
         var fileProvider = new DesktopFileProvider(window);
         var vaultProvider = new DesktopVaultProvider(fileProvider);
 
-        var gateway = new ZylanceGateway(transport, fileProvider, vaultProvider);
-        zylance.Listen(gateway);
+        _ = new Core.Zylance(transport, fileProvider, vaultProvider);
 
         Console.WriteLine($"Starting {WindowTitle} application...");
         window.WaitForClose();

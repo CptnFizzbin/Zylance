@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Zylance.Lib.Converters;
-using Zylance.Lib.Entities;
+using Zylance.Core.Entities;
+using static Zylance.Core.Converters.MonetaryValueConverters;
 
 namespace Zylance.Vault.Local.Context;
 
@@ -19,10 +19,10 @@ public class LocalVaultDbContext(DbContextOptions<LocalVaultDbContext> options) 
         modelBuilder.Entity<TransactionEntity>(entity =>
         {
             entity.Property(e => e.Debit)
-                .HasConversion(MonetaryValueConverters.NullableMonetaryValueConverter);
+                .HasConversion(NullableMonetaryValueConverter);
 
             entity.Property(e => e.Credit)
-                .HasConversion(MonetaryValueConverters.NullableMonetaryValueConverter);
+                .HasConversion(NullableMonetaryValueConverter);
         });
     }
 }

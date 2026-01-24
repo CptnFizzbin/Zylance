@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Zylance.Lib\Zylance.Lib.csproj"/>
+        <ProjectReference Include="..\Zylance.Core\Zylance.Core.csproj"/>
     </ItemGroup>
 
 </Project>

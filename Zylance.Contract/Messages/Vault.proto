@@ -13,13 +13,13 @@ message VaultOpenReq {
 }
 
 message VaultOpenRes {
-  VaultRef vault = 1;
+  VaultRef vault_ref = 1;
 }
 
 message VaultCreateReq {
 }
 
 message VaultCreateRes {
-  VaultRef vault = 1;
+  VaultRef vault_ref = 1;
 }
 
