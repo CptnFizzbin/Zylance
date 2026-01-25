@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Zylance.Core.Attributes;
+using Zylance.Core.Controllers.Attributes;
 using Zylance.Core.Controllers.Services;
 using Zylance.Core.Interfaces;
 using Zylance.Core.Services;
