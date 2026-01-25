@@ -2,11 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Zylance.Core.Attributes;
 using Zylance.Core.Delegates;
-using Zylance.Core.Models;
 using Zylance.Core.Utils;
 using static System.Reflection.BindingFlags;
 
-namespace Zylance.Core.Interfaces;
+namespace Zylance.Core.Models;
 
 public class RequestRouter
 {

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Zylance.Core.Attributes;
 using Zylance.Core.Interfaces;
+using Zylance.Core.Models;
 using Zylance.Core.Services;
 
 namespace Zylance.Core.Extensions;
