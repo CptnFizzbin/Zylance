@@ -13,7 +13,7 @@ namespace Zylance.Core.Controllers;
 public class FileController(FileService fileService)
 {
     [RequestHandler]
-    private Task<ZyResponse<SelectFileRes>> SelectFile(ZyRequest<SelectFileReq> req, ZyResponse<SelectFileRes> res)
+    private Task SelectFile(ZyRequest<SelectFileReq> req, ZyResponse<SelectFileRes> res)
     {
         var data = req.GetData();
 
@@ -26,11 +26,11 @@ public class FileController(FileService fileService)
         );
 
         res.SetData(new SelectFileRes { FileRef = fileRef });
-        return Task.FromResult(res);
+        return Task.CompletedTask;
     }
 
     [RequestHandler]
-    private Task<ZyResponse<CreateFileRes>> CreateFile(ZyRequest<CreateFileReq> req, ZyResponse<CreateFileRes> res)
+    private Task CreateFile(ZyRequest<CreateFileReq> req, ZyResponse<CreateFileRes> res)
     {
         var data = req.GetData();
 
@@ -43,6 +43,6 @@ public class FileController(FileService fileService)
         );
 
         res.SetData(new CreateFileRes { FileRef = fileRef });
-        return Task.FromResult(res);
+        return Task.CompletedTask;
     }
 }

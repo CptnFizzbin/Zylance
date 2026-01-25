@@ -46,7 +46,7 @@ public class RequestRouter
             else
                 throw new InvalidOperationException(
                     $"Method {method.Name} has [RequestHandler] attribute but doesn't match any supported signature. "
-                    + $"Expected: Task<ZyResponse<TRes>>(ZyRequest<TReq>, ZyResponse<TRes>), Task(ZyRequest<TReq>), or Task<ZyResponse>(ZyRequest, ZyResponse)");
+                    + $"Expected: Task(ZyRequest<TReq>, ZyResponse<TRes>) or void(ZyRequest<TReq>, ZyResponse<TRes>)");
         }
 
         return this;
@@ -55,22 +55,18 @@ public class RequestRouter
     private bool IsTypedRequestResponseHandler(MethodInfo method, ParameterInfo[] parameters)
     {
         if (parameters.Length != 2) return false;
-        if (!method.ReturnType.IsGenericType) return false;
-
-        var returnType = method.ReturnType.GetGenericTypeDefinition();
-        if (returnType != typeof(Task<>)) return false;
-
-        var taskResultType = method.ReturnType.GetGenericArguments()[0];
-        if (!taskResultType.IsGenericType) return false;
-        if (taskResultType.GetGenericTypeDefinition() != typeof(ZyResponse<>)) return false;
 
         var param1Type = parameters[0].ParameterType;
         var param2Type = parameters[1].ParameterType;
 
-        return param1Type.IsGenericType
+        var hasCorrectParams = param1Type.IsGenericType
             && param1Type.GetGenericTypeDefinition() == typeof(ZyRequest<>)
             && param2Type.IsGenericType
             && param2Type.GetGenericTypeDefinition() == typeof(ZyResponse<>);
+
+        if (!hasCorrectParams) return false;
+
+        return method.ReturnType == typeof(void) || method.ReturnType == typeof(Task);
     }
 
     private void RegisterTypedHandler(object controller, MethodInfo method, string? action)
@@ -82,12 +78,28 @@ public class RequestRouter
         if (string.IsNullOrEmpty(action))
             action = ResolveActionFromTypes(requestType, responseType, method);
 
-        var delegateType = typeof(AsyncZyRequestHandler<,>).MakeGenericType(requestType, responseType);
-        var handlerDelegate = Delegate.CreateDelegate(delegateType, controller, method);
+        AsyncZyRequestHandler wrappedHandler;
 
-        var wrapMethod = typeof(RequestHandlerUtils).GetMethod(nameof(RequestHandlerUtils.Wrap))!
-            .MakeGenericMethod(requestType, responseType);
-        var wrappedHandler = (AsyncZyRequestHandler)wrapMethod.Invoke(null, [handlerDelegate])!;
+        if (method.ReturnType == typeof(Task))
+        {
+            // Async handler (returns Task)
+            var delegateType = typeof(AsyncZyRequestHandler<,>).MakeGenericType(requestType, responseType);
+            var handlerDelegate = Delegate.CreateDelegate(delegateType, controller, method);
+
+            var wrapMethod = typeof(RequestHandlerUtils).GetMethod(nameof(RequestHandlerUtils.Wrap))!
+                .MakeGenericMethod(requestType, responseType);
+            wrappedHandler = (AsyncZyRequestHandler)wrapMethod.Invoke(null, [handlerDelegate])!;
+        }
+        else
+        {
+            // Sync handler (returns void)
+            var delegateType = typeof(SyncZyRequestHandler<,>).MakeGenericType(requestType, responseType);
+            var handlerDelegate = Delegate.CreateDelegate(delegateType, controller, method);
+
+            var wrapMethod = typeof(RequestHandlerUtils).GetMethod(nameof(RequestHandlerUtils.WrapSync))!
+                .MakeGenericMethod(requestType, responseType);
+            wrappedHandler = (AsyncZyRequestHandler)wrapMethod.Invoke(null, [handlerDelegate])!;
+        }
 
         Use(action, wrappedHandler);
     }

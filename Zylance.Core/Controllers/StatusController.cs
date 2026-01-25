@@ -8,10 +8,13 @@ namespace Zylance.Core.Controllers;
 public class StatusController
 {
     [RequestHandler]
-    private Task<ZyResponse<GetStatusRes>> GetStatus(ZyRequest<GetStatusReq> req, ZyResponse<GetStatusRes> res)
+    public void GetStatus(ZyRequest<GetStatusReq> req, ZyResponse<GetStatusRes> res)
     {
-        // Since there's no typed response in the protobuf, we'll just set status
-        res.SetStatus("OK");
-        return Task.FromResult(res);
+        res.SetData(
+            new GetStatusRes
+            {
+                Status = "All systems operational",
+            }
+        );
     }
 }
