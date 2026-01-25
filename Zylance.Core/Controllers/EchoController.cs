@@ -1,4 +1,4 @@
-using Zylance.Contract.Messages.Echo;
+using Zylance.Contract.Api.Echo;
 using Zylance.Core.Attributes;
 using Zylance.Core.Models;
 

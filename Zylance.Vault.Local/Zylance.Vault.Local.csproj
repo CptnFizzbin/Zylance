@@ -18,5 +18,4 @@
     <ItemGroup>
         <ProjectReference Include="..\Zylance.Core\Zylance.Core.csproj"/>
     </ItemGroup>
-
 </Project>

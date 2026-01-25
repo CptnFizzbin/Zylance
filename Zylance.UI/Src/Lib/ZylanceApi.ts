@@ -1,9 +1,14 @@
 ﻿import { type Endpoint, MessageError, ZylanceClient } from "@/Lib/ZylanceClient"
-import type { CreateFileReq, FileRef, SelectFileReq } from "@/Generated/Messages/Files"
-import type { VaultOpenRes, VaultRef } from "@/Generated/Messages/Vault"
-import type { CreateFileRes, SelectFileRes } from "@/Generated/Messages/File"
-import type { GetStatusRes } from "@/Generated/Messages/Status"
-import type { EchoReq, EchoRes } from "@/Generated/Messages/Echo"
+import type { GetStatusRes } from "@/Generated/zylance/api/Status.ts"
+import type { EchoReq, EchoRes } from "@/Generated/zylance/api/Echo.ts"
+import type {
+  CreateFileReq,
+  CreateFileRes,
+  FileRef,
+  SelectFileReq,
+  SelectFileRes,
+} from "@/Generated/zylance/api/File.ts"
+import type { VaultOpenRes, VaultRef } from "@/Generated/zylance/api/Vault.ts"
 
 export interface ZylanceApi {
   GetStatus: Endpoint<"Status:GetStatus", void, GetStatusRes>;

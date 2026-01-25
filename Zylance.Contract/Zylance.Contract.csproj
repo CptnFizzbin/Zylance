@@ -7,11 +7,6 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(AppData)\fnm\node-versions\v24.5.0\installation\yarn.cmd</YarnExe>
-        <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows'))">$(HOME)/.local/share/fnm/node-versions/v24.5.0/installation/bin/yarn</YarnExe>
-    </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include="Google.Protobuf" Version="3.34.0-rc1"/>
         <PackageReference Include="Grpc.Tools" Version="2.76.0">
@@ -20,13 +15,18 @@
         </PackageReference>
     </ItemGroup>
 
+    <PropertyGroup>
+        <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(AppData)\fnm\node-versions\v24.5.0\installation\yarn.cmd</YarnExe>
+        <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows'))">$(HOME)/.local/share/fnm/node-versions/v24.5.0/installation/bin/yarn</YarnExe>
+    </PropertyGroup>
+
     <ItemGroup>
-        <Protobuf Include="**/*.proto" GrpcServices="None" />
+        <Protobuf Include="./zylance/**/*.proto" GrpcServices="None"/>
     </ItemGroup>
 
     <Target Name="GenerateTS"
             AfterTargets="Build"
-            Inputs="@(Protobuf)"
+            Inputs="@(Protobuf); Scripts/build.ps1"
             Outputs="$(IntermediateOutputPath)GenerateTS.marker">
         <Exec Command="$(YarnExe) build"/>
         <Touch Files="$(IntermediateOutputPath)GenerateTS.marker" AlwaysCreate="true"/>

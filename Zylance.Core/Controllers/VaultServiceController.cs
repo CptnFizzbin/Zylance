@@ -1,4 +1,4 @@
-using Zylance.Contract.Messages.Vault;
+using Zylance.Contract.Api.Vault;
 using Zylance.Core.Attributes;
 using Zylance.Core.Models;
 using Zylance.Core.Services;

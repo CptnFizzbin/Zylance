@@ -1,4 +1,4 @@
-﻿using Zylance.Contract.Envelope;
+﻿using Zylance.Contract.Lib.Envelope;
 
 namespace Zylance.Core.Handlers;
 

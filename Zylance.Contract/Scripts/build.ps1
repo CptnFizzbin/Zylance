@@ -6,6 +6,7 @@ Write-Host "Root Directory: $rootDir"
 
 $contractDir = Join-Path $rootDir "Zylance.Contract"
 $uiDir = Join-Path $rootDir "Zylance.UI"
+$outDir = Join-Path $uiDir "Src/Generated"
 
 Set-Location $contractDir
 
@@ -20,6 +21,9 @@ if ($protoFiles.Count -eq 0)
 
 Write-Host "Found $( $protoFiles.Count ) proto file(s):"
 $protoFiles | ForEach-Object { Write-Host "  - $_" }
+
+Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $outDir
+New-Item -ItemType Directory -Path $outDir
 
 # Run protoc for each proto file
 foreach ($protoFile in $protoFiles)
@@ -40,7 +44,7 @@ foreach ($protoFile in $protoFiles)
         --ts_proto_opt=outputJsonMethods=true `
         --ts_proto_opt=outputClientImpl=false `
         --ts_proto_opt=nestJs=false `
-        --ts_proto_out=$uiDir/Src/Generated `
+        --ts_proto_out=$outDir `
         $protoFile
 
     if ($LASTEXITCODE -ne 0)

@@ -1,4 +1,4 @@
-﻿using Zylance.Contract.Envelope;
+﻿using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Serializers;
 
 namespace Zylance.Core.Models;

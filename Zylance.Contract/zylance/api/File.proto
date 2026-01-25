@@ -1,9 +1,9 @@
 ﻿syntax = "proto3";
 package zylance.contract;
 
-import "Extensions/ActionExtensions.proto";
+import "zylance/extensions/action_option.proto";
 
-option csharp_namespace = "Zylance.Contract.Messages.File";
+option csharp_namespace = "Zylance.Contract.Api.File";
 
 // === Models ===
 message FileRef {

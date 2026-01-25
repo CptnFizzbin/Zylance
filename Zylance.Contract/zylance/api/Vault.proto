@@ -1,10 +1,11 @@
 ﻿syntax = "proto3";
 package zylance.contract;
 
-import "Extensions/ActionExtensions.proto";
+import "zylance/extensions/action_option.proto";
 
-option csharp_namespace = "Zylance.Contract.Messages.Vault";
+option csharp_namespace = "Zylance.Contract.Api.Vault";
 
+// === Models ===
 message VaultRef {
   string id = 1;
   bool unlocked = 2;
@@ -29,3 +30,7 @@ message VaultCreateRes {
   VaultRef vault_ref = 1;
 }
 
+// === Vault Events ===
+message VaultOpenedEvt {
+  VaultRef vault = 1;
+}

@@ -6,7 +6,7 @@ import {
   GatewayEnvelope,
   type RequestPayload,
   type ResponsePayload,
-} from "@/Generated/Envelope/Envelope"
+} from "@/Generated/zylance/lib/Envelope.ts"
 
 type PendingRequest = {
   resolve: (data: any) => void,

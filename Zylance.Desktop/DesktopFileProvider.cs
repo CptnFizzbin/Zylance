@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using Photino.NET;
-using Zylance.Contract.Messages.File;
+using Zylance.Contract.Api.File;
 using Zylance.Core.Interfaces;
 
 namespace Zylance.Desktop;

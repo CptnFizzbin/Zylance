@@ -18,15 +18,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Resources\**"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Remove="Resources\src\Global.d.ts.cs"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\Zylance.Core\Zylance.Core.csproj"/>
         <ProjectReference Include="..\Zylance.Vault.Local\Zylance.Vault.Local.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Resources\**"/>
     </ItemGroup>
 </Project>

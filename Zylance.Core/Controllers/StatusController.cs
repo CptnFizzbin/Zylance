@@ -1,4 +1,4 @@
-using Zylance.Contract.Messages.Status;
+using Zylance.Contract.Api.Status;
 using Zylance.Core.Attributes;
 using Zylance.Core.Models;
 

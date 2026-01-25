@@ -24,13 +24,13 @@ public static class ProtoActionUtils
     /// <summary>
     ///     Gets the action name from a protobuf message descriptor.
     /// </summary>
-    public static string? GetActionFromDescriptor(MessageDescriptor descriptor)
+    private static string? GetActionFromDescriptor(MessageDescriptor descriptor)
     {
         var customOptions = descriptor.GetOptions();
         if (customOptions == null) return null;
 
         // Use the generated extension to get the action value
-        var actionValue = customOptions.GetExtension(ActionExtensionsExtensions.Action);
+        var actionValue = customOptions.GetExtension(ActionOptionExtensions.Action);
         return string.IsNullOrEmpty(actionValue)
             ? null
             : actionValue;

@@ -1,7 +1,7 @@
 ﻿syntax = "proto3";
 package zylance.contract;
 
-option csharp_namespace = "Zylance.Contract.Envelope";
+option csharp_namespace = "Zylance.Contract.Lib.Envelope";
 
 // === Protocol Messages ===
 message GatewayEnvelope {
