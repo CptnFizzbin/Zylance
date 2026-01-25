@@ -21,13 +21,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="**/*.proto" GrpcServices="None"/>
-        <ProtoFiles Include="**/*.proto"/>
+        <Protobuf Include="**/*.proto" GrpcServices="None" />
     </ItemGroup>
 
     <Target Name="GenerateTS"
             AfterTargets="Build"
-            Inputs="@(ProtoFiles)"
+            Inputs="@(Protobuf)"
             Outputs="$(IntermediateOutputPath)GenerateTS.marker">
         <Exec Command="$(YarnExe) build"/>
         <Touch Files="$(IntermediateOutputPath)GenerateTS.marker" AlwaysCreate="true"/>

@@ -1,6 +1,8 @@
 ﻿syntax = "proto3";
 package zylance.contract;
 
+import "Extensions/ActionExtensions.proto";
+
 option csharp_namespace = "Zylance.Contract.Messages.Vault";
 
 message VaultRef {
@@ -10,16 +12,20 @@ message VaultRef {
 
 // === Vault Operation Messages ===
 message VaultOpenReq {
+  option (action) = "Vault:OpenVault";
 }
 
 message VaultOpenRes {
+  option (action) = "Vault:OpenVault";
   VaultRef vault_ref = 1;
 }
 
 message VaultCreateReq {
+  option (action) = "Vault:CreateVault";
 }
 
 message VaultCreateRes {
+  option (action) = "Vault:CreateVault";
   VaultRef vault_ref = 1;
 }
 

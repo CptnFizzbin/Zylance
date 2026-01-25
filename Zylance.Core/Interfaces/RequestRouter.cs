@@ -22,15 +22,6 @@ public class RequestRouter
     }
 
     /// <summary>
-    ///     Registers a strongly-typed async request handler for the specified action.
-    ///     The handler will be wrapped to work with the generic handler interface.
-    /// </summary>
-    public RequestRouter Use<TReq, TRes>(string action, AsyncZyRequestHandler<TReq, TRes> handler)
-    {
-        return Use(action, RequestHandlerUtils.Wrap(handler));
-    }
-
-    /// <summary>
     ///     Automatically discovers and registers all methods marked with [RequestHandler] attribute
     ///     from the specified controller instance.
     /// </summary>
@@ -50,13 +41,8 @@ public class RequestRouter
             if (attribute == null) continue;
 
             var parameters = method.GetParameters();
-            Console.WriteLine($"[RequestRouter] Registering handler: {attribute.Action} -> {method.Name}");
-
-            // Determine handler type based on method signature
             if (IsTypedRequestResponseHandler(method, parameters))
                 RegisterTypedHandler(controller, method, attribute.Action);
-            else if (IsGenericHandler(method, parameters))
-                RegisterGenericHandler(controller, method, attribute.Action);
             else
                 throw new InvalidOperationException(
                     $"Method {method.Name} has [RequestHandler] attribute but doesn't match any supported signature. "
@@ -87,36 +73,63 @@ public class RequestRouter
             && param2Type.GetGenericTypeDefinition() == typeof(ZyResponse<>);
     }
 
-    private bool IsGenericHandler(MethodInfo method, ParameterInfo[] parameters)
-    {
-        if (parameters.Length != 2) return false;
-        if (method.ReturnType != typeof(Task<ZyResponse>)) return false;
-
-        return parameters[0].ParameterType == typeof(ZyRequest) && parameters[1].ParameterType == typeof(ZyResponse);
-    }
-
-    private void RegisterTypedHandler(object controller, MethodInfo method, string action)
+    private void RegisterTypedHandler(object controller, MethodInfo method, string? action)
     {
         var parameters = method.GetParameters();
         var requestType = parameters[0].ParameterType.GetGenericArguments()[0];
         var responseType = parameters[1].ParameterType.GetGenericArguments()[0];
 
-        // Create AsyncZyRequestHandler<TReq, TRes> delegate
+        if (string.IsNullOrEmpty(action))
+            action = ResolveActionFromTypes(requestType, responseType, method);
+
         var delegateType = typeof(AsyncZyRequestHandler<,>).MakeGenericType(requestType, responseType);
         var handlerDelegate = Delegate.CreateDelegate(delegateType, controller, method);
 
-        // Call Wrap<TReq, TRes>
         var wrapMethod = typeof(RequestHandlerUtils).GetMethod(nameof(RequestHandlerUtils.Wrap))!
             .MakeGenericMethod(requestType, responseType);
-        var wrappedHandler = (AsyncZyRequestHandler)wrapMethod.Invoke(null, new[] { handlerDelegate })!;
+        var wrappedHandler = (AsyncZyRequestHandler)wrapMethod.Invoke(null, [handlerDelegate])!;
 
         Use(action, wrappedHandler);
     }
 
-    private void RegisterGenericHandler(object controller, MethodInfo method, string action)
+    private string ResolveActionFromTypes(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+        Type requestType,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+        Type responseType,
+        MethodInfo method
+    )
     {
-        var handler = (AsyncZyRequestHandler)Delegate.CreateDelegate(typeof(AsyncZyRequestHandler), controller, method);
-        Use(action, handler);
+        var getActionMethod = typeof(ProtoActionUtils).GetMethod(nameof(ProtoActionUtils.GetAction))!;
+
+        var reqActionMethod = getActionMethod.MakeGenericMethod(requestType);
+        var resActionMethod = getActionMethod.MakeGenericMethod(responseType);
+
+        var reqAction = reqActionMethod.Invoke(null, null) as string;
+        var resAction = resActionMethod.Invoke(null, null) as string;
+
+        if (string.IsNullOrEmpty(reqAction))
+            throw new InvalidOperationException(
+                $"Cannot auto-detect action for method {method.Name}: "
+                + $"Request type {requestType.Name} is missing the (action) option in its .proto definition."
+            );
+
+        if (string.IsNullOrEmpty(resAction))
+            throw new InvalidOperationException(
+                $"Cannot auto-detect action for method {method.Name}: "
+                + $"Response type {responseType.Name} is missing the (action) option in its .proto definition."
+            );
+
+        if (reqAction != resAction)
+            throw new InvalidOperationException(
+                $"Action mismatch for method {method.Name}: "
+                + $"Request type {requestType.Name} has action '{reqAction}' but Response type {responseType.Name} has action '{resAction}'. "
+                + "Both must have the same action name."
+            );
+
+        Console.WriteLine(
+            $"[RequestRouter] Auto-detected action '{reqAction}' from {requestType.Name}/{responseType.Name}");
+        return reqAction;
     }
 
     public async Task<ZyResponse> MessageReceived(ZyRequest zyRequest, ZyResponse zyResponse)

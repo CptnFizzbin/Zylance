@@ -8,7 +8,7 @@ namespace Zylance.Core.Controllers;
 [RequestController]
 public class VaultController(VaultService vaultService)
 {
-    [RequestHandler("Vault:OpenVault")]
+    [RequestHandler]
     private Task<ZyResponse<VaultOpenRes>> OpenVault(ZyRequest<VaultOpenReq> req, ZyResponse<VaultOpenRes> res)
     {
         var vaultRef = vaultService.OpenVault();
@@ -16,7 +16,7 @@ public class VaultController(VaultService vaultService)
         return Task.FromResult(res);
     }
 
-    [RequestHandler("Vault:CreateVault")]
+    [RequestHandler]
     private Task<ZyResponse<VaultCreateRes>> CreateVault(ZyRequest<VaultCreateReq> req, ZyResponse<VaultCreateRes> res)
     {
         var vaultRef = vaultService.CreateVault();

@@ -1,12 +1,16 @@
 ﻿syntax = "proto3";
 package zylance.contract;
 
+import "Extensions/ActionExtensions.proto";
+
 option csharp_namespace = "Zylance.Contract.Messages.Echo";
 
 message EchoReq {
+  option (action) = "Echo:EchoMessage";
   string message = 1;
 }
 
 message EchoRes {
+  option (action) = "Echo:EchoMessage";
   string echoed = 1;
 }

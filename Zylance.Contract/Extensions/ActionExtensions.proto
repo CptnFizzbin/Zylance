@@ -1,0 +1,11 @@
+syntax = "proto3";
+package zylance.contract;
+
+import "google/protobuf/descriptor.proto";
+
+option csharp_namespace = "Zylance.Contract.Extensions";
+
+// Custom option to specify the action name for request/response pairs
+extend google.protobuf.MessageOptions {
+  string action = 50001;
+}

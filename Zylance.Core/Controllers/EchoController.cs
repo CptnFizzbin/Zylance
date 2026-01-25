@@ -7,7 +7,7 @@ namespace Zylance.Core.Controllers;
 [RequestController]
 public class EchoController
 {
-    [RequestHandler("Echo:EchoMessage")]
+    [RequestHandler]
     private Task<ZyResponse<EchoRes>> EchoMessage(ZyRequest<EchoReq> req, ZyResponse<EchoRes> res)
     {
         var message = req.GetData().Message;

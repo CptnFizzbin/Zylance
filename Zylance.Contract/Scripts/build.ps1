@@ -1,3 +1,6 @@
+Get-Command protoc | Foreach-Object { Write-Host "protoc found at: $( $_.Source )" }
+Write-Host "PROTO_PATH: $env:PROTO_PATH"
+
 $rootDir = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 Write-Host "Root Directory: $rootDir"
 
@@ -9,22 +12,25 @@ Set-Location $contractDir
 # Find all .proto files recursively
 $protoFiles = Get-ChildItem -Path . -Filter "*.proto" -Recurse | ForEach-Object { $_.FullName }
 
-if ($protoFiles.Count -eq 0) {
+if ($protoFiles.Count -eq 0)
+{
     Write-Error "No .proto files found in $contractDir"
     exit 1
 }
 
-Write-Host "Found $($protoFiles.Count) proto file(s):"
+Write-Host "Found $( $protoFiles.Count ) proto file(s):"
 $protoFiles | ForEach-Object { Write-Host "  - $_" }
 
 # Run protoc for each proto file
-foreach ($protoFile in $protoFiles) {
+foreach ($protoFile in $protoFiles)
+{
     $protoFileName = Split-Path -Leaf $protoFile
 
     Write-Host "`nCompiling $protoFileName..."
 
     # Execute protoc with proper PowerShell syntax
     & protoc `
+        --proto_path=$env:PROTO_PATH `
         --proto_path=$contractDir `
         --plugin=$contractDir/node_modules/.bin/protoc-gen-ts_proto.cmd `
         --ts_proto_opt=esModuleInterop `
@@ -37,7 +43,8 @@ foreach ($protoFile in $protoFiles) {
         --ts_proto_out=$uiDir/Src/Generated `
         $protoFile
 
-    if ($LASTEXITCODE -ne 0) {
+    if ($LASTEXITCODE -ne 0)
+    {
         Write-Error "Failed to compile $protoFileName"
         exit $LASTEXITCODE
     }

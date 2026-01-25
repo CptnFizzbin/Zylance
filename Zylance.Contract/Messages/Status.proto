@@ -1,12 +1,15 @@
 ﻿syntax = "proto3";
 package zylance.contract;
 
+import "Extensions/ActionExtensions.proto";
+
 option csharp_namespace = "Zylance.Contract.Messages.Status";
 
 message GetStatusReq {
-
+  option (action) = "Status:GetStatus";
 }
 
 message GetStatusRes {
+  option (action) = "Status:GetStatus";
   string status = 1;
 }

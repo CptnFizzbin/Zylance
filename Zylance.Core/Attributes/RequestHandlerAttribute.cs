@@ -8,10 +8,20 @@ namespace Zylance.Core.Attributes;
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
 [MeansImplicitUse(ImplicitUseKindFlags.Access)]
-public class RequestHandlerAttribute(string action) : Attribute
+public class RequestHandlerAttribute : Attribute
 {
     /// <summary>
-    ///     The action name this handler responds to.
+    ///     Creates a request handler that will auto-detect the action name from the protobuf message types.
+    ///     This requires the request and response types to have the [action] custom option defined.
     /// </summary>
-    public string Action { get; } = action;
+    public RequestHandlerAttribute()
+    {
+        Action = null; // Will be resolved during registration
+    }
+
+    /// <summary>
+    ///     The action name this handler responds to.
+    ///     If null, the action will be auto-detected from the method's request/response types.
+    /// </summary>
+    public string? Action { get; }
 }

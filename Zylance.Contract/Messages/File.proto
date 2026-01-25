@@ -1,6 +1,8 @@
 ﻿syntax = "proto3";
 package zylance.contract;
 
+import "Extensions/ActionExtensions.proto";
+
 option csharp_namespace = "Zylance.Contract.Messages.File";
 
 // === Models ===
@@ -17,38 +19,46 @@ message FileFilter {
 
 // === Operations ===
 message SelectFileReq {
+  option (action) = "File:SelectFile";
   optional string title = 1;
   repeated FileFilter filters = 2;
   bool read_only = 3;
 }
 
 message SelectFileRes {
+  option (action) = "File:SelectFile";
   FileRef file_ref = 1;
 }
 
 message CreateFileReq {
+  option (action) = "File:CreateFile";
   optional string title = 1;
   optional string filename = 2;
   repeated FileFilter filters = 3;
 }
 
 message CreateFileRes {
+  option (action) = "File:CreateFile";
   FileRef file_ref = 1;
 }
 
 message SaveFileReq {
+  option (action) = "File:SaveFile";
   FileRef file_ref = 1;
   string content = 2;
 }
 
 message GetFileReq {
+  option (action) = "File:GetFile";
   string path = 1;
 }
 
 message FileExistsRes {
+  option (action) = "File:FileExists";
   bool exists = 1;
 }
 
 message FileContentRes {
+  option (action) = "File:GetFile";
   string content = 1;
 }
