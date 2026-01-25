@@ -1,6 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Zylance.Core.Models;
 
 namespace Zylance.Core.Entities;
 
@@ -27,16 +26,16 @@ public class TransactionEntity
     public required string Memo { get; set; }
 
     /// <summary>
-    ///     Debit amount stored in cents.
+    ///     Debit amount in dollars.
     ///     Null if this is a credit transaction.
     /// </summary>
-    [Column(TypeName = "INTEGER")]
-    public MonetaryValue? Debit { get; set; }
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal? Debit { get; set; }
 
     /// <summary>
-    ///     Credit amount stored in cents.
+    ///     Credit amount in dollars.
     ///     Null if this is a debit transaction.
     /// </summary>
-    [Column(TypeName = "INTEGER")]
-    public MonetaryValue? Credit { get; set; }
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal? Credit { get; set; }
 }
