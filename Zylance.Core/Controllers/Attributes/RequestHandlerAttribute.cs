@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Zylance.Core.Attributes;
+namespace Zylance.Core.Controllers.Attributes;
 
 /// <summary>
 ///     Marks a method as a request handler for the specified action.
@@ -17,6 +17,15 @@ public class RequestHandlerAttribute : Attribute
     public RequestHandlerAttribute()
     {
         Action = null; // Will be resolved during registration
+    }
+
+    /// <summary>
+    ///     Creates a request handler for the specified action.
+    /// </summary>
+    /// <param name="action">The action name this handler responds to.</param>
+    public RequestHandlerAttribute(string action)
+    {
+        Action = action;
     }
 
     /// <summary>

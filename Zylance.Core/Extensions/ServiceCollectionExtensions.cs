@@ -3,8 +3,8 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Zylance.Core.Attributes;
+using Zylance.Core.Controllers.Services;
 using Zylance.Core.Interfaces;
-using Zylance.Core.Models;
 using Zylance.Core.Services;
 
 namespace Zylance.Core.Extensions;
@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
     {
         return Assembly.GetExecutingAssembly()
             .GetTypes()
-            .Where(t => t.GetCustomAttribute<RequestControllerAttribute>() != null)
+            .Where(t => t.GetCustomAttribute<ControllerAttribute>() != null)
             .ToList();
     }
 
@@ -54,23 +54,23 @@ public static class ServiceCollectionExtensions
                 services.Add(ServiceDescriptor.Singleton(controllerType, controllerType));
             }
 
-            services.TryAddSingleton<RequestRouter>(sp =>
+            services.TryAddSingleton<RouterService>(sp =>
             {
                 Console.WriteLine("[ServiceCollection] Creating RequestRouter");
-                var router = new RequestRouter();
+                var router = new RouterService();
 
                 foreach (var controllerType in controllerTypes)
                 {
                     Console.WriteLine($"[ServiceCollection] Calling UseController for {controllerType.Name}");
-                    
+
                     // Resolve the controller instance
                     var controller = sp.GetRequiredService(controllerType);
-                    
+
                     // Call UseController<TController>(controller) using reflection
-                    var useControllerMethod = typeof(RequestRouter)
-                        .GetMethod(nameof(RequestRouter.UseController))!
+                    var useControllerMethod = typeof(RouterService)
+                        .GetMethod(nameof(RouterService.UseController))!
                         .MakeGenericMethod(controllerType);
-                    
+
                     useControllerMethod.Invoke(router, new[] { controller });
                 }
 
@@ -81,7 +81,7 @@ public static class ServiceCollectionExtensions
             services.TryAddSingleton<Gateway>(sp =>
             {
                 var transport = sp.GetRequiredService<ITransport>();
-                var router = sp.GetRequiredService<RequestRouter>();
+                var router = sp.GetRequiredService<RouterService>();
                 return new Gateway(transport, router);
             });
 

@@ -1,7 +1,7 @@
 ﻿syntax = "proto3";
 package zylance.contract;
 
-import "zylance/extensions/action_option.proto";
+import "zylance/extensions/zylance.proto";
 
 option csharp_namespace = "Zylance.Contract.Api.Status";
 

@@ -18,6 +18,8 @@ public class ZyEvent
 
 public class ZyEvent<TData> : ZyEvent
 {
+    public TData Data => GetData();
+
     public ZyEvent<TData> SetData(TData data)
     {
         Payload.DataJson = MessageSerializer.Serialize(data);

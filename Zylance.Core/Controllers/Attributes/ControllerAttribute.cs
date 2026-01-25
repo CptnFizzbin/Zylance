@@ -10,6 +10,6 @@ namespace Zylance.Core.Attributes;
 [MeansImplicitUse(
     ImplicitUseKindFlags
         .InstantiatedNoFixedConstructorSignature)] // Tell ReSharper/Rider this class is instantiated via DI
-public class RequestControllerAttribute : Attribute
+public class ControllerAttribute : Attribute
 {
 }

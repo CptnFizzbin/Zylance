@@ -2,7 +2,7 @@ using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Zylance.Contract.Extensions;
 
-namespace Zylance.Core.Utils;
+namespace Zylance.Core.Controllers.Utils;
 
 /// <summary>
 ///     Utility for extracting action names from protobuf messages using custom options.
@@ -30,7 +30,29 @@ public static class ProtoActionUtils
         if (customOptions == null) return null;
 
         // Use the generated extension to get the action value
-        var actionValue = customOptions.GetExtension(ActionOptionExtensions.Action);
+        var actionValue = customOptions.GetExtension(ZylanceExtensions.Action);
+        return string.IsNullOrEmpty(actionValue)
+            ? null
+            : actionValue;
+    }
+
+    public static string? GetEventName<TMessage>() where TMessage : IMessage, new()
+    {
+        var instance = new TMessage();
+        var descriptor = instance.Descriptor;
+        return GetEventNameFromDescriptor(descriptor);
+    }
+
+    /// <summary>
+    ///     Gets the action name from a protobuf message descriptor.
+    /// </summary>
+    private static string? GetEventNameFromDescriptor(MessageDescriptor descriptor)
+    {
+        var customOptions = descriptor.GetOptions();
+        if (customOptions == null) return null;
+
+        // Use the generated extension to get the action value
+        var actionValue = customOptions.GetExtension(ZylanceExtensions.EventName);
         return string.IsNullOrEmpty(actionValue)
             ? null
             : actionValue;

@@ -1,5 +1,6 @@
 using Zylance.Contract.Api.File;
 using Zylance.Core.Attributes;
+using Zylance.Core.Controllers.Attributes;
 using Zylance.Core.Models;
 using Zylance.Core.Services;
 
@@ -9,7 +10,7 @@ namespace Zylance.Core.Controllers;
 ///     Handles all file-related requests for the Gateway.
 ///     Routes file: prefixed actions to the FileService.
 /// </summary>
-[RequestController]
+[Controller]
 public class FileController(FileService fileService)
 {
     [RequestHandler]

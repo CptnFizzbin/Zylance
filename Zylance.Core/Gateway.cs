@@ -1,5 +1,5 @@
 using Zylance.Contract.Lib.Envelope;
-using Zylance.Core.Delegates;
+using Zylance.Core.Controllers.Services;
 using Zylance.Core.Handlers;
 using Zylance.Core.Interfaces;
 using Zylance.Core.Models;
@@ -9,14 +9,13 @@ namespace Zylance.Core;
 
 public class Gateway
 {
-    private readonly HashSet<AsyncZyEventHandler> _eventHandlers = [];
-    private readonly RequestRouter _router;
+    private readonly RouterService _routerService;
     private readonly ITransport _transport;
 
-    public Gateway(ITransport transport, RequestRouter router)
+    public Gateway(ITransport transport, RouterService routerService)
     {
         _transport = transport;
-        _router = router;
+        _routerService = routerService;
         _transport.Receive(message => _ = HandleMessage(message));
     }
 
@@ -81,23 +80,22 @@ public class Gateway
     {
         Console.WriteLine($"==> Req[{reqPayload.RequestId}]: {reqPayload.Action} - {reqPayload.DataJson}");
 
+        var req = new ZyRequest { Payload = reqPayload };
+
         var resPayload = new ResponsePayload { RequestId = reqPayload.RequestId };
-        var request = new ZyRequest { Payload = reqPayload };
-        var response = new ZyResponse { Payload = resPayload };
+        var res = new ZyResponse { Payload = resPayload };
 
-        // Route the request through the centralized router
-        response = await _router.MessageReceived(request, response);
-
-        Send(response.Payload);
+        res = await _routerService.HandleRequest(req, res);
+        Send(res.Payload);
     }
 
     private async Task HandleMessage(EventPayload payload)
     {
         Console.WriteLine($"==> Evt: {payload.Event} - {payload.DataJson}");
-        var zyEvent = new ZyEvent { Payload = payload };
 
-        foreach (var handler in _eventHandlers)
-            await handler(zyEvent);
+        var evt = new ZyEvent { Payload = payload };
+
+        await _routerService.HandleEvent(evt);
     }
 
     private void Send(GatewayEnvelope envelope)

@@ -2,7 +2,7 @@
 // versions:
 //   protoc-gen-ts_proto  v2.11.0
 //   protoc               v6.33.4
-// source: zylance/extensions/action_option.proto
+// source: zylance/extensions/zylance.proto
 
 /* eslint-disable */
 

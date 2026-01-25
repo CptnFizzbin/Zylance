@@ -7,5 +7,6 @@ option csharp_namespace = "Zylance.Contract.Extensions";
 
 // Custom option to specify the action name for request/response pairs
 extend google.protobuf.MessageOptions {
-  string action = 50001;
+  string action = 50001; 
+  string eventName = 50002;
 }
