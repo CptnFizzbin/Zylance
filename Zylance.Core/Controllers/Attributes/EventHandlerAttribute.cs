@@ -7,7 +7,7 @@ namespace Zylance.Core.Controllers.Attributes;
 ///     The RequestRouter will automatically discover and register methods with this attribute.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
-[MeansImplicitUse(ImplicitUseKindFlags.Access)]
+[MeansImplicitUse]
 public class EventHandlerAttribute : Attribute
 {
     /// <summary>

@@ -36,6 +36,7 @@ public class RouterService
     ///     Automatically discovers and registers all methods marked with [RequestHandler] attribute
     ///     from the specified controller instance.
     /// </summary>
+    [RequiresUnreferencedCode("This method uses reflection to discover and register controller methods at runtime.")]
     public RouterService UseController<
         [DynamicallyAccessedMembers(
             DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.NonPublicMethods)]
@@ -71,6 +72,7 @@ public class RouterService
         return this;
     }
 
+    [RequiresUnreferencedCode("This method uses reflection to discover and invoke controller methods at runtime.")]
     private void RegisterRequestHandler(object controller, MethodInfo method, string? action)
     {
         var parameters = method.GetParameters();
@@ -106,7 +108,11 @@ public class RouterService
         Use(action, wrappedHandler);
     }
 
-    private void RegisterEventHandler(object controller, MethodInfo method, string? eventName)
+    [RequiresUnreferencedCode("This method uses reflection to discover and invoke controller methods at runtime.")]
+    private void RegisterEventHandler(
+        object controller,
+        MethodInfo method,
+        string? eventName)
     {
         var parameters = method.GetParameters();
         var eventType = parameters[0].ParameterType.GetGenericArguments()[0];
@@ -183,6 +189,7 @@ public class RouterService
     }
 
 
+    [RequiresUnreferencedCode("This method uses reflection with dynamically determined types.")]
     private static string ResolveEventFromType(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
         Type eventType,
