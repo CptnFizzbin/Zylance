@@ -3,28 +3,11 @@ using Microsoft.CodeAnalysis;
 
 namespace Zylance.SourceGenerators.Models;
 
-internal class ControllerInfo
+internal record ControllerInfo
 {
-    public string ClassName { get; set; } = "";
-    public string Namespace { get; set; } = "";
-    public string FullTypeName { get; set; } = "";
-    public List<HandlerInfo> Handlers { get; set; } = new();
-    public List<Diagnostic> Diagnostics { get; set; } = new();
-}
-
-internal class HandlerInfo
-{
-    public HandlerType Type { get; set; }
-    public string MethodName { get; set; } = "";
-    public string? Action { get; set; }
-    public string? RequestTypeName { get; set; }
-    public string? ResponseTypeName { get; set; }
-    public string? EventTypeName { get; set; }
-    public bool IsAsync { get; set; }
-}
-
-internal enum HandlerType
-{
-    Request,
-    Event,
+    public string ClassName { get; init; } = "";
+    public string Namespace { get; init; } = "";
+    public string FullTypeName { get; init; } = "";
+    public List<HandlerInfo> Handlers { get; init; } = new();
+    public List<Diagnostic> Diagnostics { get; init; } = new();
 }

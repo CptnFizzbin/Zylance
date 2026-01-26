@@ -13,7 +13,7 @@ namespace Zylance.Core.Controllers;
 public class FileController(FileService fileService)
 {
     [RequestHandler]
-    private Task SelectFile(ZyRequest<SelectFileReq> req, ZyResponse<SelectFileRes> res)
+    public Task SelectFile(ZyRequest<SelectFileReq> req, ZyResponse<SelectFileRes> res)
     {
         var data = req.GetData();
 
@@ -30,7 +30,7 @@ public class FileController(FileService fileService)
     }
 
     [RequestHandler]
-    private Task CreateFile(ZyRequest<CreateFileReq> req, ZyResponse<CreateFileRes> res)
+    public Task CreateFile(ZyRequest<CreateFileReq> req, ZyResponse<CreateFileRes> res)
     {
         var data = req.GetData();
 

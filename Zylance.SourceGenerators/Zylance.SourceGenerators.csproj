@@ -12,17 +12,9 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all"/>
-        <PackageReference Include="Handlebars.Net" Version="2.1.6" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Generators\*.hbs"/>
+        <AdditionalFiles Include="AnalyzerReleases.Shipped.md"/>
     </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Zylance.Core\Zylance.Core.csproj"
-                          OutputItemType="Analyzer"
-                          ReferenceOutputAssembly="false"/>
-    </ItemGroup>
-
 </Project>

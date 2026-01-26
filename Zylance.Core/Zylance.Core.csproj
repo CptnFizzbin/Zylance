@@ -7,6 +7,10 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0"/>
@@ -15,5 +19,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Zylance.Contract\Zylance.Contract.csproj"/>
+        <ProjectReference Include="..\Zylance.SourceGenerators\Zylance.SourceGenerators.csproj"
+                          OutputItemType="Analyzer"
+                          ReferenceOutputAssembly="false"/>
     </ItemGroup>
 </Project>

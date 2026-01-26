@@ -8,7 +8,7 @@ namespace Zylance.SourceGenerators.Analyzers;
 /// </summary>
 internal static class DiagnosticRules
 {
-    public static readonly DiagnosticDescriptor MissingControllerAttribute = new(
+    public readonly static DiagnosticDescriptor MissingControllerAttribute = new(
         "ZYL001",
         "Handler methods require [Controller] attribute on class",
         "Class '{0}' contains handler methods but is missing the [Controller] attribute. Add [Controller] to the class declaration.",
@@ -17,10 +17,10 @@ internal static class DiagnosticRules
         true,
         "Classes with [RequestHandler] or [EventHandler] methods must be marked with [Controller] attribute.");
 
-    public static readonly DiagnosticDescriptor InvalidHandlerSignature = new(
+    public readonly static DiagnosticDescriptor InvalidHandlerSignature = new(
         "ZYL002",
         "Invalid handler method signature",
-        "Method '{0}' has invalid signature. {1}",
+        "Method '{0}' has invalid signature. EventHandler methods must have signature: Task(ZyEvent<T>) or void(ZyEvent<T>).",
         "Zylance.Controllers",
         DiagnosticSeverity.Error,
         true,
@@ -38,8 +38,7 @@ internal static class DiagnosticRules
         return Diagnostic.Create(
             InvalidHandlerSignature,
             location,
-            method.Name,
-            message);
+            method.Name);
     }
 
     /// <summary>
