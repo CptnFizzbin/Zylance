@@ -35,7 +35,7 @@ internal static class TypeChecks
             .Any(attr =>
             {
                 var name = attr.Name.ToString();
-                return name == "Controller" || name == "ControllerAttribute";
+                return name is "Controller" or "ControllerAttribute";
             });
     }
 }

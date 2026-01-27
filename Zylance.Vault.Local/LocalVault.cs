@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 using Zylance.Core.Interfaces;
-using Zylance.Core.Models;
 using Zylance.Vault.Local.Context;
 
 namespace Zylance.Vault.Local;
@@ -10,7 +10,7 @@ namespace Zylance.Vault.Local;
 /// </summary>
 public class LocalVault(LocalVaultDbContext dbContext) : IVault
 {
-    private readonly LocalVaultDbContext _dbContext = dbContext;
+    [UsedImplicitly] private readonly LocalVaultDbContext _dbContext = dbContext;
 
     /// <summary>
     ///     Creates a LocalVault instance from a file path.

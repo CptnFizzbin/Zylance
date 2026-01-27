@@ -1,5 +1,4 @@
 ﻿using Zylance.Core.Interfaces;
-using Zylance.Core.Models;
 using Zylance.Vault.Local;
 
 namespace Zylance.Desktop;

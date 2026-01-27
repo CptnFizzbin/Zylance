@@ -1,7 +1,8 @@
-using Zylance.Core.Delegates;
-using Zylance.Core.Models;
+using JetBrains.Annotations;
+using Zylance.Core.Controllers.Delegates;
+using Zylance.Core.Controllers.Models;
 
-namespace Zylance.Core.Utils;
+namespace Zylance.Core.Controllers.Utils;
 
 public static class RequestHandlerUtils
 {
@@ -9,6 +10,7 @@ public static class RequestHandlerUtils
     ///     Wraps a strongly-typed async handler (returns Task) into a generic AsyncZyRequestHandler.
     ///     Handles the type conversions automatically.
     /// </summary>
+    [UsedImplicitly(Reason = "Used by controllers via source generator")]
     public static AsyncZyRequestHandler Wrap<TReq, TRes>(AsyncZyRequestHandler<TReq, TRes> handler)
     {
         return async (req, res) =>
@@ -26,6 +28,7 @@ public static class RequestHandlerUtils
     ///     Wraps a strongly-typed sync handler (returns void) into a generic AsyncZyRequestHandler.
     ///     Handles the type conversions automatically.
     /// </summary>
+    [UsedImplicitly(Reason = "Used by controllers via source generator")]
     public static AsyncZyRequestHandler WrapSync<TReq, TRes>(SyncZyRequestHandler<TReq, TRes> handler)
     {
         return (req, res) =>

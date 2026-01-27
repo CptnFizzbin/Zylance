@@ -1,6 +1,6 @@
 using Zylance.Contract.Api.File;
 using Zylance.Core.Controllers.Attributes;
-using Zylance.Core.Models;
+using Zylance.Core.Controllers.Models;
 using Zylance.Core.Services;
 
 namespace Zylance.Core.Controllers;
@@ -13,7 +13,7 @@ namespace Zylance.Core.Controllers;
 public class FileController(FileService fileService)
 {
     [RequestHandler]
-    public Task SelectFile(ZyRequest<SelectFileReq> req, ZyResponse<SelectFileRes> res)
+    public void SelectFile(ZyRequest<SelectFileReq> req, ZyResponse<SelectFileRes> res)
     {
         var data = req.GetData();
 
@@ -26,11 +26,10 @@ public class FileController(FileService fileService)
         );
 
         res.SetData(new SelectFileRes { FileRef = fileRef });
-        return Task.CompletedTask;
     }
 
     [RequestHandler]
-    public Task CreateFile(ZyRequest<CreateFileReq> req, ZyResponse<CreateFileRes> res)
+    public void CreateFile(ZyRequest<CreateFileReq> req, ZyResponse<CreateFileRes> res)
     {
         var data = req.GetData();
 
@@ -43,6 +42,5 @@ public class FileController(FileService fileService)
         );
 
         res.SetData(new CreateFileRes { FileRef = fileRef });
-        return Task.CompletedTask;
     }
 }

@@ -1,6 +1,6 @@
-﻿using Zylance.Core.Models;
+﻿using Zylance.Core.Controllers.Models;
 
-namespace Zylance.Core.Delegates;
+namespace Zylance.Core.Controllers.Delegates;
 
 /// <summary>
 ///     Async event handler that processes an event.

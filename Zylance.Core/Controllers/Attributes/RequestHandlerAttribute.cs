@@ -11,26 +11,9 @@ namespace Zylance.Core.Controllers.Attributes;
 public class RequestHandlerAttribute : Attribute
 {
     /// <summary>
-    ///     Creates a request handler that will auto-detect the action name from the protobuf message types.
-    ///     This requires the request and response types to have the [action] custom option defined.
-    /// </summary>
-    public RequestHandlerAttribute()
-    {
-        Action = null; // Will be resolved during registration
-    }
-
-    /// <summary>
-    ///     Creates a request handler for the specified action.
-    /// </summary>
-    /// <param name="action">The action name this handler responds to.</param>
-    public RequestHandlerAttribute(string action)
-    {
-        Action = action;
-    }
-
-    /// <summary>
     ///     The action name this handler responds to.
     ///     If null, the action will be auto-detected from the method's request/response types.
     /// </summary>
-    public string? Action { get; }
+    [UsedImplicitly(Reason = "Used by source generator")]
+    public string? Action { get; init; }
 }

@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Zylance.Core.Controllers.Attributes;
-using Zylance.Core.Models;
+using Zylance.Core.Controllers.Models;
 
 namespace Zylance.Core.Controllers.Extensions;
 

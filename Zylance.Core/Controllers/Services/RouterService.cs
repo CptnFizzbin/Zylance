@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
-using Zylance.Core.Delegates;
-using Zylance.Core.Models;
+using Zylance.Core.Controllers.Delegates;
+using Zylance.Core.Controllers.Models;
 
 namespace Zylance.Core.Controllers.Services;
 

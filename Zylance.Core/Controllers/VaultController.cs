@@ -1,6 +1,6 @@
 using Zylance.Contract.Api.Vault;
 using Zylance.Core.Controllers.Attributes;
-using Zylance.Core.Models;
+using Zylance.Core.Controllers.Models;
 using Zylance.Core.Services;
 
 namespace Zylance.Core.Controllers;

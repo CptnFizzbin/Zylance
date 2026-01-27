@@ -1,7 +1,7 @@
 ﻿using Zylance.Contract.Lib.Envelope;
-using Zylance.Core.Serializers;
+using Zylance.Core.Controllers.Utils;
 
-namespace Zylance.Core.Models;
+namespace Zylance.Core.Controllers.Models;
 
 public class ZyEvent
 {

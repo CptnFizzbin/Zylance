@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Zylance.SourceGenerators.Models;
+using Zylance.SourceGenerators.Roslyn;
 using Zylance.SourceGenerators.Utils;
 
 namespace Zylance.SourceGenerators.Analyzers;
@@ -9,18 +10,20 @@ namespace Zylance.SourceGenerators.Analyzers;
 /// </summary>
 internal static class RequestHandlerAnalyzer
 {
-    public static (HandlerInfo? HandlerInfo, Diagnostic? Diagnostic) Analyze(
-        IMethodSymbol method,
-        AttributeData attribute
-    )
+    public static RequestHandlerInfo Analyze(IMethodSymbol method)
     {
-        // Validate signature: Task(ZyRequest<TReq>, ZyResponse<TRes>) or void(ZyRequest<TReq>, ZyResponse<TRes>)
+        var handlerInfo = new RequestHandlerInfo
+        {
+            Method = method,
+            RequestType = null,
+            ResponseType = null,
+            IsAsync = method.IsAsync,
+        };
+
         if (method.Parameters.Length != 2)
         {
-            var diagnostic = DiagnosticRules.CreateInvalidSignatureDiagnostic(
-                method,
-                "RequestHandler methods must have exactly 2 parameters");
-            return (null, diagnostic);
+            handlerInfo.Diagnostics.Add(DiagnosticRules.CreateInvalidRequestHandlerSignatureDiagnostic(method));
+            return handlerInfo;
         }
 
         var param1 = method.Parameters[0];
@@ -28,32 +31,25 @@ internal static class RequestHandlerAnalyzer
 
         if (!TypeChecks.IsZyRequest(param1.Type) || !TypeChecks.IsZyResponse(param2.Type))
         {
-            var diagnostic = DiagnosticRules.CreateInvalidSignatureDiagnostic(
-                method,
-                "RequestHandler methods must have signature: Task(ZyRequest<T>, ZyResponse<U>) or void(ZyRequest<T>, ZyResponse<U>)");
-            return (null, diagnostic);
+            handlerInfo.Diagnostics.Add(DiagnosticRules.CreateInvalidRequestHandlerSignatureDiagnostic(method));
+            return handlerInfo;
         }
 
         var requestType = ((INamedTypeSymbol)param1.Type).TypeArguments[0];
+        var requestMessageName = requestType.Name.Replace("Req", "");
+
         var responseType = ((INamedTypeSymbol)param2.Type).TypeArguments[0];
+        var responseMessageName = responseType.Name.Replace("Res", "");
 
-        // Get action from attribute or will be auto-detected
-        string? action = null;
-        if (attribute.ConstructorArguments.Length > 0)
-            action = attribute.ConstructorArguments[0].Value as string;
-
-        var isAsync = method.ReturnType.Name == "Task";
-
-        var handlerInfo = new HandlerInfo
+        if (requestMessageName != responseMessageName)
         {
-            Type = HandlerType.Request,
-            MethodName = method.Name,
-            Action = action,
-            RequestTypeName = requestType.Name,
-            ResponseTypeName = responseType.Name,
-            IsAsync = isAsync,
-        };
+            handlerInfo.Diagnostics.Add(DiagnosticRules.CreateRequestHandlerTypeMismatchDiagnostic(method));
+        }
 
-        return (handlerInfo, null);
+        return handlerInfo with
+        {
+            RequestType = requestType,
+            ResponseType = responseType,
+        };
     }
 }

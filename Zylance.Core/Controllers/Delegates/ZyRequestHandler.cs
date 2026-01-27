@@ -1,6 +1,6 @@
-using Zylance.Core.Models;
+using Zylance.Core.Controllers.Models;
 
-namespace Zylance.Core.Delegates;
+namespace Zylance.Core.Controllers.Delegates;
 
 /// <summary>
 ///     Async request handler that processes a request and returns a response.

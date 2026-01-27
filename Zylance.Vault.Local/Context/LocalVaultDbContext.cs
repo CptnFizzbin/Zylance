@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Zylance.Core.Entities;
+using Zylance.Vault.Local.Entities;
 
 namespace Zylance.Vault.Local.Context;
 

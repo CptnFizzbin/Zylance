@@ -1,6 +1,6 @@
 using Zylance.Contract.Api.Echo;
 using Zylance.Core.Controllers.Attributes;
-using Zylance.Core.Models;
+using Zylance.Core.Controllers.Models;
 
 namespace Zylance.Core.Controllers;
 
