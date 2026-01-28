@@ -1,6 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Zylance.Core.Extensions;
-using Zylance.Core.Interfaces;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Zylance.Core.App.Services;
+using Zylance.Core.Lib.Gateway;
+using Zylance.Core.Lib.Gateway.Services;
+using Zylance.Core.Lib.Gateway.Extensions;
+using Zylance.Core.Lib.Interfaces;
 
 namespace Zylance.Core;
 
@@ -35,7 +39,15 @@ public class Zylance
 
         // Register all core Zylance services
         Console.WriteLine("[Zylance] Calling AddZylance()...");
-        services.AddZylance();
+        services.AddSingleton<FileService>();
+        services.AddSingleton<VaultService>();
+        services.AddZylanceRouter();
+
+        services.TryAddSingleton<Gateway>(sp =>
+        {
+            var router = sp.GetRequiredService<RouterService>();
+            return new Gateway(transport, router);
+        });
 
         Console.WriteLine("[Zylance] Building service provider...");
         IServiceProvider serviceProvider = services.BuildServiceProvider();

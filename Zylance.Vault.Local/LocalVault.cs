@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Zylance.Core.Interfaces;
+using Zylance.Core.Lib.Interfaces;
 using Zylance.Vault.Local.Context;
 
 namespace Zylance.Vault.Local;

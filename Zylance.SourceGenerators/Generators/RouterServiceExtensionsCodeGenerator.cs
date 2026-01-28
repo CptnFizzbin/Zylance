@@ -43,11 +43,11 @@ internal static class RouterServiceExtensionsCodeGenerator
 
                  using System;
                  using System.Threading.Tasks;
-                 using Zylance.Core.Controllers.Services;
-                 using Zylance.Core.Controllers.Utils;
+                 using Zylance.Core.Lib.Gateway.Utils;
+                 using Zylance.Core.Lib.Gateway.Services;
                  {{ForEach(namespaces, ns => $"using {ns.ToDisplayString()};")}}
 
-                 namespace Zylance.Core.Extensions;
+                 namespace Zylance.Core.Lib.Gateway.Extensions;
 
                  public static partial class RouterServiceExtensions
                  {

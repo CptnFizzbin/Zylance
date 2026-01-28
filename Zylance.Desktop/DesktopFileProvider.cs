@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Photino.NET;
 using Zylance.Contract.Api.File;
-using Zylance.Core.Interfaces;
+using Zylance.Core.Lib.Interfaces;
 
 namespace Zylance.Desktop;
 

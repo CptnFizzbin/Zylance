@@ -37,10 +37,10 @@ internal static class ControllerRegistrationCodeGenerator
                  using System;
                  using Microsoft.Extensions.DependencyInjection;
                  using Microsoft.Extensions.DependencyInjection.Extensions;
-                 using Zylance.Core.Controllers.Services;
+                 using Zylance.Core.Lib.Gateway.Services;
                  {{ForEach(namespaces, ns => $"using {ns.ToDisplayString()};")}}
 
-                 namespace Zylance.Core.Extensions;
+                 namespace Zylance.Core.Lib.Gateway.Extensions;
 
                  public static class ControllerRegistration
                  {

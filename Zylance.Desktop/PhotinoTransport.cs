@@ -1,5 +1,5 @@
 ﻿using Photino.NET;
-using Zylance.Core.Interfaces;
+using Zylance.Core.Lib.Interfaces;
 
 namespace Zylance.Desktop;
 

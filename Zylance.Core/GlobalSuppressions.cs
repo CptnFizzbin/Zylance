@@ -1,4 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+
+// TODO: Create SourceGenerator to create a JSON serialization context for all protobuf types
 
 // Suppress IL2026 warnings for MessageSerializer usage
 // All types used with MessageSerializer are protobuf-generated types which are safe for JSON serialization
