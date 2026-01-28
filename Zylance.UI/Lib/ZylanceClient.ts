@@ -1,4 +1,4 @@
-﻿import { v7 as uuidv7 } from "uuid"
+import { v7 as uuidv7 } from "uuid"
 import { getTransport, type ITransport } from "@Lib/ITransport"
 import {
   type ErrorPayload,

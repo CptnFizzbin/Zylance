@@ -1,4 +1,4 @@
-﻿import { type Endpoint, MessageError, ZylanceClient } from "@Lib/ZylanceClient"
+import { type Endpoint, MessageError, ZylanceClient } from "@Lib/ZylanceClient"
 import type { GetStatusRes } from "@Contract/api/Status"
 import type { EchoReq, EchoRes } from "@Contract/api/Echo"
 import type {

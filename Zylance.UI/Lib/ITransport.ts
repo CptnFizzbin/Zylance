@@ -1,4 +1,4 @@
-﻿export interface ITransport {
+export interface ITransport {
   send: (message: string) => void;
   receive: (handler: (message: string) => void) => void;
 }

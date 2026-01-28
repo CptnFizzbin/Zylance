@@ -1,4 +1,4 @@
-﻿using Zylance.Contract.Lib.Envelope;
+using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Lib.Gateway.Utils;
 
 namespace Zylance.Core.Lib.Gateway.Models;

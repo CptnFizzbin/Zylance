@@ -1,4 +1,4 @@
-﻿<component name="ProjectRunConfigurationManager">
+<component name="ProjectRunConfigurationManager">
   <configuration default="false" name="UI - Start" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/Zylance.UI/package.json" />
     <command value="start" />

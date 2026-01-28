@@ -1,4 +1,4 @@
-﻿namespace Zylance.Core.Lib.Interfaces;
+namespace Zylance.Core.Lib.Interfaces;
 
 public interface ITransport
 {

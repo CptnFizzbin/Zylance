@@ -1,4 +1,4 @@
-﻿# Zylance.Vault.Local
+# Zylance.Vault.Local
 
 Local vault implementation using SQLite database through Entity Framework Core.
 

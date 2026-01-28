@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Photino.NET;
 using Zylance.Contract.Api.File;
 using Zylance.Core.Lib.Interfaces;

@@ -1,4 +1,4 @@
-﻿using Zylance.Core.Lib.Interfaces;
+using Zylance.Core.Lib.Interfaces;
 using Zylance.Vault.Local;
 
 namespace Zylance.Desktop;

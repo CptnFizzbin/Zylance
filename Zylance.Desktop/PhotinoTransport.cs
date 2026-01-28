@@ -1,4 +1,4 @@
-﻿using Photino.NET;
+using Photino.NET;
 using Zylance.Core.Lib.Interfaces;
 
 namespace Zylance.Desktop;

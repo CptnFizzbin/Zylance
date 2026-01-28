@@ -1,4 +1,4 @@
-﻿using Zylance.Contract.Api.Vault;
+using Zylance.Contract.Api.Vault;
 using Zylance.Core.Lib.Interfaces;
 
 namespace Zylance.Core.App.Services;

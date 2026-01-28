@@ -1,4 +1,4 @@
-﻿using Zylance.Contract.Api.File;
+using Zylance.Contract.Api.File;
 
 namespace Zylance.Core.Lib.Interfaces;
 

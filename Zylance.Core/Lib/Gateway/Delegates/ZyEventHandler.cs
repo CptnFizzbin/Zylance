@@ -1,4 +1,4 @@
-﻿using Zylance.Core.Lib.Gateway.Models;
+using Zylance.Core.Lib.Gateway.Models;
 
 namespace Zylance.Core.Lib.Gateway.Delegates;
 

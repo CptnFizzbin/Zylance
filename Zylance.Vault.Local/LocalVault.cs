@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Zylance.Core.Lib.Interfaces;
 using Zylance.Vault.Local.Context;
