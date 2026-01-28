@@ -32,6 +32,12 @@
     "paths": {
       "@/*": [
         "./Src/*"
+      ],
+      "@Contract/*": [
+        "./Generated/zylance/*"
+      ],
+      "@Lib/*": [
+        "./Lib/*"
       ]
     },
     "allowSyntheticDefaultImports": true

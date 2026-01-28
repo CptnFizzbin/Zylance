@@ -5,7 +5,7 @@ import { routeTree } from './routeTree.gen';
 import * as TanStackQueryProvider from './Integrations/tanstack-query/root-provider';
 
 import './styles.css';
-import { ZylanceProvider } from '@/Lib/ZylanceContext';
+import { ZylanceProvider } from '@Lib/ZylanceContext';
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext();
 const router = createRouter({

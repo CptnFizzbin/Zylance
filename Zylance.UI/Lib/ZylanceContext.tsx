@@ -1,5 +1,5 @@
 ﻿import { createContext, type FC, type PropsWithChildren, useContext } from 'react';
-import { createZylanceApi } from '@/Lib/ZylanceApi';
+import { createZylanceApi } from '@Lib/ZylanceApi';
 
 const zylanceApi = createZylanceApi();
 

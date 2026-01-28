@@ -2,11 +2,16 @@
   "name": "zylance",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": "^24.13.0"
+  },
   "scripts": {
-    "start": "vite --port 3000",
-    "build": "vite build && tsc",
+    "start": "yarn build:contract && vite --port 3000",
+    "build": "yarn build:contract -c Release && yarn build:ui",
+    "build:ui": "yarn tsc && vite build",
+    "build:contract": "dotnet build ../Zylance.Contract",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "yarn build:contract && vitest run",
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check"

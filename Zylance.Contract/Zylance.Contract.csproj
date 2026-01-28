@@ -24,6 +24,10 @@
         <Protobuf Include="./zylance/**/*.proto" GrpcServices="None"/>
     </ItemGroup>
 
+    <Target Name="CleanGenerated" BeforeTargets="Clean">
+        <RemoveDir Directories="bin;obj"/>
+    </Target>
+
     <Target Name="GenerateTS"
             AfterTargets="Build"
             Inputs="@(Protobuf); Scripts/build.ps1"

@@ -40,6 +40,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.join(ZYLANCE_UI_DIR, 'Src'),
+      '@Contract': path.join(ZYLANCE_UI_DIR, 'Generated/zylance'),
+      '@Lib': path.join(ZYLANCE_UI_DIR, 'Lib'),
     },
   },
 });

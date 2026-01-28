@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router"
 import logo from "../logo.svg"
 import { useState } from "react"
-import { useZylance } from "@/Lib/ZylanceContext"
+import { useZylance } from "@Lib/ZylanceContext"
 
 export const Route = createFileRoute("/")({
   component: App,

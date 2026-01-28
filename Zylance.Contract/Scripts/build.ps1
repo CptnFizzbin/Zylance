@@ -6,7 +6,7 @@ Write-Host "Root Directory: $rootDir"
 
 $contractDir = Join-Path $rootDir "Zylance.Contract"
 $uiDir = Join-Path $rootDir "Zylance.UI"
-$outDir = Join-Path $uiDir "Src/Generated"
+$outDir = Join-Path $uiDir "Generated"
 
 Set-Location $contractDir
 

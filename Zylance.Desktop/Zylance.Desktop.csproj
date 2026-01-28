@@ -19,6 +19,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Zylance.Core\Zylance.Core.csproj"/>
+        <ProjectReference Include="..\Zylance.UI\Zylance.UI.csproj"/>
         <ProjectReference Include="..\Zylance.Vault.Local\Zylance.Vault.Local.csproj"/>
     </ItemGroup>
 

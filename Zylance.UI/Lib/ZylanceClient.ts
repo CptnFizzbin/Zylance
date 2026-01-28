@@ -1,12 +1,12 @@
 ﻿import { v7 as uuidv7 } from "uuid"
-import { getTransport, type ITransport } from "@/Lib/ITransport"
+import { getTransport, type ITransport } from "@Lib/ITransport"
 import {
   type ErrorPayload,
   type EventPayload,
   GatewayEnvelope,
   type RequestPayload,
   type ResponsePayload,
-} from "@/Generated/zylance/lib/Envelope.ts"
+} from "@Contract/lib/Envelope"
 
 type PendingRequest = {
   resolve: (data: any) => void,

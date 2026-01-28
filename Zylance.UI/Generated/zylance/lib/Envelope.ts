@@ -15,6 +15,7 @@ export interface GatewayEnvelope {
   response?: ResponsePayload | undefined;
   event?: EventPayload | undefined;
   error?: ErrorPayload | undefined;
+  stream?: StreamPayload | undefined;
 }
 
 export interface RequestPayload {
@@ -40,8 +41,27 @@ export interface ErrorPayload {
   details: string;
 }
 
+export interface StreamPayload {
+  streamId: string;
+  isFinalChunk: boolean;
+  dataJson?:
+    | string
+    | undefined;
+  /** Sequential number starting from 0 */
+  sequenceNumber: number;
+  /** Total number of items in stream (if known) */
+  totalItems?: number | undefined;
+}
+
 function createBaseGatewayEnvelope(): GatewayEnvelope {
-  return { messageId: "", request: undefined, response: undefined, event: undefined, error: undefined };
+  return {
+    messageId: "",
+    request: undefined,
+    response: undefined,
+    event: undefined,
+    error: undefined,
+    stream: undefined,
+  };
 }
 
 export const GatewayEnvelope: MessageFns<GatewayEnvelope> = {
@@ -56,6 +76,7 @@ export const GatewayEnvelope: MessageFns<GatewayEnvelope> = {
       response: isSet(object.response) ? ResponsePayload.fromJSON(object.response) : undefined,
       event: isSet(object.event) ? EventPayload.fromJSON(object.event) : undefined,
       error: isSet(object.error) ? ErrorPayload.fromJSON(object.error) : undefined,
+      stream: isSet(object.stream) ? StreamPayload.fromJSON(object.stream) : undefined,
     };
   },
 
@@ -75,6 +96,9 @@ export const GatewayEnvelope: MessageFns<GatewayEnvelope> = {
     }
     if (message.error !== undefined) {
       obj.error = ErrorPayload.toJSON(message.error);
+    }
+    if (message.stream !== undefined) {
+      obj.stream = StreamPayload.toJSON(message.stream);
     }
     return obj;
   },
@@ -96,6 +120,9 @@ export const GatewayEnvelope: MessageFns<GatewayEnvelope> = {
       : undefined;
     message.error = (object.error !== undefined && object.error !== null)
       ? ErrorPayload.fromPartial(object.error)
+      : undefined;
+    message.stream = (object.stream !== undefined && object.stream !== null)
+      ? StreamPayload.fromPartial(object.stream)
       : undefined;
     return message;
   },
@@ -272,6 +299,75 @@ export const ErrorPayload: MessageFns<ErrorPayload> = {
     message.requestId = object.requestId ?? undefined;
     message.type = object.type ?? "";
     message.details = object.details ?? "";
+    return message;
+  },
+};
+
+function createBaseStreamPayload(): StreamPayload {
+  return { streamId: "", isFinalChunk: false, dataJson: undefined, sequenceNumber: 0, totalItems: undefined };
+}
+
+export const StreamPayload: MessageFns<StreamPayload> = {
+  fromJSON(object: any): StreamPayload {
+    return {
+      streamId: isSet(object.streamId)
+        ? globalThis.String(object.streamId)
+        : isSet(object.stream_id)
+        ? globalThis.String(object.stream_id)
+        : "",
+      isFinalChunk: isSet(object.isFinalChunk)
+        ? globalThis.Boolean(object.isFinalChunk)
+        : isSet(object.is_final_chunk)
+        ? globalThis.Boolean(object.is_final_chunk)
+        : false,
+      dataJson: isSet(object.dataJson)
+        ? globalThis.String(object.dataJson)
+        : isSet(object.data_json)
+        ? globalThis.String(object.data_json)
+        : undefined,
+      sequenceNumber: isSet(object.sequenceNumber)
+        ? globalThis.Number(object.sequenceNumber)
+        : isSet(object.sequence_number)
+        ? globalThis.Number(object.sequence_number)
+        : 0,
+      totalItems: isSet(object.totalItems)
+        ? globalThis.Number(object.totalItems)
+        : isSet(object.total_items)
+        ? globalThis.Number(object.total_items)
+        : undefined,
+    };
+  },
+
+  toJSON(message: StreamPayload): unknown {
+    const obj: any = {};
+    if (message.streamId !== "") {
+      obj.streamId = message.streamId;
+    }
+    if (message.isFinalChunk !== false) {
+      obj.isFinalChunk = message.isFinalChunk;
+    }
+    if (message.dataJson !== undefined) {
+      obj.dataJson = message.dataJson;
+    }
+    if (message.sequenceNumber !== 0) {
+      obj.sequenceNumber = Math.round(message.sequenceNumber);
+    }
+    if (message.totalItems !== undefined) {
+      obj.totalItems = Math.round(message.totalItems);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<StreamPayload>, I>>(base?: I): StreamPayload {
+    return StreamPayload.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<StreamPayload>, I>>(object: I): StreamPayload {
+    const message = createBaseStreamPayload();
+    message.streamId = object.streamId ?? "";
+    message.isFinalChunk = object.isFinalChunk ?? false;
+    message.dataJson = object.dataJson ?? undefined;
+    message.sequenceNumber = object.sequenceNumber ?? 0;
+    message.totalItems = object.totalItems ?? undefined;
     return message;
   },
 };
