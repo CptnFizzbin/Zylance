@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Desktop", "Zylance.Desktop\Zylance.Desktop.csproj", "{E39B0693-39E5-41F6-8542-87594D671E65}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Core", "Zylance.Core\Zylance.Core.csproj", "{9C67CCBB-568C-41A4-89C8-6492DB4C1BD2}"
@@ -11,11 +11,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Local", "Zyla
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.SourceGenerators", "Zylance.SourceGenerators\Zylance.SourceGenerators.csproj", "{D16E2F9E-293F-4FAF-9289-5C6FD53348CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Core.Tests", "Zylance.Core.Tests\Zylance.Core.Tests.csproj", "{596E23AD-8C60-4C41-9DEA-A6EA75BEFCAD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Remote", "Zylance.Vault.Remote\Zylance.Vault.Remote.csproj", "{9ED44B59-D740-4F6A-BED9-79A1F8B9614B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Desktop.Tests", "Zylance.Desktop.Tests\Zylance.Desktop.Tests.csproj", "{3C538E34-A8F1-4E6E-AFFB-5AFE34A8BECA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Remote.Tests", "Zylance.Vault.Remote.Tests\Zylance.Vault.Remote.Tests.csproj", "{16AB785C-F14B-439D-A4AC-F173FB2DBA51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Local.Tests", "Zylance.Vault.Local.Tests\Zylance.Vault.Local.Tests.csproj", "{685E6C89-803A-4853-B600-51B324FB618B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Core.Tests", "Zylance.Core.Tests\Zylance.Core.Tests.csproj", "{0FFB7C1F-3B18-4213-B76F-9836518DB649}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Local.Tests", "Zylance.Vault.Local.Tests\Zylance.Vault.Local.Tests.csproj", "{6FC908AB-5E7A-4123-9C27-31EF992D4A56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Desktop.Tests", "Zylance.Desktop.Tests\Zylance.Desktop.Tests.csproj", "{0EA51A53-0F23-4E55-AB72-0AB7DBCEAF3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,17 +55,25 @@ Global
 		{A5B3C4D5-E6F7-4A8B-9C0D-1E2F3A4B5C6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5B3C4D5-E6F7-4A8B-9C0D-1E2F3A4B5C6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5B3C4D5-E6F7-4A8B-9C0D-1E2F3A4B5C6D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{596E23AD-8C60-4C41-9DEA-A6EA75BEFCAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{596E23AD-8C60-4C41-9DEA-A6EA75BEFCAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{596E23AD-8C60-4C41-9DEA-A6EA75BEFCAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{596E23AD-8C60-4C41-9DEA-A6EA75BEFCAD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3C538E34-A8F1-4E6E-AFFB-5AFE34A8BECA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3C538E34-A8F1-4E6E-AFFB-5AFE34A8BECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3C538E34-A8F1-4E6E-AFFB-5AFE34A8BECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3C538E34-A8F1-4E6E-AFFB-5AFE34A8BECA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{685E6C89-803A-4853-B600-51B324FB618B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{685E6C89-803A-4853-B600-51B324FB618B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{685E6C89-803A-4853-B600-51B324FB618B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{685E6C89-803A-4853-B600-51B324FB618B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9ED44B59-D740-4F6A-BED9-79A1F8B9614B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9ED44B59-D740-4F6A-BED9-79A1F8B9614B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9ED44B59-D740-4F6A-BED9-79A1F8B9614B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9ED44B59-D740-4F6A-BED9-79A1F8B9614B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16AB785C-F14B-439D-A4AC-F173FB2DBA51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16AB785C-F14B-439D-A4AC-F173FB2DBA51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16AB785C-F14B-439D-A4AC-F173FB2DBA51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16AB785C-F14B-439D-A4AC-F173FB2DBA51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FFB7C1F-3B18-4213-B76F-9836518DB649}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FFB7C1F-3B18-4213-B76F-9836518DB649}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FFB7C1F-3B18-4213-B76F-9836518DB649}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FFB7C1F-3B18-4213-B76F-9836518DB649}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FC908AB-5E7A-4123-9C27-31EF992D4A56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FC908AB-5E7A-4123-9C27-31EF992D4A56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FC908AB-5E7A-4123-9C27-31EF992D4A56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FC908AB-5E7A-4123-9C27-31EF992D4A56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EA51A53-0F23-4E55-AB72-0AB7DBCEAF3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EA51A53-0F23-4E55-AB72-0AB7DBCEAF3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EA51A53-0F23-4E55-AB72-0AB7DBCEAF3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EA51A53-0F23-4E55-AB72-0AB7DBCEAF3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
