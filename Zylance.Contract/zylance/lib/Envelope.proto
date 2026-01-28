@@ -1,4 +1,4 @@
-﻿syntax = "proto3";
+syntax = "proto3";
 package zylance.contract;
 
 option csharp_namespace = "Zylance.Contract.Lib.Envelope";
@@ -12,6 +12,7 @@ message GatewayEnvelope {
     ResponsePayload response = 3;
     EventPayload event = 4;
     ErrorPayload error = 5;
+    StreamPayload stream = 6;
   }
 }
 
@@ -36,4 +37,12 @@ message ErrorPayload {
   optional string request_id = 1;
   string type = 2;
   string details = 3;
+}
+
+message StreamPayload {
+  string stream_id = 1;
+  bool is_final_chunk = 2;
+  optional string data_json = 3;
+  uint32 sequence_number = 4;  // Sequential number starting from 0
+  optional uint32 total_items = 5;  // Total number of items in stream (if known)
 }

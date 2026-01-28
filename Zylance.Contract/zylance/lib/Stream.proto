@@ -1,0 +1,39 @@
+﻿syntax = "proto3";
+package zylance.contract;
+
+option csharp_namespace = "Zylance.Contract.Lib.Stream";
+
+// === Stream Events ===
+
+/**
+ * Event emitted by the sender, to let the receiver know a stream is being sent.
+ * Data will be passed in subsequent StreamPayload messages.
+ */
+message StreamStartEvt {
+  string stream_id = 1;
+}
+
+/**
+ * Event emitted by the receiver, to say that it's ready to receive stream data.
+ */
+message StreamListenEvt {
+  string stream_id = 1;
+}
+
+/**
+ * Event emitted by either party to indicate that the stream should be cancelled.
+ */
+message StreamCancelledEvt {
+  string stream_id = 1;
+  string reason = 2;
+  optional string data_json = 3;
+}
+
+/**
+ * Event emitted by either party to indicate that an error has occurred with the stream.
+ */
+message StreamErrorEvt {
+  string stream_id = 1;
+  string reason = 2;
+  string details = 3;
+}
