@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 
 // TODO: Create SourceGenerator to create a JSON serialization context for all protobuf types
 
