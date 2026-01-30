@@ -1,0 +1,15 @@
+# CSharpier ignore file
+# Ignore generated files and build artifacts
+**/obj/**
+**/bin/**
+**/Generated/**
+**/*.Designer.cs
+**/*.g.cs
+**/*.g.i.cs
+**/TemporaryGeneratedFile_*.cs
+
+# Ignore node_modules
+**/node_modules/**
+
+# Keep generated contract code unformatted
+Zylance.Contract/zylance/**
