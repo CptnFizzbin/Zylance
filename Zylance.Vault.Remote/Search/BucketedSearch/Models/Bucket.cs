@@ -1,5 +1,15 @@
 namespace Zylance.Vault.Remote.Search.BucketedSearch.Models;
 
+/// <summary>
+///     Represents a unique identifier for a bucket.
+/// </summary>
+/// <param name="Value">
+///     The bucket identifier string, typically formatted as "{keyword}:{index}" (e.g., "coffee:0").
+/// </param>
+/// <remarks>
+///     In zero-knowledge implementations, this value should be a hashed or encrypted representation
+///     to prevent the storage layer from knowing which keyword the bucket belongs to.
+/// </remarks>
 public readonly record struct BucketId(string Value);
 
 /// <summary>

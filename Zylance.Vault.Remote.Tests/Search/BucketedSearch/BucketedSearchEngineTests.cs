@@ -50,11 +50,10 @@ public class BucketedSearchEngineTests
 
         // Assert
         var keywords = _storage.Glossary.GetAll();
-        Assert.Equal(4, keywords.Count);
+        Assert.Equal(3, keywords.Count);
         Assert.Contains(keywords, k => k.Value == "hello");
         Assert.Contains(keywords, k => k.Value == "world");
-        Assert.Contains(keywords, k => k.Value == "test"); // @ splits tokens
-        Assert.Contains(keywords, k => k.Value == "123");
+        Assert.Contains(keywords, k => k.Value == "test@123"); // @ is preserved in tokens
     }
 
     [Fact]
@@ -70,6 +69,8 @@ public class BucketedSearchEngineTests
         // Assert
         var keywords = _storage.Glossary.GetAll();
         Assert.Equal(2, keywords.Count);
+        Assert.Contains(keywords, k => k.Value == "hello");
+        Assert.Contains(keywords, k => k.Value == "world");
     }
 
     [Fact]
@@ -649,6 +650,164 @@ public class BucketedSearchEngineTests
 
         // Assert - All variations should be found
         Assert.Equal(4, results.Count);
+    }
+
+    [Fact]
+    public async Task Search_FuzzyWithHyphenatedTerm_ShouldMatchExact()
+    {
+        // Arrange - Index content with hyphenated term
+        await _searchEngine.AddItemAsync("item1", "Purchase from foo-bar store");
+        await _searchEngine.AddItemAsync("item2", "Visit to foobar location");
+        await _searchEngine.AddItemAsync("item3", "Order at foo bar restaurant");
+
+        // Act - Search with exact hyphenated term
+        var results = await _searchEngine.SearchAsync("foo-bar", fuzzy: true);
+
+        // Assert - Hyphens are now preserved in tokens
+        // "foo-bar" remains as a single token "foo-bar"
+        // Only item1 has the exact token "foo-bar"
+        Assert.Single(results);
+        Assert.Contains("item1", results);
+    }
+
+    [Fact]
+    public async Task Search_FuzzyWithHyphenatedQuery_ShouldTokenizeAndMatch()
+    {
+        // Arrange
+        await _searchEngine.AddItemAsync("item1", "check-in process completed");
+        await _searchEngine.AddItemAsync("item2", "checking status");
+        await _searchEngine.AddItemAsync("item3", "process incoming requests");
+
+        // Act - Hyphen is preserved in token
+        var results = await _searchEngine.SearchAsync("check-in", fuzzy: true);
+
+        // Assert - "check-in" remains as single token
+        // item1: has "check-in" token ✓
+        // item2: has "checking" (fuzzy contains "check-in"? No, "check-in" is longer)
+        // Actually fuzzy means the keyword contains the search token
+        // So we're looking for keywords that contain "check-in"
+        Assert.Single(results);
+        Assert.Contains("item1", results);
+    }
+
+    [Fact]
+    public async Task Search_FuzzyWithEmailPattern_ShouldMatchPartialEmail()
+    {
+        // Arrange - Index content with email-like patterns
+        await _searchEngine.AddItemAsync("item1", "Contact me@place.com for details");
+        await _searchEngine.AddItemAsync("item2", "Email sent to me@other.org");
+        await _searchEngine.AddItemAsync("item3", "User you@place.com replied");
+
+        // Act - Search with partial email (fuzzy)
+        var results = await _searchEngine.SearchAsync("me@pla", fuzzy: true);
+
+        // Assert - "@" is now preserved, "." still splits
+        // "me@place.com" becomes tokens ["me@place", "com"]
+        // Query "me@pla" is a single token
+        // Fuzzy search: keyword contains search token
+        // "me@place" contains "me@pla" ✓
+        Assert.Single(results);
+        Assert.Contains("item1", results);
+    }
+
+    [Fact]
+    public async Task Search_FuzzyWithEmailPattern_ExactToken()
+    {
+        // Arrange
+        await _searchEngine.AddItemAsync("item1", "user@example.com registration");
+        await _searchEngine.AddItemAsync("item2", "contact example support");
+        await _searchEngine.AddItemAsync("item3", "user account created");
+
+        // Act - Search for "user" (part of email)
+        var results = await _searchEngine.SearchAsync("user", fuzzy: true);
+
+        // Assert - "user@example" is a single token, but contains "user"
+        // item1: has "user@example" (contains "user") ✓
+        // item2: no token containing "user" ✗
+        // item3: has "user" token ✓
+        Assert.Equal(2, results.Count);
+        Assert.Contains("item1", results);
+        Assert.Contains("item3", results);
+    }
+
+    [Fact]
+    public async Task Search_FuzzyWithSpecialChars_ShouldSplitTokens()
+    {
+        // Arrange - Various special characters as delimiters
+        await _searchEngine.AddItemAsync("item1", "product@store/location");
+        await _searchEngine.AddItemAsync("item2", "store#2 branch");
+        await _searchEngine.AddItemAsync("item3", "location coordinates");
+
+        // Act - Search for "store" (separated by special chars)
+        var results = await _searchEngine.SearchAsync("store", fuzzy: true);
+
+        // Assert - @ is preserved, / and # still split
+        // item1: "product@store/location" → ["product@store", "location"], no exact "store" but "product@store" doesn't contain "store" at start
+        // Actually "product@store" DOES contain "store" (fuzzy substring match)
+        // item2: "store#2 branch" → ["store", "2", "branch"]
+        Assert.Equal(2, results.Count);
+        Assert.Contains("item1", results);
+        Assert.Contains("item2", results);
+    }
+
+    [Fact]
+    public async Task Search_ExactWithHyphenatedTerm_ShouldMatchIndividualTokens()
+    {
+        // Arrange
+        await _searchEngine.AddItemAsync("item1", "Product foo-bar available");
+
+        // Act - Exact search for "foo-bar"
+        var results = await _searchEngine.SearchAsync("foo-bar", fuzzy: false);
+
+        // Assert - "foo-bar" is now a single token that exists exactly
+        Assert.Single(results);
+        Assert.Contains("item1", results);
+    }
+
+    [Fact]
+    public async Task Search_ExactWithEmailPattern_ShouldNotMatchPartial()
+    {
+        // Arrange
+        await _searchEngine.AddItemAsync("item1", "Contact me@place.com");
+
+        // Act - Exact search for "me@pla"
+        var results = await _searchEngine.SearchAsync("me@pla", fuzzy: false);
+
+        // Assert - "me@place" is the indexed token, but exact search requires "me@pla" exactly
+        // No exact match for token "me@pla"
+        Assert.Empty(results);
+    }
+
+    [Fact]
+    public async Task Search_WithUnderscores_ShouldPreserveInTokens()
+    {
+        // Arrange
+        await _searchEngine.AddItemAsync("item1", "function check_status called");
+        await _searchEngine.AddItemAsync("item2", "checking status");
+        await _searchEngine.AddItemAsync("item3", "status_update pending");
+
+        // Act
+        var results = await _searchEngine.SearchAsync("check_status", fuzzy: true);
+
+        // Assert - Underscores are preserved, only item1 has "check_status"
+        Assert.Single(results);
+        Assert.Contains("item1", results);
+    }
+
+    [Fact]
+    public async Task Search_WithEmailAddress_ShouldPreserveAtSymbol()
+    {
+        // Arrange
+        await _searchEngine.AddItemAsync("item1", "Email: support@company.com");
+        await _searchEngine.AddItemAsync("item2", "Contact support at company");
+
+        // Act
+        var results = await _searchEngine.SearchAsync("support@company", fuzzy: true);
+
+        // Assert - @ is preserved in tokens
+        // item1: "support@company" token (before .com) ✓
+        Assert.Single(results);
+        Assert.Contains("item1", results);
     }
 
     #endregion
