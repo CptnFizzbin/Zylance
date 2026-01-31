@@ -17,8 +17,12 @@ export type EventHandler = (data: any) => void;
 export type Unsubscribe = () => void;
 export type OptionalData = object | void;
 
-export interface Endpoint<_TAction extends string, TReqData extends OptionalData = void, TResData extends OptionalData = void, TReturn extends OptionalData = TResData> {
+export interface RequestEndpoint<_TAction extends string, TReqData extends OptionalData = void, TResData extends OptionalData = void, TReturn extends OptionalData = TResData> {
   (data: TReqData): Promise<TReturn>
+}
+
+export interface EventEndpoint<_TEvent extends string, TEvtData extends OptionalData = void> {
+  (data: TEvtData): Promise<void>
 }
 
 export class MessageError extends Error {
@@ -42,14 +46,14 @@ export class ZylanceClient {
     this.transport.receive(this.onMessageReceived.bind(this))
   }
 
-  public createEndpoint<
+  public createRequestEndpoint<
     TAction extends string,
     TReqData extends OptionalData = void,
     TResData extends OptionalData = void
   > (
     action: TAction,
-  ): Endpoint<TAction, TReqData, TResData>
-  public createEndpoint<
+  ): RequestEndpoint<TAction, TReqData, TResData>
+  public createRequestEndpoint<
     TAction extends string,
     TReqData extends OptionalData = void,
     TResData extends OptionalData = void,
@@ -57,8 +61,8 @@ export class ZylanceClient {
   > (
     action: TAction,
     handler: (res: TResData) => Promise<TReturn>,
-  ): Endpoint<TAction, TReqData, TResData, TReturn>
-  public createEndpoint<
+  ): RequestEndpoint<TAction, TReqData, TResData, TReturn>
+  public createRequestEndpoint<
     TAction extends string,
     TReqData extends OptionalData = void,
     TResData extends OptionalData = void,
@@ -66,11 +70,17 @@ export class ZylanceClient {
   > (
     action: TAction,
     handler?: (res: TResData) => Promise<TReturn>,
-  ): Endpoint<TAction, TReqData, TResData, TReturn> {
+  ): RequestEndpoint<TAction, TReqData, TResData, TReturn> {
     return async (data: TReqData) => {
       return handler
         ? this.makeRequest<TReqData, TResData>(action, data).then(res => handler(res))
         : this.makeRequest<TReqData, TReturn>(action, data)
+    }
+  }
+
+  public createEventEndpoint<TEvent extends string, TEvtData extends OptionalData = void> (event: TEvent): EventEndpoint<TEvent, TEvtData> {
+    return async (data: TEvtData) => {
+      this.sendEvent<TEvtData>(event, data)
     }
   }
 
@@ -89,8 +99,8 @@ export class ZylanceClient {
     }
   }
 
-  public sendEvent<TData = void> (event: string, data?: TData) {
-    const eventPayload: EventPayload = { event }
+  public sendEvent<TData = void> (eventName: string, data?: TData) {
+    const eventPayload: EventPayload = { eventName }
     if (data) { eventPayload.dataJson = JSON.stringify(data) }
     this.sendMessage({ event: eventPayload })
   }
@@ -128,10 +138,10 @@ export class ZylanceClient {
     pending.resolve(data)
   }
 
-  private onEventReceived ({ event, dataJson }: EventPayload) {
+  private onEventReceived ({ eventName, dataJson }: EventPayload) {
     const data = dataJson ? JSON.parse(dataJson) : undefined
 
-    const handlers = this.eventHandlers.get(event)
+    const handlers = this.eventHandlers.get(eventName)
     if (!handlers || handlers.size === 0) return
 
     handlers.forEach(handler => {
@@ -151,7 +161,7 @@ export class ZylanceClient {
         pending.reject(new Error(`Error of type ${type} received. Details: ${details}`))
       }
     } else {
-      this.onEventReceived({ event: "error", dataJson: JSON.stringify({ type, details }) })
+      this.onEventReceived({ eventName: "error", dataJson: JSON.stringify({ type, details }) })
     }
   }
 
