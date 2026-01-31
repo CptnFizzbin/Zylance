@@ -10,7 +10,7 @@ public class ZyRequest
 
     public TData GetData<TData>()
     {
-        return MessageSerializer.Deserialize<TData>(Payload.DataJson)
+        return MessageUtils.Deserialize<TData>(Payload.DataJson)
             ?? throw new ArgumentException("Failed to deserialize request data");
     }
 }
@@ -19,7 +19,7 @@ public class ZyRequest<TData> : ZyRequest
 {
     public TData GetData()
     {
-        return MessageSerializer.Deserialize<TData>(Payload.DataJson)
+        return MessageUtils.Deserialize<TData>(Payload.DataJson)
             ?? throw new ArgumentException("Failed to deserialize request data");
     }
 }

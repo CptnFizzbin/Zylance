@@ -28,7 +28,7 @@ public class Gateway
 
     public void Send(EventPayload eventPayload)
     {
-        Console.WriteLine($"<== Evt: {eventPayload.Event} - {eventPayload.DataJson}");
+        Console.WriteLine($"<== Evt: {eventPayload.EventName} - {eventPayload.DataJson}");
         var envelope = new GatewayEnvelope { Event = eventPayload };
         Send(envelope);
     }
@@ -67,9 +67,8 @@ public class Gateway
         }
         catch (Exception ex)
         {
-            var requestId = message.PayloadCase == GatewayEnvelope.PayloadOneofCase.Request
-                ? message.Request.RequestId
-                : null;
+            var requestId =
+                message.PayloadCase == GatewayEnvelope.PayloadOneofCase.Request ? message.Request.RequestId : null;
 
             var error = ExceptionHandler.WrapException(ex, requestId);
             Send(error);
@@ -91,7 +90,7 @@ public class Gateway
 
     private async Task HandleMessage(EventPayload payload)
     {
-        Console.WriteLine($"==> Evt: {payload.Event} - {payload.DataJson}");
+        Console.WriteLine($"==> Evt: {payload.EventName} - {payload.DataJson}");
 
         var evt = new ZyEvent { Payload = payload };
 
@@ -101,7 +100,7 @@ public class Gateway
     private void Send(GatewayEnvelope envelope)
     {
         envelope.MessageId = Guid.NewGuid().ToString();
-        var msgJson = MessageSerializer.Serialize(envelope);
+        var msgJson = MessageUtils.Serialize(envelope);
         _transport.Send(msgJson);
     }
 }

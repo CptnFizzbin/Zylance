@@ -16,7 +16,7 @@ public class ZyResponse
 
     public ZyResponse SetData<TData>(TData data)
     {
-        Payload.DataJson = MessageSerializer.Serialize(data);
+        Payload.DataJson = MessageUtils.Serialize(data);
         return this;
     }
 }
@@ -25,13 +25,13 @@ public class ZyResponse<TData> : ZyResponse
 {
     public ZyResponse<TData> SetData(TData data)
     {
-        Payload.DataJson = MessageSerializer.Serialize(data);
+        Payload.DataJson = MessageUtils.Serialize(data);
         return this;
     }
 
     public TData GetData()
     {
-        return MessageSerializer.Deserialize<TData>(Payload.DataJson)
+        return MessageUtils.Deserialize<TData>(Payload.DataJson)
             ?? throw new ArgumentException("Failed to deserialize response data");
     }
 }
