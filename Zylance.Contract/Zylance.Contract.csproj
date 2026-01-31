@@ -31,7 +31,8 @@
             Inputs="@(Protobuf);$(MSBuildProjectFile)"
             Outputs="$(TsGeneratedMarker)/.generated">
         <Message Importance="high" Text="Generating TypeScript from Protocol Buffers..."/>
-        <Exec Command="$(YarnExe) build &quot;$(TsOutputPath)&quot;"/>
+        <Exec Command="$(YarnExe) install"/>
+        <Exec Command="$(YarnExe) build &quot;$(TsOutputPath)&quot;" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
         <Touch Files="$(TsOutputPath)/.generated" AlwaysCreate="true"/>
     </Target>
 </Project>

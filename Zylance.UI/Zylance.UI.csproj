@@ -32,6 +32,7 @@
             Inputs="@(SourceFiles);@(ConfigFiles)"
             Outputs="$(IntermediateOutputPath)tsc.marker"
     >
+        <Exec Command="$(YarnExe) install"/>
         <Exec Command="$(YarnExe) tsc" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
         <Touch Files="$(IntermediateOutputPath)tsc.marker" AlwaysCreate="true"/>
     </Target>
@@ -43,6 +44,7 @@
             Inputs="@(SourceFiles);@(ConfigFiles)"
             Outputs="$(IntermediateOutputPath)build.marker"
     >
+        <Exec Command="$(YarnExe) install"/>
         <Exec Command="$(YarnExe) build:ui" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
         <Touch Files="$(IntermediateOutputPath)build.marker" AlwaysCreate="true"/>
     </Target>
