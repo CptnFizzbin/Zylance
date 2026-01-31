@@ -11,7 +11,7 @@ export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({ onClose, ...prop
     <FileBarMenu {...props} label={"File"} onClose={onClose}>
       <MenuItem
         onClick={() => {
-          zylance.desktop.exit()
+          zylance.desktop.emitExit()
           onClose()
         }}
       >

@@ -24,9 +24,3 @@ message VaultCreateRes {
   option (action) = "Vault:CreateVault";
   VaultRef vault_ref = 1;
 }
-
-// === Vault Events ===
-message VaultOpenedEvt {
-  option (eventName) = "Vault:VaultOpened";
-  VaultRef vault = 1;
-}

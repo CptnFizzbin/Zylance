@@ -24,11 +24,6 @@ export interface VaultCreateRes {
   vaultRef: VaultRef | undefined;
 }
 
-/** === Vault Events === */
-export interface VaultOpenedEvt {
-  vault: VaultRef | undefined;
-}
-
 function createBaseVaultOpenReq(): VaultOpenReq {
   return {};
 }
@@ -140,35 +135,6 @@ export const VaultCreateRes: MessageFns<VaultCreateRes> = {
     const message = createBaseVaultCreateRes();
     message.vaultRef = (object.vaultRef !== undefined && object.vaultRef !== null)
       ? VaultRef.fromPartial(object.vaultRef)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseVaultOpenedEvt(): VaultOpenedEvt {
-  return { vault: undefined };
-}
-
-export const VaultOpenedEvt: MessageFns<VaultOpenedEvt> = {
-  fromJSON(object: any): VaultOpenedEvt {
-    return { vault: isSet(object.vault) ? VaultRef.fromJSON(object.vault) : undefined };
-  },
-
-  toJSON(message: VaultOpenedEvt): unknown {
-    const obj: any = {};
-    if (message.vault !== undefined) {
-      obj.vault = VaultRef.toJSON(message.vault);
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<VaultOpenedEvt>, I>>(base?: I): VaultOpenedEvt {
-    return VaultOpenedEvt.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<VaultOpenedEvt>, I>>(object: I): VaultOpenedEvt {
-    const message = createBaseVaultOpenedEvt();
-    message.vault = (object.vault !== undefined && object.vault !== null)
-      ? VaultRef.fromPartial(object.vault)
       : undefined;
     return message;
   },

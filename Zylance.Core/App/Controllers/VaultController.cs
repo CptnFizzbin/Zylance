@@ -21,10 +21,4 @@ public class VaultController(VaultService vaultService)
         var vaultRef = vaultService.CreateVault();
         res.SetData(new VaultCreateRes { VaultRef = vaultRef });
     }
-
-    [EventHandler]
-    public void OnVaultUpdated(ZyEvent<VaultOpenedEvt> evt)
-    {
-        Console.WriteLine($"[VaultController] Vault updated: {evt.Data.Vault.Id}");
-    }
 }
