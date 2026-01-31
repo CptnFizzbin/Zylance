@@ -52,7 +52,7 @@ public interface IBucketManager<TItemId>
     ///     Implementations should decrypt bucket contents client-side. The server only stores and
     ///     retrieves encrypted blobs identified by the bucket ID.
     /// </remarks>
-    public Task<Bucket<TItemId>?> LoadBucket(BucketId bucketId);
+    public Task<Bucket<TItemId>> LoadBucket(BucketId bucketId);
 
     /// <summary>
     ///     Saves a bucket to storage.

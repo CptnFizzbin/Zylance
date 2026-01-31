@@ -141,7 +141,7 @@ public class BucketedSearchEngineTests
         var results = await _searchEngine.SearchAsync("hello world");
 
         // Assert
-        Assert.Equal(1, results.Count);
+        Assert.Single(results);
         Assert.Contains("item1", results);
     }
 
@@ -455,40 +455,109 @@ public class BucketedSearchEngineTests
         // Arrange - Index 100 transaction payees
         var payees = new[]
         {
-            "Starbucks Coffee #1234", "Amazon.com", "Shell Gas Station",
-            "Whole Foods Market", "Target Store #5678", "McDonald's Restaurant",
-            "Walmart Supercenter", "CVS Pharmacy #9012", "Home Depot",
-            "Best Buy Electronics", "Chipotle Mexican Grill", "Safeway Grocery",
-            "Costco Wholesale", "7-Eleven Store", "Subway Sandwiches",
-            "Apple Store Online", "Netflix Subscription", "Spotify Premium",
-            "AT&T Wireless Payment", "Comcast Cable Bill", "PG&E Utilities",
-            "State Farm Insurance", "Chase Credit Card Payment", "Venmo Payment",
-            "PayPal Transfer", "Square Cash", "Uber Trip", "Lyft Ride",
-            "DoorDash Delivery", "Grubhub Order", "Instacart Groceries",
-            "Southwest Airlines", "United Airlines", "Hilton Hotels",
-            "Marriott International", "Airbnb Reservation", "Budget Car Rental",
-            "Enterprise Rent-A-Car", "AutoZone Auto Parts", "Jiffy Lube Oil Change",
-            "Planet Fitness Gym", "LA Fitness Membership", "AMC Theatres",
-            "Regal Cinemas", "Barnes & Noble Bookstore", "GameStop",
-            "Pet-co Pet Supplies", "PetSmart", "Chewy.com Pet Food",
-            "Kroger Supermarket", "Trader Joe's", "Panera Bread",
-            "Olive Garden Restaurant", "Red Lobster", "Outback Steakhouse",
-            "Chili's Grill & Bar", "Apple-bee's", "Buffalo Wild Wings",
-            "Pizza Hut Delivery", "Domino's Pizza", "Papa John's",
-            "Taco Bell", "KFC Restaurant", "Burger King",
-            "Wendy's", "Arby's", "Five Guys Burgers",
-            "In-N-Out Burger", "Shake Shack", "The Cheesecake Factory",
-            "P.F. Chang's", "California Pizza Kitchen", "Panda Express",
-            "Jamba Juice", "Smoothie King", "Dunkin' Donuts",
-            "Krispy Kreme", "Baskin-Robbins", "Cold Stone Creamery",
-            "Yogurtland", "Pinkberry Frozen Yogurt", "Nordstrom Department Store",
-            "Macy's", "JCPenney", "Kohl's Department Store",
-            "Gap Clothing Store", "Old Navy", "H&M Fashion",
-            "Zara", "Forever 21", "Victoria's Secret",
-            "Bath & Body Works", "Bed Bath & Beyond", "Williams Sonoma",
-            "Crate and Barrel", "IKEA Furniture", "Office Depot",
-            "Staples Office Supplies", "FedEx Shipping", "UPS Store",
-            "USPS Postage", "Walgreens Pharmacy", "Rite Aid",
+            "Starbucks Coffee #1234",
+            "Amazon.com",
+            "Shell Gas Station",
+            "Whole Foods Market",
+            "Target Store #5678",
+            "McDonald's Restaurant",
+            "Walmart Supercenter",
+            "CVS Pharmacy #9012",
+            "Home Depot",
+            "Best Buy Electronics",
+            "Chipotle Mexican Grill",
+            "Safeway Grocery",
+            "Costco Wholesale",
+            "7-Eleven Store",
+            "Subway Sandwiches",
+            "Apple Store Online",
+            "Netflix Subscription",
+            "Spotify Premium",
+            "AT&T Wireless Payment",
+            "Comcast Cable Bill",
+            "PG&E Utilities",
+            "State Farm Insurance",
+            "Chase Credit Card Payment",
+            "Venmo Payment",
+            "PayPal Transfer",
+            "Square Cash",
+            "Uber Trip",
+            "Lyft Ride",
+            "DoorDash Delivery",
+            "Grubhub Order",
+            "Instacart Groceries",
+            "Southwest Airlines",
+            "United Airlines",
+            "Hilton Hotels",
+            "Marriott International",
+            "Airbnb Reservation",
+            "Budget Car Rental",
+            "Enterprise Rent-A-Car",
+            "AutoZone Auto Parts",
+            "Jiffy Lube Oil Change",
+            "Planet Fitness Gym",
+            "LA Fitness Membership",
+            "AMC Theatres",
+            "Regal Cinemas",
+            "Barnes & Noble Bookstore",
+            "GameStop",
+            "Pet-co Pet Supplies",
+            "PetSmart",
+            "Chewy.com Pet Food",
+            "Kroger Supermarket",
+            "Trader Joe's",
+            "Panera Bread",
+            "Olive Garden Restaurant",
+            "Red Lobster",
+            "Outback Steakhouse",
+            "Chili's Grill & Bar",
+            "Apple-bee's",
+            "Buffalo Wild Wings",
+            "Pizza Hut Delivery",
+            "Domino's Pizza",
+            "Papa John's",
+            "Taco Bell",
+            "KFC Restaurant",
+            "Burger King",
+            "Wendy's",
+            "Arby's",
+            "Five Guys Burgers",
+            "In-N-Out Burger",
+            "Shake Shack",
+            "The Cheesecake Factory",
+            "P.F. Chang's",
+            "California Pizza Kitchen",
+            "Panda Express",
+            "Jamba Juice",
+            "Smoothie King",
+            "Dunkin' Donuts",
+            "Krispy Kreme",
+            "Baskin-Robbins",
+            "Cold Stone Creamery",
+            "Yogurtland",
+            "Pinkberry Frozen Yogurt",
+            "Nordstrom Department Store",
+            "Macy's",
+            "JCPenney",
+            "Kohl's Department Store",
+            "Gap Clothing Store",
+            "Old Navy",
+            "H&M Fashion",
+            "Zara",
+            "Forever 21",
+            "Victoria's Secret",
+            "Bath & Body Works",
+            "Bed Bath & Beyond",
+            "Williams Sonoma",
+            "Crate and Barrel",
+            "IKEA Furniture",
+            "Office Depot",
+            "Staples Office Supplies",
+            "FedEx Shipping",
+            "UPS Store",
+            "USPS Postage",
+            "Walgreens Pharmacy",
+            "Rite Aid",
         };
 
         for (var i = 0; i < payees.Length; i++)
@@ -858,7 +927,7 @@ public class BucketedSearchEngineTests
         {
             ("item1", "Hello World"),
             ("item2", "Goodbye Universe"),
-            ("item3", "Test Content")
+            ("item3", "Test Content"),
         };
 
         // Act
@@ -881,9 +950,9 @@ public class BucketedSearchEngineTests
 
         var items = new List<(string itemId, string content)>
         {
-            ("item1", "Already Indexed"),  // Already indexed
-            ("item2", "New Item One"),     // New
-            ("item3", "New Item Two")      // New
+            ("item1", "Already Indexed"), // Already indexed
+            ("item2", "New Item One"), // New
+            ("item3", "New Item Two"), // New
         };
 
         // Act
@@ -946,7 +1015,7 @@ public class BucketedSearchEngineTests
         {
             ("item1", "Original One", "Updated One"),
             ("item2", "Original Two", "Updated Two"),
-            ("item3", "Old Three", "New Three")  // Not indexed
+            ("item3", "Old Three", "New Three"), // Not indexed
         };
 
         // Act
@@ -1003,7 +1072,7 @@ public class BucketedSearchEngineTests
         {
             ("item1", "Content One"),
             ("item2", "Content Two"),
-            ("item3", "Content Three")
+            ("item3", "Content Three"),
         };
 
         await _searchEngine.AddItemsAsync(items);
@@ -1032,7 +1101,7 @@ public class BucketedSearchEngineTests
         {
             ("item1", "Content One"),
             ("item2", "Content Two"),
-            ("item3", "Content Three")  // Not indexed
+            ("item3", "Content Three"), // Not indexed
         };
 
         // Act
@@ -1045,7 +1114,7 @@ public class BucketedSearchEngineTests
 
         Assert.False(item1Flags.IsIndexed);
         Assert.False(item2Flags.IsIndexed);
-        Assert.False(item3Flags.IsIndexed);  // Should remain false
+        Assert.False(item3Flags.IsIndexed); // Should remain false
     }
 
     [Fact]
@@ -1085,9 +1154,9 @@ public class BucketedSearchEngineTests
 
         var itemsToAdd = new List<(string itemId, string content)>
         {
-            ("item1", "Different Content"),  // Already indexed, should skip
-            ("item2", "New Content"),        // Not indexed, should add
-            ("item4", "Another New")         // Not indexed, should add
+            ("item1", "Different Content"), // Already indexed, should skip
+            ("item2", "New Content"), // Not indexed, should add
+            ("item4", "Another New"), // Not indexed, should add
         };
 
         // Act
@@ -1099,10 +1168,10 @@ public class BucketedSearchEngineTests
         var item3Flags = await _storage.Flags.GetFlagAsync("item3");
         var item4Flags = await _storage.Flags.GetFlagAsync("item4");
 
-        Assert.True(item1Flags.IsIndexed);   // Was already indexed
-        Assert.True(item2Flags.IsIndexed);   // Newly indexed
-        Assert.True(item3Flags.IsIndexed);   // Unchanged
-        Assert.True(item4Flags.IsIndexed);   // Newly indexed
+        Assert.True(item1Flags.IsIndexed); // Was already indexed
+        Assert.True(item2Flags.IsIndexed); // Newly indexed
+        Assert.True(item3Flags.IsIndexed); // Unchanged
+        Assert.True(item4Flags.IsIndexed); // Newly indexed
     }
 
     [Fact]
@@ -1129,5 +1198,3 @@ public class BucketedSearchEngineTests
 
     #endregion
 }
-
-
