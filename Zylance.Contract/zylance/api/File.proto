@@ -2,20 +2,9 @@ syntax = "proto3";
 package zylance.contract;
 
 import "zylance/extensions/zylance.proto";
+import "zylance/models/File.proto";
 
 option csharp_namespace = "Zylance.Contract.Api.File";
-
-// === Models ===
-message FileRef {
-  string id = 1;
-  string filename = 2;
-  bool read_only = 3;
-}
-
-message FileFilter {
-  string name = 1;
-  repeated string extensions = 2;
-}
 
 // === Operations ===
 message SelectFileReq {

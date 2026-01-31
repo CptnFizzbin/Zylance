@@ -1,0 +1,32 @@
+syntax = "proto3";
+package zylance.contract;
+
+import "zylance/extensions/zylance.proto";
+import "zylance/models/Ledger.proto";
+
+option csharp_namespace = "Zylance.Contract.Api.Ledger";
+
+message LedgerFilter {
+  optional string account_id = 1;
+  optional int64 start_timestamp = 2;
+  optional int64 end_timestamp = 3;
+  optional string cursor = 4;
+  optional uint32 limit = 5;
+}
+
+message GetLedgerReq {
+  option (action) = "Ledger:GetLedger";
+  optional LedgerFilter filter = 1;
+  optional string after_cursor = 2;
+  optional string before_cursor = 3;
+}
+
+message GetLedgerRes {
+  option (action) = "Ledger:GetLedger";
+  uint64 total_count = 1;
+  uint32 page = 2;
+  string cursor = 3;
+  bool last_page = 4;
+
+  repeated LedgerEntryData entries = 5;
+}

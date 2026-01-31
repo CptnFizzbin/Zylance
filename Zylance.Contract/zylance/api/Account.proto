@@ -1,0 +1,57 @@
+syntax = "proto3";
+package zylance.contract;
+
+import "zylance/models/Account.proto";
+import "zylance/extensions/zylance.proto";
+
+option csharp_namespace = "Zylance.Contract.Api.Account";
+
+message ListAccountsReq {
+  option (action) = "Account:ListAccounts";
+}
+
+message ListAccountsRes {
+  option (action) = "Account:ListAccounts";
+  repeated AccountData accounts = 1;
+}
+
+message GetAccountReq {
+  option (action) = "Account:GetAccount";
+  string account_id = 1;
+}
+
+message GetAccountRes {
+  option (action) = "Account:GetAccount";
+  AccountData account = 1;
+}
+
+message CreateAccountReq {
+  option (action) = "Account:CreateAccount";
+  AccountData account = 1;
+}
+
+message CreateAccountRes {
+  option (action) = "Account:CreateAccount";
+  AccountData account = 1;
+}
+
+message UpdateAccountReq {
+  option (action) = "Account:UpdateAccount";
+  string account_id = 1;
+  AccountData account = 2;
+}
+
+message UpdateAccountRes {
+  option (action) = "Account:UpdateAccount";
+  AccountData account = 1;
+}
+
+message DeleteAccountReq {
+  option (action) = "Account:DeleteAccount";
+  string account_id = 1;
+}
+
+message DeleteAccountRes {
+  option (action) = "Account:DeleteAccount";
+  AccountData account = 1;
+}
