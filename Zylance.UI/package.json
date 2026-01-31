@@ -17,7 +17,12 @@
     "check": "biome check"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@faker-js/faker": "^10.0.0",
+    "@fontsource/roboto": "^5.2.9",
+    "@mui/icons-material": "^7.3.7",
+    "@mui/material": "^7.3.7",
     "@t3-oss/env-core": "^0.13.8",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/match-sorter-utils": "^8.19.4",

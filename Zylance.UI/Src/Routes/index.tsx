@@ -14,13 +14,13 @@ function App () {
   const [openedVault, setOpenedVault] = useState<string | null>(null)
 
   const onBtnClick = async () => {
-    const res = await zylanceApi.EchoMessage({ message: "Hello from Zylence!" })
+    const res = await zylanceApi.echo.echoMessage({ message: "Hello from Zylence!" })
     setLastMessage(res.echoed)
   }
 
   const onSelectFileClick = async () => {
     try {
-      const fileRef = await zylanceApi.files.select({
+      const fileRef = await zylanceApi.files.selectFile({
         title: "Select a text file",
         filters: [
           { name: "Text Files", extensions: ["txt", "md"] },
@@ -38,7 +38,7 @@ function App () {
 
   const onOpenVaultClick = async () => {
     try {
-      const vaultRef = await zylanceApi.vault.open()
+      const vaultRef = await zylanceApi.vault.openVault()
       setOpenedVault(vaultRef.id)
     } catch (error) {
       console.error("Vault open error:", error)
