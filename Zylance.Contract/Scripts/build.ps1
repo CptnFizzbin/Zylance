@@ -1,3 +1,8 @@
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$OutputDir
+)
+
 Get-Command protoc | Foreach-Object { Write-Host "protoc found at: $( $_.Source )" }
 Write-Host "PROTO_PATH: $env:PROTO_PATH"
 
@@ -5,8 +10,19 @@ $rootDir = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 Write-Host "Root Directory: $rootDir"
 
 $contractDir = Join-Path $rootDir "Zylance.Contract"
-$uiDir = Join-Path $rootDir "Zylance.UI"
-$outDir = Join-Path $uiDir "Generated"
+
+# Convert relative path to absolute if needed
+if ( [System.IO.Path]::IsPathRooted($OutputDir))
+{
+    $outDir = $OutputDir
+}
+else
+{
+    $outDir = Join-Path $contractDir $OutputDir
+    $outDir = [System.IO.Path]::GetFullPath($outDir)
+}
+
+Write-Host "Output Directory: $outDir"
 
 Set-Location $contractDir
 
@@ -19,18 +35,17 @@ if ($protoFiles.Count -eq 0)
     exit 1
 }
 
-Write-Host "Found $( $protoFiles.Count ) proto file(s):"
-$protoFiles | ForEach-Object { Write-Host "  - $_" }
-
+Write-Host "Found $( $protoFiles.Count ) proto file(s)"
 Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $outDir
-New-Item -ItemType Directory -Path $outDir
+New-Item -ItemType Directory -Path $outDir | Out-Null
 
 # Run protoc for each proto file
 foreach ($protoFile in $protoFiles)
 {
+    $relativePath = $protoFile.Replace($contractDir, "").TrimStart('\', '/')
     $protoFileName = Split-Path -Leaf $protoFile
 
-    Write-Host "`nCompiling $protoFileName..."
+    Write-Host "Compiling $relativePath..."
 
     # Execute protoc with proper PowerShell syntax
     & protoc `
@@ -54,4 +69,4 @@ foreach ($protoFile in $protoFiles)
     }
 }
 
-Write-Host "`nSuccessfully compiled all proto files!" -ForegroundColor Green
+Write-Host "Successfully compiled all proto files!" -ForegroundColor Green

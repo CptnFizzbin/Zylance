@@ -18,13 +18,20 @@
     <PropertyGroup>
         <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(AppData)\fnm\node-versions\v24.5.0\installation\yarn.cmd</YarnExe>
         <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows'))">$(HOME)/.local/share/fnm/node-versions/v24.5.0/installation/bin/yarn</YarnExe>
+        <TsOutputPath>../Zylance.UI/Generated</TsOutputPath>
     </PropertyGroup>
 
     <ItemGroup>
+        <!-- Track all proto files as inputs for incremental build -->
         <Protobuf Include="./zylance/**/*.proto" GrpcServices="None"/>
     </ItemGroup>
 
-    <Target Name="GenerateTS" AfterTargets="Build">
-        <Exec Command="$(YarnExe) build"/>
+    <Target Name="GenerateTS"
+            AfterTargets="Build"
+            Inputs="@(Protobuf);$(MSBuildProjectFile)"
+            Outputs="$(TsGeneratedMarker)/.generated">
+        <Message Importance="high" Text="Generating TypeScript from Protocol Buffers..."/>
+        <Exec Command="$(YarnExe) build &quot;$(TsOutputPath)&quot;"/>
+        <Touch Files="$(TsOutputPath)/.generated" AlwaysCreate="true"/>
     </Target>
 </Project>

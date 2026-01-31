@@ -31,7 +31,7 @@ export interface ResponsePayload {
 }
 
 export interface EventPayload {
-  event: string;
+  eventName: string;
   dataJson?: string | undefined;
 }
 
@@ -223,13 +223,13 @@ export const ResponsePayload: MessageFns<ResponsePayload> = {
 };
 
 function createBaseEventPayload(): EventPayload {
-  return { event: "", dataJson: undefined };
+  return { eventName: "", dataJson: undefined };
 }
 
 export const EventPayload: MessageFns<EventPayload> = {
   fromJSON(object: any): EventPayload {
     return {
-      event: isSet(object.event) ? globalThis.String(object.event) : "",
+      eventName: isSet(object.eventName) ? globalThis.String(object.eventName) : "",
       dataJson: isSet(object.dataJson)
         ? globalThis.String(object.dataJson)
         : isSet(object.data_json)
@@ -240,8 +240,8 @@ export const EventPayload: MessageFns<EventPayload> = {
 
   toJSON(message: EventPayload): unknown {
     const obj: any = {};
-    if (message.event !== "") {
-      obj.event = message.event;
+    if (message.eventName !== "") {
+      obj.eventName = message.eventName;
     }
     if (message.dataJson !== undefined) {
       obj.dataJson = message.dataJson;
@@ -254,7 +254,7 @@ export const EventPayload: MessageFns<EventPayload> = {
   },
   fromPartial<I extends Exact<DeepPartial<EventPayload>, I>>(object: I): EventPayload {
     const message = createBaseEventPayload();
-    message.event = object.event ?? "";
+    message.eventName = object.eventName ?? "";
     message.dataJson = object.dataJson ?? undefined;
     return message;
   },

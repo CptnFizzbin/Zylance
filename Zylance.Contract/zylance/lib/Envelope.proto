@@ -29,7 +29,7 @@ message ResponsePayload {
 }
 
 message EventPayload {
-  string event = 1;
+  string eventName = 1;
   optional string data_json = 2;
 }
 
