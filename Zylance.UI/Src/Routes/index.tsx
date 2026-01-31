@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router"
-import logo from "../logo.svg"
-import { useState } from "react"
+import type { FileRef } from "@Contract/models/File"
+import type { VaultRef } from "@Contract/models/vault"
 import { useZylance } from "@Lib/ZylanceContext"
+import { createFileRoute } from "@tanstack/react-router"
+import { useState } from "react"
+import logo from "../logo.svg"
 
 export const Route = createFileRoute("/")({
   component: App,
@@ -10,8 +12,9 @@ export const Route = createFileRoute("/")({
 function App () {
   const zylanceApi = useZylance()
   const [lastMessage, setLastMessage] = useState("")
-  const [selectedFile, setSelectedFile] = useState("")
-  const [openedVault, setOpenedVault] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedFile, setSelectedFile] = useState<FileRef | null>(null)
+  const [openedVault, setOpenedVault] = useState<VaultRef | null>(null)
 
   const onBtnClick = async () => {
     const res = await zylanceApi.echo.echoMessage({ message: "Hello from Zylence!" })
@@ -20,7 +23,7 @@ function App () {
 
   const onSelectFileClick = async () => {
     try {
-      const fileRef = await zylanceApi.files.selectFile({
+      const { fileRef } = await zylanceApi.files.selectFile({
         title: "Select a text file",
         filters: [
           { name: "Text Files", extensions: ["txt", "md"] },
@@ -29,20 +32,28 @@ function App () {
         readOnly: true,
       })
 
-      setSelectedFile(fileRef.filename)
+      if (fileRef) {
+        setError(null)
+        setSelectedFile(fileRef)
+      } else {
+        setError("No file selected")
+        setSelectedFile(null)
+      }
+      setSelectedFile(fileRef ?? null)
     } catch (error) {
       console.error("File selection error:", error)
-      setSelectedFile("Error selecting file")
+      setSelectedFile(null)
+      setError("Error selecting file")
     }
   }
 
   const onOpenVaultClick = async () => {
     try {
-      const vaultRef = await zylanceApi.vault.openVault()
-      setOpenedVault(vaultRef.id)
+      const { vaultRef } = await zylanceApi.vault.openVault()
+      setOpenedVault(vaultRef ?? null)
     } catch (error) {
       console.error("Vault open error:", error)
-      setOpenedVault("Error opening vault")
+      setError("Error opening vault")
     }
   }
 
@@ -57,6 +68,10 @@ function App () {
         <p>
           Edit <code>src/routes/index.tsx</code> and save to reload
         </p>
+
+        <div>
+          {error && <p className="text-red-500">Error: {error}</p>}
+        </div>
 
         <div className="space-y-4 mt-4">
           <button type="button" onClick={onBtnClick} className="mx-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded">
@@ -73,7 +88,7 @@ function App () {
           </button>
           {selectedFile && (
             <div className="mt-2">
-              <p>Selected file: {selectedFile}</p>
+              <p>Selected file: {selectedFile.filename}</p>
             </div>
           )}
 
@@ -86,7 +101,7 @@ function App () {
           </button>
           {openedVault && (
             <div className="mt-2">
-              <p>Opened vault: {openedVault}</p>
+              <p>Opened vault: {openedVault.id}</p>
             </div>
           )}
         </div>

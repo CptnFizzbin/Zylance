@@ -1,6 +1,6 @@
 using System.Reflection;
 using Photino.NET;
-using Zylance.Contract.Api.File;
+using Zylance.Contract.Models.File;
 using Zylance.Core.Lib.Interfaces;
 
 namespace Zylance.Desktop;
@@ -16,11 +16,7 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
     private readonly Lock _lock = new();
 
     // Create a unique session directory for this instance
-    private readonly string _sessionTempDir = Path.Combine(
-        Path.GetTempPath(),
-        "Zylance",
-        Guid.NewGuid().ToString()
-    );
+    private readonly string _sessionTempDir = Path.Combine(Path.GetTempPath(), "Zylance", Guid.NewGuid().ToString());
 
     private bool _disposed;
 
@@ -29,7 +25,8 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
     /// </summary>
     public void Dispose()
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
 
         try
         {
@@ -58,10 +55,7 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
         bool readOnly = true
     )
     {
-        var dialogTitle = title
-            ?? (filters is { Length: > 0 }
-                ? $"Select {filters[0].Name}"
-                : "Select File");
+        var dialogTitle = title ?? (filters is { Length: > 0 } ? $"Select {filters[0].Name}" : "Select File");
 
         var fileFilters = filters ?? [(Name: "All Files", Extensions: ["*"])];
 
@@ -79,10 +73,7 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
         (string Name, string[] Extensions)[]? filters = null
     )
     {
-        var dialogTitle = title
-            ?? (filters is { Length: > 0 }
-                ? $"Save {filters[0].Name}"
-                : "Save File");
+        var dialogTitle = title ?? (filters is { Length: > 0 } ? $"Save {filters[0].Name}" : "Save File");
 
         var fileFilters = filters ?? [(Name: "All Files", Extensions: ["*"])];
 
@@ -102,9 +93,7 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
 
         // Check if the file is read-only on the file system
         var fileInfo = new FileInfo(filePath);
-        var fileAccess = fileInfo.IsReadOnly
-            ? FileAccess.Read
-            : FileAccess.ReadWrite;
+        var fileAccess = fileInfo.IsReadOnly ? FileAccess.Read : FileAccess.ReadWrite;
 
         return File.Open(filePath, FileMode.Open, fileAccess, FileShare.Read);
     }
@@ -112,7 +101,6 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
     public void SaveFile(FileRef fileRef, Stream content)
     {
         var filePath = GetFilePath(fileRef);
-
 
         // Check if the file exists and is read-only on the file system
         if (File.Exists(filePath))
@@ -135,7 +123,6 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
     public void DeleteFile(FileRef fileRef)
     {
         var filePath = GetFilePath(fileRef);
-
 
         // Check if the file exists and is read-only on the file system
         if (File.Exists(filePath))

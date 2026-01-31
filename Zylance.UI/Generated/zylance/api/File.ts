@@ -5,20 +5,9 @@
 // source: zylance/api/File.proto
 
 /* eslint-disable */
+import { FileFilter, FileRef } from "../models/File";
 
 export const protobufPackage = "zylance.contract";
-
-/** === Models === */
-export interface FileRef {
-  id: string;
-  filename: string;
-  readOnly: boolean;
-}
-
-export interface FileFilter {
-  name: string;
-  extensions: string[];
-}
 
 /** === Operations === */
 export interface SelectFileReq {
@@ -57,85 +46,6 @@ export interface FileExistsRes {
 export interface FileContentRes {
   content: string;
 }
-
-function createBaseFileRef(): FileRef {
-  return { id: "", filename: "", readOnly: false };
-}
-
-export const FileRef: MessageFns<FileRef> = {
-  fromJSON(object: any): FileRef {
-    return {
-      id: isSet(object.id) ? globalThis.String(object.id) : "",
-      filename: isSet(object.filename) ? globalThis.String(object.filename) : "",
-      readOnly: isSet(object.readOnly)
-        ? globalThis.Boolean(object.readOnly)
-        : isSet(object.read_only)
-        ? globalThis.Boolean(object.read_only)
-        : false,
-    };
-  },
-
-  toJSON(message: FileRef): unknown {
-    const obj: any = {};
-    if (message.id !== "") {
-      obj.id = message.id;
-    }
-    if (message.filename !== "") {
-      obj.filename = message.filename;
-    }
-    if (message.readOnly !== false) {
-      obj.readOnly = message.readOnly;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<FileRef>, I>>(base?: I): FileRef {
-    return FileRef.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<FileRef>, I>>(object: I): FileRef {
-    const message = createBaseFileRef();
-    message.id = object.id ?? "";
-    message.filename = object.filename ?? "";
-    message.readOnly = object.readOnly ?? false;
-    return message;
-  },
-};
-
-function createBaseFileFilter(): FileFilter {
-  return { name: "", extensions: [] };
-}
-
-export const FileFilter: MessageFns<FileFilter> = {
-  fromJSON(object: any): FileFilter {
-    return {
-      name: isSet(object.name) ? globalThis.String(object.name) : "",
-      extensions: globalThis.Array.isArray(object?.extensions)
-        ? object.extensions.map((e: any) => globalThis.String(e))
-        : [],
-    };
-  },
-
-  toJSON(message: FileFilter): unknown {
-    const obj: any = {};
-    if (message.name !== "") {
-      obj.name = message.name;
-    }
-    if (message.extensions?.length) {
-      obj.extensions = message.extensions;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<FileFilter>, I>>(base?: I): FileFilter {
-    return FileFilter.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<FileFilter>, I>>(object: I): FileFilter {
-    const message = createBaseFileFilter();
-    message.name = object.name ?? "";
-    message.extensions = object.extensions?.map((e) => e) || [];
-    return message;
-  },
-};
 
 function createBaseSelectFileReq(): SelectFileReq {
   return { title: undefined, filters: [], readOnly: false };

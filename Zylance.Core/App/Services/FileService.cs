@@ -1,4 +1,4 @@
-using Zylance.Contract.Api.File;
+using Zylance.Contract.Models.File;
 using Zylance.Core.Lib.Interfaces;
 
 namespace Zylance.Core.App.Services;
@@ -105,7 +105,7 @@ public class FileService(IFileProvider fileProvider)
             if (!_readOnlyRegistry.ContainsKey(fileRef.Id))
                 throw new UnauthorizedAccessException(
                     $"FileRef with ID '{fileRef.Id}' is not registered with this FileService. "
-                    + "This may indicate a security violation or use of a FileRef from another session."
+                        + "This may indicate a security violation or use of a FileRef from another session."
                 );
         }
     }
@@ -126,7 +126,7 @@ public class FileService(IFileProvider fileProvider)
         if (isReadOnlyInRegistry || fileRef.ReadOnly)
             throw new UnauthorizedAccessException(
                 $"Cannot modify read-only file: {fileRef.Filename}. "
-                + $"Registry status: {isReadOnlyInRegistry}, FileRef status: {fileRef.ReadOnly}"
+                    + $"Registry status: {isReadOnlyInRegistry}, FileRef status: {fileRef.ReadOnly}"
             );
     }
 }

@@ -1,63 +1,32 @@
-import { MessageError, type RequestEndpoint, ZylanceClient } from "@Lib/ZylanceClient"
-import type { GetStatusRes } from "@Contract/api/Status"
 import type { EchoReq, EchoRes } from "@Contract/api/Echo"
-import type { CreateFileReq, CreateFileRes, FileRef, SelectFileReq, SelectFileRes } from "@Contract/api/File"
-import type { VaultOpenRes, VaultRef } from "@Contract/api/Vault"
+import type { CreateFileReq, CreateFileRes, SelectFileReq, SelectFileRes } from "@Contract/api/File"
+import type { GetStatusRes } from "@Contract/api/Status"
+import { VaultOpenRes } from "@Contract/api/Vault"
+import { ZylanceClient } from "@Lib/ZylanceClient"
 
-export interface ZylanceApi {
-  desktop: {
-    exit: RequestEndpoint<"Desktop:Exit">;
-  };
-
-  status: {
-    getStatus: RequestEndpoint<"Status:GetStatus", void, GetStatusRes>;
-  }
-
-  echo: {
-    echoMessage: RequestEndpoint<"Echo:EchoMessage", EchoReq, EchoRes>;
-  }
-
-  files: {
-    selectFile: RequestEndpoint<"File:SelectFile", SelectFileReq, SelectFileRes, FileRef>;
-    createFile: RequestEndpoint<"File:CreateFile", CreateFileReq, CreateFileRes, FileRef>;
-  };
-
-  vault: {
-    openVault: RequestEndpoint<"Vault:OpenVault", void, VaultOpenRes, VaultRef>;
-  };
-}
-
-export function createZylanceApi (): ZylanceApi {
+export function createZylanceApi () {
   const client = new ZylanceClient()
 
   return {
     desktop: {
-      exit: client.createEventEndpoint("Desktop:Exit"),
+      exit: client.createEventEndpoint<"Desktop:Exit">("Desktop:Exit"),
     },
 
     status: {
-      getStatus: client.createRequestEndpoint("Status:GetStatus"),
+      getStatus: client.createRequestEndpoint<"Status:GetStatus", void, GetStatusRes>("Status:GetStatus"),
     },
 
     echo: {
-      echoMessage: client.createRequestEndpoint("Echo:EchoMessage"),
+      echoMessage: client.createRequestEndpoint<"Echo:EchoMessage", EchoReq, EchoRes>("Echo:EchoMessage"),
     },
 
     files: {
-      selectFile: client.createRequestEndpoint("File:SelectFile", async res => {
-        return res.fileRef || MessageError.throw("No fileRef in response")
-      }),
-      createFile: client.createRequestEndpoint("File:CreateFile", async res => {
-        return res.fileRef || MessageError.throw("No fileRef in response")
-      }),
+      selectFile: client.createRequestEndpoint<"File:SelectFile", SelectFileReq, SelectFileRes>("File:SelectFile"),
+      createFile: client.createRequestEndpoint<"File:CreateFile", CreateFileReq, CreateFileRes>("File:CreateFile"),
     },
 
     vault: {
-      openVault: client.createRequestEndpoint("Vault:OpenVault", async ({ vaultRef }) => {
-        if (!vaultRef) throw new MessageError("No vaultRef in response")
-        client.sendEvent("Vault:Opened", { vaultRef })
-        return vaultRef
-      }),
+      openVault: client.createRequestEndpoint<"Vault:OpenVault", void, VaultOpenRes>("Vault:OpenVault"),
     },
   }
 }

@@ -5,14 +5,9 @@
 // source: zylance/api/Vault.proto
 
 /* eslint-disable */
+import { VaultRef } from "../models/vault";
 
 export const protobufPackage = "zylance.contract";
-
-/** === Models === */
-export interface VaultRef {
-  id: string;
-  unlocked: boolean;
-}
 
 /** === Vault Operation Messages === */
 export interface VaultOpenReq {
@@ -33,40 +28,6 @@ export interface VaultCreateRes {
 export interface VaultOpenedEvt {
   vault: VaultRef | undefined;
 }
-
-function createBaseVaultRef(): VaultRef {
-  return { id: "", unlocked: false };
-}
-
-export const VaultRef: MessageFns<VaultRef> = {
-  fromJSON(object: any): VaultRef {
-    return {
-      id: isSet(object.id) ? globalThis.String(object.id) : "",
-      unlocked: isSet(object.unlocked) ? globalThis.Boolean(object.unlocked) : false,
-    };
-  },
-
-  toJSON(message: VaultRef): unknown {
-    const obj: any = {};
-    if (message.id !== "") {
-      obj.id = message.id;
-    }
-    if (message.unlocked !== false) {
-      obj.unlocked = message.unlocked;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<VaultRef>, I>>(base?: I): VaultRef {
-    return VaultRef.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<VaultRef>, I>>(object: I): VaultRef {
-    const message = createBaseVaultRef();
-    message.id = object.id ?? "";
-    message.unlocked = object.unlocked ?? false;
-    return message;
-  },
-};
 
 function createBaseVaultOpenReq(): VaultOpenReq {
   return {};
