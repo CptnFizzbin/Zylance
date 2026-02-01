@@ -2,34 +2,9 @@
 
 An OpenSource finance and budgeting app
 
-## Architecture
-
-Zylance uses a clean architecture with Dependency Injection for loose coupling and testability.
-
-### Core Components
-
-- **Zylance.Core** - Core business logic, controllers, and services
-- **Zylance.Desktop** - Desktop application using Photino
-- **Zylance.UI** - React/TypeScript frontend
-- **Zylance.Contract** - Protocol Buffers message contracts
-- **Zylance.Vault.Local** - Local vault implementation
-
-### Dependency Injection
-
-The application uses `Microsoft.Extensions.DependencyInjection` for service registration and resolution.
-
-**Quick Start:**
-
-```csharp
-var services = new ServiceCollection();
-services.AddSingleton<ITransport, MyTransport>();
-services.AddSingleton<IFileProvider, MyFileProvider>();
-services.AddSingleton<IVaultProvider, MyVaultProvider>();
-services.AddZylance();
-
-var serviceProvider = services.BuildServiceProvider();
-var app = serviceProvider.GetRequiredService<Zylance>();
-```
+> # Work in Progress
+> This project is in early development, with almost no features implemented yet.
+> Expect dragons and incomplete functionality.
 
 ## Development
 
@@ -65,7 +40,7 @@ This project uses [CSharpier](https://csharpier.com/) for consistent C# code for
 **First-time setup:**
 
 ```bash
-dotnet tool restore
+dotnet tool install csharpier
 ```
 
 **Format all files:**
