@@ -16,8 +16,8 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(AppData)\fnm\node-versions\v24.5.0\installation\yarn.cmd</YarnExe>
-        <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows'))">$(HOME)/.local/share/fnm/node-versions/v24.5.0/installation/bin/yarn</YarnExe>
+        <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(NODE_HOME)\yarn.cmd</YarnExe>
+        <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows'))">$(NODE_HOME)/bin/yarn</YarnExe>
         <TsOutputPath>../Zylance.UI/Generated</TsOutputPath>
     </PropertyGroup>
 
