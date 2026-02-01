@@ -6,26 +6,27 @@ public interface IFileProvider
 {
     public bool Exists(string path);
 
-    public FileRef SelectFile(
+    public Task<FileRef> SelectFile(
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
         bool readOnly = true
     );
 
-    public FileRef CreateFile(
+    public Task<FileRef> CreateFile(
         string? title = null,
-        string? filename = null,
+        string? defaultPath = null,
         (string Name, string[] Extensions)[]? filters = null
     );
 
-    public Stream OpenFile(FileRef fileRef);
-    public void SaveFile(FileRef fileRef, Stream content);
-    public void DeleteFile(FileRef fileRef);
-    public FileRef GetTempFile(string path);
-    public FileRef GetAppDataFile(string path);
+    public Task<Stream> OpenFile(FileRef fileRef);
+    public Task TouchFile(FileRef fileRef);
+    public Task SaveFile(FileRef fileRef, Stream content);
+    public Task DeleteFile(FileRef fileRef);
+    public Task<FileRef> GetTempFile(string path);
+    public Task<FileRef> GetAppDataFile(string path);
 }
 
 public interface ILocalFileProvider : IFileProvider
 {
-    public string GetFilePath(FileRef fileRef);
+    public Task<string> GetFilePath(FileRef fileRef);
 }

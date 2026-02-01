@@ -1,128 +1,158 @@
-import type { FileRef } from "@Contract/models/File"
-import type { VaultRef } from "@Contract/models/Vault"
 import { useZylance } from "@Lib/ZylanceContext"
+import { Alert, Box, Button, Card, CardContent, Container, Divider, Stack, Typography } from "@mui/material"
+import { useMutation } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import { useState } from "react"
-import logo from "../logo.svg"
 
 export const Route = createFileRoute("/")({
-  component: App,
+  component: VaultLogin,
 })
 
-function App () {
+function VaultLogin () {
   const zylanceApi = useZylance()
-  const [lastMessage, setLastMessage] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [selectedFile, setSelectedFile] = useState<FileRef | null>(null)
-  const [openedVault, setOpenedVault] = useState<VaultRef | null>(null)
 
-  const onBtnClick = async () => {
-    const res = await zylanceApi.echo.echoMessage({ message: "Hello from Zylence!" })
-    setLastMessage(res.echoed)
-  }
-
-  const onSelectFileClick = async () => {
-    try {
-      const { fileRef } = await zylanceApi.files.selectFile({
-        title: "Select a text file",
-        filters: [
-          { name: "Text Files", extensions: ["txt", "md"] },
-          { name: "All Files", extensions: ["*"] },
-        ],
-        readOnly: true,
-      })
-
-      if (fileRef) {
-        setError(null)
-        setSelectedFile(fileRef)
+  // Mutation for opening an existing vault
+  const openVaultMutation = useMutation({
+    mutationFn: async () => zylanceApi.vault.openVault(),
+    onSuccess: (data) => {
+      if (data.vaultRef) {
+        // TODO: Navigate to main app view once vault is opened
+        console.log("Vault opened successfully:", data.vaultRef)
+        // navigate({ to: "/vault" })
       } else {
-        setError("No file selected")
-        setSelectedFile(null)
+        openVaultMutation.reset()
+        // Set error via the mutation's error state instead
+        throw new Error("No vault selected")
       }
-      setSelectedFile(fileRef ?? null)
-    } catch (error) {
-      console.error("File selection error:", error)
-      setSelectedFile(null)
-      setError("Error selecting file")
-    }
-  }
+    },
+    onError: (error) => {
+      console.error("Error opening vault:", error)
+    },
+  })
 
-  const onOpenVaultClick = async () => {
-    try {
-      const { vaultRef } = await zylanceApi.vault.openVault()
-      setOpenedVault(vaultRef ?? null)
-    } catch (error) {
-      console.error("Vault open error:", error)
-      setError("Error opening vault")
-    }
-  }
+  // Mutation for creating a new vault
+  const createVaultMutation = useMutation({
+    mutationFn: async () => zylanceApi.vault.createVault(),
+    onSuccess: (data) => {
+      if (data.vaultRef) {
+        // TODO: Navigate to main app view once vault is created
+        console.log("Vault created successfully:", data.vaultRef)
+        // navigate({ to: "/vault" })
+      } else {
+        createVaultMutation.reset()
+        throw new Error("Failed to create vault")
+      }
+    },
+    onError: (error) => {
+      console.error("Error creating vault:", error)
+    },
+  })
+
+  const isLoading = openVaultMutation.isPending || createVaultMutation.isPending
+  const error = openVaultMutation.error || createVaultMutation.error
 
   return (
-    <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <img
-          src={logo}
-          className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-          alt="logo"
-        />
-        <p>
-          Edit <code>src/routes/index.tsx</code> and save to reload
-        </p>
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%)",
+      }}
+    >
+      <Container maxWidth="sm">
+        <Stack spacing={4} alignItems="center">
+          {/* Logo and Title Section */}
+          <Stack spacing={2} alignItems="center" sx={{ textAlign: "center" }}>
+            <Typography
+              variant="h2"
+              component="h1"
+              fontWeight="bold"
+              sx={{
+                background: "linear-gradient(135deg, #d4af37 0%, #c0c0c0 100%)",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Zylance
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Your Personal Finance Vault
+            </Typography>
+          </Stack>
 
-        <div>
-          {error && <p className="text-red-500">Error: {error}</p>}
-        </div>
+          {/* Main Card - Theme handles glassmorphic styling */}
+          <Card sx={{ width: "100%" }}>
+            <CardContent sx={{ p: 4 }}>
+              <Typography
+                variant="h5"
+                component="h2"
+                fontWeight="600"
+                textAlign="center"
+                gutterBottom
+                sx={{ mb: 3 }}
+              >
+                Select Your Vault
+              </Typography>
 
-        <div className="space-y-4 mt-4">
-          <button type="button" onClick={onBtnClick} className="mx-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded">
-            Send Message to Backend
-          </button>
-          {lastMessage && <p>Last message from backend: {lastMessage}</p>}
+              {error && (
+                <Alert
+                  severity="error"
+                  sx={{ mb: 3 }}
+                >
+                  {error.message || "An error occurred. Please try again."}
+                </Alert>
+              )}
 
-          <button
-            type="button"
-            onClick={onSelectFileClick}
-            className="mx-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded"
-          >
-            Select File
-          </button>
-          {selectedFile && (
-            <div className="mt-2">
-              <p>Selected file: {selectedFile.filename}</p>
-            </div>
-          )}
+              <Stack spacing={2}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  fullWidth
+                  onClick={() => openVaultMutation.mutate()}
+                  disabled={isLoading}
+                  sx={{ py: 1.5 }}
+                >
+                  {openVaultMutation.isPending ? "Opening..." : "Open Existing Vault"}
+                </Button>
 
-          <button
-            type="button"
-            onClick={onOpenVaultClick}
-            className="mx-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded"
-          >
-            Open Vault
-          </button>
-          {openedVault && (
-            <div className="mt-2">
-              <p>Opened vault: {openedVault.id}</p>
-            </div>
-          )}
-        </div>
+                <Divider sx={{ my: 2 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    or
+                  </Typography>
+                </Divider>
 
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
-        </a>
-      </header>
-    </div>
+                <Button
+                  variant="contained"
+                  size="large"
+                  fullWidth
+                  onClick={() => createVaultMutation.mutate()}
+                  disabled={isLoading}
+                  color="success"
+                  sx={{ py: 1.5 }}
+                >
+                  {createVaultMutation.isPending ? "Creating..." : "Create New Vault"}
+                </Button>
+              </Stack>
+
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                textAlign="center"
+                sx={{ mt: 3 }}
+              >
+                All data is stored locally.
+              </Typography>
+            </CardContent>
+          </Card>
+
+          {/* Footer */}
+          <Typography variant="caption" color="text.disabled" textAlign="center">
+            © 2026 CptnFizzbin
+          </Typography>
+        </Stack>
+      </Container>
+    </Box>
   )
 }

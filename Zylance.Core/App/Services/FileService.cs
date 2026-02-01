@@ -17,51 +17,51 @@ public class FileService(IFileProvider fileProvider)
         return fileProvider.Exists(path);
     }
 
-    public FileRef SelectFile(
+    public async Task<FileRef> SelectFile(
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
         bool readOnly = true
     )
     {
-        var fileRef = fileProvider.SelectFile(title, filters, readOnly);
+        var fileRef = await fileProvider.SelectFile(title, filters, readOnly);
         RegisterFileRef(fileRef);
 
         return fileRef;
     }
 
-    public FileRef CreateFile(
+    public async Task<FileRef> CreateFile(
         string? title = null,
         string? filename = null,
         (string Name, string[] Extensions)[]? filters = null
     )
     {
-        var fileRef = fileProvider.CreateFile(title, filename, filters);
+        var fileRef = await fileProvider.CreateFile(title, filename, filters);
         RegisterFileRef(fileRef);
 
         return fileRef;
     }
 
-    public Stream OpenFile(FileRef fileRef)
+    public async Task<Stream> OpenFile(FileRef fileRef)
     {
         AssertFileRegistered(fileRef);
 
-        return fileProvider.OpenFile(fileRef);
+        return await fileProvider.OpenFile(fileRef);
     }
 
-    public void SaveFile(FileRef fileRef, Stream content)
+    public async Task SaveFile(FileRef fileRef, Stream content)
     {
         AssertFileRegistered(fileRef);
         AssertFileWritable(fileRef);
 
-        fileProvider.SaveFile(fileRef, content);
+        await fileProvider.SaveFile(fileRef, content);
     }
 
-    public void DeleteFile(FileRef fileRef)
+    public async Task DeleteFile(FileRef fileRef)
     {
         AssertFileRegistered(fileRef);
         AssertFileWritable(fileRef);
 
-        fileProvider.DeleteFile(fileRef);
+        await fileProvider.DeleteFile(fileRef);
 
         lock (_lock)
         {
@@ -69,16 +69,16 @@ public class FileService(IFileProvider fileProvider)
         }
     }
 
-    public FileRef GetTempFile(string path)
+    public async Task<FileRef> GetTempFile(string path)
     {
-        var fileRef = fileProvider.GetTempFile(path);
+        var fileRef = await fileProvider.GetTempFile(path);
         RegisterFileRef(fileRef);
         return fileRef;
     }
 
-    public FileRef GetAppDataFile(string path)
+    public async Task<FileRef> GetAppDataFile(string path)
     {
-        var fileRef = fileProvider.GetAppDataFile(path);
+        var fileRef = await fileProvider.GetAppDataFile(path);
         RegisterFileRef(fileRef);
         return fileRef;
     }

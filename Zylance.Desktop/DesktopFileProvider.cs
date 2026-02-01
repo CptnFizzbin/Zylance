@@ -49,7 +49,7 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
         return File.Exists(path);
     }
 
-    public FileRef SelectFile(
+    public async Task<FileRef> SelectFile(
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
         bool readOnly = true
@@ -59,17 +59,17 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
 
         var fileFilters = filters ?? [(Name: "All Files", Extensions: ["*"])];
 
-        var selectedFiles = window.ShowOpenFile(dialogTitle, null, false, fileFilters);
+        var selectedFiles = await window.ShowOpenFileAsync(dialogTitle, null, false, fileFilters);
 
         if (selectedFiles == null || selectedFiles.Length == 0 || string.IsNullOrEmpty(selectedFiles[0]))
             throw new OperationCanceledException("File selection was cancelled by the user.");
 
-        return CreateFileReference(selectedFiles[0], readOnly);
+        return await CreateFileReference(selectedFiles[0], readOnly);
     }
 
-    public FileRef CreateFile(
+    public async Task<FileRef> CreateFile(
         string? title = null,
-        string? filename = null,
+        string? defaultPath = null,
         (string Name, string[] Extensions)[]? filters = null
     )
     {
@@ -77,16 +77,18 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
 
         var fileFilters = filters ?? [(Name: "All Files", Extensions: ["*"])];
 
-        var filePath = window.ShowSaveFile(dialogTitle, filename, fileFilters);
+        var filePath = await window.ShowSaveFileAsync(dialogTitle, defaultPath, fileFilters);
 
-        return string.IsNullOrEmpty(filePath)
-            ? throw new OperationCanceledException("File creation was cancelled by the user.")
-            : CreateFileReference(filePath);
+        return await (
+            string.IsNullOrEmpty(filePath)
+                ? throw new OperationCanceledException("File creation was cancelled by the user.")
+                : CreateFileReference(filePath)
+        );
     }
 
-    public Stream OpenFile(FileRef fileRef)
+    public async Task<Stream> OpenFile(FileRef fileRef)
     {
-        var filePath = GetFilePath(fileRef);
+        var filePath = await GetFilePath(fileRef);
 
         if (!File.Exists(filePath))
             throw new FileNotFoundException($"File not found: {filePath}", filePath);
@@ -98,9 +100,14 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
         return File.Open(filePath, FileMode.Open, fileAccess, FileShare.Read);
     }
 
-    public void SaveFile(FileRef fileRef, Stream content)
+    public Task TouchFile(FileRef fileRef)
     {
-        var filePath = GetFilePath(fileRef);
+        return SaveFile(fileRef, "");
+    }
+
+    public async Task SaveFile(FileRef fileRef, Stream content)
+    {
+        var filePath = await GetFilePath(fileRef);
 
         // Check if the file exists and is read-only on the file system
         if (File.Exists(filePath))
@@ -117,12 +124,12 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
 
         // Write the stream to the file
         using var fileStream = File.Create(filePath);
-        content.CopyTo(fileStream);
+        await content.CopyToAsync(fileStream);
     }
 
-    public void DeleteFile(FileRef fileRef)
+    public async Task DeleteFile(FileRef fileRef)
     {
-        var filePath = GetFilePath(fileRef);
+        var filePath = await GetFilePath(fileRef);
 
         // Check if the file exists and is read-only on the file system
         if (File.Exists(filePath))
@@ -141,7 +148,7 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
         }
     }
 
-    public FileRef GetTempFile(string path)
+    public Task<FileRef> GetTempFile(string path)
     {
         // Combine the path with the session-specific temp directory
         var tempPath = Path.Combine(_sessionTempDir, path);
@@ -154,7 +161,7 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
         return CreateFileReference(tempPath);
     }
 
-    public FileRef GetAppDataFile(string path)
+    public Task<FileRef> GetAppDataFile(string path)
     {
         // Get the application data directory (roaming)
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -174,21 +181,27 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
     /// <summary>
     ///     Retrieves the actual file path from a FileRef.
     /// </summary>
-    public string GetFilePath(FileRef fileRef)
+    public Task<string> GetFilePath(FileRef fileRef)
     {
         lock (_lock)
         {
             if (_fileReferences.TryGetValue(fileRef.Id, out var filePath))
-                return filePath;
+                return Task.FromResult(filePath);
         }
 
         throw new ArgumentException($"Invalid FileRef ID: {fileRef.Id}", nameof(fileRef));
     }
 
+    private Task SaveFile(FileRef fileRef, string content)
+    {
+        var writer = new StreamReader(content);
+        return SaveFile(fileRef, writer.BaseStream);
+    }
+
     /// <summary>
     ///     Creates a FileRef from a file path and stores the mapping.
     /// </summary>
-    private FileRef CreateFileReference(string filePath, bool readOnly = false)
+    private Task<FileRef> CreateFileReference(string filePath, bool readOnly = false)
     {
         var fileRef = new FileRef
         {
@@ -202,6 +215,6 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
             _fileReferences[fileRef.Id] = filePath;
         }
 
-        return fileRef;
+        return Task.FromResult(fileRef);
     }
 }

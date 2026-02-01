@@ -1,11 +1,13 @@
+import { ZylanceProvider } from "@Lib/ZylanceContext"
+import { CssBaseline } from "@mui/material"
+import GlobalStyles from "@mui/material/GlobalStyles"
+import { ThemeProvider } from "@mui/system"
+import { createRouter, RouterProvider } from "@tanstack/react-router"
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
-import { createRouter, RouterProvider } from "@tanstack/react-router"
-import { routeTree } from "./routeTree.gen"
+import { theme } from "./Integrations/mui/Theme"
 import * as TanStackQueryProvider from "./Integrations/tanstack-query/root-provider"
-import { ZylanceProvider } from "@Lib/ZylanceContext"
-import { StyledEngineProvider } from "@mui/material/styles"
-import GlobalStyles from "@mui/material/GlobalStyles"
+import { routeTree } from "./routeTree.gen"
 
 import "./styles.css"
 
@@ -36,13 +38,14 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <ZylanceProvider>
-        <StyledEngineProvider enableCssLayer>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
           <GlobalStyles styles="@layer theme,base,mui,components,utilities;" />
 
           <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
             <RouterProvider router={router} />
           </TanStackQueryProvider.Provider>
-        </StyledEngineProvider>
+        </ThemeProvider>
       </ZylanceProvider>
     </StrictMode>,
   )

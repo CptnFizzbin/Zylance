@@ -35,7 +35,7 @@ import type {
   UpdateLedgerEntryRes,
 } from "@Contract/api/Ledger"
 import type { GetStatusReq, GetStatusRes } from "@Contract/api/Status"
-import type { VaultCreateReq, VaultCreateRes, VaultOpenRes } from "@Contract/api/Vault"
+import type { VaultCreateRes, VaultOpenRes } from "@Contract/api/Vault"
 import { ZylanceClient } from "@Lib/ZylanceClient"
 
 export function createZylanceApi () {
@@ -63,7 +63,7 @@ export function createZylanceApi () {
 
     vault: {
       openVault: client.createRequestEndpoint<"Vault:OpenVault", void, VaultOpenRes>("Vault:OpenVault"),
-      createVault: client.createRequestEndpoint<"Vault:CreateVault", VaultCreateReq, VaultCreateRes>(
+      createVault: client.createRequestEndpoint<"Vault:CreateVault", void, VaultCreateRes>(
         "Vault:CreateVault"),
     },
 

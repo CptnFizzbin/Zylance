@@ -47,6 +47,22 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
         aria-haspopup="true"
         onClick={() => onClick()}
         className={styles.menuButton}
+        sx={{
+          color: "text.primary",
+          minWidth: 0,
+          padding: "6px 12px",
+          textTransform: "capitalize",
+          borderRadius: 1,
+          transition: "all 0.2s ease-in-out",
+          "&:hover": {
+            backgroundColor: (theme) => `${theme.palette.primary.main}15`,
+            color: "primary.main",
+          },
+          ...(open && {
+            backgroundColor: (theme) => `${theme.palette.primary.main}20`,
+            color: "primary.main",
+          }),
+        }}
       >
         {label}
       </Button>
@@ -67,7 +83,13 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
                 placement === "bottom-start" ? "left top" : "left bottom",
             }}
           >
-            <Paper sx={{ width: 320, maxWidth: "100%" }}>
+            <Paper
+              sx={{
+                width: 320,
+                maxWidth: "100%",
+                mt: 0.5,
+              }}
+            >
               <MenuList
                 dense
                 autoFocusItem={open}

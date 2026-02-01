@@ -27,7 +27,19 @@ export const DesktopMenuBar: FC = () => {
 
   return (
     <ClickAwayListener onClickAway={onClickAway}>
-      <Stack direction="row" bgcolor="grey.200" className={styles.menuBar} ref={anchorRef}>
+      <Stack
+        direction="row"
+        className={styles.menuBar}
+        ref={anchorRef}
+        sx={{
+          backgroundColor: (theme) => theme.palette.mode === "dark"
+            ? "rgba(10, 10, 10, 0.8)"
+            : "rgba(255, 255, 255, 0.8)",
+          backdropFilter: "blur(20px)",
+          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+          transition: "all 0.3s ease-in-out",
+        }}
+      >
         {Object.entries(menus).map(([key, MenuComponent]) => (
           <MenuComponent
             key={key}

@@ -1,14 +1,13 @@
-import { createRootRouteWithContext, Outlet } from "@tanstack/react-router"
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
+import { DesktopMenuBar } from "@/Components/Desktop/FileBar/DesktopMenuBar.tsx"
+import { useIsDesktop } from "@/Hooks/UseRuntime.ts"
+import { Box, Stack } from "@mui/material"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 
-import Header from "../Components/Header"
+import type { QueryClient } from "@tanstack/react-query"
+import { createRootRouteWithContext, Outlet } from "@tanstack/react-router"
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 
 import TanStackQueryDevtools from "../Integrations/tanstack-query/devtools"
-
-import type { QueryClient } from "@tanstack/react-query"
-import { useIsDesktop } from "@/Hooks/UseRuntime.ts"
-import { DesktopMenuBar } from "@/Components/Desktop/FileBar/DesktopMenuBar.tsx"
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -20,9 +19,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
     return (
       <>
-        {isDesktop && <DesktopMenuBar />}
-        <Header />
-        <Outlet />
+        <Stack height={"100vh"}>
+          {isDesktop && <DesktopMenuBar />}
+          <Box flexGrow={1} overflow="auto">
+            <Outlet />
+          </Box>
+        </Stack>
         <TanStackDevtools
           config={{
             position: "bottom-right",
