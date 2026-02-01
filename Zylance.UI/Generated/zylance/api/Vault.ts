@@ -5,7 +5,7 @@
 // source: zylance/api/Vault.proto
 
 /* eslint-disable */
-import { VaultRef } from "../models/vault";
+import { VaultRef } from "../models/Vault";
 
 export const protobufPackage = "zylance.contract";
 

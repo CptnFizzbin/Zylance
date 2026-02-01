@@ -6,6 +6,7 @@
 
 /* eslint-disable */
 import { LedgerEntryData } from "../models/Ledger";
+import { VaultRef } from "../models/Vault";
 
 export const protobufPackage = "zylance.contract";
 
@@ -14,18 +15,69 @@ export interface LedgerFilter {
   startTimestamp?: string | undefined;
   endTimestamp?: string | undefined;
   cursor?: string | undefined;
-  limit?: number | undefined;
+  pageSize?: number | undefined;
 }
 
-export interface GetLedgerReq {
+/** Create a new ledger entry */
+export interface CreateLedgerEntryReq {
+  vaultRef: VaultRef | undefined;
+  entry: LedgerEntryData | undefined;
+}
+
+export interface CreateLedgerEntryRes {
+  entry: LedgerEntryData | undefined;
+}
+
+/** Get a single ledger entry by ID */
+export interface GetLedgerEntryReq {
+  vaultRef: VaultRef | undefined;
+  id: string;
+}
+
+export interface GetLedgerEntryRes {
+  entry: LedgerEntryData | undefined;
+}
+
+/** List ledger entries with pagination */
+export interface ListLedgerEntriesReq {
+  vaultRef: VaultRef | undefined;
   filter?: LedgerFilter | undefined;
-  afterCursor?: string | undefined;
-  beforeCursor?: string | undefined;
 }
 
-export interface GetLedgerRes {
+export interface ListLedgerEntriesRes {
   totalCount: string;
-  page: number;
+  cursor: string;
+  lastPage: boolean;
+  entries: LedgerEntryData[];
+}
+
+export interface UpdateLedgerEntryReq {
+  id: string;
+  entry: LedgerEntryData | undefined;
+}
+
+export interface UpdateLedgerEntryRes {
+  entry: LedgerEntryData | undefined;
+}
+
+/** Delete a ledger entry */
+export interface DeleteLedgerEntryReq {
+  id: string;
+}
+
+export interface DeleteLedgerEntryRes {
+  success: boolean;
+  entry: LedgerEntryData | undefined;
+}
+
+/** Search ledger entries with advanced filtering */
+export interface SearchLedgerEntriesReq {
+  query: string;
+  filter?: LedgerFilter | undefined;
+}
+
+export interface SearchLedgerEntriesRes {
+  totalCount: string;
   cursor: string;
   lastPage: boolean;
   entries: LedgerEntryData[];
@@ -37,7 +89,7 @@ function createBaseLedgerFilter(): LedgerFilter {
     startTimestamp: undefined,
     endTimestamp: undefined,
     cursor: undefined,
-    limit: undefined,
+    pageSize: undefined,
   };
 }
 
@@ -60,7 +112,11 @@ export const LedgerFilter: MessageFns<LedgerFilter> = {
         ? globalThis.String(object.end_timestamp)
         : undefined,
       cursor: isSet(object.cursor) ? globalThis.String(object.cursor) : undefined,
-      limit: isSet(object.limit) ? globalThis.Number(object.limit) : undefined,
+      pageSize: isSet(object.pageSize)
+        ? globalThis.Number(object.pageSize)
+        : isSet(object.page_size)
+        ? globalThis.Number(object.page_size)
+        : undefined,
     };
   },
 
@@ -78,8 +134,8 @@ export const LedgerFilter: MessageFns<LedgerFilter> = {
     if (message.cursor !== undefined) {
       obj.cursor = message.cursor;
     }
-    if (message.limit !== undefined) {
-      obj.limit = Math.round(message.limit);
+    if (message.pageSize !== undefined) {
+      obj.pageSize = Math.round(message.pageSize);
     }
     return obj;
   },
@@ -93,73 +149,205 @@ export const LedgerFilter: MessageFns<LedgerFilter> = {
     message.startTimestamp = object.startTimestamp ?? undefined;
     message.endTimestamp = object.endTimestamp ?? undefined;
     message.cursor = object.cursor ?? undefined;
-    message.limit = object.limit ?? undefined;
+    message.pageSize = object.pageSize ?? undefined;
     return message;
   },
 };
 
-function createBaseGetLedgerReq(): GetLedgerReq {
-  return { filter: undefined, afterCursor: undefined, beforeCursor: undefined };
+function createBaseCreateLedgerEntryReq(): CreateLedgerEntryReq {
+  return { vaultRef: undefined, entry: undefined };
 }
 
-export const GetLedgerReq: MessageFns<GetLedgerReq> = {
-  fromJSON(object: any): GetLedgerReq {
+export const CreateLedgerEntryReq: MessageFns<CreateLedgerEntryReq> = {
+  fromJSON(object: any): CreateLedgerEntryReq {
     return {
-      filter: isSet(object.filter) ? LedgerFilter.fromJSON(object.filter) : undefined,
-      afterCursor: isSet(object.afterCursor)
-        ? globalThis.String(object.afterCursor)
-        : isSet(object.after_cursor)
-        ? globalThis.String(object.after_cursor)
+      vaultRef: isSet(object.vaultRef)
+        ? VaultRef.fromJSON(object.vaultRef)
+        : isSet(object.vault_ref)
+        ? VaultRef.fromJSON(object.vault_ref)
         : undefined,
-      beforeCursor: isSet(object.beforeCursor)
-        ? globalThis.String(object.beforeCursor)
-        : isSet(object.before_cursor)
-        ? globalThis.String(object.before_cursor)
-        : undefined,
+      entry: isSet(object.entry) ? LedgerEntryData.fromJSON(object.entry) : undefined,
     };
   },
 
-  toJSON(message: GetLedgerReq): unknown {
+  toJSON(message: CreateLedgerEntryReq): unknown {
     const obj: any = {};
-    if (message.filter !== undefined) {
-      obj.filter = LedgerFilter.toJSON(message.filter);
+    if (message.vaultRef !== undefined) {
+      obj.vaultRef = VaultRef.toJSON(message.vaultRef);
     }
-    if (message.afterCursor !== undefined) {
-      obj.afterCursor = message.afterCursor;
-    }
-    if (message.beforeCursor !== undefined) {
-      obj.beforeCursor = message.beforeCursor;
+    if (message.entry !== undefined) {
+      obj.entry = LedgerEntryData.toJSON(message.entry);
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<GetLedgerReq>, I>>(base?: I): GetLedgerReq {
-    return GetLedgerReq.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<CreateLedgerEntryReq>, I>>(base?: I): CreateLedgerEntryReq {
+    return CreateLedgerEntryReq.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<GetLedgerReq>, I>>(object: I): GetLedgerReq {
-    const message = createBaseGetLedgerReq();
-    message.filter = (object.filter !== undefined && object.filter !== null)
-      ? LedgerFilter.fromPartial(object.filter)
+  fromPartial<I extends Exact<DeepPartial<CreateLedgerEntryReq>, I>>(object: I): CreateLedgerEntryReq {
+    const message = createBaseCreateLedgerEntryReq();
+    message.vaultRef = (object.vaultRef !== undefined && object.vaultRef !== null)
+      ? VaultRef.fromPartial(object.vaultRef)
       : undefined;
-    message.afterCursor = object.afterCursor ?? undefined;
-    message.beforeCursor = object.beforeCursor ?? undefined;
+    message.entry = (object.entry !== undefined && object.entry !== null)
+      ? LedgerEntryData.fromPartial(object.entry)
+      : undefined;
     return message;
   },
 };
 
-function createBaseGetLedgerRes(): GetLedgerRes {
-  return { totalCount: "0", page: 0, cursor: "", lastPage: false, entries: [] };
+function createBaseCreateLedgerEntryRes(): CreateLedgerEntryRes {
+  return { entry: undefined };
 }
 
-export const GetLedgerRes: MessageFns<GetLedgerRes> = {
-  fromJSON(object: any): GetLedgerRes {
+export const CreateLedgerEntryRes: MessageFns<CreateLedgerEntryRes> = {
+  fromJSON(object: any): CreateLedgerEntryRes {
+    return { entry: isSet(object.entry) ? LedgerEntryData.fromJSON(object.entry) : undefined };
+  },
+
+  toJSON(message: CreateLedgerEntryRes): unknown {
+    const obj: any = {};
+    if (message.entry !== undefined) {
+      obj.entry = LedgerEntryData.toJSON(message.entry);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreateLedgerEntryRes>, I>>(base?: I): CreateLedgerEntryRes {
+    return CreateLedgerEntryRes.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreateLedgerEntryRes>, I>>(object: I): CreateLedgerEntryRes {
+    const message = createBaseCreateLedgerEntryRes();
+    message.entry = (object.entry !== undefined && object.entry !== null)
+      ? LedgerEntryData.fromPartial(object.entry)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseGetLedgerEntryReq(): GetLedgerEntryReq {
+  return { vaultRef: undefined, id: "" };
+}
+
+export const GetLedgerEntryReq: MessageFns<GetLedgerEntryReq> = {
+  fromJSON(object: any): GetLedgerEntryReq {
+    return {
+      vaultRef: isSet(object.vaultRef)
+        ? VaultRef.fromJSON(object.vaultRef)
+        : isSet(object.vault_ref)
+        ? VaultRef.fromJSON(object.vault_ref)
+        : undefined,
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+    };
+  },
+
+  toJSON(message: GetLedgerEntryReq): unknown {
+    const obj: any = {};
+    if (message.vaultRef !== undefined) {
+      obj.vaultRef = VaultRef.toJSON(message.vaultRef);
+    }
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetLedgerEntryReq>, I>>(base?: I): GetLedgerEntryReq {
+    return GetLedgerEntryReq.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetLedgerEntryReq>, I>>(object: I): GetLedgerEntryReq {
+    const message = createBaseGetLedgerEntryReq();
+    message.vaultRef = (object.vaultRef !== undefined && object.vaultRef !== null)
+      ? VaultRef.fromPartial(object.vaultRef)
+      : undefined;
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseGetLedgerEntryRes(): GetLedgerEntryRes {
+  return { entry: undefined };
+}
+
+export const GetLedgerEntryRes: MessageFns<GetLedgerEntryRes> = {
+  fromJSON(object: any): GetLedgerEntryRes {
+    return { entry: isSet(object.entry) ? LedgerEntryData.fromJSON(object.entry) : undefined };
+  },
+
+  toJSON(message: GetLedgerEntryRes): unknown {
+    const obj: any = {};
+    if (message.entry !== undefined) {
+      obj.entry = LedgerEntryData.toJSON(message.entry);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetLedgerEntryRes>, I>>(base?: I): GetLedgerEntryRes {
+    return GetLedgerEntryRes.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetLedgerEntryRes>, I>>(object: I): GetLedgerEntryRes {
+    const message = createBaseGetLedgerEntryRes();
+    message.entry = (object.entry !== undefined && object.entry !== null)
+      ? LedgerEntryData.fromPartial(object.entry)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseListLedgerEntriesReq(): ListLedgerEntriesReq {
+  return { vaultRef: undefined, filter: undefined };
+}
+
+export const ListLedgerEntriesReq: MessageFns<ListLedgerEntriesReq> = {
+  fromJSON(object: any): ListLedgerEntriesReq {
+    return {
+      vaultRef: isSet(object.vaultRef)
+        ? VaultRef.fromJSON(object.vaultRef)
+        : isSet(object.vault_ref)
+        ? VaultRef.fromJSON(object.vault_ref)
+        : undefined,
+      filter: isSet(object.filter) ? LedgerFilter.fromJSON(object.filter) : undefined,
+    };
+  },
+
+  toJSON(message: ListLedgerEntriesReq): unknown {
+    const obj: any = {};
+    if (message.vaultRef !== undefined) {
+      obj.vaultRef = VaultRef.toJSON(message.vaultRef);
+    }
+    if (message.filter !== undefined) {
+      obj.filter = LedgerFilter.toJSON(message.filter);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListLedgerEntriesReq>, I>>(base?: I): ListLedgerEntriesReq {
+    return ListLedgerEntriesReq.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ListLedgerEntriesReq>, I>>(object: I): ListLedgerEntriesReq {
+    const message = createBaseListLedgerEntriesReq();
+    message.vaultRef = (object.vaultRef !== undefined && object.vaultRef !== null)
+      ? VaultRef.fromPartial(object.vaultRef)
+      : undefined;
+    message.filter = (object.filter !== undefined && object.filter !== null)
+      ? LedgerFilter.fromPartial(object.filter)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseListLedgerEntriesRes(): ListLedgerEntriesRes {
+  return { totalCount: "0", cursor: "", lastPage: false, entries: [] };
+}
+
+export const ListLedgerEntriesRes: MessageFns<ListLedgerEntriesRes> = {
+  fromJSON(object: any): ListLedgerEntriesRes {
     return {
       totalCount: isSet(object.totalCount)
         ? globalThis.String(object.totalCount)
         : isSet(object.total_count)
         ? globalThis.String(object.total_count)
         : "0",
-      page: isSet(object.page) ? globalThis.Number(object.page) : 0,
       cursor: isSet(object.cursor) ? globalThis.String(object.cursor) : "",
       lastPage: isSet(object.lastPage)
         ? globalThis.Boolean(object.lastPage)
@@ -172,13 +360,10 @@ export const GetLedgerRes: MessageFns<GetLedgerRes> = {
     };
   },
 
-  toJSON(message: GetLedgerRes): unknown {
+  toJSON(message: ListLedgerEntriesRes): unknown {
     const obj: any = {};
     if (message.totalCount !== "0") {
       obj.totalCount = message.totalCount;
-    }
-    if (message.page !== 0) {
-      obj.page = Math.round(message.page);
     }
     if (message.cursor !== "") {
       obj.cursor = message.cursor;
@@ -192,13 +377,230 @@ export const GetLedgerRes: MessageFns<GetLedgerRes> = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<GetLedgerRes>, I>>(base?: I): GetLedgerRes {
-    return GetLedgerRes.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<ListLedgerEntriesRes>, I>>(base?: I): ListLedgerEntriesRes {
+    return ListLedgerEntriesRes.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<GetLedgerRes>, I>>(object: I): GetLedgerRes {
-    const message = createBaseGetLedgerRes();
+  fromPartial<I extends Exact<DeepPartial<ListLedgerEntriesRes>, I>>(object: I): ListLedgerEntriesRes {
+    const message = createBaseListLedgerEntriesRes();
     message.totalCount = object.totalCount ?? "0";
-    message.page = object.page ?? 0;
+    message.cursor = object.cursor ?? "";
+    message.lastPage = object.lastPage ?? false;
+    message.entries = object.entries?.map((e) => LedgerEntryData.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseUpdateLedgerEntryReq(): UpdateLedgerEntryReq {
+  return { id: "", entry: undefined };
+}
+
+export const UpdateLedgerEntryReq: MessageFns<UpdateLedgerEntryReq> = {
+  fromJSON(object: any): UpdateLedgerEntryReq {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      entry: isSet(object.entry) ? LedgerEntryData.fromJSON(object.entry) : undefined,
+    };
+  },
+
+  toJSON(message: UpdateLedgerEntryReq): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.entry !== undefined) {
+      obj.entry = LedgerEntryData.toJSON(message.entry);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdateLedgerEntryReq>, I>>(base?: I): UpdateLedgerEntryReq {
+    return UpdateLedgerEntryReq.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdateLedgerEntryReq>, I>>(object: I): UpdateLedgerEntryReq {
+    const message = createBaseUpdateLedgerEntryReq();
+    message.id = object.id ?? "";
+    message.entry = (object.entry !== undefined && object.entry !== null)
+      ? LedgerEntryData.fromPartial(object.entry)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseUpdateLedgerEntryRes(): UpdateLedgerEntryRes {
+  return { entry: undefined };
+}
+
+export const UpdateLedgerEntryRes: MessageFns<UpdateLedgerEntryRes> = {
+  fromJSON(object: any): UpdateLedgerEntryRes {
+    return { entry: isSet(object.entry) ? LedgerEntryData.fromJSON(object.entry) : undefined };
+  },
+
+  toJSON(message: UpdateLedgerEntryRes): unknown {
+    const obj: any = {};
+    if (message.entry !== undefined) {
+      obj.entry = LedgerEntryData.toJSON(message.entry);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdateLedgerEntryRes>, I>>(base?: I): UpdateLedgerEntryRes {
+    return UpdateLedgerEntryRes.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdateLedgerEntryRes>, I>>(object: I): UpdateLedgerEntryRes {
+    const message = createBaseUpdateLedgerEntryRes();
+    message.entry = (object.entry !== undefined && object.entry !== null)
+      ? LedgerEntryData.fromPartial(object.entry)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseDeleteLedgerEntryReq(): DeleteLedgerEntryReq {
+  return { id: "" };
+}
+
+export const DeleteLedgerEntryReq: MessageFns<DeleteLedgerEntryReq> = {
+  fromJSON(object: any): DeleteLedgerEntryReq {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: DeleteLedgerEntryReq): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DeleteLedgerEntryReq>, I>>(base?: I): DeleteLedgerEntryReq {
+    return DeleteLedgerEntryReq.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<DeleteLedgerEntryReq>, I>>(object: I): DeleteLedgerEntryReq {
+    const message = createBaseDeleteLedgerEntryReq();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseDeleteLedgerEntryRes(): DeleteLedgerEntryRes {
+  return { success: false, entry: undefined };
+}
+
+export const DeleteLedgerEntryRes: MessageFns<DeleteLedgerEntryRes> = {
+  fromJSON(object: any): DeleteLedgerEntryRes {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      entry: isSet(object.entry) ? LedgerEntryData.fromJSON(object.entry) : undefined,
+    };
+  },
+
+  toJSON(message: DeleteLedgerEntryRes): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.entry !== undefined) {
+      obj.entry = LedgerEntryData.toJSON(message.entry);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DeleteLedgerEntryRes>, I>>(base?: I): DeleteLedgerEntryRes {
+    return DeleteLedgerEntryRes.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<DeleteLedgerEntryRes>, I>>(object: I): DeleteLedgerEntryRes {
+    const message = createBaseDeleteLedgerEntryRes();
+    message.success = object.success ?? false;
+    message.entry = (object.entry !== undefined && object.entry !== null)
+      ? LedgerEntryData.fromPartial(object.entry)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseSearchLedgerEntriesReq(): SearchLedgerEntriesReq {
+  return { query: "", filter: undefined };
+}
+
+export const SearchLedgerEntriesReq: MessageFns<SearchLedgerEntriesReq> = {
+  fromJSON(object: any): SearchLedgerEntriesReq {
+    return {
+      query: isSet(object.query) ? globalThis.String(object.query) : "",
+      filter: isSet(object.filter) ? LedgerFilter.fromJSON(object.filter) : undefined,
+    };
+  },
+
+  toJSON(message: SearchLedgerEntriesReq): unknown {
+    const obj: any = {};
+    if (message.query !== "") {
+      obj.query = message.query;
+    }
+    if (message.filter !== undefined) {
+      obj.filter = LedgerFilter.toJSON(message.filter);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SearchLedgerEntriesReq>, I>>(base?: I): SearchLedgerEntriesReq {
+    return SearchLedgerEntriesReq.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<SearchLedgerEntriesReq>, I>>(object: I): SearchLedgerEntriesReq {
+    const message = createBaseSearchLedgerEntriesReq();
+    message.query = object.query ?? "";
+    message.filter = (object.filter !== undefined && object.filter !== null)
+      ? LedgerFilter.fromPartial(object.filter)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseSearchLedgerEntriesRes(): SearchLedgerEntriesRes {
+  return { totalCount: "0", cursor: "", lastPage: false, entries: [] };
+}
+
+export const SearchLedgerEntriesRes: MessageFns<SearchLedgerEntriesRes> = {
+  fromJSON(object: any): SearchLedgerEntriesRes {
+    return {
+      totalCount: isSet(object.totalCount)
+        ? globalThis.String(object.totalCount)
+        : isSet(object.total_count)
+        ? globalThis.String(object.total_count)
+        : "0",
+      cursor: isSet(object.cursor) ? globalThis.String(object.cursor) : "",
+      lastPage: isSet(object.lastPage)
+        ? globalThis.Boolean(object.lastPage)
+        : isSet(object.last_page)
+        ? globalThis.Boolean(object.last_page)
+        : false,
+      entries: globalThis.Array.isArray(object?.entries)
+        ? object.entries.map((e: any) => LedgerEntryData.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: SearchLedgerEntriesRes): unknown {
+    const obj: any = {};
+    if (message.totalCount !== "0") {
+      obj.totalCount = message.totalCount;
+    }
+    if (message.cursor !== "") {
+      obj.cursor = message.cursor;
+    }
+    if (message.lastPage !== false) {
+      obj.lastPage = message.lastPage;
+    }
+    if (message.entries?.length) {
+      obj.entries = message.entries.map((e) => LedgerEntryData.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SearchLedgerEntriesRes>, I>>(base?: I): SearchLedgerEntriesRes {
+    return SearchLedgerEntriesRes.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<SearchLedgerEntriesRes>, I>>(object: I): SearchLedgerEntriesRes {
+    const message = createBaseSearchLedgerEntriesRes();
+    message.totalCount = object.totalCount ?? "0";
     message.cursor = object.cursor ?? "";
     message.lastPage = object.lastPage ?? false;
     message.entries = object.entries?.map((e) => LedgerEntryData.fromPartial(e)) || [];
