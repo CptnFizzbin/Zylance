@@ -46,6 +46,10 @@ An OpenSource finance and budgeting app
    # For FNM users - add to your shell profile (~/.bashrc, ~/.zshrc, etc.):
    export NODE_HOME="$HOME/.local/share/fnm/node-versions/v24.5.0/installation"
    ```
+6. build the solution:
+   ```pwsh
+   dotnet build
+   ```
 
 ### Code Formatting
 
