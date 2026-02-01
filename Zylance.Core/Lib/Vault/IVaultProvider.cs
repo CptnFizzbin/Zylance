@@ -2,6 +2,6 @@ namespace Zylance.Core.Lib.Vault;
 
 public interface IVaultProvider
 {
-    public IVault OpenVault();
-    public IVault CreateVault();
+    public Task<IVault> OpenVault();
+    public Task<IVault> CreateVault();
 }

@@ -15,17 +15,17 @@ public class VaultService(IVaultProvider vaultProvider)
 {
     public IVault? ActiveVault { get; private set; }
 
-    public VaultRef OpenVault()
+    public async Task<VaultRef> OpenVault()
     {
-        var vault = vaultProvider.OpenVault();
+        var vault = await vaultProvider.OpenVault();
         var vaultId = Guid.NewGuid().ToString();
         ActiveVault = vault;
         return new VaultRef { Id = vaultId };
     }
 
-    public VaultRef CreateVault()
+    public async Task<VaultRef> CreateVault()
     {
-        var vault = vaultProvider.CreateVault();
+        var vault = await vaultProvider.CreateVault();
         var vaultId = Guid.NewGuid().ToString();
         ActiveVault = vault;
         return new VaultRef { Id = vaultId };

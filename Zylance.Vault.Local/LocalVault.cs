@@ -69,19 +69,10 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     /// </summary>
     /// <param name="filePath">Path to the SQLite database file</param>
     /// <returns>A new LocalVault instance</returns>
-    public static LocalVault FromFile(string filePath)
+    public async static Task<LocalVault> FromFile(string filePath)
     {
-        // Configure Entity Framework Core to use SQLite with the provided file path
-        var optionsBuilder = new DbContextOptionsBuilder<LocalVaultDbContext>();
-        optionsBuilder.UseSqlite($"Data Source={filePath}");
-
-        // Create the DbContext with the configured options
-        var dbContext = new LocalVaultDbContext(optionsBuilder.Options);
-
-        // Ensure the database schema is created if it doesn't exist
-        // This creates tables based on your DbContext model
-        dbContext.Database.EnsureCreated();
-
+        var dbContext = LocalVaultContextFactory.CreateDbContextFromFile(filePath);
+        await dbContext.Database.MigrateAsync();
         return new LocalVault(dbContext);
     }
 }

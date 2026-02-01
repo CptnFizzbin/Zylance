@@ -146,3 +146,5 @@ obj/
 wwwroot/
 
 .tanstack/
+
+identifier.sqlite
