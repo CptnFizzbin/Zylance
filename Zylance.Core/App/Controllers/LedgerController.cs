@@ -1,18 +1,19 @@
 using Zylance.Contract.Api.Ledger;
-using Zylance.Core.App.Services;
 using Zylance.Core.Lib.Gateway.Attributes;
 using Zylance.Core.Lib.Gateway.Models;
+using Zylance.Core.Lib.Vault;
+using Zylance.Core.Lib.Vault.Exceptions;
 
 namespace Zylance.Core.App.Controllers;
 
 [Controller]
-public class LedgerController(VaultService vaultService)
+public class LedgerController(VaultContext vaultContext)
 {
     [RequestHandler]
     public async Task CreateLedgerEntry(ZyRequest<CreateLedgerEntryReq> req, ZyResponse<CreateLedgerEntryRes> res)
     {
         var data = req.GetData();
-        var vault = vaultService.ActiveVault ?? throw VaultException.NoActiveVault();
+        var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
         await vault.WithScope(async scope =>
         {
@@ -25,7 +26,7 @@ public class LedgerController(VaultService vaultService)
     public async Task GetLedgerEntry(ZyRequest<GetLedgerEntryReq> req, ZyResponse<GetLedgerEntryRes> res)
     {
         var data = req.GetData();
-        var vault = vaultService.ActiveVault ?? throw VaultException.NoActiveVault();
+        var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
         if (!Guid.TryParse(data.Id, out var entryId))
             throw new ArgumentException($"Invalid ledger entry ID format: {data.Id}");
@@ -38,7 +39,7 @@ public class LedgerController(VaultService vaultService)
     public async Task ListLedgerEntries(ZyRequest<ListLedgerEntriesReq> req, ZyResponse<ListLedgerEntriesRes> res)
     {
         var data = req.GetData();
-        var vault = vaultService.ActiveVault ?? throw VaultException.NoActiveVault();
+        var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
         var result = await vault.Ledgers.ListAsync(data.Filter);
 
@@ -57,7 +58,7 @@ public class LedgerController(VaultService vaultService)
     public async Task UpdateLedgerEntry(ZyRequest<UpdateLedgerEntryReq> req, ZyResponse<UpdateLedgerEntryRes> res)
     {
         var data = req.GetData();
-        var vault = vaultService.ActiveVault ?? throw VaultException.NoActiveVault();
+        var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
         if (!Guid.TryParse(data.Id, out var entryId))
             throw new ArgumentException($"Invalid ledger entry ID format: {data.Id}");
@@ -77,7 +78,7 @@ public class LedgerController(VaultService vaultService)
     public async Task DeleteLedgerEntry(ZyRequest<DeleteLedgerEntryReq> req, ZyResponse<DeleteLedgerEntryRes> res)
     {
         var data = req.GetData();
-        var vault = vaultService.ActiveVault ?? throw VaultException.NoActiveVault();
+        var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
         if (!Guid.TryParse(data.Id, out var entryId))
             throw new ArgumentException($"Invalid ledger entry ID format: {data.Id}");
@@ -93,7 +94,7 @@ public class LedgerController(VaultService vaultService)
     public async Task SearchLedgerEntries(ZyRequest<SearchLedgerEntriesReq> req, ZyResponse<SearchLedgerEntriesRes> res)
     {
         var data = req.GetData();
-        var vault = vaultService.ActiveVault ?? throw VaultException.NoActiveVault();
+        var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
         var searchText = data.Query ?? string.Empty;
         var result = await vault.Ledgers.SearchAsync(searchText, data.Filter);

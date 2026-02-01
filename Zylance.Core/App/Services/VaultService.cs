@@ -3,23 +3,13 @@ using Zylance.Core.Lib.Vault;
 
 namespace Zylance.Core.App.Services;
 
-public class VaultException(string message) : Exception(message)
+public class VaultService(IVaultProvider vaultProvider, VaultContext vaultContext)
 {
-    public static VaultException NoActiveVault()
-    {
-        return new VaultException("No active vault. Please open or create a vault before performing operations.");
-    }
-}
-
-public class VaultService(IVaultProvider vaultProvider)
-{
-    public IVault? ActiveVault { get; private set; }
-
     public async Task<VaultRef> OpenVault()
     {
         var vault = await vaultProvider.OpenVault();
         var vaultId = Guid.NewGuid().ToString();
-        ActiveVault = vault;
+        vaultContext.ActiveVault = vault;
         return new VaultRef { Id = vaultId };
     }
 
@@ -27,7 +17,12 @@ public class VaultService(IVaultProvider vaultProvider)
     {
         var vault = await vaultProvider.CreateVault();
         var vaultId = Guid.NewGuid().ToString();
-        ActiveVault = vault;
+        vaultContext.ActiveVault = vault;
         return new VaultRef { Id = vaultId };
+    }
+
+    public void CloseVault()
+    {
+        vaultContext.ActiveVault = null;
     }
 }

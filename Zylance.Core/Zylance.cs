@@ -38,6 +38,7 @@ public class Zylance
         Console.WriteLine("[Zylance] Calling AddZylance()...");
         services.AddSingleton<FileService>();
         services.AddSingleton<VaultService>();
+        services.AddSingleton<VaultContext>();
         services.AddZylanceRouter();
 
         services.TryAddSingleton<Gateway>(sp =>
@@ -49,9 +50,11 @@ public class Zylance
         Console.WriteLine("[Zylance] Building service provider...");
         IServiceProvider serviceProvider = services.BuildServiceProvider();
 
-        // Resolve and cache the gateway
-        Console.WriteLine("[Zylance] Resolving Gateway...");
+        // Resolve and cache the vault context
+        Console.WriteLine("[Zylance] Initializing contexts...");
         serviceProvider.GetRequiredService<Gateway>();
+        serviceProvider.GetRequiredService<VaultContext>();
+
         Console.WriteLine("[Zylance] Initialization complete!");
     }
 }

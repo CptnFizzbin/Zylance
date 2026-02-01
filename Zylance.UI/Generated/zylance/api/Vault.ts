@@ -24,6 +24,21 @@ export interface VaultCreateRes {
   vaultRef: VaultRef | undefined;
 }
 
+export interface VaultOpenedEvt {
+  vaultRef: VaultRef | undefined;
+}
+
+export interface VaultClosedEvt {
+}
+
+export interface VaultUnlockedEvt {
+  vaultRef: VaultRef | undefined;
+}
+
+export interface VaultLockedEvt {
+  vaultRef: VaultRef | undefined;
+}
+
 function createBaseVaultOpenReq(): VaultOpenReq {
   return {};
 }
@@ -133,6 +148,134 @@ export const VaultCreateRes: MessageFns<VaultCreateRes> = {
   },
   fromPartial<I extends Exact<DeepPartial<VaultCreateRes>, I>>(object: I): VaultCreateRes {
     const message = createBaseVaultCreateRes();
+    message.vaultRef = (object.vaultRef !== undefined && object.vaultRef !== null)
+      ? VaultRef.fromPartial(object.vaultRef)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseVaultOpenedEvt(): VaultOpenedEvt {
+  return { vaultRef: undefined };
+}
+
+export const VaultOpenedEvt: MessageFns<VaultOpenedEvt> = {
+  fromJSON(object: any): VaultOpenedEvt {
+    return {
+      vaultRef: isSet(object.vaultRef)
+        ? VaultRef.fromJSON(object.vaultRef)
+        : isSet(object.vault_ref)
+        ? VaultRef.fromJSON(object.vault_ref)
+        : undefined,
+    };
+  },
+
+  toJSON(message: VaultOpenedEvt): unknown {
+    const obj: any = {};
+    if (message.vaultRef !== undefined) {
+      obj.vaultRef = VaultRef.toJSON(message.vaultRef);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<VaultOpenedEvt>, I>>(base?: I): VaultOpenedEvt {
+    return VaultOpenedEvt.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<VaultOpenedEvt>, I>>(object: I): VaultOpenedEvt {
+    const message = createBaseVaultOpenedEvt();
+    message.vaultRef = (object.vaultRef !== undefined && object.vaultRef !== null)
+      ? VaultRef.fromPartial(object.vaultRef)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseVaultClosedEvt(): VaultClosedEvt {
+  return {};
+}
+
+export const VaultClosedEvt: MessageFns<VaultClosedEvt> = {
+  fromJSON(_: any): VaultClosedEvt {
+    return {};
+  },
+
+  toJSON(_: VaultClosedEvt): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<VaultClosedEvt>, I>>(base?: I): VaultClosedEvt {
+    return VaultClosedEvt.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<VaultClosedEvt>, I>>(_: I): VaultClosedEvt {
+    const message = createBaseVaultClosedEvt();
+    return message;
+  },
+};
+
+function createBaseVaultUnlockedEvt(): VaultUnlockedEvt {
+  return { vaultRef: undefined };
+}
+
+export const VaultUnlockedEvt: MessageFns<VaultUnlockedEvt> = {
+  fromJSON(object: any): VaultUnlockedEvt {
+    return {
+      vaultRef: isSet(object.vaultRef)
+        ? VaultRef.fromJSON(object.vaultRef)
+        : isSet(object.vault_ref)
+        ? VaultRef.fromJSON(object.vault_ref)
+        : undefined,
+    };
+  },
+
+  toJSON(message: VaultUnlockedEvt): unknown {
+    const obj: any = {};
+    if (message.vaultRef !== undefined) {
+      obj.vaultRef = VaultRef.toJSON(message.vaultRef);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<VaultUnlockedEvt>, I>>(base?: I): VaultUnlockedEvt {
+    return VaultUnlockedEvt.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<VaultUnlockedEvt>, I>>(object: I): VaultUnlockedEvt {
+    const message = createBaseVaultUnlockedEvt();
+    message.vaultRef = (object.vaultRef !== undefined && object.vaultRef !== null)
+      ? VaultRef.fromPartial(object.vaultRef)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseVaultLockedEvt(): VaultLockedEvt {
+  return { vaultRef: undefined };
+}
+
+export const VaultLockedEvt: MessageFns<VaultLockedEvt> = {
+  fromJSON(object: any): VaultLockedEvt {
+    return {
+      vaultRef: isSet(object.vaultRef)
+        ? VaultRef.fromJSON(object.vaultRef)
+        : isSet(object.vault_ref)
+        ? VaultRef.fromJSON(object.vault_ref)
+        : undefined,
+    };
+  },
+
+  toJSON(message: VaultLockedEvt): unknown {
+    const obj: any = {};
+    if (message.vaultRef !== undefined) {
+      obj.vaultRef = VaultRef.toJSON(message.vaultRef);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<VaultLockedEvt>, I>>(base?: I): VaultLockedEvt {
+    return VaultLockedEvt.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<VaultLockedEvt>, I>>(object: I): VaultLockedEvt {
+    const message = createBaseVaultLockedEvt();
     message.vaultRef = (object.vaultRef !== undefined && object.vaultRef !== null)
       ? VaultRef.fromPartial(object.vaultRef)
       : undefined;

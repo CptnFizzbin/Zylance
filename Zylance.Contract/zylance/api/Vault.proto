@@ -24,3 +24,23 @@ message VaultCreateRes {
   option (action) = "Vault:CreateVault";
   VaultRef vault_ref = 1;
 }
+
+message VaultOpenedEvt {
+  option (action) = "Vault:VaultOpened";
+  VaultRef vault_ref = 1;
+}
+
+message VaultClosedEvt {
+  option (action) = "Vault:VaultClosed";
+}
+
+message VaultUnlockedEvt {
+  option (action) = "Vault:Unlocked";
+  VaultRef vault_ref = 1;
+}
+
+message VaultLockedEvt {
+  option (action) = "Vault:Locked";
+  VaultRef vault_ref = 1;
+}
+
