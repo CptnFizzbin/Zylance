@@ -22,14 +22,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- Track all proto files as inputs for incremental build -->
         <Protobuf Include="./zylance/**/*.proto" GrpcServices="None"/>
     </ItemGroup>
 
     <Target Name="GenerateTS"
             AfterTargets="Build"
             Inputs="@(Protobuf);$(MSBuildProjectFile)"
-            Outputs="$(TsGeneratedMarker)/.generated">
+            Outputs="$(TsOutputPath)/.generated">
         <Message Importance="high" Text="Generating TypeScript from Protocol Buffers..."/>
         <Exec Command="$(YarnExe) install"/>
         <Exec Command="$(YarnExe) build &quot;$(TsOutputPath)&quot;" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
