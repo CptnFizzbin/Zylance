@@ -1,5 +1,5 @@
 import type { FileRef } from "@Contract/models/File"
-import type { VaultRef } from "@Contract/models/vault"
+import type { VaultRef } from "@Contract/models/Vault"
 import { useZylance } from "@Lib/ZylanceContext"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
