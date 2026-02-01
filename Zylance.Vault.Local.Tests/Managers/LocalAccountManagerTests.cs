@@ -1,6 +1,7 @@
 using Zylance.Contract.Models.Account;
 using Zylance.Vault.Local.Context;
 using Zylance.Vault.Local.Managers;
+using Zylance.Vault.Local.Tests.Factories;
 
 namespace Zylance.Vault.Local.Tests.Managers;
 

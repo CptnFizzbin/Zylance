@@ -1,4 +1,4 @@
-using Zylance.Core.Lib.Interfaces;
+using Zylance.Core.Lib;
 using Zylance.Core.Lib.Vault;
 using Zylance.Vault.Local;
 

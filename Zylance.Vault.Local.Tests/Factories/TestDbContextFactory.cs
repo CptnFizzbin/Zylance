@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Zylance.Vault.Local.Context;
 
-namespace Zylance.Vault.Local.Tests;
+namespace Zylance.Vault.Local.Tests.Factories;
 
 /// <summary>
 ///     Factory for creating test database contexts with in-memory database.

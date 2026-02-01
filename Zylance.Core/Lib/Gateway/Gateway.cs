@@ -3,7 +3,6 @@ using Zylance.Core.Lib.Gateway.Handlers;
 using Zylance.Core.Lib.Gateway.Models;
 using Zylance.Core.Lib.Gateway.Services;
 using Zylance.Core.Lib.Gateway.Utils;
-using Zylance.Core.Lib.Interfaces;
 
 namespace Zylance.Core.Lib.Gateway;
 

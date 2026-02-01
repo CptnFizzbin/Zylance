@@ -1,4 +1,4 @@
-namespace Zylance.Core.Lib.Interfaces;
+namespace Zylance.Core.Lib.Gateway;
 
 /// <summary>
 ///     Defines a transport layer for bidirectional message communication between the application core and UI layer.

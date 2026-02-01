@@ -1,10 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Zylance.Core.App.Services;
+using Zylance.Core.Lib;
 using Zylance.Core.Lib.Gateway;
 using Zylance.Core.Lib.Gateway.Extensions;
 using Zylance.Core.Lib.Gateway.Services;
-using Zylance.Core.Lib.Interfaces;
 using Zylance.Core.Lib.Vault;
 
 namespace Zylance.Core;

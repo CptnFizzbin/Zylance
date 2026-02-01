@@ -1,5 +1,5 @@
 using Zylance.Contract.Models.File;
-using Zylance.Core.Lib.Interfaces;
+using Zylance.Core.Lib;
 
 namespace Zylance.Core.App.Services;
 

@@ -1,6 +1,6 @@
 using Zylance.Contract.Models.File;
 
-namespace Zylance.Core.Lib.Interfaces;
+namespace Zylance.Core.Lib;
 
 public interface IFileProvider
 {

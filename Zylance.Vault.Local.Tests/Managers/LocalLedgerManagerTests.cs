@@ -2,8 +2,9 @@ using Zylance.Contract.Api.Ledger;
 using Zylance.Contract.Models.Ledger;
 using Zylance.Vault.Local.Context;
 using Zylance.Vault.Local.Managers;
+using Zylance.Vault.Local.Tests.Factories;
 
-namespace Zylance.Vault.Local.Tests;
+namespace Zylance.Vault.Local.Tests.Managers;
 
 /// <summary>
 ///     Tests for LocalLedgerManager to ensure CRUD operations, filtering, and pagination work correctly.

@@ -1,7 +1,7 @@
 using Photino.NET;
 using Zylance.Contract.Lib.Envelope;
+using Zylance.Core.Lib.Gateway;
 using Zylance.Core.Lib.Gateway.Utils;
-using Zylance.Core.Lib.Interfaces;
 
 namespace Zylance.Desktop;
 
