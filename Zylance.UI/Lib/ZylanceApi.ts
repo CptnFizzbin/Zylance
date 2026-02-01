@@ -20,7 +20,20 @@ import type {
   SelectFileReq,
   SelectFileRes,
 } from "@Contract/api/File"
-import type { GetLedgerReq, GetLedgerRes } from "@Contract/api/Ledger"
+import type {
+  CreateLedgerEntryReq,
+  CreateLedgerEntryRes,
+  DeleteLedgerEntryReq,
+  DeleteLedgerEntryRes,
+  GetLedgerEntryReq,
+  GetLedgerEntryRes,
+  ListLedgerEntriesReq,
+  ListLedgerEntriesRes,
+  SearchLedgerEntriesReq,
+  SearchLedgerEntriesRes,
+  UpdateLedgerEntryReq,
+  UpdateLedgerEntryRes,
+} from "@Contract/api/Ledger"
 import type { GetStatusReq, GetStatusRes } from "@Contract/api/Status"
 import type { VaultCreateReq, VaultCreateRes, VaultOpenRes } from "@Contract/api/Vault"
 import { ZylanceClient } from "@Lib/ZylanceClient"
@@ -68,7 +81,18 @@ export function createZylanceApi () {
     },
 
     ledger: {
-      getLedger: client.createRequestEndpoint<"Ledger:GetLedger", GetLedgerReq, GetLedgerRes>("Ledger:GetLedger"),
+      createLedgerEntry: client.createRequestEndpoint<"Ledger:CreateLedgerEntry", CreateLedgerEntryReq, CreateLedgerEntryRes>(
+        "Ledger:CreateLedgerEntry"),
+      getLedgerEntry: client.createRequestEndpoint<"Ledger:GetLedgerEntry", GetLedgerEntryReq, GetLedgerEntryRes>(
+        "Ledger:GetLedgerEntry"),
+      listLedgerEntries: client.createRequestEndpoint<"Ledger:ListLedgerEntries", ListLedgerEntriesReq, ListLedgerEntriesRes>(
+        "Ledger:ListLedgerEntries"),
+      updateLedgerEntry: client.createRequestEndpoint<"Ledger:UpdateLedgerEntry", UpdateLedgerEntryReq, UpdateLedgerEntryRes>(
+        "Ledger:UpdateLedgerEntry"),
+      deleteLedgerEntry: client.createRequestEndpoint<"Ledger:DeleteLedgerEntry", DeleteLedgerEntryReq, DeleteLedgerEntryRes>(
+        "Ledger:DeleteLedgerEntry"),
+      searchLedgerEntries: client.createRequestEndpoint<"Ledger:SearchLedgerEntries", SearchLedgerEntriesReq, SearchLedgerEntriesRes>(
+        "Ledger:SearchLedgerEntries"),
     },
   }
 }

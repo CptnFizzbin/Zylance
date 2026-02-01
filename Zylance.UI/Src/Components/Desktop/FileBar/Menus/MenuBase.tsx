@@ -1,5 +1,5 @@
-import { Button, ClickAwayListener, Grow, MenuList, Paper, Popper } from "@mui/material"
-import { type FC, type KeyboardEvent, type PropsWithChildren, type SyntheticEvent, useEffect, useRef } from "react"
+import { Button, Grow, MenuList, Paper, Popper } from "@mui/material"
+import { type FC, type KeyboardEvent, type PropsWithChildren, useEffect, useRef } from "react"
 
 import styles from "../FileBar.module.css"
 
@@ -19,21 +19,9 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
 }) => {
   const anchorRef = useRef<HTMLButtonElement>(null)
 
-  const onClickAway = (event: Event | SyntheticEvent) => {
-    if (
-      anchorRef.current &&
-      anchorRef.current.contains(event.target as HTMLElement)
-    ) {
-      return
-    }
-
-    onClose()
-  }
-
   function handleListKeyDown (event: KeyboardEvent) {
     if (event.key === "Tab") {
       event.preventDefault()
-      onClickAway(event)
     } else if (event.key === "Escape") {
       onClose()
     }
@@ -80,17 +68,15 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
             }}
           >
             <Paper sx={{ width: 320, maxWidth: "100%" }}>
-              <ClickAwayListener onClickAway={onClose}>
-                <MenuList
-                  dense
-                  autoFocusItem={open}
-                  id={`${label}-menu`}
-                  aria-labelledby={`${label}-menu-button`}
-                  onKeyDown={handleListKeyDown}
-                >
-                  {children}
-                </MenuList>
-              </ClickAwayListener>
+              <MenuList
+                dense
+                autoFocusItem={open}
+                id={`${label}-menu`}
+                aria-labelledby={`${label}-menu-button`}
+                onKeyDown={handleListKeyDown}
+              >
+                {children}
+              </MenuList>
             </Paper>
           </Grow>
         )}
