@@ -1,3 +1,4 @@
+using Google.Protobuf;
 using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Lib.Gateway.Utils;
 
@@ -15,23 +16,25 @@ public class ZyResponse
     }
 
     public ZyResponse SetData<TData>(TData data)
+        where TData : IMessage
     {
-        Payload.DataJson = MessageUtils.Serialize(data);
+        Payload.DataJson = MessageUtils.ToJson(data);
         return this;
     }
 }
 
 public class ZyResponse<TData> : ZyResponse
+    where TData : IMessage, new()
 {
     public ZyResponse<TData> SetData(TData data)
     {
-        Payload.DataJson = MessageUtils.Serialize(data);
+        Payload.DataJson = MessageUtils.ToJson(data);
         return this;
     }
 
     public TData GetData()
     {
-        return MessageUtils.Deserialize<TData>(Payload.DataJson)
+        return MessageUtils.FromJson<TData>(Payload.DataJson)
             ?? throw new ArgumentException("Failed to deserialize response data");
     }
 }

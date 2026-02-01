@@ -1,3 +1,4 @@
+using Google.Protobuf;
 using JetBrains.Annotations;
 using Zylance.Core.Lib.Gateway.Delegates;
 using Zylance.Core.Lib.Gateway.Models;
@@ -12,6 +13,8 @@ public static class RequestHandlerUtils
     /// </summary>
     [UsedImplicitly(Reason = "Used by controllers via source generator")]
     public static AsyncZyRequestHandler Wrap<TReq, TRes>(AsyncZyRequestHandler<TReq, TRes> handler)
+        where TRes : IMessage, new()
+        where TReq : IMessage, new()
     {
         return async (req, res) =>
         {
@@ -30,6 +33,8 @@ public static class RequestHandlerUtils
     /// </summary>
     [UsedImplicitly(Reason = "Used by controllers via source generator")]
     public static AsyncZyRequestHandler WrapSync<TReq, TRes>(SyncZyRequestHandler<TReq, TRes> handler)
+        where TReq : IMessage, new()
+        where TRes : IMessage, new()
     {
         return (req, res) =>
         {

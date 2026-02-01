@@ -1,3 +1,4 @@
+using Google.Protobuf;
 using Zylance.Core.Lib.Gateway.Models;
 
 namespace Zylance.Core.Lib.Gateway.Delegates;
@@ -11,9 +12,11 @@ public delegate Task AsyncZyEventHandler(ZyEvent evt);
 /// <summary>
 ///     Async typed event handler for strongly-typed events.
 /// </summary>
-public delegate Task AsyncZyEventHandler<TData>(ZyEvent<TData> evt);
+public delegate Task AsyncZyEventHandler<TData>(ZyEvent<TData> evt)
+    where TData : IMessage, new();
 
 /// <summary>
 ///     Sync typed event handler for strongly-typed events.
 /// </summary>
-public delegate void SyncZyEventHandler<TData>(ZyEvent<TData> evt);
+public delegate void SyncZyEventHandler<TData>(ZyEvent<TData> evt)
+    where TData : IMessage, new();

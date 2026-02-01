@@ -1,3 +1,4 @@
+using Google.Protobuf;
 using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Lib.Gateway.Utils;
 
@@ -10,25 +11,27 @@ public class ZyEvent
     public string Name => Payload.EventName;
 
     public TData GetData<TData>()
+        where TData : IMessage, new()
     {
-        return MessageUtils.Deserialize<TData>(Payload.DataJson)
+        return MessageUtils.FromJson<TData>(Payload.DataJson)
             ?? throw new ArgumentException("Failed to deserialize event data");
     }
 }
 
 public class ZyEvent<TData> : ZyEvent
+    where TData : IMessage, new()
 {
     public TData Data => GetData();
 
     public ZyEvent<TData> SetData(TData data)
     {
-        Payload.DataJson = MessageUtils.Serialize(data);
+        Payload.DataJson = MessageUtils.ToJson(data);
         return this;
     }
 
     public TData GetData()
     {
-        return MessageUtils.Deserialize<TData>(Payload.DataJson)
+        return MessageUtils.FromJson<TData>(Payload.DataJson)
             ?? throw new ArgumentException("Failed to deserialize response data");
     }
 }

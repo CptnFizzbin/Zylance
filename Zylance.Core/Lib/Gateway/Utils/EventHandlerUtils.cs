@@ -1,3 +1,4 @@
+using Google.Protobuf;
 using JetBrains.Annotations;
 using Zylance.Core.Lib.Gateway.Delegates;
 using Zylance.Core.Lib.Gateway.Models;
@@ -12,6 +13,7 @@ public static class EventHandlerUtils
     /// </summary>
     [UsedImplicitly(Reason = "Used by controllers via source generator")]
     public static AsyncZyEventHandler Wrap<TData>(AsyncZyEventHandler<TData> handler)
+        where TData : IMessage, new()
     {
         return evt => handler(new ZyEvent<TData> { Payload = evt.Payload });
     }
@@ -22,6 +24,7 @@ public static class EventHandlerUtils
     /// </summary>
     [UsedImplicitly(Reason = "Used by controllers via source generator")]
     public static AsyncZyEventHandler WrapSync<TData>(SyncZyEventHandler<TData> handler)
+        where TData : IMessage, new()
     {
         return evt =>
         {

@@ -1,3 +1,4 @@
+using Google.Protobuf;
 using Zylance.Core.Lib.Gateway.Models;
 
 namespace Zylance.Core.Lib.Gateway.Delegates;
@@ -12,10 +13,14 @@ public delegate Task<ZyResponse> AsyncZyRequestHandler(ZyRequest req, ZyResponse
 ///     Async typed request handler for strongly-typed request/response pairs.
 ///     Handlers should mutate the response parameter and return void or Task.
 /// </summary>
-public delegate Task AsyncZyRequestHandler<TReq, TRes>(ZyRequest<TReq> req, ZyResponse<TRes> res);
+public delegate Task AsyncZyRequestHandler<TReq, TRes>(ZyRequest<TReq> req, ZyResponse<TRes> res)
+    where TReq : IMessage, new()
+    where TRes : IMessage, new();
 
 /// <summary>
 ///     Sync typed request handler for strongly-typed request/response pairs.
 ///     Handlers should mutate the response parameter and return void.
 /// </summary>
-public delegate void SyncZyRequestHandler<TReq, TRes>(ZyRequest<TReq> req, ZyResponse<TRes> res);
+public delegate void SyncZyRequestHandler<TReq, TRes>(ZyRequest<TReq> req, ZyResponse<TRes> res)
+    where TReq : IMessage, new()
+    where TRes : IMessage, new();

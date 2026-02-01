@@ -71,7 +71,7 @@ public class PhotinoTransport : ITransport
     /// </remarks>
     private void HandleWebMessageReceived(object? sender, string message)
     {
-        var envelope = MessageUtils.Deserialize<GatewayEnvelope>(message);
+        var envelope = MessageUtils.FromJson<GatewayEnvelope>(message);
         if (envelope is null)
             return;
 

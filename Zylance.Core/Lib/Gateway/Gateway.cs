@@ -99,7 +99,7 @@ public class Gateway
     private void Send(GatewayEnvelope envelope)
     {
         envelope.MessageId = Guid.NewGuid().ToString();
-        var msgJson = MessageUtils.Serialize(envelope);
+        var msgJson = MessageUtils.ToJson(envelope);
         _transport.Send(msgJson);
     }
 }
