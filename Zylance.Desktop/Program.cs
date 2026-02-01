@@ -45,9 +45,7 @@ public static class Program
 
     private static Uri GetServerUrl()
     {
-        var serverUrl = GetUiMode() == "external"
-            ? GetZylanceUiUrl()
-            : StartWebServer();
+        var serverUrl = GetUiMode() == "external" ? GetZylanceUiUrl() : StartWebServer();
 
         return new Uri(serverUrl);
     }
@@ -55,17 +53,13 @@ public static class Program
     private static string GetZylanceUiUrl()
     {
         var debugServer = Environment.GetEnvironmentVariable("ZYLANCE_UI_URL");
-        return string.IsNullOrWhiteSpace(debugServer)
-            ? DefaultUiServerUrl
-            : debugServer;
+        return string.IsNullOrWhiteSpace(debugServer) ? DefaultUiServerUrl : debugServer;
     }
 
     private static string StartWebServer()
     {
         var args = Environment.GetCommandLineArgs();
-        PhotinoServer
-            .CreateStaticFileServer(args, out var serverUrl)
-            .RunAsync();
+        PhotinoServer.CreateStaticFileServer(args, out var serverUrl).RunAsync();
 
         return serverUrl;
     }
