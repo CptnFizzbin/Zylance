@@ -71,13 +71,14 @@ namespace Zylance.Vault.Remote.Search.BucketedSearch;
 /// // Returns: ["txn2"] - substring matches
 /// </code>
 /// </example>
-public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> storage)
-    : IZkSearchEngine<TItemId> where TItemId : notnull
+public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> storage) : IZkSearchEngine<TItemId>
+    where TItemId : notnull
 {
     public async Task AddItemAsync(TItemId itemId, string content)
     {
         var itemFlags = await storage.Flags.GetFlagAsync(itemId);
-        if (itemFlags.IsIndexed) return;
+        if (itemFlags.IsIndexed)
+            return;
 
         await IndexItem(itemId, content);
 
@@ -89,22 +90,23 @@ public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> sto
         var itemIds = items.Select(i => i.itemId).ToList();
         var itemFlags = await storage.Flags.GetFlagsAsync(itemIds);
 
-        var indexedItemIds = itemIds
-            .Where(id => itemFlags.GetValueOrDefault(id)?.IsIndexed ?? false)
-            .ToHashSet();
+        var indexedItemIds = itemIds.Where(id => itemFlags.GetValueOrDefault(id)?.IsIndexed ?? false).ToHashSet();
 
-        var itemsToIndex = items
-            .Where(item => !indexedItemIds.Contains(item.itemId))
-            .ToList();
+        var itemsToIndex = items.Where(item => !indexedItemIds.Contains(item.itemId)).ToList();
 
         foreach (var item in itemsToIndex)
             await IndexItem(item.itemId, item.content);
 
         var updatedFlags = itemIds
             .Where(id => !indexedItemIds.Contains(id))
-            .Select(id => itemFlags.GetValueOrDefault(id) is { } existingFlags
-                ? existingFlags with { IsIndexed = true }
-                : new ItemFlags<TItemId> { ItemId = id, IsIndexed = true })
+            .Select(id =>
+                itemFlags.GetValueOrDefault(id) is { } existingFlags
+                    ? existingFlags with
+                    {
+                        IsIndexed = true,
+                    }
+                    : new ItemFlags<TItemId> { ItemId = id, IsIndexed = true }
+            )
             .ToList();
 
         await storage.Flags.SaveFlagsAsync(updatedFlags);
@@ -112,7 +114,8 @@ public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> sto
 
     public async Task UpdateItemAsync(TItemId itemId, string oldContent, string content)
     {
-        if (!(await storage.Flags.GetFlagAsync(itemId)).IsIndexed) return;
+        if (!(await storage.Flags.GetFlagAsync(itemId)).IsIndexed)
+            return;
 
         await ReindexItem(itemId, oldContent, content);
     }
@@ -122,13 +125,9 @@ public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> sto
         var itemIds = items.Select(i => i.itemId).ToList();
         var itemFlags = await storage.Flags.GetFlagsAsync(itemIds);
 
-        var indexedItemIds = itemIds
-            .Where(id => itemFlags.GetValueOrDefault(id)?.IsIndexed ?? false)
-            .ToHashSet();
+        var indexedItemIds = itemIds.Where(id => itemFlags.GetValueOrDefault(id)?.IsIndexed ?? false).ToHashSet();
 
-        var itemsToReindex = items
-            .Where(item => indexedItemIds.Contains(item.itemId))
-            .ToList();
+        var itemsToReindex = items.Where(item => indexedItemIds.Contains(item.itemId)).ToList();
 
         foreach (var item in itemsToReindex)
             await ReindexItem(item.itemId, item.oldContent, item.newContent);
@@ -137,7 +136,8 @@ public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> sto
     public async Task RemoveItemAsync(TItemId itemId, string content)
     {
         var itemFlags = await storage.Flags.GetFlagAsync(itemId);
-        if (!itemFlags.IsIndexed) return;
+        if (!itemFlags.IsIndexed)
+            return;
 
         await DeindexItem(itemId, content);
 
@@ -149,13 +149,9 @@ public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> sto
         var itemIds = items.Select(i => i.itemId).ToList();
         var itemFlags = await storage.Flags.GetFlagsAsync(itemIds);
 
-        var indexedItemIds = itemIds
-            .Where(id => itemFlags.GetValueOrDefault(id)?.IsIndexed ?? false)
-            .ToHashSet();
+        var indexedItemIds = itemIds.Where(id => itemFlags.GetValueOrDefault(id)?.IsIndexed ?? false).ToHashSet();
 
-        var itemsToDeindex = items
-            .Where(item => indexedItemIds.Contains(item.itemId))
-            .ToList();
+        var itemsToDeindex = items.Where(item => indexedItemIds.Contains(item.itemId)).ToList();
 
         foreach (var item in itemsToDeindex)
             await DeindexItem(item.itemId, item.content);
@@ -175,25 +171,25 @@ public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> sto
     )
     {
         var searchTokens = Tokenize(terms);
-        if (searchTokens.Count == 0) return [];
+        if (searchTokens.Count == 0)
+            return [];
 
         HashSet<TItemId>? resultItemIds = null;
 
         // For each search token, find all matching keywords and union their items
         foreach (var searchToken in searchTokens)
         {
-            var matchingKeywords = storage.Glossary
-                .GetAll()
-                .Where(k => fuzzy
-                    ? k.Value.Contains(searchToken)
-                    : k.Value == searchToken)
+            var matchingKeywords = storage
+                .Glossary.GetAll()
+                .Where(k => fuzzy ? k.Value.Contains(searchToken) : k.Value == searchToken)
                 .ToList();
 
             var itemsForThisToken = new HashSet<TItemId>();
             foreach (var keyword in matchingKeywords)
             {
                 var keywordItems = await GetItemsForKeyword(keyword, direction);
-                foreach (var item in keywordItems) itemsForThisToken.Add(item);
+                foreach (var item in keywordItems)
+                    itemsForThisToken.Add(item);
             }
 
             resultItemIds = resultItemIds is null
@@ -201,7 +197,8 @@ public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> sto
                 : resultItemIds.Intersect(itemsForThisToken).ToHashSet();
 
             // Early exit: if any token yields no results, the final result is empty
-            if (resultItemIds.Count == 0) break;
+            if (resultItemIds.Count == 0)
+                break;
         }
 
         return resultItemIds?.ToList() ?? [];
@@ -300,8 +297,7 @@ public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> sto
         else
         {
             var lastBucketId = new BucketId($"{keyword.Value}:{keyword.NumBuckets - 1}");
-            bucket = await storage.Buckets.LoadBucket(lastBucketId)
-                ?? new Bucket<TItemId> { Id = lastBucketId };
+            bucket = await storage.Buckets.LoadBucket(lastBucketId) ?? new Bucket<TItemId> { Id = lastBucketId };
 
             if (bucket.ItemIds.Count >= storage.Buckets.MaxItemsPerBucket)
             {
@@ -336,13 +332,15 @@ public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> sto
     private async Task DeindexToken(TItemId itemId, string token)
     {
         var keyword = storage.Glossary.Get(token);
-        if (keyword.NumBuckets == 0) return;
+        if (keyword.NumBuckets == 0)
+            return;
 
         var bucketIds = ListBucketIds([keyword]);
         foreach (var bucketId in bucketIds)
         {
             var bucket = await storage.Buckets.LoadBucket(bucketId);
-            if (bucket is null) continue;
+            if (bucket is null)
+                continue;
 
             if (bucket.ItemIds.Remove(itemId))
                 await storage.Buckets.SaveBucket(bucket);
@@ -366,11 +364,10 @@ public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> sto
     )
     {
         var resultItemIds = new HashSet<TItemId>();
-        if (keyword.NumBuckets == 0) return resultItemIds;
+        if (keyword.NumBuckets == 0)
+            return resultItemIds;
 
-        var currentIndex = direction == SearchDirection.LatestFirst
-            ? (int)(keyword.NumBuckets - 1)
-            : 0;
+        var currentIndex = direction == SearchDirection.LatestFirst ? (int)(keyword.NumBuckets - 1) : 0;
 
         while (currentIndex >= 0 && currentIndex < keyword.NumBuckets)
         {
@@ -378,9 +375,7 @@ public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> sto
             var bucket = await storage.Buckets.LoadBucket(bucketId);
             bucket?.ItemIds.ToList().ForEach(x => resultItemIds.Add(x));
 
-            currentIndex += direction == SearchDirection.LatestFirst
-                ? -1
-                : 1;
+            currentIndex += direction == SearchDirection.LatestFirst ? -1 : 1;
         }
 
         return resultItemIds;
@@ -418,18 +413,15 @@ public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> sto
         var bucketIds = new List<BucketId>();
         foreach (var keyword in keywords)
         {
-            if (keyword.NumBuckets == 0) continue;
+            if (keyword.NumBuckets == 0)
+                continue;
 
-            var currentIndex = direction == SearchDirection.LatestFirst
-                ? (int)(keyword.NumBuckets - 1)
-                : 0;
+            var currentIndex = direction == SearchDirection.LatestFirst ? (int)(keyword.NumBuckets - 1) : 0;
 
             while (currentIndex >= 0 && currentIndex < keyword.NumBuckets)
             {
                 bucketIds.Add(new BucketId($"{keyword.Value}:{currentIndex}"));
-                currentIndex += direction == SearchDirection.LatestFirst
-                    ? -1
-                    : 1;
+                currentIndex += direction == SearchDirection.LatestFirst ? -1 : 1;
             }
         }
 
@@ -465,7 +457,8 @@ public partial class BucketedSearchEngine<TItemId>(IBucketedStorage<TItemId> sto
     /// </remarks>
     private static HashSet<string> Tokenize(string text)
     {
-        return TokenBoundaryRegex().Split(text)
+        return TokenBoundaryRegex()
+            .Split(text)
             .Where(t => !string.IsNullOrWhiteSpace(t))
             .Select(t => t.ToLowerInvariant())
             .ToHashSet();

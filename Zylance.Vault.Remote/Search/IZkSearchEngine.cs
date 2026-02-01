@@ -19,7 +19,8 @@ namespace Zylance.Vault.Remote.Search;
 ///         tokens and bucket references in remote storage.
 ///     </para>
 /// </remarks>
-public interface IZkSearchEngine<TItemId> where TItemId : notnull
+public interface IZkSearchEngine<TItemId>
+    where TItemId : notnull
 {
     /// <summary>
     ///     Adds an item to the search index.

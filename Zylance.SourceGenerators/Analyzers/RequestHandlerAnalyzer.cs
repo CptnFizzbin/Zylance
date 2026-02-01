@@ -42,9 +42,7 @@ internal static class RequestHandlerAnalyzer
         var responseMessageName = responseType.Name.Replace("Res", "");
 
         if (requestMessageName != responseMessageName)
-        {
             handlerInfo.Diagnostics.Add(DiagnosticRules.CreateRequestHandlerTypeMismatchDiagnostic(method));
-        }
 
         return handlerInfo with
         {

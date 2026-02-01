@@ -9,8 +9,7 @@ public class MemoryGlossary : IGlossary
 
     public Keyword Get(string keyword)
     {
-        return _keywords.GetValueOrDefault(keyword)
-            ?? new Keyword { Value = keyword };
+        return _keywords.GetValueOrDefault(keyword) ?? new Keyword { Value = keyword };
     }
 
     public List<Keyword> GetAll()

@@ -35,7 +35,7 @@ internal static class EventHandlerAnalyzer
 
         return handlerInfo with
         {
-            EventType = ((INamedTypeSymbol)param.Type).TypeArguments[0]
+            EventType = ((INamedTypeSymbol)param.Type).TypeArguments[0],
         };
     }
 }

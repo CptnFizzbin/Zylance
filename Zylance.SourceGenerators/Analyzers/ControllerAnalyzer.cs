@@ -10,13 +10,13 @@ public static class ControllerAnalyzer
 {
     internal static bool IsController(INamedTypeSymbol classSymbol)
     {
-        return classSymbol.GetAttributes()
-            .Any(a => a.AttributeClass?.Name == "ControllerAttribute");
+        return classSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "ControllerAttribute");
     }
 
     internal static bool HasHandlers(INamedTypeSymbol classSymbol)
     {
-        return classSymbol.GetMembers()
+        return classSymbol
+            .GetMembers()
             .OfType<IMethodSymbol>()
             .ToList()
             .SelectMany(m => m.GetAttributes())
@@ -33,16 +33,13 @@ public static class ControllerAnalyzer
         var allMethods = classSymbol.GetMembers().OfType<IMethodSymbol>().ToList();
 
         var reqHandlerMethods = allMethods
-            .Where(m => m.GetAttributes()
-                .Any(a => a.AttributeClass?.Name == "RequestHandlerAttribute"))
+            .Where(m => m.GetAttributes().Any(a => a.AttributeClass?.Name == "RequestHandlerAttribute"))
             .ToList();
+        reqHandlerMethods.ForEach(method => requestHandlers.Add(RequestHandlerAnalyzer.Analyze(method)));
 
         var eventHandlerMethods = allMethods
-            .Where(m => m.GetAttributes()
-                .Any(a => a.AttributeClass?.Name == "EventHandlerAttribute"))
+            .Where(m => m.GetAttributes().Any(a => a.AttributeClass?.Name == "EventHandlerAttribute"))
             .ToList();
-
-        reqHandlerMethods.ForEach(method => requestHandlers.Add(RequestHandlerAnalyzer.Analyze(method)));
         eventHandlerMethods.ForEach(method => eventHandlers.Add(EventHandlerAnalyzer.Analyze(method)));
 
         var numHandlers = eventHandlers.Count + requestHandlers.Count;
