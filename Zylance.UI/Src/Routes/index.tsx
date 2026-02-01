@@ -1,5 +1,15 @@
-import { useZylance } from "@Lib/ZylanceContext"
-import { Alert, Box, Button, Card, CardContent, Container, Divider, Stack, Typography } from "@mui/material"
+import { useZylanceApi } from "@Lib/ZylanceContext"
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  Divider,
+  Stack,
+  Typography,
+} from "@mui/material"
 import { useMutation } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 
@@ -7,8 +17,8 @@ export const Route = createFileRoute("/")({
   component: VaultLogin,
 })
 
-function VaultLogin () {
-  const zylanceApi = useZylance()
+function VaultLogin() {
+  const zylanceApi = useZylanceApi()
 
   // Mutation for opening an existing vault
   const openVaultMutation = useMutation({
@@ -57,7 +67,8 @@ function VaultLogin () {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%)",
+        background:
+          "linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%)",
       }}
     >
       <Container maxWidth="sm">
@@ -97,10 +108,7 @@ function VaultLogin () {
               </Typography>
 
               {error && (
-                <Alert
-                  severity="error"
-                  sx={{ mb: 3 }}
-                >
+                <Alert severity="error" sx={{ mb: 3 }}>
                   {error.message || "An error occurred. Please try again."}
                 </Alert>
               )}
@@ -114,7 +122,9 @@ function VaultLogin () {
                   disabled={isLoading}
                   sx={{ py: 1.5 }}
                 >
-                  {openVaultMutation.isPending ? "Opening..." : "Open Existing Vault"}
+                  {openVaultMutation.isPending
+                    ? "Opening..."
+                    : "Open Existing Vault"}
                 </Button>
 
                 <Divider sx={{ my: 2 }}>
@@ -132,7 +142,9 @@ function VaultLogin () {
                   color="success"
                   sx={{ py: 1.5 }}
                 >
-                  {createVaultMutation.isPending ? "Creating..." : "Create New Vault"}
+                  {createVaultMutation.isPending
+                    ? "Creating..."
+                    : "Create New Vault"}
                 </Button>
               </Stack>
 
@@ -148,7 +160,11 @@ function VaultLogin () {
           </Card>
 
           {/* Footer */}
-          <Typography variant="caption" color="text.disabled" textAlign="center">
+          <Typography
+            variant="caption"
+            color="text.disabled"
+            textAlign="center"
+          >
             © 2026 CptnFizzbin
           </Typography>
         </Stack>

@@ -1,5 +1,3 @@
-import { v7 as uuidv7 } from "uuid"
-import { getTransport, type ITransport } from "@Lib/ITransport"
 import {
   type ErrorPayload,
   type EventPayload,
@@ -7,6 +5,8 @@ import {
   type RequestPayload,
   type ResponsePayload,
 } from "@Contract/lib/Envelope"
+import { getTransport, type ITransport } from "@Lib/ITransport"
+import { v7 as uuidv7 } from "uuid"
 
 type PendingRequest = {
   resolve: (data: any) => void,
@@ -21,8 +21,12 @@ export interface RequestEndpoint<_TAction extends string, TReqData extends Optio
   (data: TReqData): Promise<TReturn>
 }
 
-export interface EventEndpoint<_TEvent extends string, TEvtData extends OptionalData = void> {
+export interface EventEmitter<_TEvent extends string, TEvtData extends OptionalData = void> {
   (data: TEvtData): Promise<void>
+}
+
+export interface EventListener<_TEvent extends string, TEvtData extends OptionalData = void> {
+  (handler: (data: TEvtData) => void | Promise<void>): Unsubscribe
 }
 
 export class MessageError extends Error {
@@ -78,13 +82,19 @@ export class ZylanceClient {
     }
   }
 
-  public createEventEndpoint<TEvent extends string, TEvtData extends OptionalData = void> (event: TEvent): EventEndpoint<TEvent, TEvtData> {
+  public createEventEmitter<TEvent extends string, TEvtData extends OptionalData = void> (event: TEvent): EventEmitter<TEvent, TEvtData> {
     return async (data: TEvtData) => {
       this.sendEvent<TEvtData>(event, data)
     }
   }
 
-  public on<TData> (event: string, handler: (data: unknown) => TData): Unsubscribe {
+  public createEventListener<TEvent extends string, TData extends OptionalData = void> (event: string): EventListener<TEvent, TData> {
+    return (handler: (data: TData) => void | Promise<void>): Unsubscribe => {
+      return this.on<TData>(event, handler)
+    }
+  }
+
+  public on<TData> (event: string, handler: (data: TData) => void): Unsubscribe {
     let handlers = this.eventHandlers.get(event)
     if (!handlers) {
       handlers = new Set()

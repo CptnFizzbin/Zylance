@@ -35,7 +35,13 @@ import type {
   UpdateLedgerEntryRes,
 } from "@Contract/api/Ledger"
 import type { GetStatusReq, GetStatusRes } from "@Contract/api/Status"
-import type { VaultCreateRes, VaultOpenRes } from "@Contract/api/Vault"
+import type {
+  VaultCreateRes,
+  VaultLockedEvt,
+  VaultOpenedEvt,
+  VaultOpenRes,
+  VaultUnlockedEvt,
+} from "@Contract/api/Vault"
 import { ZylanceClient } from "@Lib/ZylanceClient"
 
 export function createZylanceApi () {
@@ -43,7 +49,7 @@ export function createZylanceApi () {
 
   return {
     desktop: {
-      emitExit: client.createEventEndpoint<"Desktop:Exit">("Desktop:Exit"),
+      emitExit: client.createEventEmitter<"Desktop:Exit">("Desktop:Exit"),
     },
 
     status: {
@@ -65,6 +71,10 @@ export function createZylanceApi () {
       openVault: client.createRequestEndpoint<"Vault:OpenVault", void, VaultOpenRes>("Vault:OpenVault"),
       createVault: client.createRequestEndpoint<"Vault:CreateVault", void, VaultCreateRes>(
         "Vault:CreateVault"),
+      onVaultOpened: client.createEventListener<"Vault:VaultOpened", VaultOpenedEvt>("Vault:VaultOpened"),
+      onVaultClosed: client.createEventListener<"Vault:VaultClosed", void>("Vault:VaultClosed"),
+      onVaultUnlocked: client.createEventListener<"Vault:Unlocked", VaultUnlockedEvt>("Vault:Unlocked"),
+      onVaultLocked: client.createEventListener<"Vault:Locked", VaultLockedEvt>("Vault:Locked"),
     },
 
     account: {
@@ -96,3 +106,5 @@ export function createZylanceApi () {
     },
   }
 }
+
+export type ZylanceApi = ReturnType<typeof createZylanceApi>;
