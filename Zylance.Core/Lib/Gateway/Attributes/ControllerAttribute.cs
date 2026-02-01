@@ -8,6 +8,4 @@ namespace Zylance.Core.Lib.Gateway.Attributes;
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
 [MeansImplicitUse]
-public class ControllerAttribute : Attribute
-{
-}
+public class ControllerAttribute : Attribute;

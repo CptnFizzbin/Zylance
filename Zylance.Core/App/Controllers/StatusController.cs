@@ -10,11 +10,6 @@ public class StatusController
     [RequestHandler]
     public void GetStatus(ZyRequest<GetStatusReq> req, ZyResponse<GetStatusRes> res)
     {
-        res.SetData(
-            new GetStatusRes
-            {
-                Status = "All systems operational",
-            }
-        );
+        res.SetData(new GetStatusRes { Status = "All systems operational" });
     }
 }

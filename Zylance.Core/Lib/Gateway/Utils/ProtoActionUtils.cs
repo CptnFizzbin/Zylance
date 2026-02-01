@@ -14,7 +14,8 @@ public static class ProtoActionUtils
     /// </summary>
     /// <typeparam name="TMessage">The protobuf message type (must implement IMessage)</typeparam>
     /// <returns>The action name if specified, otherwise null</returns>
-    public static string? GetAction<TMessage>() where TMessage : IMessage, new()
+    public static string? GetAction<TMessage>()
+        where TMessage : IMessage, new()
     {
         var instance = new TMessage();
         var descriptor = instance.Descriptor;
@@ -27,16 +28,16 @@ public static class ProtoActionUtils
     private static string? GetActionFromDescriptor(MessageDescriptor descriptor)
     {
         var customOptions = descriptor.GetOptions();
-        if (customOptions == null) return null;
+        if (customOptions == null)
+            return null;
 
         // Use the generated extension to get the action value
         var actionValue = customOptions.GetExtension(ZylanceExtensions.Action);
-        return string.IsNullOrEmpty(actionValue)
-            ? null
-            : actionValue;
+        return string.IsNullOrEmpty(actionValue) ? null : actionValue;
     }
 
-    public static string? GetEventName<TMessage>() where TMessage : IMessage, new()
+    public static string? GetEventName<TMessage>()
+        where TMessage : IMessage, new()
     {
         var instance = new TMessage();
         var descriptor = instance.Descriptor;
@@ -49,12 +50,11 @@ public static class ProtoActionUtils
     private static string? GetEventNameFromDescriptor(MessageDescriptor descriptor)
     {
         var customOptions = descriptor.GetOptions();
-        if (customOptions == null) return null;
+        if (customOptions == null)
+            return null;
 
         // Use the generated extension to get the action value
         var actionValue = customOptions.GetExtension(ZylanceExtensions.EventName);
-        return string.IsNullOrEmpty(actionValue)
-            ? null
-            : actionValue;
+        return string.IsNullOrEmpty(actionValue) ? null : actionValue;
     }
 }

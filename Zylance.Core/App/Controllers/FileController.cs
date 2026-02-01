@@ -19,11 +19,7 @@ public class FileController(FileService fileService)
 
         var filters = data.Filters?.Select(f => (f.Name, f.Extensions.ToArray())).ToArray();
 
-        var fileRef = fileService.SelectFile(
-            data.Title,
-            filters,
-            data.ReadOnly
-        );
+        var fileRef = fileService.SelectFile(data.Title, filters, data.ReadOnly);
 
         res.SetData(new SelectFileRes { FileRef = fileRef });
     }
@@ -35,11 +31,7 @@ public class FileController(FileService fileService)
 
         var filters = data.Filters?.Select(f => (f.Name, f.Extensions.ToArray())).ToArray();
 
-        var fileRef = fileService.CreateFile(
-            data.Title,
-            data.Filename,
-            filters
-        );
+        var fileRef = fileService.CreateFile(data.Title, data.Filename, filters);
 
         res.SetData(new CreateFileRes { FileRef = fileRef });
     }

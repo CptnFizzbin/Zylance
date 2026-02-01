@@ -13,11 +13,7 @@ public static class ExceptionHandler
     /// </summary>
     public static ErrorPayload WrapException(Exception ex, string? requestId = null)
     {
-        var payload = new ErrorPayload
-        {
-            Type = ex.GetType().Name,
-            Details = ex.Message,
-        };
+        var payload = new ErrorPayload { Type = ex.GetType().Name, Details = ex.Message };
 
         if (requestId is not null)
             payload.RequestId = requestId;

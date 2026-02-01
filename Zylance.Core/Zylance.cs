@@ -2,9 +2,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Zylance.Core.App.Services;
 using Zylance.Core.Lib.Gateway;
-using Zylance.Core.Lib.Gateway.Services;
 using Zylance.Core.Lib.Gateway.Extensions;
+using Zylance.Core.Lib.Gateway.Services;
 using Zylance.Core.Lib.Interfaces;
+using Zylance.Core.Lib.Vault;
 
 namespace Zylance.Core;
 
@@ -21,11 +22,7 @@ public class Zylance
     /// <param name="transport">The transport implementation for communication.</param>
     /// <param name="fileProvider">The file provider implementation.</param>
     /// <param name="vaultProvider">The vault provider implementation.</param>
-    public Zylance(
-        ITransport transport,
-        IFileProvider fileProvider,
-        IVaultProvider vaultProvider
-    )
+    public Zylance(ITransport transport, IFileProvider fileProvider, IVaultProvider vaultProvider)
     {
         Console.WriteLine("[Zylance] Initializing...");
 
