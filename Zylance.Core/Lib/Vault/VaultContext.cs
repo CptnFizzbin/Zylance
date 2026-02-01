@@ -7,7 +7,7 @@ namespace Zylance.Core.Lib.Vault;
 ///     Manages the active vault state and handles vault state transitions.
 ///     Implements a state machine pattern for vault lifecycle events.
 /// </summary>
-public class VaultContext(Gateway.Gateway gateway)
+public class VaultContext(Zylance zylance)
 {
     /// <summary>
     ///     Gets or sets the currently active vault.
@@ -28,28 +28,11 @@ public class VaultContext(Gateway.Gateway gateway)
     {
         return (Old: oldVault, New: newVault) switch
         {
-            // No change - both null
-            (null, null) => VaultTransition.None,
-
-            // No change - same vault with same lock state
-            ({ } old, { } @new) when old.VaultId == @new.VaultId && old.Unlocked == @new.Unlocked =>
-                VaultTransition.None,
-
-            // Vault closed
             (not null, null) => VaultTransition.Closed,
-
-            // Vault opened
-            (null, { } vault) => vault.Unlocked ? VaultTransition.OpenedUnlocked : VaultTransition.Opened,
-
-            // Vault switched
-            ({ } old, { } @new) when old.VaultId != @new.VaultId => @new.Unlocked
-                ? VaultTransition.SwitchedUnlocked
-                : VaultTransition.Switched,
-
-            // Lock state changed
+            (null, not null) => VaultTransition.Opened,
+            ({ } old, { } @new) when old.VaultId != @new.VaultId => VaultTransition.Switched,
             ({ Unlocked: false }, { Unlocked: true }) => VaultTransition.Unlocked,
             ({ Unlocked: true }, { Unlocked: false }) => VaultTransition.Locked,
-
             _ => VaultTransition.None,
         };
     }
@@ -69,20 +52,9 @@ public class VaultContext(Gateway.Gateway gateway)
                 SendVaultOpenedEvent(vault!);
                 break;
 
-            case VaultTransition.OpenedUnlocked:
-                SendVaultOpenedEvent(vault!);
-                SendVaultUnlockedEvent(vault!);
-                break;
-
             case VaultTransition.Switched:
                 SendVaultClosedEvent();
                 SendVaultOpenedEvent(vault!);
-                break;
-
-            case VaultTransition.SwitchedUnlocked:
-                SendVaultClosedEvent();
-                SendVaultOpenedEvent(vault!);
-                SendVaultUnlockedEvent(vault!);
                 break;
 
             case VaultTransition.Locked:
@@ -100,25 +72,25 @@ public class VaultContext(Gateway.Gateway gateway)
     private void SendVaultOpenedEvent(IVault vault)
     {
         var evt = new VaultOpenedEvt { VaultRef = vault.ToRef() };
-        gateway.Send(MessageUtils.ToEventPayload(evt));
+        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     private void SendVaultClosedEvent()
     {
         var evt = new VaultClosedEvt();
-        gateway.Send(MessageUtils.ToEventPayload(evt));
+        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     private void SendVaultLockedEvent(IVault vault)
     {
         var evt = new VaultLockedEvt { VaultRef = vault.ToRef() };
-        gateway.Send(MessageUtils.ToEventPayload(evt));
+        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     private void SendVaultUnlockedEvent(IVault vault)
     {
         var evt = new VaultUnlockedEvt { VaultRef = vault.ToRef() };
-        gateway.Send(MessageUtils.ToEventPayload(evt));
+        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     /// <summary>
@@ -128,10 +100,8 @@ public class VaultContext(Gateway.Gateway gateway)
     {
         None,
         Opened,
-        OpenedUnlocked,
         Closed,
         Switched,
-        SwitchedUnlocked,
         Locked,
         Unlocked,
     }

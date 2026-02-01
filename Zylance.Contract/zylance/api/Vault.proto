@@ -26,21 +26,21 @@ message VaultCreateRes {
 }
 
 message VaultOpenedEvt {
-  option (action) = "Vault:VaultOpened";
+  option (eventName) = "Vault:VaultOpened";
   VaultRef vault_ref = 1;
 }
 
 message VaultClosedEvt {
-  option (action) = "Vault:VaultClosed";
+  option (eventName) = "Vault:VaultClosed";
 }
 
 message VaultUnlockedEvt {
-  option (action) = "Vault:Unlocked";
+  option (eventName) = "Vault:Unlocked";
   VaultRef vault_ref = 1;
 }
 
 message VaultLockedEvt {
-  option (action) = "Vault:Locked";
+  option (eventName) = "Vault:Locked";
   VaultRef vault_ref = 1;
 }
 

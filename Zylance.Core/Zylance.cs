@@ -29,6 +29,8 @@ public class Zylance
         // Build the internal DI container
         var services = new ServiceCollection();
 
+        services.AddSingleton(this);
+
         // Register platform-specific implementations
         services.AddSingleton(transport);
         services.AddSingleton(fileProvider);
@@ -51,10 +53,11 @@ public class Zylance
         IServiceProvider serviceProvider = services.BuildServiceProvider();
 
         // Resolve and cache the vault context
-        Console.WriteLine("[Zylance] Initializing contexts...");
-        serviceProvider.GetRequiredService<Gateway>();
-        serviceProvider.GetRequiredService<VaultContext>();
+        Console.WriteLine("[Zylance] Initializing Gateway...");
+        Gateway = serviceProvider.GetRequiredService<Gateway>();
 
         Console.WriteLine("[Zylance] Initialization complete!");
     }
+
+    public Gateway Gateway { get; }
 }

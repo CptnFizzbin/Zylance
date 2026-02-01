@@ -18,6 +18,8 @@ public static class ExceptionHandler
         if (requestId is not null)
             payload.RequestId = requestId;
 
+        Console.Error.WriteLine(ex);
+
         return payload;
     }
 }

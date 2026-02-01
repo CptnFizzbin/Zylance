@@ -12,14 +12,20 @@ public static class ProtoActionUtils
     /// <summary>
     ///     Gets the action name from a protobuf message type using the custom [action] option.
     /// </summary>
-    /// <typeparam name="TMessage">The protobuf message type (must implement IMessage)</typeparam>
+    /// <typeparam name="TReqData">The protobuf message type (must implement IMessage)</typeparam>
     /// <returns>The action name if specified, otherwise null</returns>
-    public static string? GetAction<TMessage>()
-        where TMessage : IMessage, new()
+    public static string GetAction<TReqData>()
+        where TReqData : IMessage, new()
     {
-        var instance = new TMessage();
-        var descriptor = instance.Descriptor;
-        return GetActionFromDescriptor(descriptor);
+        return GetAction(new TReqData());
+    }
+
+    public static string GetAction<TReqData>(TReqData reqData)
+        where TReqData : IMessage, new()
+    {
+        var descriptor = reqData.Descriptor;
+        return GetActionFromDescriptor(descriptor)
+            ?? throw new InvalidOperationException($"Action option not found in descriptor for {descriptor.Name}.");
     }
 
     /// <summary>
@@ -36,12 +42,18 @@ public static class ProtoActionUtils
         return string.IsNullOrEmpty(actionValue) ? null : actionValue;
     }
 
-    public static string? GetEventName<TMessage>()
+    public static string GetEventName<TMessage>()
         where TMessage : IMessage, new()
     {
-        var instance = new TMessage();
-        var descriptor = instance.Descriptor;
-        return GetEventNameFromDescriptor(descriptor);
+        return GetEventName(new TMessage());
+    }
+
+    public static string GetEventName<TEvtData>(TEvtData eventData)
+        where TEvtData : IMessage, new()
+    {
+        var descriptor = eventData.Descriptor;
+        return GetEventNameFromDescriptor(descriptor)
+            ?? throw new InvalidOperationException($"EventName option not found in descriptor for {descriptor.Name}.");
     }
 
     /// <summary>
@@ -54,7 +66,7 @@ public static class ProtoActionUtils
             return null;
 
         // Use the generated extension to get the action value
-        var actionValue = customOptions.GetExtension(ZylanceExtensions.EventName);
-        return string.IsNullOrEmpty(actionValue) ? null : actionValue;
+        var eventName = customOptions.GetExtension(ZylanceExtensions.EventName);
+        return string.IsNullOrEmpty(eventName) ? null : eventName;
     }
 }

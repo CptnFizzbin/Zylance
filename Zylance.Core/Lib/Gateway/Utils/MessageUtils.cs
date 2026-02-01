@@ -59,7 +59,7 @@ public static class MessageUtils
     public static EventPayload ToEventPayload<TData>(TData data)
         where TData : IMessage, new()
     {
-        var payload = new EventPayload { EventName = ProtoActionUtils.GetEventName<TData>(), DataJson = ToJson(data) };
+        var payload = new EventPayload { EventName = ProtoActionUtils.GetEventName(data), DataJson = ToJson(data) };
 
         return payload;
     }
