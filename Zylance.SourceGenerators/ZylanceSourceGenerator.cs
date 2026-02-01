@@ -20,7 +20,8 @@ public class ZylanceSourceGenerator : IIncrementalGenerator
 
         context.RegisterSourceOutput(
             allControllers,
-            static (spc, controller) => RouterServiceExtensionsCodeGenerator.Execute(controller, spc));
+            static (spc, controller) => RegisterControllerCodeGenerator.Execute(controller, spc)
+        );
 
         context.RegisterSourceOutput(
             allControllers.Collect(),
@@ -29,29 +30,29 @@ public class ZylanceSourceGenerator : IIncrementalGenerator
                 foreach (var diagnostic in controllers.SelectMany(controller => controller.AllDiagnostics))
                     spc.ReportDiagnostic(diagnostic);
 
-                ControllerRegistrationCodeGenerator.Execute(controllers, spc);
-            });
+                AddZylanceRouterCodeGenerator.Execute(controllers, spc);
+            }
+        );
     }
 
     private static IncrementalValuesProvider<ControllerInfo> FindControllers(
         IncrementalGeneratorInitializationContext context
     )
     {
-        return context.SyntaxProvider
-            .CreateSyntaxProvider(
-                predicate: static (s, _) => s is ClassDeclarationSyntax { AttributeLists.Count: > 0 },
-                transform: static (ctx, cToken) =>
+        return context
+            .SyntaxProvider.CreateSyntaxProvider(
+                static (s, _) => s is ClassDeclarationSyntax { AttributeLists.Count: > 0 },
+                static (ctx, cToken) =>
                 {
                     var classDecl = (ClassDeclarationSyntax)ctx.Node;
-                    var symbol = ctx.SemanticModel.GetDeclaredSymbol(classDecl, cancellationToken: cToken);
+                    var symbol = ctx.SemanticModel.GetDeclaredSymbol(classDecl, cToken);
 
-                    if (symbol is not INamedTypeSymbol classSymbol) return null;
+                    if (symbol is not INamedTypeSymbol classSymbol)
+                        return null;
 
-                    var isController = ControllerAnalyzer.IsController(classSymbol)
-                        || ControllerAnalyzer.HasHandlers(classSymbol);
-                    return isController
-                        ? ControllerAnalyzer.Analyze(classSymbol)
-                        : null;
+                    var isController =
+                        ControllerAnalyzer.IsController(classSymbol) || ControllerAnalyzer.HasHandlers(classSymbol);
+                    return isController ? ControllerAnalyzer.Analyze(classSymbol) : null;
                 }
             )
             .Where(static m => m is not null)

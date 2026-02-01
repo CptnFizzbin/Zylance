@@ -17,7 +17,6 @@ internal static class RequestHandlerAnalyzer
             Method = method,
             RequestType = null,
             ResponseType = null,
-            IsAsync = method.IsAsync,
         };
 
         if (method.Parameters.Length != 2)

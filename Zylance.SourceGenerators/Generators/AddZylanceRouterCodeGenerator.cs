@@ -9,12 +9,9 @@ using static Zylance.SourceGenerators.Utils.TemplateUtils;
 
 namespace Zylance.SourceGenerators.Generators;
 
-internal static class ControllerRegistrationCodeGenerator
+internal static class AddZylanceRouterCodeGenerator
 {
-    public static void Execute(
-        ImmutableArray<ControllerInfo> controllers,
-        SourceProductionContext context
-    )
+    public static void Execute(ImmutableArray<ControllerInfo> controllers, SourceProductionContext context)
     {
         var source = Generate(controllers.ToList());
         context.AddSource("ControllerRegistration.g.cs", SourceText.From(source, Encoding.UTF8));
@@ -23,10 +20,10 @@ internal static class ControllerRegistrationCodeGenerator
     private static string Generate(List<ControllerInfo> controllers)
     {
         var namespaces = controllers
-            .SelectMany(controller => controller.Namespaces)
+            .Select(c => c.Namespace)
+            .Where(ns => !ns.IsGlobalNamespace)
             .Distinct(SymbolEqualityComparer.Default)
-            .Where(s => s is not null)
-            .Select(s => s!)
+            .OfType<INamespaceSymbol>()
             .ToList();
 
         //language=csharp
@@ -52,7 +49,10 @@ internal static class ControllerRegistrationCodeGenerator
                          {
                              var router = new RouterService();
 
-                             {{ForEach(controllers, c => $"router.Register{c.ClassType.Name}(sp.GetRequiredService<{c.ClassType.Name}>());")}}
+                             {{ForEach(
+                                 controllers,
+                                 c => $"router.Register{c.ClassType.Name}(sp.GetRequiredService<{c.ClassType.Name}>());"
+                             )}}
 
                              return router;
                          });

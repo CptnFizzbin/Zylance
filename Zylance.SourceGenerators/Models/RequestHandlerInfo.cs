@@ -10,7 +10,8 @@ internal record RequestHandlerInfo
     public List<Diagnostic> Diagnostics { get; } = [];
     public ITypeSymbol? RequestType { get; init; }
     public ITypeSymbol? ResponseType { get; init; }
-    public bool IsAsync { get; init; }
+
+    public bool IsAsync => Method.IsAsync || Method.ReturnType.Name == "Task";
 
     public HashSet<INamespaceSymbol> Namespaces
     {
@@ -31,7 +32,8 @@ internal record RequestHandlerInfo
     {
         if (!IsValid)
             throw new InvalidOperationException(
-                "Cannot convert to ValidRequestHandlerInfo: RequestType or ResponseType is null.");
+                "Cannot convert to ValidRequestHandlerInfo: RequestType or ResponseType is null."
+            );
 
         return new ValidRequestHandlerInfo
         {
@@ -44,6 +46,6 @@ internal record RequestHandlerInfo
 
 internal record ValidRequestHandlerInfo : RequestHandlerInfo
 {
-    public required new ITypeSymbol RequestType { get; init; }
-    public required new ITypeSymbol ResponseType { get; init; }
+    public new required ITypeSymbol RequestType { get; init; }
+    public new required ITypeSymbol ResponseType { get; init; }
 }

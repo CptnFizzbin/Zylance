@@ -7,7 +7,7 @@ using static Zylance.SourceGenerators.Utils.TemplateUtils;
 
 namespace Zylance.SourceGenerators.Generators;
 
-internal static class RouterServiceExtensionsCodeGenerator
+internal static class RegisterControllerCodeGenerator
 {
     public static void Execute(ControllerInfo controller, SourceProductionContext context)
     {
@@ -23,18 +23,12 @@ internal static class RouterServiceExtensionsCodeGenerator
     {
         var requestHandlers = controller.RequestHandlers;
         var eventHandlers = controller.EventHandlers;
-        var namespaces = controller.Namespaces;
+        var namespaces = controller.Namespaces.Where(ns => !ns.IsGlobalNamespace).ToList();
         var controllerClassName = controller.ClassType.Name;
 
-        var validRequestHandlers = requestHandlers
-            .Where(h => h.IsValid)
-            .Select(h => h.ToValid())
-            .ToList();
+        var validRequestHandlers = requestHandlers.Where(h => h.IsValid).Select(h => h.ToValid()).ToList();
 
-        var validEventHandlers = eventHandlers
-            .Where(h => h.IsValid)
-            .Select(h => h.ToValid())
-            .ToList();
+        var validEventHandlers = eventHandlers.Where(h => h.IsValid).Select(h => h.ToValid()).ToList();
 
         //language=csharp
         return $$"""
@@ -63,7 +57,7 @@ internal static class RouterServiceExtensionsCodeGenerator
                                    if (string.IsNullOrEmpty(reqAction))
                                        throw new InvalidOperationException(
                                            "Cannot auto-detect action for method {{handler.Method.Name}}: " +
-                                           "Request type {{handler.RequestType}} is missing the (action) option in its .proto definition."
+                                           "Request type {{{handler.RequestType}}} is missing the (action) option in its .proto definition."
                                        );
 
                                    if (string.IsNullOrEmpty(resAction))

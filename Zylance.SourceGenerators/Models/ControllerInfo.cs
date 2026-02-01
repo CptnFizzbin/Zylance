@@ -14,17 +14,19 @@ internal record ControllerInfo
 
     public int HandlerCount => EventHandlers.Count + RequestHandlers.Count;
 
+    public INamespaceSymbol Namespace => ClassType.ContainingNamespace;
+
     public HashSet<INamespaceSymbol> Namespaces =>
-    [
-        ClassType.ContainingNamespace,
-        ..RequestHandlers.SelectMany(rh => rh.Namespaces),
-        ..EventHandlers.SelectMany(eh => eh.Namespaces),
-    ];
+        [
+            Namespace,
+            .. RequestHandlers.SelectMany(rh => rh.Namespaces),
+            .. EventHandlers.SelectMany(eh => eh.Namespaces),
+        ];
 
     public List<Diagnostic> AllDiagnostics =>
-    [
-        ..Diagnostics,
-        ..RequestHandlers.SelectMany(rh => rh.Diagnostics),
-        ..EventHandlers.SelectMany(eh => eh.Diagnostics),
-    ];
+        [
+            .. Diagnostics,
+            .. RequestHandlers.SelectMany(rh => rh.Diagnostics),
+            .. EventHandlers.SelectMany(eh => eh.Diagnostics),
+        ];
 }

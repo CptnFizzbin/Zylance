@@ -28,17 +28,14 @@ internal record EventHandlerInfo
     {
         if (!IsValid)
             throw new InvalidOperationException(
-                "Cannot convert to ValidRequestHandlerInfo: RequestType or ResponseType is null.");
+                "Cannot convert to ValidRequestHandlerInfo: RequestType or ResponseType is null."
+            );
 
-        return new ValidEventHandlerInfo
-        {
-            Method = Method,
-            EventType = EventType!,
-        };
+        return new ValidEventHandlerInfo { Method = Method, EventType = EventType! };
     }
 }
 
 internal record ValidEventHandlerInfo : EventHandlerInfo
 {
-    public required new ITypeSymbol EventType { get; init; }
+    public new required ITypeSymbol EventType { get; init; }
 }

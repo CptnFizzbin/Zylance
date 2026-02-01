@@ -30,8 +30,8 @@ internal static class TypeChecks
         if (node is not ClassDeclarationSyntax classDecl)
             return false;
 
-        return classDecl.AttributeLists
-            .SelectMany(al => al.Attributes)
+        return classDecl
+            .AttributeLists.SelectMany(al => al.Attributes)
             .Any(attr =>
             {
                 var name = attr.Name.ToString();
