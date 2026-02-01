@@ -8,17 +8,17 @@
   "files": {
     "ignoreUnknown": false,
     "includes": [
-      "**/src/**/*",
+      "**/Src/**/*",
       "**/.vscode/**/*",
       "**/index.html",
       "**/vite.config.js",
-      "!**/src/routeTree.gen.ts",
-      "!**/src/styles.css"
+      "!**/Src/routeTree.gen.ts",
+      "!**/Src/styles.css"
     ]
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "tab"
+    "indentStyle": "space"
   },
   "assist": {
     "actions": {
@@ -35,7 +35,8 @@
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "double"
+      "quoteStyle": "double",
+      "semicolons": "asNeeded"
     }
   }
 }

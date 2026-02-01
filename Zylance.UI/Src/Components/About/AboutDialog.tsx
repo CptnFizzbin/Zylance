@@ -15,10 +15,7 @@ export interface AboutDialogProps extends DialogProps {
   onClose?: () => void
 }
 
-export const AboutDialog: FC<AboutDialogProps> = ({
-  onClose,
-  ...props
-}) => {
+export const AboutDialog: FC<AboutDialogProps> = ({ onClose, ...props }) => {
   return (
     <Dialog {...props} onClose={onClose}>
       <DialogTitle>About Zylance</DialogTitle>
@@ -31,7 +28,8 @@ export const AboutDialog: FC<AboutDialogProps> = ({
             Version 0.1.0-alpha
           </Typography>
           <Typography variant="body1">
-            An open-source finance and budgeting application built with clean architecture.
+            An open-source finance and budgeting application built with clean
+            architecture.
           </Typography>
           <Box>
             <Typography variant="body2" color="text.secondary">
@@ -48,7 +46,11 @@ export const AboutDialog: FC<AboutDialogProps> = ({
             </Typography>
           </Box>
           <Typography variant="body2">
-            <Link href="https://github.com/cptnfizzbin/Zylance" target="_blank" rel="noopener">
+            <Link
+              href="https://github.com/cptnfizzbin/Zylance"
+              target="_blank"
+              rel="noopener"
+            >
               View on GitHub
             </Link>
           </Typography>

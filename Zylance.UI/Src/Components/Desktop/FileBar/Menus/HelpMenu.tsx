@@ -1,10 +1,16 @@
 import { AboutDialog } from "@/Components/About/AboutDialog.tsx"
-import { FileBarMenu, type MenuBarMenuProps } from "@/Components/Desktop/FileBar/Menus/MenuBase.tsx"
+import {
+  FileBarMenu,
+  type MenuBarMenuProps,
+} from "@/Components/Desktop/FileBar/Menus/MenuBase.tsx"
 import InfoOutlineIcon from "@mui/icons-material/InfoOutline"
 import { ListItemIcon, ListItemText, MenuItem } from "@mui/material"
 import { type FC, useState } from "react"
 
-export const HelpMenu: FC<Omit<MenuBarMenuProps, "label">> = ({ onClose, ...props }) => {
+export const HelpMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
+  onClose,
+  ...props
+}) => {
   const [aboutDialogOpen, setAboutDialogOpen] = useState(false)
 
   return (
@@ -23,7 +29,10 @@ export const HelpMenu: FC<Omit<MenuBarMenuProps, "label">> = ({ onClose, ...prop
         </MenuItem>
       </FileBarMenu>
 
-      <AboutDialog open={aboutDialogOpen} onClose={() => setAboutDialogOpen(false)} />
+      <AboutDialog
+        open={aboutDialogOpen}
+        onClose={() => setAboutDialogOpen(false)}
+      />
     </>
   )
 }

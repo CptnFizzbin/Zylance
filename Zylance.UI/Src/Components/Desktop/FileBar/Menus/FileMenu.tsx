@@ -1,11 +1,17 @@
-import { FileBarMenu, type MenuBarMenuProps } from "@/Components/Desktop/FileBar/Menus/MenuBase"
-import { useZylance } from "@Lib/ZylanceContext"
+import {
+  FileBarMenu,
+  type MenuBarMenuProps,
+} from "@/Components/Desktop/FileBar/Menus/MenuBase"
+import { useZylanceApi } from "@Lib/ZylanceContext"
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
 import { ListItemIcon, ListItemText, MenuItem, Typography } from "@mui/material"
 import type { FC } from "react"
 
-export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({ onClose, ...props }) => {
-  const zylance = useZylance()
+export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
+  onClose,
+  ...props
+}) => {
+  const zylance = useZylanceApi()
 
   return (
     <FileBarMenu {...props} label={"File"} onClose={onClose}>
