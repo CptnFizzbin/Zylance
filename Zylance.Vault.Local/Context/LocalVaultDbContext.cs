@@ -9,5 +9,6 @@ namespace Zylance.Vault.Local.Context;
 /// </summary>
 public class LocalVaultDbContext(DbContextOptions<LocalVaultDbContext> options) : DbContext(options)
 {
-    public DbSet<TransactionEntity> Transactions { get; set; } = null!;
+    public DbSet<AccountEntity> Accounts { get; set; }
+    public DbSet<LedgerEntryEntity> LedgerEntries { get; set; }
 }

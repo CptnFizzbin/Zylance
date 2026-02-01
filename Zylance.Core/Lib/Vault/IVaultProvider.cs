@@ -1,4 +1,4 @@
-namespace Zylance.Core.Lib.Interfaces;
+namespace Zylance.Core.Lib.Vault;
 
 public interface IVaultProvider
 {
