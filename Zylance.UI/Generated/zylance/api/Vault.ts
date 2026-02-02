@@ -24,6 +24,12 @@ export interface VaultCreateRes {
   vaultRef: VaultRef | undefined;
 }
 
+export interface VaultCloseReq {
+}
+
+export interface VaultCloseRes {
+}
+
 export interface VaultOpenedEvt {
   vaultRef: VaultRef | undefined;
 }
@@ -158,6 +164,52 @@ export const VaultCreateRes: MessageFns<VaultCreateRes> = {
     message.vaultRef = (object.vaultRef !== undefined && object.vaultRef !== null)
       ? VaultRef.fromPartial(object.vaultRef)
       : undefined;
+    return message;
+  },
+};
+
+function createBaseVaultCloseReq(): VaultCloseReq {
+  return {};
+}
+
+export const VaultCloseReq: MessageFns<VaultCloseReq> = {
+  fromJSON(_: any): VaultCloseReq {
+    return {};
+  },
+
+  toJSON(_: VaultCloseReq): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<VaultCloseReq>, I>>(base?: I): VaultCloseReq {
+    return VaultCloseReq.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<VaultCloseReq>, I>>(_: I): VaultCloseReq {
+    const message = createBaseVaultCloseReq();
+    return message;
+  },
+};
+
+function createBaseVaultCloseRes(): VaultCloseRes {
+  return {};
+}
+
+export const VaultCloseRes: MessageFns<VaultCloseRes> = {
+  fromJSON(_: any): VaultCloseRes {
+    return {};
+  },
+
+  toJSON(_: VaultCloseRes): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<VaultCloseRes>, I>>(base?: I): VaultCloseRes {
+    return VaultCloseRes.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<VaultCloseRes>, I>>(_: I): VaultCloseRes {
+    const message = createBaseVaultCloseRes();
     return message;
   },
 };

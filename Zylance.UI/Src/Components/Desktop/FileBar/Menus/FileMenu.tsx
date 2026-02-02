@@ -1,11 +1,11 @@
-import {
-  FileBarMenu,
-  type MenuBarMenuProps,
-} from "@/Components/Desktop/FileBar/Menus/MenuBase"
 import { useZylanceApi } from "@Lib/ZylanceContext"
+import AddIcon from "@mui/icons-material/Add"
+import CloseIcon from "@mui/icons-material/Close"
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
-import { ListItemIcon, ListItemText, MenuItem, Typography } from "@mui/material"
+import FolderOpenIcon from "@mui/icons-material/FolderOpen"
+import { Divider, ListItemIcon, ListItemText, MenuItem, Typography } from "@mui/material"
 import type { FC } from "react"
+import { FileBarMenu, type MenuBarMenuProps } from "@/Components/Desktop/FileBar/Menus/MenuBase"
 
 export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
   onClose,
@@ -13,14 +13,35 @@ export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
 }) => {
   const zylance = useZylanceApi()
 
+  const onMenuClick = (handler: () => void) => {
+    return () => {
+      handler()
+      onClose()
+    }
+  }
+
   return (
     <FileBarMenu {...props} label={"File"} onClose={onClose}>
-      <MenuItem
-        onClick={() => {
-          zylance.desktop.emitExit()
-          onClose()
-        }}
-      >
+      <MenuItem onClick={onMenuClick(() => zylance.vault.createVault())}>
+        <ListItemIcon>
+          <AddIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>New Vault</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={onMenuClick(() => zylance.vault.openVault())}>
+        <ListItemIcon>
+          <FolderOpenIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>Open Vault</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={onMenuClick(() => zylance.vault.closeVault())}>
+        <ListItemIcon>
+          <CloseIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>Close Vault</ListItemText>
+      </MenuItem>
+      <Divider />
+      <MenuItem onClick={onMenuClick(() => zylance.desktop.emitExit())}>
         <ListItemIcon>
           <ExitToAppIcon fontSize="small" />
         </ListItemIcon>

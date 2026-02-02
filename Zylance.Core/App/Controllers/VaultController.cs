@@ -24,6 +24,13 @@ public class VaultController(VaultService vaultService, VaultContext vaultContex
     }
 
     [RequestHandler]
+    public void CloseVault(ZyRequest<VaultCloseReq> req, ZyResponse<VaultCloseRes> res)
+    {
+        vaultService.CloseVault();
+        res.SetData(new VaultCloseRes());
+    }
+
+    [RequestHandler]
     public void GetStatus(ZyRequest<VaultGetStatusReq> req, ZyResponse<VaultGetStatusRes> res)
     {
         var activeVault = vaultContext.ActiveVault;

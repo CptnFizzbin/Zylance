@@ -36,6 +36,7 @@ import type {
 } from "@Contract/api/Ledger"
 import type { GetStatusReq, GetStatusRes } from "@Contract/api/Status"
 import type {
+  VaultCloseRes,
   VaultCreateRes,
   VaultGetStatusRes,
   VaultLockedEvt,
@@ -73,6 +74,7 @@ export function createZylanceApi () {
       openVault: client.createRequestEndpoint<"Vault:OpenVault", void, VaultOpenRes>("Vault:OpenVault"),
       createVault: client.createRequestEndpoint<"Vault:CreateVault", void, VaultCreateRes>(
         "Vault:CreateVault"),
+      closeVault: client.createRequestEndpoint<"Vault:CloseVault", void, VaultCloseRes>("Vault:CloseVault"),
       onVaultOpened: client.createEventListener<"Vault:VaultOpened", VaultOpenedEvt>("Vault:VaultOpened"),
       onVaultClosed: client.createEventListener<"Vault:VaultClosed", void>("Vault:VaultClosed"),
       onVaultUnlocked: client.createEventListener<"Vault:Unlocked", VaultUnlockedEvt>("Vault:Unlocked"),

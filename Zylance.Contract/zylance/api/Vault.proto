@@ -25,6 +25,14 @@ message VaultCreateRes {
   VaultRef vault_ref = 1;
 }
 
+message VaultCloseReq {
+  option (action) = "Vault:CloseVault";
+}
+
+message VaultCloseRes {
+  option (action) = "Vault:CloseVault";
+}
+
 message VaultOpenedEvt {
   option (eventName) = "Vault:VaultOpened";
   VaultRef vault_ref = 1;

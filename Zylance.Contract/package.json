@@ -2,7 +2,7 @@
   "name": "@cptnfizzbin/zylance-contract",
   "packageManager": "yarn@4.12.0",
   "scripts": {
-    "build": "dotnet build ./Zylance.Contract.sln -c Release",
+    "build": "dotnet build ./Zylance.Contract.csproj -c Release",
     "build:msbuild": "pwsh.exe -File ./scripts/build.ps1"
   },
   "devDependencies": {
