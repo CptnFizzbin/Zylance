@@ -18,20 +18,27 @@
     <PropertyGroup>
         <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(NODE_HOME)\yarn.cmd</YarnExe>
         <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows'))">$(NODE_HOME)/bin/yarn</YarnExe>
-        <TsOutputPath>../Zylance.UI/Generated</TsOutputPath>
+        <TsOutputPath>../Zylance.UI/Generated/</TsOutputPath>
     </PropertyGroup>
 
     <ItemGroup>
         <Protobuf Include="./zylance/**/*.proto" GrpcServices="None"/>
     </ItemGroup>
 
+    <Target Name="YarnInstall"
+            BeforeTargets="Build"
+            Inputs="package.json;yarn.lock"
+            Outputs="$(IntermediateOutputPath)yarn.install.marker"
+    >
+        <Exec Command="$(YarnExe) install"/>
+        <Touch Files="$(IntermediateOutputPath)yarn.install.marker" AlwaysCreate="true"/>
+    </Target>
+
     <Target Name="GenerateTS"
             AfterTargets="Build"
             Inputs="@(Protobuf);$(MSBuildProjectFile)"
-            Outputs="$(TsOutputPath)/.generated">
-        <Message Importance="high" Text="Generating TypeScript from Protocol Buffers..."/>
-        <Exec Command="$(YarnExe) install"/>
+            Outputs="$(TsOutputPath).generated.marker">
         <Exec Command="$(YarnExe) build &quot;$(TsOutputPath)&quot;" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
-        <Touch Files="$(TsOutputPath)/.generated" AlwaysCreate="true"/>
+        <Touch Files="$(TsOutputPath).generated.marker" AlwaysCreate="true"/>
     </Target>
 </Project>

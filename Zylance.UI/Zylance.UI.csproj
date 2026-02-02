@@ -25,6 +25,15 @@
         </ItemGroup>
     </Target>
 
+    <Target Name="YarnInstall"
+            BeforeTargets="Build"
+            Inputs="package.json;yarn.lock"
+            Outputs="$(IntermediateOutputPath)yarn.install.marker"
+    >
+        <Exec Command="$(YarnExe) install"/>
+        <Touch Files="$(IntermediateOutputPath)yarn.install.marker" AlwaysCreate="true"/>
+    </Target>
+
     <Target Name="YarnTscDev"
             AfterTargets="Build"
             DependsOnTargets="CollectSourceFiles"
@@ -32,7 +41,6 @@
             Inputs="@(SourceFiles);@(ConfigFiles)"
             Outputs="$(IntermediateOutputPath)tsc.marker"
     >
-        <Exec Command="$(YarnExe) install"/>
         <Exec Command="$(YarnExe) tsc" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
         <Touch Files="$(IntermediateOutputPath)tsc.marker" AlwaysCreate="true"/>
     </Target>
@@ -44,7 +52,7 @@
             Inputs="@(SourceFiles);@(ConfigFiles)"
             Outputs="$(IntermediateOutputPath)build.marker"
     >
-        <Exec Command="$(YarnExe) install"/>
+        <Exec Command="$(YarnExe) lint --check"/>
         <Exec Command="$(YarnExe) build:ui" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
         <Touch Files="$(IntermediateOutputPath)build.marker" AlwaysCreate="true"/>
     </Target>
