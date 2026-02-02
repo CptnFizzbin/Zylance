@@ -20,7 +20,7 @@ public class Gateway
 
     public void Send(ResponsePayload response)
     {
-        Console.WriteLine($"<== Res[{response.RequestId}]: {response.Status} - {response.DataJson}");
+        Console.WriteLine($"<== Res[{response.RequestId}]: {response.DataJson}");
         var envelope = new GatewayEnvelope { Response = response };
         Send(envelope);
     }
@@ -98,7 +98,7 @@ public class Gateway
 
     private void Send(GatewayEnvelope envelope)
     {
-        envelope.MessageId = Guid.NewGuid().ToString();
+        envelope.MessageId = Guid.CreateVersion7().ToString();
         var msgJson = MessageUtils.ToJson(envelope);
         _transport.Send(msgJson);
     }

@@ -84,7 +84,6 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
               sx={{
                 width: 320,
                 maxWidth: "100%",
-                mt: 0.5,
               }}
             >
               <MenuList

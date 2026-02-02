@@ -44,3 +44,12 @@ message VaultLockedEvt {
   VaultRef vault_ref = 1;
 }
 
+message VaultGetStatusReq {
+  option (action) = "Vault:GetStatus";
+}
+
+message VaultGetStatusRes {
+  option (action) = "Vault:GetStatus";
+  optional VaultRef vault_ref = 1;
+}
+

@@ -38,7 +38,7 @@
             AfterTargets="Build"
             Inputs="@(Protobuf);$(MSBuildProjectFile)"
             Outputs="$(TsOutputPath).generated.marker">
-        <Exec Command="$(YarnExe) build &quot;$(TsOutputPath)&quot;" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
+        <Exec Command="$(YarnExe) build:msbuild &quot;$(TsOutputPath)&quot;" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
         <Touch Files="$(TsOutputPath).generated.marker" AlwaysCreate="true"/>
     </Target>
 </Project>

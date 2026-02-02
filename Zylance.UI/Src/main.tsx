@@ -17,16 +17,16 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <ZylanceProvider>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <GlobalStyles styles="@layer theme,base,mui,components,utilities;" />
+      <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+        <ZylanceProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <GlobalStyles styles="@layer theme,base,mui,components,utilities;" />
 
-          <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
             <App />
-          </TanStackQueryProvider.Provider>
-        </ThemeProvider>
-      </ZylanceProvider>
+          </ThemeProvider>
+        </ZylanceProvider>
+      </TanStackQueryProvider.Provider>
     </StrictMode>,
   )
 }

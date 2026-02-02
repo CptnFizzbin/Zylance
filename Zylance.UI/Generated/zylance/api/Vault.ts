@@ -39,6 +39,13 @@ export interface VaultLockedEvt {
   vaultRef: VaultRef | undefined;
 }
 
+export interface VaultGetStatusReq {
+}
+
+export interface VaultGetStatusRes {
+  vaultRef?: VaultRef | undefined;
+}
+
 function createBaseVaultOpenReq(): VaultOpenReq {
   return {};
 }
@@ -276,6 +283,64 @@ export const VaultLockedEvt: MessageFns<VaultLockedEvt> = {
   },
   fromPartial<I extends Exact<DeepPartial<VaultLockedEvt>, I>>(object: I): VaultLockedEvt {
     const message = createBaseVaultLockedEvt();
+    message.vaultRef = (object.vaultRef !== undefined && object.vaultRef !== null)
+      ? VaultRef.fromPartial(object.vaultRef)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseVaultGetStatusReq(): VaultGetStatusReq {
+  return {};
+}
+
+export const VaultGetStatusReq: MessageFns<VaultGetStatusReq> = {
+  fromJSON(_: any): VaultGetStatusReq {
+    return {};
+  },
+
+  toJSON(_: VaultGetStatusReq): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<VaultGetStatusReq>, I>>(base?: I): VaultGetStatusReq {
+    return VaultGetStatusReq.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<VaultGetStatusReq>, I>>(_: I): VaultGetStatusReq {
+    const message = createBaseVaultGetStatusReq();
+    return message;
+  },
+};
+
+function createBaseVaultGetStatusRes(): VaultGetStatusRes {
+  return { vaultRef: undefined };
+}
+
+export const VaultGetStatusRes: MessageFns<VaultGetStatusRes> = {
+  fromJSON(object: any): VaultGetStatusRes {
+    return {
+      vaultRef: isSet(object.vaultRef)
+        ? VaultRef.fromJSON(object.vaultRef)
+        : isSet(object.vault_ref)
+        ? VaultRef.fromJSON(object.vault_ref)
+        : undefined,
+    };
+  },
+
+  toJSON(message: VaultGetStatusRes): unknown {
+    const obj: any = {};
+    if (message.vaultRef !== undefined) {
+      obj.vaultRef = VaultRef.toJSON(message.vaultRef);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<VaultGetStatusRes>, I>>(base?: I): VaultGetStatusRes {
+    return VaultGetStatusRes.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<VaultGetStatusRes>, I>>(object: I): VaultGetStatusRes {
+    const message = createBaseVaultGetStatusRes();
     message.vaultRef = (object.vaultRef !== undefined && object.vaultRef !== null)
       ? VaultRef.fromPartial(object.vaultRef)
       : undefined;

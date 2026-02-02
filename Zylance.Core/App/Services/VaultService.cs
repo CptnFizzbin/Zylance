@@ -25,4 +25,9 @@ public class VaultService(IVaultProvider vaultProvider, VaultContext vaultContex
     {
         vaultContext.ActiveVault = null;
     }
+
+    public VaultRef? GetStatus()
+    {
+        return vaultContext.ActiveVault?.ToRef();
+    }
 }

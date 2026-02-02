@@ -1,5 +1,6 @@
 import type { VaultRef } from "@Contract/models/Vault"
 import { createZylanceApi, type ZylanceApi } from "@Lib/ZylanceApi"
+import { useQuery } from "@tanstack/react-query"
 import { createContext, type FC, type PropsWithChildren, useContext, useEffect, useMemo, useState } from "react"
 
 export interface ZylanceState {
@@ -24,6 +25,20 @@ export const useZylanceApi = (): ZylanceApi => useZylance().zylanceApi
 
 export const ZylanceProvider: FC<PropsWithChildren> = ({ children }) => {
   const [currentVault, setCurrentVault] = useState<VaultRef | null>(null)
+
+  const { data: vaultStatus } = useQuery({
+    queryKey: ["vault", "status"],
+    queryFn: async () => {
+      const status = await zylanceApi.vault.getStatus()
+      return status.vaultRef ?? null
+    },
+    staleTime: Number.POSITIVE_INFINITY,
+  })
+
+  useEffect(() => {
+    if (!vaultStatus) return
+    setCurrentVault(vaultStatus)
+  }, [vaultStatus])
 
   useEffect(() => {
     const onVaultChanged = (data: { vaultRef?: VaultRef }) => {

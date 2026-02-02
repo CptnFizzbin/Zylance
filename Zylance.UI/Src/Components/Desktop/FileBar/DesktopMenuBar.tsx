@@ -30,15 +30,10 @@ export const DesktopMenuBar: FC = () => {
         direction="row"
         ref={anchorRef}
         sx={{
+          zIndex: 10000,
           padding: 0.5,
           gap: 0.5,
-          backgroundColor: (theme) =>
-            theme.palette.mode === "dark"
-              ? "rgba(10, 10, 10, 0.8)"
-              : "rgba(255, 255, 255, 0.8)",
-          backdropFilter: "blur(20px)",
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
-          transition: "all 0.3s ease-in-out",
         }}
       >
         {Object.entries(menus).map(([key, MenuComponent]) => (

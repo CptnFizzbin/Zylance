@@ -37,6 +37,7 @@ import type {
 import type { GetStatusReq, GetStatusRes } from "@Contract/api/Status"
 import type {
   VaultCreateRes,
+  VaultGetStatusRes,
   VaultLockedEvt,
   VaultOpenedEvt,
   VaultOpenRes,
@@ -68,6 +69,7 @@ export function createZylanceApi () {
     },
 
     vault: {
+      getStatus: client.createRequestEndpoint<"Vault:GetStatus", void, VaultGetStatusRes>("Vault:GetStatus"),
       openVault: client.createRequestEndpoint<"Vault:OpenVault", void, VaultOpenRes>("Vault:OpenVault"),
       createVault: client.createRequestEndpoint<"Vault:CreateVault", void, VaultCreateRes>(
         "Vault:CreateVault"),

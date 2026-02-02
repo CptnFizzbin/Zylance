@@ -1,9 +1,9 @@
-import TanStackQueryDevtools from "@/Integrations/tanstack-query/devtools"
-import type { ZylanceState } from "@Lib/ZylanceContext"
+import { useZylance, type ZylanceState } from "@Lib/ZylanceContext"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import type { QueryClient } from "@tanstack/react-query"
-import { createRootRouteWithContext, Outlet } from "@tanstack/react-router"
+import { createRootRouteWithContext, Navigate, Outlet, useLocation } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
+import TanStackQueryDevtools from "@/Integrations/tanstack-query/devtools"
 
 interface ZylanceRouterContext {
   queryClient: QueryClient
@@ -12,32 +12,24 @@ interface ZylanceRouterContext {
 
 export const Route = createRootRouteWithContext<ZylanceRouterContext>()({
   component: RootComponent,
-  beforeLoad: async ({ context, location }) => {
-    const { currentVault } = context.zylance
-
-    if (currentVault === null) {
-      if (location.pathname !== "/locked/select-vault") {
-        throw Route.redirect({ to: "/locked/select-vault" })
-      }
-
-      return
-    }
-
-    if (currentVault.locked) {
-      if (location.pathname !== "/locked/unlock-vault") {
-        throw Route.redirect({ to: "/locked/unlock-vault" })
-      }
-
-      return
-    }
-
-    if (location.pathname.startsWith("/locked/")) {
-      throw Route.redirect({ to: "/vault" })
-    }
-  },
 })
 
-function RootComponent() {
+function RootComponent () {
+  const { currentVault } = useZylance()
+  const location = useLocation()
+
+  if (currentVault === null) {
+    if (location.pathname !== "/locked/select-vault") {
+      return <Navigate to="/locked/select-vault" />
+    }
+  } else if (currentVault.locked) {
+    if (location.pathname !== "/locked/unlock-vault") {
+      return <Navigate to="/locked/unlock-vault" />
+    }
+  } else if (location.pathname.startsWith("/locked/")) {
+    return <Navigate to="/vault" />
+  }
+
   return (
     <>
       <Outlet />
