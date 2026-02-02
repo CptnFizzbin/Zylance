@@ -2,12 +2,11 @@ using Zylance.Contract.Api.Vault;
 using Zylance.Core.App.Services;
 using Zylance.Core.Lib.Gateway.Attributes;
 using Zylance.Core.Lib.Gateway.Models;
-using Zylance.Core.Lib.Vault;
 
 namespace Zylance.Core.App.Controllers;
 
 [Controller]
-public class VaultController(VaultService vaultService, VaultContext vaultContext)
+public class VaultController(VaultService vaultService)
 {
     [RequestHandler]
     public async Task OpenVault(ZyRequest<VaultOpenReq> req, ZyResponse<VaultOpenRes> res)
@@ -33,7 +32,6 @@ public class VaultController(VaultService vaultService, VaultContext vaultContex
     [RequestHandler]
     public void GetStatus(ZyRequest<VaultGetStatusReq> req, ZyResponse<VaultGetStatusRes> res)
     {
-        var activeVault = vaultContext.ActiveVault;
-        res.SetData(new VaultGetStatusRes { VaultRef = activeVault?.ToRef() });
+        res.SetData(new VaultGetStatusRes { VaultRef = vaultService.GetActiveVaultRef() });
     }
 }

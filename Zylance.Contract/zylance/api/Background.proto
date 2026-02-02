@@ -1,0 +1,26 @@
+syntax = "proto3";
+package zylance.contract;
+
+import "zylance/extensions/Zylance.proto";
+
+option csharp_namespace = "Zylance.Contract.Api.Background";
+
+// === Background Task Events ===
+message BackgroundWorkStartEvt {
+  option (eventName) = "Background:WorkStart";
+  string task_id = 1;
+  optional string description = 2;
+}
+
+message BackgroundWorkProgressEvt {
+  option (eventName) = "Background:WorkProgress";
+  string task_id = 1;
+  float progress = 2; // 0.0 to 1.0
+  optional string description = 3;
+}
+
+message BackgroundWorkFinishEvt {
+  option (eventName) = "Background:WorkFinish";
+  string task_id = 1;
+  optional string description = 2;
+}

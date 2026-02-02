@@ -10,6 +10,11 @@ import type {
   UpdateAccountReq,
   UpdateAccountRes,
 } from "@Contract/api/Account"
+import type {
+  BackgroundWorkFinishEvt,
+  BackgroundWorkProgressEvt,
+  BackgroundWorkStartEvt,
+} from "@Contract/api/Background"
 import type { EchoReq, EchoRes } from "@Contract/api/Echo"
 import type {
   CreateFileReq,
@@ -79,6 +84,12 @@ export function createZylanceApi () {
       onVaultClosed: client.createEventListener<"Vault:VaultClosed", void>("Vault:VaultClosed"),
       onVaultUnlocked: client.createEventListener<"Vault:Unlocked", VaultUnlockedEvt>("Vault:Unlocked"),
       onVaultLocked: client.createEventListener<"Vault:Locked", VaultLockedEvt>("Vault:Locked"),
+    },
+
+    background: {
+      onWorkStart: client.createEventListener<"Background:WorkStart", BackgroundWorkStartEvt>("Background:WorkStart"),
+      onWorkProgress: client.createEventListener<"Background:WorkProgress", BackgroundWorkProgressEvt>("Background:WorkProgress"),
+      onWorkFinish: client.createEventListener<"Background:WorkFinish", BackgroundWorkFinishEvt>("Background:WorkFinish"),
     },
 
     account: {

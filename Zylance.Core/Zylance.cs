@@ -41,6 +41,7 @@ public class Zylance
         services.AddSingleton<FileService>();
         services.AddSingleton<VaultService>();
         services.AddSingleton<VaultContext>();
+        services.AddSingleton<BackgroundTaskService>();
         services.AddZylanceRouter();
 
         services.TryAddSingleton<Gateway>(sp =>

@@ -2,6 +2,7 @@ import { useZylance } from "@Lib/ZylanceContext"
 import { Stack } from "@mui/material"
 import { createRouter, RouterProvider } from "@tanstack/react-router"
 import type { FC } from "react"
+import { BackgroundProgressBar } from "@/Components/Background/BackgroundProgressBar"
 import { DesktopMenuBar } from "@/Components/Desktop/FileBar/DesktopMenuBar"
 import { useIsDesktop } from "@/Hooks/UseRuntime"
 import * as TanStackQueryProvider from "@/Integrations/tanstack-query/root-provider"
@@ -36,8 +37,9 @@ export const App: FC = () => {
   return (
     <Stack height={"100vh"}>
       {isDesktop && <DesktopMenuBar />}
+      <Stack flexGrow={1} overflow="auto" sx={{ position: "relative" }}>
+        <BackgroundProgressBar />
 
-      <Stack flexGrow={1} overflow="auto">
         <RouterProvider router={router} context={{ zylance }} />
       </Stack>
     </Stack>
