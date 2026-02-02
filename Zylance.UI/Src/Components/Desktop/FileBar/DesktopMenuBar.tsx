@@ -3,8 +3,6 @@ import { type FC, type SyntheticEvent, useRef, useState } from "react"
 import { FileMenu } from "@/Components/Desktop/FileBar/Menus/FileMenu.tsx"
 import { HelpMenu } from "@/Components/Desktop/FileBar/Menus/HelpMenu.tsx"
 
-import styles from "./FileBar.module.css"
-
 export const DesktopMenuBar: FC = () => {
   const anchorRef = useRef<HTMLDivElement>(null)
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
@@ -30,9 +28,10 @@ export const DesktopMenuBar: FC = () => {
     <ClickAwayListener onClickAway={onClickAway}>
       <Stack
         direction="row"
-        className={styles.menuBar}
         ref={anchorRef}
         sx={{
+          padding: 0.5,
+          gap: 0.5,
           backgroundColor: (theme) =>
             theme.palette.mode === "dark"
               ? "rgba(10, 10, 10, 0.8)"

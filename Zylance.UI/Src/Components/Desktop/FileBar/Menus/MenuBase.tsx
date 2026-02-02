@@ -1,13 +1,5 @@
 import { Button, Grow, MenuList, Paper, Popper } from "@mui/material"
-import {
-  type FC,
-  type KeyboardEvent,
-  type PropsWithChildren,
-  useEffect,
-  useRef,
-} from "react"
-
-import styles from "../FileBar.module.css"
+import { type FC, type KeyboardEvent, type PropsWithChildren, useEffect, useRef } from "react"
 
 export interface MenuBarMenuProps extends PropsWithChildren {
   label: string
@@ -25,7 +17,7 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
 }) => {
   const anchorRef = useRef<HTMLButtonElement>(null)
 
-  function handleListKeyDown(event: KeyboardEvent) {
+  function handleListKeyDown (event: KeyboardEvent) {
     if (event.key === "Tab") {
       event.preventDefault()
     } else if (event.key === "Escape") {
@@ -52,11 +44,11 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
         aria-expanded={open ? "true" : undefined}
         aria-haspopup="true"
         onClick={() => onClick()}
-        className={styles.menuButton}
         sx={{
+          fontSize: "12px",
+          padding: "2px 4px",
           color: "text.primary",
           minWidth: 0,
-          padding: "6px 12px",
           textTransform: "capitalize",
           borderRadius: 1,
           transition: "all 0.2s ease-in-out",
