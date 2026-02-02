@@ -9,50 +9,138 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './Routes/__root'
-import { Route as IndexRouteImport } from './Routes/index'
+import { Route as VaultIndexRouteImport } from './Routes/vault/index'
+import { Route as LockedIndexRouteImport } from './Routes/locked/index'
+import { Route as LockedUnlockVaultRouteImport } from './Routes/locked/unlock-vault'
+import { Route as LockedSelectVaultRouteImport } from './Routes/locked/select-vault'
+import { Route as VaultLedgerIndexRouteImport } from './Routes/vault/ledger/index'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const VaultIndexRoute = VaultIndexRouteImport.update({
+  id: '/vault/',
+  path: '/vault/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LockedIndexRoute = LockedIndexRouteImport.update({
+  id: '/locked/',
+  path: '/locked/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LockedUnlockVaultRoute = LockedUnlockVaultRouteImport.update({
+  id: '/locked/unlock-vault',
+  path: '/locked/unlock-vault',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LockedSelectVaultRoute = LockedSelectVaultRouteImport.update({
+  id: '/locked/select-vault',
+  path: '/locked/select-vault',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VaultLedgerIndexRoute = VaultLedgerIndexRouteImport.update({
+  id: '/vault/ledger/',
+  path: '/vault/ledger/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/locked/select-vault': typeof LockedSelectVaultRoute
+  '/locked/unlock-vault': typeof LockedUnlockVaultRoute
+  '/locked/': typeof LockedIndexRoute
+  '/vault/': typeof VaultIndexRoute
+  '/vault/ledger/': typeof VaultLedgerIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/locked/select-vault': typeof LockedSelectVaultRoute
+  '/locked/unlock-vault': typeof LockedUnlockVaultRoute
+  '/locked': typeof LockedIndexRoute
+  '/vault': typeof VaultIndexRoute
+  '/vault/ledger': typeof VaultLedgerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/locked/select-vault': typeof LockedSelectVaultRoute
+  '/locked/unlock-vault': typeof LockedUnlockVaultRoute
+  '/locked/': typeof LockedIndexRoute
+  '/vault/': typeof VaultIndexRoute
+  '/vault/ledger/': typeof VaultLedgerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/locked/select-vault'
+    | '/locked/unlock-vault'
+    | '/locked/'
+    | '/vault/'
+    | '/vault/ledger/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/locked/select-vault'
+    | '/locked/unlock-vault'
+    | '/locked'
+    | '/vault'
+    | '/vault/ledger'
+  id:
+    | '__root__'
+    | '/locked/select-vault'
+    | '/locked/unlock-vault'
+    | '/locked/'
+    | '/vault/'
+    | '/vault/ledger/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  LockedSelectVaultRoute: typeof LockedSelectVaultRoute
+  LockedUnlockVaultRoute: typeof LockedUnlockVaultRoute
+  LockedIndexRoute: typeof LockedIndexRoute
+  VaultIndexRoute: typeof VaultIndexRoute
+  VaultLedgerIndexRoute: typeof VaultLedgerIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/vault/': {
+      id: '/vault/'
+      path: '/vault'
+      fullPath: '/vault/'
+      preLoaderRoute: typeof VaultIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/locked/': {
+      id: '/locked/'
+      path: '/locked'
+      fullPath: '/locked/'
+      preLoaderRoute: typeof LockedIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/locked/unlock-vault': {
+      id: '/locked/unlock-vault'
+      path: '/locked/unlock-vault'
+      fullPath: '/locked/unlock-vault'
+      preLoaderRoute: typeof LockedUnlockVaultRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/locked/select-vault': {
+      id: '/locked/select-vault'
+      path: '/locked/select-vault'
+      fullPath: '/locked/select-vault'
+      preLoaderRoute: typeof LockedSelectVaultRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vault/ledger/': {
+      id: '/vault/ledger/'
+      path: '/vault/ledger'
+      fullPath: '/vault/ledger/'
+      preLoaderRoute: typeof VaultLedgerIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  LockedSelectVaultRoute: LockedSelectVaultRoute,
+  LockedUnlockVaultRoute: LockedUnlockVaultRoute,
+  LockedIndexRoute: LockedIndexRoute,
+  VaultIndexRoute: VaultIndexRoute,
+  VaultLedgerIndexRoute: VaultLedgerIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

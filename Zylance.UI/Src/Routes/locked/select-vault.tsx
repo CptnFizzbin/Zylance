@@ -1,4 +1,4 @@
-import { useZylanceApi } from "@Lib/ZylanceContext"
+import { useZylance } from "@Lib/ZylanceContext"
 import {
   Alert,
   Box,
@@ -13,21 +13,22 @@ import {
 import { useMutation } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 
-export const Route = createFileRoute("/")({
-  component: VaultLogin,
+export const Route = createFileRoute("/locked/select-vault")({
+  component: RouteComponent,
 })
 
-function VaultLogin() {
-  const zylanceApi = useZylanceApi()
+function RouteComponent() {
+  console.log("Rendering /_locked/vault/select route")
 
-  // Mutation for opening an existing vault
+  const navigate = Route.useNavigate()
+  const { zylanceApi } = useZylance()
+
   const openVaultMutation = useMutation({
     mutationFn: async () => zylanceApi.vault.openVault(),
     onSuccess: (data) => {
       if (data.vaultRef) {
-        // TODO: Navigate to main app view once vault is opened
         console.log("Vault opened successfully:", data.vaultRef)
-        // navigate({ to: "/vault" })
+        navigate({ to: "/locked/unlock-vault" })
       } else {
         openVaultMutation.reset()
         // Set error via the mutation's error state instead
@@ -39,14 +40,12 @@ function VaultLogin() {
     },
   })
 
-  // Mutation for creating a new vault
   const createVaultMutation = useMutation({
     mutationFn: async () => zylanceApi.vault.createVault(),
     onSuccess: (data) => {
       if (data.vaultRef) {
-        // TODO: Navigate to main app view once vault is created
         console.log("Vault created successfully:", data.vaultRef)
-        // navigate({ to: "/vault" })
+        navigate({ to: "/locked/unlock-vault" })
       } else {
         createVaultMutation.reset()
         throw new Error("Failed to create vault")
@@ -93,7 +92,6 @@ function VaultLogin() {
             </Typography>
           </Stack>
 
-          {/* Main Card - Theme handles glassmorphic styling */}
           <Card sx={{ width: "100%" }}>
             <CardContent sx={{ p: 4 }}>
               <Typography
@@ -159,7 +157,6 @@ function VaultLogin() {
             </CardContent>
           </Card>
 
-          {/* Footer */}
           <Typography
             variant="caption"
             color="text.disabled"

@@ -37,7 +37,7 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
   const prevOpen = useRef(open)
   useEffect(() => {
     if (prevOpen.current && !open) {
-      anchorRef.current!.focus()
+      anchorRef.current?.focus()
     }
 
     prevOpen.current = open
@@ -76,7 +76,6 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
       <Popper
         open={open}
         anchorEl={anchorRef.current}
-        role={undefined}
         placement="bottom-start"
         transition
         disablePortal

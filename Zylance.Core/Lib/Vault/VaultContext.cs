@@ -31,8 +31,8 @@ public class VaultContext(Zylance zylance)
             (not null, null) => VaultTransition.Closed,
             (null, not null) => VaultTransition.Opened,
             ({ } old, { } @new) when old.VaultId != @new.VaultId => VaultTransition.Switched,
-            ({ Unlocked: false }, { Unlocked: true }) => VaultTransition.Unlocked,
-            ({ Unlocked: true }, { Unlocked: false }) => VaultTransition.Locked,
+            ({ Locked: true }, { Locked: false }) => VaultTransition.Unlocked,
+            ({ Locked: false }, { Locked: true }) => VaultTransition.Locked,
             _ => VaultTransition.None,
         };
     }

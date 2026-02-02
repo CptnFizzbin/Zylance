@@ -22,7 +22,7 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     public ILedgerManager Ledgers { get; } = new LocalLedgerManager(dbContext);
 
     public Guid VaultId { get; } = Guid.CreateVersion7();
-    public bool Unlocked => true; // TODO: Implement lock state management
+    public bool Locked => false; // TODO: Implement lock state management
 
     /// <summary>
     ///     Creates a new transactional scope for vault operations.

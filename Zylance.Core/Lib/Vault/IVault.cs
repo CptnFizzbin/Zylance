@@ -7,7 +7,7 @@ public interface IVault
 {
     public Guid VaultId { get; }
 
-    public bool Unlocked { get; }
+    public bool Locked { get; }
 
     public IAccountManager Accounts { get; }
     public ILedgerManager Ledgers { get; }
@@ -17,6 +17,6 @@ public interface IVault
 
     public VaultRef ToRef()
     {
-        return new VaultRef { Id = VaultId.ToString(), Unlocked = Unlocked };
+        return new VaultRef { Id = VaultId.ToString(), Locked = Locked };
     }
 }

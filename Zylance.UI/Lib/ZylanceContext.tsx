@@ -8,14 +8,19 @@ export interface ZylanceState {
 }
 
 const zylanceApi = createZylanceApi()
+export const ZylanceContext = createContext<ZylanceState | null>(null)
 
-const ZylanceContext = createContext<ZylanceState>({
-  currentVault: null,
-  zylanceApi: zylanceApi,
-})
+export const useZylance = () => {
+  const zylance = useContext(ZylanceContext)
 
-export const useZylance = () => useContext(ZylanceContext)
-export const useZylanceApi = (): ZylanceApi => useContext(ZylanceContext).zylanceApi
+  if (!zylance) {
+    throw new Error("useZylance must be used within a ZylanceProvider")
+  }
+
+  return zylance
+}
+
+export const useZylanceApi = (): ZylanceApi => useZylance().zylanceApi
 
 export const ZylanceProvider: FC<PropsWithChildren> = ({ children }) => {
   const [currentVault, setCurrentVault] = useState<VaultRef | null>(null)

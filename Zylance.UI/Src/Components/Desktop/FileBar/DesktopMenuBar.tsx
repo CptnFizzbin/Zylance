@@ -1,7 +1,7 @@
-import { FileMenu } from "@/Components/Desktop/FileBar/Menus/FileMenu.tsx"
-import { HelpMenu } from "@/Components/Desktop/FileBar/Menus/HelpMenu.tsx"
 import { ClickAwayListener, Stack } from "@mui/material"
 import { type FC, type SyntheticEvent, useRef, useState } from "react"
+import { FileMenu } from "@/Components/Desktop/FileBar/Menus/FileMenu.tsx"
+import { HelpMenu } from "@/Components/Desktop/FileBar/Menus/HelpMenu.tsx"
 
 import styles from "./FileBar.module.css"
 
@@ -15,14 +15,15 @@ export const DesktopMenuBar: FC = () => {
   }
 
   const onClickAway = (event: Event | SyntheticEvent) => {
-    if (
-      anchorRef.current &&
-      anchorRef.current.contains(event.target as HTMLElement)
-    ) {
+    if (anchorRef.current?.contains(event.target as HTMLElement)) {
       return
     }
 
     setActiveMenu(null)
+  }
+
+  const onMenuClick = (menuKey: string) => {
+    setActiveMenu((prevMenu) => (prevMenu === menuKey ? null : menuKey))
   }
 
   return (
@@ -45,7 +46,7 @@ export const DesktopMenuBar: FC = () => {
           <MenuComponent
             key={key}
             open={activeMenu === key}
-            onClick={() => setActiveMenu(key)}
+            onClick={() => onMenuClick(key)}
             onClose={() => setActiveMenu(null)}
           />
         ))}

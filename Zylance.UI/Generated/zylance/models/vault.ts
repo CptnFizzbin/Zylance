@@ -11,18 +11,18 @@ export const protobufPackage = "zylance.contract";
 /** === Models === */
 export interface VaultRef {
   id: string;
-  unlocked: boolean;
+  locked: boolean;
 }
 
 function createBaseVaultRef(): VaultRef {
-  return { id: "", unlocked: false };
+  return { id: "", locked: false };
 }
 
 export const VaultRef: MessageFns<VaultRef> = {
   fromJSON(object: any): VaultRef {
     return {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
-      unlocked: isSet(object.unlocked) ? globalThis.Boolean(object.unlocked) : false,
+      locked: isSet(object.locked) ? globalThis.Boolean(object.locked) : false,
     };
   },
 
@@ -31,8 +31,8 @@ export const VaultRef: MessageFns<VaultRef> = {
     if (message.id !== "") {
       obj.id = message.id;
     }
-    if (message.unlocked !== false) {
-      obj.unlocked = message.unlocked;
+    if (message.locked !== false) {
+      obj.locked = message.locked;
     }
     return obj;
   },
@@ -43,7 +43,7 @@ export const VaultRef: MessageFns<VaultRef> = {
   fromPartial<I extends Exact<DeepPartial<VaultRef>, I>>(object: I): VaultRef {
     const message = createBaseVaultRef();
     message.id = object.id ?? "";
-    message.unlocked = object.unlocked ?? false;
+    message.locked = object.locked ?? false;
     return message;
   },
 };
