@@ -3,6 +3,7 @@
 import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
 import { join, resolve, relative, isAbsolute, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 /**
  * Build script to compile Protocol Buffer files to TypeScript using ts-proto
@@ -31,7 +32,9 @@ if (!outputDir) {
 
 // Check if protoc is available
 try {
-  const protocPath = execSync("which protoc", { encoding: "utf-8" }).trim();
+  const isWindows = process.platform === "win32";
+  const whichCommand = isWindows ? "where protoc" : "which protoc";
+  const protocPath = execSync(whichCommand, { encoding: "utf-8" }).trim();
   console.log(`protoc found at: ${protocPath}`);
 } catch {
   console.error("Error: protoc not found in PATH");
@@ -42,8 +45,8 @@ const protoPath = process.env.PROTO_PATH;
 console.log(`PROTO_PATH: ${protoPath || "(not set)"}`);
 
 // Determine directories
-const scriptDir = dirname(new URL(import.meta.url).pathname);
-const contractDir = resolve(scriptDir, "..");
+const scriptPath = fileURLToPath(import.meta.url);
+const contractDir = resolve(dirname(scriptPath), "..");
 console.log(`Contract Directory: ${contractDir}`);
 
 // Convert relative path to absolute if needed
