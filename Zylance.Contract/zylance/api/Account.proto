@@ -2,7 +2,7 @@ syntax = "proto3";
 package zylance.contract;
 
 import "zylance/models/Account.proto";
-import "zylance/extensions/zylance.proto";
+import "zylance/extensions/Zylance.proto";
 
 option csharp_namespace = "Zylance.Contract.Api.Account";
 

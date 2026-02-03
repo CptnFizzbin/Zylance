@@ -1,114 +1,272 @@
 #!/usr/bin/env node
 
-import { execSync, execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
-import { join, resolve, relative, isAbsolute, dirname } from "node:path";
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { dirname, join, relative, resolve } from "node:path";
+import { glob } from "glob";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+import { XMLParser } from "fast-xml-parser";
 
-/**
- * Build script to compile Protocol Buffer files to TypeScript using ts-proto
- * Replaces the PowerShell build.ps1 script
- */
+// Directory constants for key locations
+const SCRIPT_DIR = dirname(new URL(import.meta.url).pathname);
+const CONTRACT_DIR = resolve(SCRIPT_DIR, "..");
+const HOME_DIR = process.env.HOME || process.env.USERPROFILE || "";
+const GRPC_TOOLS_BASE_DIR = join(HOME_DIR, ".nuget", "packages", "grpc.tools");
 
-// Parse command line arguments
-const args = process.argv.slice(2);
-let outputDir = "";
+interface BuildOptions {
+  outputDir: string;
+}
 
-for (let i = 0; i < args.length; i++) {
-  if (args[i] === "--output-dir" && i + 1 < args.length) {
-    outputDir = args[i + 1];
-    i++;
-  } else if (!outputDir && !args[i].startsWith("--")) {
-    outputDir = args[i];
+async function main(): Promise<void> {
+  const options = await parseCommandLineArgs();
+  
+  console.log(`Contract Directory: ${CONTRACT_DIR}`);
+  console.log(`Output Directory: ${options.outputDir}`);
+
+  const protocPath = findProtocPath();
+  console.log(`Using protoc from: ${protocPath}`);
+  
+  const protoFiles = await findProtoFiles();
+  console.log(`Found ${protoFiles.length} proto file(s)`);
+  
+  prepareOutputDirectory(options.outputDir);
+  
+  const pluginPath = getProtocPluginPath();
+  const grpcInclude = findGrpcToolsInclude();
+  
+  compileProtoFiles(protoFiles, options.outputDir, pluginPath, grpcInclude, protocPath);
+  
+  console.log("\x1b[32mSuccessfully compiled all proto files!\x1b[0m");
+}
+
+async function parseCommandLineArgs(): Promise<BuildOptions> {
+  const argv = await yargs(hideBin(process.argv))
+    .command("$0 [output-dir]", "Compile Protocol Buffer files to TypeScript", (yargs) => {
+      yargs.positional("output-dir", {
+        describe: "Output directory for generated TypeScript files",
+        type: "string",
+      });
+    })
+    .option("output-dir", {
+      alias: ["o", "output"],
+      type: "string",
+      description: "Output directory for generated TypeScript files",
+    })
+    .help()
+    .parse();
+
+  let outputDir = argv.outputDir || argv._[0];
+
+  // Fall back to reading from .csproj if not provided
+  if (!outputDir) {
+    outputDir = getOutputDirFromCsproj();
   }
+
+  if (!outputDir) {
+    console.error("Error: OutputDir is required");
+    console.error(
+      "Usage: vite-node Scripts/build.ts <path>"
+    );
+    console.error(
+      "   or: vite-node Scripts/build.ts --output-dir <path>"
+    );
+    process.exit(1);
+  }
+
+  return {
+    outputDir: resolve(outputDir as string),
+  };
 }
 
-if (!outputDir) {
-  console.error("Error: OutputDir is required");
-  console.error("Usage: vite-node Scripts/build.ts --output-dir <path>");
-  console.error("   or: vite-node Scripts/build.ts <path>");
-  process.exit(1);
-}
-
-// Check if protoc is available
-try {
-  const protocPath = execSync("which protoc", { encoding: "utf-8" }).trim();
-  console.log(`protoc found at: ${protocPath}`);
-} catch {
-  console.error("Error: protoc not found in PATH");
-  process.exit(1);
-}
-
-const protoPath = process.env.PROTO_PATH;
-console.log(`PROTO_PATH: ${protoPath || "(not set)"}`);
-
-// Determine directories
-const scriptDir = dirname(new URL(import.meta.url).pathname);
-const contractDir = resolve(scriptDir, "..");
-console.log(`Contract Directory: ${contractDir}`);
-
-// Convert relative path to absolute if needed
-const outDir = isAbsolute(outputDir)
-  ? outputDir
-  : resolve(contractDir, outputDir);
-
-console.log(`Output Directory: ${outDir}`);
-
-// Find all .proto files recursively
-function findProtoFiles(dir: string): string[] {
-  const files: string[] = [];
-
-  function traverse(currentDir: string) {
-    const entries = readdirSync(currentDir);
-
-    for (const entry of entries) {
-      const fullPath = join(currentDir, entry);
-      const stat = statSync(fullPath);
-
-      if (stat.isDirectory()) {
-        traverse(fullPath);
-      } else if (entry.endsWith(".proto")) {
-        files.push(fullPath);
+function getOutputDirFromCsproj(): string | null {
+  const csprojPath = join(CONTRACT_DIR, "Zylance.Contract.csproj");
+  
+  try {
+    const content = readFileSync(csprojPath, "utf-8");
+    const parser = new XMLParser();
+    const parsed = parser.parse(content);
+    
+    // Navigate to find TsOutputPath property
+    const propertyGroups = parsed.Project?.PropertyGroup;
+    if (Array.isArray(propertyGroups)) {
+      for (const group of propertyGroups) {
+        if (group.TsOutputPath) {
+          return group.TsOutputPath;
+        }
       }
+    } else if (propertyGroups?.TsOutputPath) {
+      return propertyGroups.TsOutputPath;
+    }
+  } catch (error) {
+    // If we can't parse, just return null and let the caller handle it
+  }
+  
+  return null;
+}
+
+function findProtocPath(): string {
+  // Try to find protoc in PATH first
+  try {
+    execFileSync("protoc", ["--version"], { encoding: "utf-8" });
+    return "protoc";
+  } catch {
+    // Not in PATH, look in grpc.tools
+  }
+
+  // Find protoc from grpc.tools NuGet package
+  if (!existsSync(GRPC_TOOLS_BASE_DIR)) {
+    console.error("Error: protoc not found in PATH and grpc.tools package not found");
+    console.error("Install protoc: https://grpc.io/docs/protoc-installation/");
+    process.exit(1);
+  }
+
+  const versions = readdirSync(GRPC_TOOLS_BASE_DIR).sort().reverse();
+  if (versions.length === 0) {
+    console.error("Error: No grpc.tools versions found");
+    process.exit(1);
+  }
+
+  // Determine platform-specific protoc location
+  let protocSubdir: string;
+  if (process.platform === "win32") {
+    protocSubdir = process.arch === "x64" ? "windows_x64" : "windows_x86";
+  } else if (process.platform === "darwin") {
+    protocSubdir = process.arch === "arm64" ? "macosx_arm64" : "macosx_x64";
+  } else {
+    // Linux
+    protocSubdir = process.arch === "arm64" ? "linux_arm64" : "linux_x64";
+  }
+
+  const protocPath = join(
+    GRPC_TOOLS_BASE_DIR,
+    versions[0],
+    "tools",
+    protocSubdir,
+    process.platform === "win32" ? "protoc.exe" : "protoc"
+  );
+
+  if (!existsSync(protocPath)) {
+    console.error(`Error: protoc not found at ${protocPath}`);
+    console.error("Make sure grpc.tools NuGet package is restored");
+    process.exit(1);
+  }
+
+  return protocPath;
+}
+
+async function findProtoFiles(): Promise<string[]> {
+  // Use glob to find all .proto files excluding node_modules, bin, and obj directories
+  const pattern = "**/*.proto";
+  const ignore = ["**/node_modules/**", "**/bin/**", "**/obj/**"];
+  
+  return await glob(pattern, {
+    cwd: CONTRACT_DIR,
+    absolute: true,
+    ignore,
+  });
+}
+
+function prepareOutputDirectory(outDir: string): void {
+  if (existsSync(outDir)) {
+    rmSync(outDir, { recursive: true, force: true });
+  }
+  mkdirSync(outDir, { recursive: true });
+}
+
+function getProtocPluginPath(): string {
+  const isWindows = process.platform === "win32";
+  return join(
+    CONTRACT_DIR,
+    "node_modules",
+    ".bin",
+    isWindows ? "protoc-gen-ts_proto.cmd" : "protoc-gen-ts_proto"
+  );
+}
+
+function findGrpcToolsInclude(): string | null {
+  if (!existsSync(GRPC_TOOLS_BASE_DIR)) {
+    return null;
+  }
+
+  // Get latest version by sorting descending
+  const versions = readdirSync(GRPC_TOOLS_BASE_DIR).sort().reverse();
+  
+  if (versions.length === 0) {
+    return null;
+  }
+
+  const includePath = join(
+    GRPC_TOOLS_BASE_DIR,
+    versions[0],
+    "build",
+    "native",
+    "include"
+  );
+  
+  return existsSync(includePath) ? includePath : null;
+}
+
+function compileProtoFiles(
+  protoFiles: string[],
+  outDir: string,
+  pluginPath: string,
+  grpcInclude: string | null,
+  protocPath: string
+): void {
+  const protoPath = process.env.PROTO_PATH;
+
+  for (const protoFile of protoFiles) {
+    const relativePath = relative(CONTRACT_DIR, protoFile);
+    console.log(`Compiling ${relativePath}...`);
+
+    const args = buildProtocArgs(
+      protoFile,
+      outDir,
+      pluginPath,
+      protoPath,
+      grpcInclude
+    );
+
+    try {
+      execFileSync(protocPath, args, {
+        cwd: CONTRACT_DIR,
+        stdio: "inherit",
+        encoding: "utf-8",
+      });
+    } catch (error) {
+      console.error(`Failed to compile ${relativePath}`);
+      process.exit(1);
     }
   }
-
-  traverse(dir);
-  return files;
 }
 
-const protoFiles = findProtoFiles(contractDir);
-
-if (protoFiles.length === 0) {
-  console.error(`No .proto files found in ${contractDir}`);
-  process.exit(1);
-}
-
-console.log(`Found ${protoFiles.length} proto file(s)`);
-
-// Clean and recreate output directory
-if (existsSync(outDir)) {
-  rmSync(outDir, { recursive: true, force: true });
-}
-mkdirSync(outDir, { recursive: true });
-
-// Determine the protoc plugin path
-const isWindows = process.platform === "win32";
-const pluginPath = join(
-  contractDir,
-  "node_modules",
-  ".bin",
-  isWindows ? "protoc-gen-ts_proto.cmd" : "protoc-gen-ts_proto"
-);
-
-// Compile each proto file
-let hasErrors = false;
-
-for (const protoFile of protoFiles) {
-  const relativePath = relative(contractDir, protoFile);
-  console.log(`Compiling ${relativePath}...`);
-
-  // Build protoc command
+function buildProtocArgs(
+  protoFile: string,
+  outDir: string,
+  pluginPath: string,
+  protoPath: string | undefined,
+  grpcInclude: string | null
+): string[] {
   const args = [
+    // Proto path options - order matters for resolution
+    `--proto_path=${CONTRACT_DIR}`,
+  ];
+
+  if (protoPath) {
+    args.push(`--proto_path=${protoPath}`);
+  }
+
+  if (grpcInclude) {
+    args.push(`--proto_path=${grpcInclude}`);
+  } else {
+    console.warn(
+      "Warning: grpc.tools include directory not found, google/protobuf imports may fail"
+    );
+  }
+
+  // Plugin and generation options
+  args.push(
     `--plugin=${pluginPath}`,
     `--ts_proto_opt=esModuleInterop`,
     `--ts_proto_opt=env=browser`,
@@ -118,50 +276,11 @@ for (const protoFile of protoFiles) {
     `--ts_proto_opt=outputClientImpl=false`,
     `--ts_proto_opt=nestJs=false`,
     `--ts_proto_out=${outDir}`,
-    protoFile,
-  ];
+    protoFile
+  );
 
-  // Add proto_path options
-  // Find grpc.tools version dynamically
-  const homeDir = process.env.HOME || process.env.USERPROFILE || "";
-  const grpcToolsBaseDir = join(homeDir, ".nuget", "packages", "grpc.tools");
-  let grpcToolsInclude = "";
-  
-  if (existsSync(grpcToolsBaseDir)) {
-    const versions = readdirSync(grpcToolsBaseDir).sort().reverse(); // Get latest version
-    if (versions.length > 0) {
-      grpcToolsInclude = join(grpcToolsBaseDir, versions[0], "build", "native", "include");
-    }
-  }
-  
-  if (grpcToolsInclude && existsSync(grpcToolsInclude)) {
-    args.unshift(`--proto_path=${grpcToolsInclude}`);
-  } else {
-    console.warn("Warning: grpc.tools include directory not found, google/protobuf imports may fail");
-  }
-  
-  if (protoPath) {
-    args.unshift(`--proto_path=${protoPath}`);
-  }
-  args.unshift(`--proto_path=${contractDir}`);
-
-  try {
-    execFileSync("protoc", args, {
-      cwd: contractDir,
-      stdio: "inherit",
-      encoding: "utf-8",
-    });
-  } catch (error) {
-    console.error(
-      `Failed to compile ${relative(contractDir, protoFile)}`
-    );
-    hasErrors = true;
-    break;
-  }
+  return args;
 }
 
-if (hasErrors) {
-  process.exit(1);
-}
-
-console.log("\x1b[32mSuccessfully compiled all proto files!\x1b[0m");
+// Entry point
+await main();

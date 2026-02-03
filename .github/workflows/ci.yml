@@ -73,16 +73,6 @@ jobs:
             os: ubuntu-latest
             name: Linux x64
 
-          # macOS x64 (Intel)
-          - runtime: osx-x64
-            os: macos-13
-            name: macOS x64
-
-          # macOS ARM64 (Apple Silicon)
-          - runtime: osx-arm64
-            os: macos-latest
-            name: macOS ARM64
-
           # Browser WebAssembly
           - runtime: browser-wasm
             os: ubuntu-latest
