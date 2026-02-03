@@ -3,13 +3,14 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { glob } from "glob";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { XMLParser } from "fast-xml-parser";
 
 // Directory constants for key locations
-const SCRIPT_DIR = dirname(new URL(import.meta.url).pathname);
+const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const CONTRACT_DIR = resolve(SCRIPT_DIR, "..");
 const HOME_DIR = process.env.HOME || process.env.USERPROFILE || "";
 const GRPC_TOOLS_BASE_DIR = join(HOME_DIR, ".nuget", "packages", "grpc.tools");
