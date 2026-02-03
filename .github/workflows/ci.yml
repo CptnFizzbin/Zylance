@@ -36,16 +36,16 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Run Core tests
-        run: dotnet test --project Zylance.Core.Tests/Zylance.Core.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=core-test-results.trx"
+        run: dotnet test Zylance.Core.Tests/Zylance.Core.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=core-test-results.trx"
 
       - name: Run Desktop tests
-        run: dotnet test --project Zylance.Desktop.Tests/Zylance.Desktop.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=desktop-test-results.trx"
+        run: dotnet test Zylance.Desktop.Tests/Zylance.Desktop.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=desktop-test-results.trx"
 
       - name: Run Vault.Local tests
-        run: dotnet test --project Zylance.Vault.Local.Tests/Zylance.Vault.Local.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=vault-local-test-results.trx"
+        run: dotnet test Zylance.Vault.Local.Tests/Zylance.Vault.Local.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=vault-local-test-results.trx"
 
       - name: Run Vault.Remote tests
-        run: dotnet test --project Zylance.Vault.Remote.Tests/Zylance.Vault.Remote.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=vault-remote-test-results.trx"
+        run: dotnet test Zylance.Vault.Remote.Tests/Zylance.Vault.Remote.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=vault-remote-test-results.trx"
 
       - name: Upload test results
         if: always()
