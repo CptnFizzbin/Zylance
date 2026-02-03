@@ -7,8 +7,10 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(NODE_HOME)\yarn.cmd</YarnExe>
-        <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows'))">$(NODE_HOME)/bin/yarn</YarnExe>
+        <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)\yarn.cmd</YarnExe>
+        <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn.cmd</YarnExe>
+        <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)/bin/yarn</YarnExe>
+        <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn</YarnExe>
     </PropertyGroup>
 
     <ItemGroup>
