@@ -1,5 +1,7 @@
 using Zylance.Contract.Models.File;
+using Zylance.Core.App.Services;
 using Zylance.Core.Importers;
+using Zylance.Core.Lib;
 using Zylance.Core.Lib.Importers;
 
 namespace Zylance.Core.Tests.Importers;
@@ -7,17 +9,25 @@ namespace Zylance.Core.Tests.Importers;
 public class QfxImporterTests
 {
     private readonly QfxImporter _importer;
+    private readonly FileService _fileService;
 
     public QfxImporterTests()
     {
-        _importer = new QfxImporter();
+        // Create a mock FileService for testing
+        var mockFileProvider = new MockFileProvider();
+        _fileService = new FileService(mockFileProvider);
+        _importer = new QfxImporter(_fileService);
     }
 
     [Fact]
     public void Constructor_CreatesInstance()
     {
-        // Arrange & Act
-        var importer = new QfxImporter();
+        // Arrange
+        var mockFileProvider = new MockFileProvider();
+        var fileService = new FileService(mockFileProvider);
+
+        // Act
+        var importer = new QfxImporter(fileService);
 
         // Assert
         Assert.NotNull(importer);
@@ -55,75 +65,14 @@ public class QfxImporterTests
     }
 
     [Fact]
-    public async Task CanImportAsync_WithNullFileRef_ThrowsNotImplementedException()
-    {
-        // Arrange
-        FileRef? nullFileRef = null;
-        using var stream = new MemoryStream();
-
-        // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.CanImportAsync(nullFileRef!, stream));
-    }
-
-    [Fact]
-    public async Task CanImportAsync_WithNullStream_ThrowsNotImplementedException()
-    {
-        // Arrange
-        var fileRef = new FileRef { Id = "test", Filename = "test.qfx", ReadOnly = true };
-        Stream? nullStream = null;
-
-        // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.CanImportAsync(fileRef, nullStream!));
-    }
-
-    [Fact]
-    public async Task CanImportAsync_WithValidQfxFile_ThrowsNotImplementedException()
-    {
-        // Arrange
-        var fileRef = new FileRef { Id = "test", Filename = "transactions.qfx", ReadOnly = true };
-        using var stream = new MemoryStream();
-
-        // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.CanImportAsync(fileRef, stream));
-    }
-
-    [Fact]
-    public async Task CanImportAsync_WithNonQfxFile_ThrowsNotImplementedException()
-    {
-        // Arrange
-        var fileRef = new FileRef { Id = "test", Filename = "document.txt", ReadOnly = true };
-        using var stream = new MemoryStream();
-
-        // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.CanImportAsync(fileRef, stream));
-    }
-
-    [Fact]
     public async Task ImportAsync_WithNullFileRef_ThrowsNotImplementedException()
     {
         // Arrange
         FileRef? nullFileRef = null;
-        using var stream = new MemoryStream();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(nullFileRef!, stream));
-    }
-
-    [Fact]
-    public async Task ImportAsync_WithNullStream_ThrowsNotImplementedException()
-    {
-        // Arrange
-        var fileRef = new FileRef { Id = "test", Filename = "test.qfx", ReadOnly = true };
-        Stream? nullStream = null;
-
-        // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(fileRef, nullStream!));
+            _importer.ImportAsync(nullFileRef!));
     }
 
     [Fact]
@@ -131,11 +80,10 @@ public class QfxImporterTests
     {
         // Arrange
         var fileRef = new FileRef { Id = "test", Filename = "transactions.qfx", ReadOnly = true };
-        using var stream = new MemoryStream();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(fileRef, stream));
+            _importer.ImportAsync(fileRef));
     }
 
     [Fact]
@@ -143,13 +91,12 @@ public class QfxImporterTests
     {
         // Arrange
         var fileRef = new FileRef { Id = "test", Filename = "transactions.qfx", ReadOnly = true };
-        using var stream = new MemoryStream();
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
         // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(fileRef, stream, cancellationToken));
+            _importer.ImportAsync(fileRef, cancellationToken));
     }
 
     [Fact]
@@ -157,14 +104,13 @@ public class QfxImporterTests
     {
         // Arrange
         var fileRef = new FileRef { Id = "test", Filename = "transactions.qfx", ReadOnly = true };
-        using var stream = new MemoryStream();
         var cancellationTokenSource = new CancellationTokenSource();
         cancellationTokenSource.Cancel();
         var cancellationToken = cancellationTokenSource.Token;
 
         // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(fileRef, stream, cancellationToken));
+            _importer.ImportAsync(fileRef, cancellationToken));
     }
 
     [Fact]
@@ -173,6 +119,36 @@ public class QfxImporterTests
         // Act & Assert
         Assert.IsAssignableFrom<IImporter>(_importer);
     }
+}
+
+// Mock FileProvider for testing
+internal class MockFileProvider : IFileProvider
+{
+    public bool Exists(string path) => true;
+
+    public Task<FileRef> SelectFile(string? title = null, (string Name, string[] Extensions)[]? filters = null, bool readOnly = true)
+        => Task.FromResult(new FileRef { Id = "mock", Filename = "mock.qfx", ReadOnly = readOnly });
+
+    public Task<FileRef> CreateFile(string? title = null, string? defaultPath = null, (string Name, string[] Extensions)[]? filters = null)
+        => Task.FromResult(new FileRef { Id = "mock", Filename = "mock.qfx", ReadOnly = false });
+
+    public Task<Stream> OpenFile(FileRef fileRef)
+        => Task.FromResult<Stream>(new MemoryStream());
+
+    public Task TouchFile(FileRef fileRef)
+        => Task.CompletedTask;
+
+    public Task SaveFile(FileRef fileRef, Stream content)
+        => Task.CompletedTask;
+
+    public Task DeleteFile(FileRef fileRef)
+        => Task.CompletedTask;
+
+    public Task<FileRef> GetTempFile(string path)
+        => Task.FromResult(new FileRef { Id = "temp", Filename = path, ReadOnly = false });
+
+    public Task<FileRef> GetAppDataFile(string path)
+        => Task.FromResult(new FileRef { Id = "appdata", Filename = path, ReadOnly = false });
 }
 
 public class ImportResultTests

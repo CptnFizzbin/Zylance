@@ -8,21 +8,12 @@ namespace Zylance.Core.Lib.Importers;
 public interface IImporter
 {
     /// <summary>
-    /// Determines if the importer can handle the specified file.
-    /// </summary>
-    /// <param name="fileRef">Reference to the file to check.</param>
-    /// <param name="stream">Stream containing the file data.</param>
-    /// <returns>True if the importer can handle this file format.</returns>
-    Task<bool> CanImportAsync(FileRef fileRef, Stream stream);
-
-    /// <summary>
     /// Imports transactions from the specified file.
     /// </summary>
     /// <param name="fileRef">Reference to the file to import.</param>
-    /// <param name="stream">Stream containing the file data.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Result of the import operation.</returns>
-    Task<ImportResult> ImportAsync(FileRef fileRef, Stream stream, CancellationToken cancellationToken = default);
+    Task<ImportResult> ImportAsync(FileRef fileRef, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the supported file extensions for this importer.
