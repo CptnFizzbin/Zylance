@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { execSync } from "node:child_process";
+import { execSync, execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
 import { join, resolve, relative, isAbsolute, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -130,10 +130,8 @@ for (const protoFile of protoFiles) {
   }
   args.unshift(`--proto_path=${contractDir}`);
 
-  const command = `protoc ${args.join(" ")}`;
-
   try {
-    execSync(command, {
+    execFileSync("protoc", args, {
       cwd: contractDir,
       stdio: "inherit",
       encoding: "utf-8",
