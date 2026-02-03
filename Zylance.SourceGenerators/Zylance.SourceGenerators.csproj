@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
+<<<<<<< HEAD
         <TargetFramework>netstandard2.0</TargetFramework>
+=======
+        <TargetFramework>net8.0</TargetFramework>
+>>>>>>> dd67644d6f2964d535b737a9440204f88415c19c
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <IsRoslynComponent>true</IsRoslynComponent>
@@ -10,7 +14,10 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all"/>
+<<<<<<< HEAD
         <PackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="all"/>
+=======
+>>>>>>> dd67644d6f2964d535b737a9440204f88415c19c
     </ItemGroup>
 
     <ItemGroup>

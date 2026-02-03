@@ -36,6 +36,7 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Run Core tests
+<<<<<<< HEAD
         run: dotnet test --project Zylance.Core.Tests/Zylance.Core.Tests.csproj --no-build --configuration Release --report-xunit --report-xunit-filename core-test-results.xml
 
       - name: Run Desktop tests
@@ -55,6 +56,18 @@ jobs:
           path: |
             **/TestResults/*.trx
             **/TestResults/*.xml
+=======
+        run: dotnet test --project Zylance.Core.Tests/Zylance.Core.Tests.csproj --no-build --configuration Release
+
+      - name: Run Desktop tests
+        run: dotnet test --project Zylance.Desktop.Tests/Zylance.Desktop.Tests.csproj --no-build --configuration Release
+
+      - name: Run Vault.Local tests
+        run: dotnet test --project Zylance.Vault.Local.Tests/Zylance.Vault.Local.Tests.csproj --no-build --configuration Release
+
+      - name: Run Vault.Remote tests
+        run: dotnet test --project Zylance.Vault.Remote.Tests/Zylance.Vault.Remote.Tests.csproj --no-build --configuration Release
+>>>>>>> dd67644d6f2964d535b737a9440204f88415c19c
 
   build-runtimes:
     name: Build for ${{ matrix.runtime }}
@@ -78,9 +91,12 @@ jobs:
             os: ubuntu-latest
             name: Browser WASM
 
+<<<<<<< HEAD
           # Note: macOS builds (osx-x64, osx-arm64) have been intentionally removed per project maintainer approval
           # to streamline the CI pipeline and reduce build times
 
+=======
+>>>>>>> dd67644d6f2964d535b737a9440204f88415c19c
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
