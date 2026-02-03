@@ -95,7 +95,18 @@ function getOutputDirFromCsproj(): string | null {
       return propertyGroups.TsOutputPath;
     }
   } catch (error) {
-    // If we can't parse, just return null and let the caller handle it
+    // If we can't read or parse the .csproj, treat it as "no configured output dir"
+    // and let the caller enforce that an explicit output path is provided. We only
+    // log unexpected errors; ENOENT (file not found) is silently ignored so the
+    // script can run outside of a full .NET build context.
+    const err = error as { code?: string; message?: string };
+    if (err.code !== "ENOENT") {
+      console.warn(
+        `Warning: Failed to read or parse ${csprojPath}. ` +
+          "Falling back to requiring an explicit --output-dir. " +
+          (err.message ? `Details: ${err.message}` : "")
+      );
+    }
   }
   
   return null;
@@ -185,7 +196,7 @@ function findGrpcToolsInclude(): string | null {
     return null;
   }
 
-  // Get latest version by sorting descending
+  // Prefer the newest installed grpc.tools version so generated code uses the most up-to-date protos and fixes
   const versions = readdirSync(GRPC_TOOLS_BASE_DIR).sort().reverse();
   
   if (versions.length === 0) {
