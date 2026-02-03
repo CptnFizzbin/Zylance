@@ -133,7 +133,7 @@ function findProtocPath(): string {
   const versions = readdirSync(GRPC_TOOLS_BASE_DIR)
     .filter((v) => semver.valid(v))
     .sort((a, b) => semver.rcompare(a, b));
-    
+
   if (versions.length === 0) {
     console.error("Error: No grpc.tools versions found");
     process.exit(1);
@@ -207,7 +207,7 @@ function findGrpcToolsInclude(): string | null {
   const versions = readdirSync(GRPC_TOOLS_BASE_DIR)
     .filter((v) => semver.valid(v))
     .sort((a, b) => semver.rcompare(a, b));
-  
+
   if (versions.length === 0) {
     return null;
   }
