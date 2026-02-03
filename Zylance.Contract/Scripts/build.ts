@@ -284,11 +284,7 @@ function buildProtocArgs(
     );
   }
 
-<<<<<<< HEAD
   // Use ts-proto in browser mode with JSON serialization, omitting client/server stubs
-=======
-  // Use ts-proto for browser environments with JSON serialization (outputClientImpl=false omits client stubs)
->>>>>>> dd67644d6f2964d535b737a9440204f88415c19c
   args.push(
     `--plugin=${pluginPath}`,
     `--ts_proto_opt=esModuleInterop`,
