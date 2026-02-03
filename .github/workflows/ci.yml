@@ -78,6 +78,9 @@ jobs:
             os: ubuntu-latest
             name: Browser WASM
 
+          # Note: macOS builds (osx-x64, osx-arm64) have been intentionally removed per project maintainer approval
+          # to streamline the CI pipeline and reduce build times
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

@@ -11,7 +11,6 @@ import { XMLParser } from "fast-xml-parser";
 import semver from "semver";
 import getError from "get-error";
 
-// Directory constants for key locations
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const CONTRACT_DIR = resolve(SCRIPT_DIR, "..");
 const HOME_DIR = process.env.HOME || process.env.USERPROFILE || "";
@@ -85,7 +84,7 @@ function getOutputDirFromCsproj(): string | null {
     const parser = new XMLParser();
     const parsed = parser.parse(content);
     
-    // Navigate to find TsOutputPath property
+    // MSBuild PropertyGroup can be a single object or an array depending on the .csproj structure
     const propertyGroups = parsed.Project?.PropertyGroup;
     if (Array.isArray(propertyGroups)) {
       for (const group of propertyGroups) {
@@ -139,7 +138,7 @@ function findProtocPath(): string {
     process.exit(1);
   }
 
-  // Determine platform-specific protoc location
+  // grpc.tools packages protoc binaries per OS/architecture
   let protocSubdir: string;
   if (process.platform === "win32") {
     protocSubdir = process.arch === "x64" ? "windows_x64" : "windows_x86";
@@ -285,7 +284,7 @@ function buildProtocArgs(
     );
   }
 
-  // Plugin and generation options
+  // Use ts-proto in browser mode with JSON serialization, omitting client/server stubs
   args.push(
     `--plugin=${pluginPath}`,
     `--ts_proto_opt=esModuleInterop`,
@@ -302,8 +301,7 @@ function buildProtocArgs(
   return args;
 }
 
-// Entry point
 await main().catch((error) => {
-  console.error(error.message || error);
-  process.exit(error.code || 1);
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exit(1);
 });
