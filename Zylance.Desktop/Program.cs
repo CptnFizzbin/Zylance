@@ -1,5 +1,5 @@
 using Photino.NET;
-using Photino.NET.Server;
+using Zylance.Desktop.Lib;
 
 namespace Zylance.Desktop;
 
@@ -58,9 +58,10 @@ public static class Program
 
     private static string StartWebServer()
     {
-        var args = Environment.GetCommandLineArgs();
-        PhotinoServer.CreateStaticFileServer(args, out var serverUrl).RunAsync();
+        var wwwrootPath = Path.Combine(AppContext.BaseDirectory, "wwwroot");
+        var server = new StaticFileServer(wwwrootPath);
+        server.Start();
 
-        return serverUrl;
+        return server.BaseUrl;
     }
 }
