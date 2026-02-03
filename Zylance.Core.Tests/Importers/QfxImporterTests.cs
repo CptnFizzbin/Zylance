@@ -1,0 +1,434 @@
+using Zylance.Core.Importers;
+using Zylance.Core.Lib.Importers;
+
+namespace Zylance.Core.Tests.Importers;
+
+public class QfxImporterTests
+{
+    private readonly QfxImporter _importer;
+
+    public QfxImporterTests()
+    {
+        _importer = new QfxImporter();
+    }
+
+    [Fact]
+    public void Constructor_CreatesInstance()
+    {
+        // Arrange & Act
+        var importer = new QfxImporter();
+
+        // Assert
+        Assert.NotNull(importer);
+    }
+
+    [Fact]
+    public void SupportedExtensions_ContainsQfxExtension()
+    {
+        // Act
+        var extensions = _importer.SupportedExtensions;
+
+        // Assert
+        Assert.NotNull(extensions);
+        Assert.Contains(".qfx", extensions);
+    }
+
+    [Fact]
+    public void SupportedExtensions_IsNotEmpty()
+    {
+        // Act
+        var extensions = _importer.SupportedExtensions;
+
+        // Assert
+        Assert.NotEmpty(extensions);
+    }
+
+    [Fact]
+    public void SupportedExtensions_IsReadOnly()
+    {
+        // Act
+        var extensions = _importer.SupportedExtensions;
+
+        // Assert
+        Assert.IsAssignableFrom<IReadOnlyList<string>>(extensions);
+    }
+
+    [Fact]
+    public async Task CanImportAsync_WithNullPath_ThrowsNotImplementedException()
+    {
+        // Arrange
+        string? nullPath = null;
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotImplementedException>(() => 
+            _importer.CanImportAsync(nullPath!));
+    }
+
+    [Fact]
+    public async Task CanImportAsync_WithEmptyPath_ThrowsNotImplementedException()
+    {
+        // Arrange
+        var emptyPath = string.Empty;
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotImplementedException>(() => 
+            _importer.CanImportAsync(emptyPath));
+    }
+
+    [Fact]
+    public async Task CanImportAsync_WithValidQfxPath_ThrowsNotImplementedException()
+    {
+        // Arrange
+        var qfxPath = "/path/to/file.qfx";
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotImplementedException>(() => 
+            _importer.CanImportAsync(qfxPath));
+    }
+
+    [Fact]
+    public async Task CanImportAsync_WithNonQfxPath_ThrowsNotImplementedException()
+    {
+        // Arrange
+        var txtPath = "/path/to/file.txt";
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotImplementedException>(() => 
+            _importer.CanImportAsync(txtPath));
+    }
+
+    [Fact]
+    public async Task ImportAsync_WithNullPath_ThrowsNotImplementedException()
+    {
+        // Arrange
+        string? nullPath = null;
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotImplementedException>(() => 
+            _importer.ImportAsync(nullPath!));
+    }
+
+    [Fact]
+    public async Task ImportAsync_WithEmptyPath_ThrowsNotImplementedException()
+    {
+        // Arrange
+        var emptyPath = string.Empty;
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotImplementedException>(() => 
+            _importer.ImportAsync(emptyPath));
+    }
+
+    [Fact]
+    public async Task ImportAsync_WithValidPath_ThrowsNotImplementedException()
+    {
+        // Arrange
+        var validPath = "/path/to/file.qfx";
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotImplementedException>(() => 
+            _importer.ImportAsync(validPath));
+    }
+
+    [Fact]
+    public async Task ImportAsync_WithCancellationToken_ThrowsNotImplementedException()
+    {
+        // Arrange
+        var validPath = "/path/to/file.qfx";
+        var cancellationTokenSource = new CancellationTokenSource();
+        var cancellationToken = cancellationTokenSource.Token;
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotImplementedException>(() => 
+            _importer.ImportAsync(validPath, cancellationToken));
+    }
+
+    [Fact]
+    public async Task ImportAsync_WithCancelledToken_ThrowsNotImplementedException()
+    {
+        // Arrange
+        var validPath = "/path/to/file.qfx";
+        var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.Cancel();
+        var cancellationToken = cancellationTokenSource.Token;
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotImplementedException>(() => 
+            _importer.ImportAsync(validPath, cancellationToken));
+    }
+
+    [Fact]
+    public void QfxImporter_ImplementsIImporter()
+    {
+        // Act & Assert
+        Assert.IsAssignableFrom<IImporter>(_importer);
+    }
+}
+
+public class ImportResultTests
+{
+    [Fact]
+    public void ImportResult_CanBeCreated_WithRequiredProperties()
+    {
+        // Arrange & Act
+        var result = new ImportResult
+        {
+            Success = true
+        };
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.True(result.Success);
+    }
+
+    [Fact]
+    public void ImportResult_Success_CanBeTrue()
+    {
+        // Arrange & Act
+        var result = new ImportResult { Success = true };
+
+        // Assert
+        Assert.True(result.Success);
+    }
+
+    [Fact]
+    public void ImportResult_Success_CanBeFalse()
+    {
+        // Arrange & Act
+        var result = new ImportResult { Success = false };
+
+        // Assert
+        Assert.False(result.Success);
+    }
+
+    [Fact]
+    public void ImportResult_ErrorMessage_CanBeNull()
+    {
+        // Arrange & Act
+        var result = new ImportResult 
+        { 
+            Success = true, 
+            ErrorMessage = null 
+        };
+
+        // Assert
+        Assert.Null(result.ErrorMessage);
+    }
+
+    [Fact]
+    public void ImportResult_ErrorMessage_CanBeSet()
+    {
+        // Arrange
+        var errorMessage = "Test error message";
+
+        // Act
+        var result = new ImportResult 
+        { 
+            Success = false, 
+            ErrorMessage = errorMessage 
+        };
+
+        // Assert
+        Assert.Equal(errorMessage, result.ErrorMessage);
+    }
+
+    [Fact]
+    public void ImportResult_TransactionCount_DefaultsToZero()
+    {
+        // Arrange & Act
+        var result = new ImportResult { Success = true };
+
+        // Assert
+        Assert.Equal(0, result.TransactionCount);
+    }
+
+    [Fact]
+    public void ImportResult_TransactionCount_CanBeSet()
+    {
+        // Arrange
+        var count = 42;
+
+        // Act
+        var result = new ImportResult 
+        { 
+            Success = true, 
+            TransactionCount = count 
+        };
+
+        // Assert
+        Assert.Equal(count, result.TransactionCount);
+    }
+
+    [Fact]
+    public void ImportResult_Warnings_CanBeNull()
+    {
+        // Arrange & Act
+        var result = new ImportResult 
+        { 
+            Success = true, 
+            Warnings = null 
+        };
+
+        // Assert
+        Assert.Null(result.Warnings);
+    }
+
+    [Fact]
+    public void ImportResult_Warnings_CanBeEmpty()
+    {
+        // Arrange & Act
+        var result = new ImportResult 
+        { 
+            Success = true, 
+            Warnings = Array.Empty<string>() 
+        };
+
+        // Assert
+        Assert.NotNull(result.Warnings);
+        Assert.Empty(result.Warnings);
+    }
+
+    [Fact]
+    public void ImportResult_Warnings_CanContainMultipleWarnings()
+    {
+        // Arrange
+        var warnings = new[] { "Warning 1", "Warning 2", "Warning 3" };
+
+        // Act
+        var result = new ImportResult 
+        { 
+            Success = true, 
+            Warnings = warnings 
+        };
+
+        // Assert
+        Assert.NotNull(result.Warnings);
+        Assert.Equal(3, result.Warnings.Count);
+        Assert.Equal("Warning 1", result.Warnings[0]);
+        Assert.Equal("Warning 2", result.Warnings[1]);
+        Assert.Equal("Warning 3", result.Warnings[2]);
+    }
+
+    [Fact]
+    public void ImportResult_Warnings_IsReadOnly()
+    {
+        // Arrange
+        var warnings = new[] { "Warning 1" };
+
+        // Act
+        var result = new ImportResult 
+        { 
+            Success = true, 
+            Warnings = warnings 
+        };
+
+        // Assert
+        Assert.IsAssignableFrom<IReadOnlyList<string>>(result.Warnings);
+    }
+
+    [Fact]
+    public void ImportResult_SuccessfulImport_WithTransactions()
+    {
+        // Arrange & Act
+        var result = new ImportResult
+        {
+            Success = true,
+            TransactionCount = 10,
+            ErrorMessage = null,
+            Warnings = null
+        };
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.Equal(10, result.TransactionCount);
+        Assert.Null(result.ErrorMessage);
+        Assert.Null(result.Warnings);
+    }
+
+    [Fact]
+    public void ImportResult_FailedImport_WithError()
+    {
+        // Arrange
+        var errorMsg = "Invalid file format";
+
+        // Act
+        var result = new ImportResult
+        {
+            Success = false,
+            TransactionCount = 0,
+            ErrorMessage = errorMsg,
+            Warnings = null
+        };
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(0, result.TransactionCount);
+        Assert.Equal(errorMsg, result.ErrorMessage);
+        Assert.Null(result.Warnings);
+    }
+
+    [Fact]
+    public void ImportResult_SuccessfulImport_WithWarnings()
+    {
+        // Arrange
+        var warnings = new[] { "Duplicate transaction found", "Unknown account type" };
+
+        // Act
+        var result = new ImportResult
+        {
+            Success = true,
+            TransactionCount = 5,
+            ErrorMessage = null,
+            Warnings = warnings
+        };
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.Equal(5, result.TransactionCount);
+        Assert.Null(result.ErrorMessage);
+        Assert.NotNull(result.Warnings);
+        Assert.Equal(2, result.Warnings.Count);
+    }
+
+    [Fact]
+    public void ImportResult_IsRecord_SupportsValueEquality()
+    {
+        // Arrange
+        var result1 = new ImportResult
+        {
+            Success = true,
+            TransactionCount = 5,
+            ErrorMessage = "Test"
+        };
+
+        var result2 = new ImportResult
+        {
+            Success = true,
+            TransactionCount = 5,
+            ErrorMessage = "Test"
+        };
+
+        // Act & Assert
+        Assert.Equal(result1, result2);
+    }
+
+    [Fact]
+    public void ImportResult_IsRecord_DifferentValuesNotEqual()
+    {
+        // Arrange
+        var result1 = new ImportResult
+        {
+            Success = true,
+            TransactionCount = 5
+        };
+
+        var result2 = new ImportResult
+        {
+            Success = true,
+            TransactionCount = 10
+        };
+
+        // Act & Assert
+        Assert.NotEqual(result1, result2);
+    }
+}
