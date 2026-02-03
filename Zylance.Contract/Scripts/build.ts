@@ -122,10 +122,23 @@ for (const protoFile of protoFiles) {
   ];
 
   // Add proto_path options
-  // Add grpc.tools include path for google/protobuf imports
+  // Find grpc.tools version dynamically
   const homeDir = process.env.HOME || process.env.USERPROFILE || "";
-  const grpcToolsInclude = join(homeDir, ".nuget", "packages", "grpc.tools", "2.76.0", "build", "native", "include");
-  args.unshift(`--proto_path=${grpcToolsInclude}`);
+  const grpcToolsBaseDir = join(homeDir, ".nuget", "packages", "grpc.tools");
+  let grpcToolsInclude = "";
+  
+  if (existsSync(grpcToolsBaseDir)) {
+    const versions = readdirSync(grpcToolsBaseDir).sort().reverse(); // Get latest version
+    if (versions.length > 0) {
+      grpcToolsInclude = join(grpcToolsBaseDir, versions[0], "build", "native", "include");
+    }
+  }
+  
+  if (grpcToolsInclude && existsSync(grpcToolsInclude)) {
+    args.unshift(`--proto_path=${grpcToolsInclude}`);
+  } else {
+    console.warn("Warning: grpc.tools include directory not found, google/protobuf imports may fail");
+  }
   
   if (protoPath) {
     args.unshift(`--proto_path=${protoPath}`);
