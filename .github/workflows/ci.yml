@@ -47,15 +47,6 @@ jobs:
       - name: Run Vault.Remote tests
         run: dotnet test --project Zylance.Vault.Remote.Tests/Zylance.Vault.Remote.Tests.csproj --no-build --configuration Release
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: |
-            **/TestResults/*.trx
-            **/TestResults/*.xml
-
   build-runtimes:
     name: Build for ${{ matrix.runtime }}
     runs-on: ${{ matrix.os }}
