@@ -8,6 +8,8 @@ import { glob } from "glob";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { XMLParser } from "fast-xml-parser";
+import semver from "semver";
+import getError from "get-error";
 
 // Directory constants for key locations
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
@@ -128,7 +130,10 @@ function findProtocPath(): string {
     process.exit(1);
   }
 
-  const versions = readdirSync(GRPC_TOOLS_BASE_DIR).sort().reverse();
+  const versions = readdirSync(GRPC_TOOLS_BASE_DIR)
+    .filter((v) => semver.valid(v))
+    .sort((a, b) => semver.rcompare(a, b));
+    
   if (versions.length === 0) {
     console.error("Error: No grpc.tools versions found");
     process.exit(1);
@@ -162,8 +167,11 @@ function findProtocPath(): string {
   return protocPath;
 }
 
+/**
+ * Finds all .proto files in the contract directory while skipping
+ * dependency and build artifact directories
+ */
 async function findProtoFiles(): Promise<string[]> {
-  // Use glob to find all .proto files excluding node_modules, bin, and obj directories
   const pattern = "**/*.proto";
   const ignore = ["**/node_modules/**", "**/bin/**", "**/obj/**"];
   
@@ -196,8 +204,9 @@ function findGrpcToolsInclude(): string | null {
     return null;
   }
 
-  // Prefer the newest installed grpc.tools version so generated code uses the most up-to-date protos and fixes
-  const versions = readdirSync(GRPC_TOOLS_BASE_DIR).sort().reverse();
+  const versions = readdirSync(GRPC_TOOLS_BASE_DIR)
+    .filter((v) => semver.valid(v))
+    .sort((a, b) => semver.rcompare(a, b));
   
   if (versions.length === 0) {
     return null;
@@ -243,6 +252,10 @@ function compileProtoFiles(
       });
     } catch (error) {
       console.error(`Failed to compile ${relativePath}`);
+      const errorMessage = getError(error);
+      if (errorMessage) {
+        console.error(errorMessage);
+      }
       process.exit(1);
     }
   }

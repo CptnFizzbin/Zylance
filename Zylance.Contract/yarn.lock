@@ -17,9 +17,12 @@ __metadata:
   resolution: "@cptnfizzbin/zylance-contract@workspace:."
   dependencies:
     "@types/node": "npm:^25.2.0"
+    "@types/semver": "npm:^7.7.1"
     "@types/yargs": "npm:^17.0.35"
     fast-xml-parser: "npm:^5.3.4"
+    get-error: "npm:^1.0.1"
     glob: "npm:^13.0.1"
+    semver: "npm:^7.7.3"
     ts-proto: "npm:^2.11.0"
     vite-node: "npm:^5.3.0"
     yargs: "npm:^18.0.0"
@@ -446,6 +449,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/semver@npm:^7.7.1":
+  version: 7.7.1
+  resolution: "@types/semver@npm:7.7.1"
+  checksum: 10c0/c938aef3bf79a73f0f3f6037c16e2e759ff40c54122ddf0b2583703393d8d3127130823facb880e694caa324eb6845628186aac1997ee8b31dc2d18fafe26268
+  languageName: node
+  linkType: hard
+
 "@types/yargs-parser@npm:*":
   version: 21.0.3
   resolution: "@types/yargs-parser@npm:21.0.3"
@@ -773,6 +783,13 @@ __metadata:
   version: 1.4.0
   resolution: "get-east-asian-width@npm:1.4.0"
   checksum: 10c0/4e481d418e5a32061c36fbb90d1b225a254cc5b2df5f0b25da215dcd335a3c111f0c2023ffda43140727a9cafb62dac41d022da82c08f31083ee89f714ee3b83
+  languageName: node
+  linkType: hard
+
+"get-error@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "get-error@npm:1.0.1"
+  checksum: 10c0/fc0fd8195adb51f817b0a8a231787145f5c145503d81848ce4f9d19f461bfcba7d357498d685629c8e925385328c24f2369b5005e038b5feb5bf55327ea555dc
   languageName: node
   linkType: hard
 
@@ -1193,7 +1210,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.3.5":
+"semver@npm:^7.3.5, semver@npm:^7.7.3":
   version: 7.7.3
   resolution: "semver@npm:7.7.3"
   bin:
