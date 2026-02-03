@@ -3,7 +3,7 @@
   "packageManager": "yarn@4.12.0",
   "scripts": {
     "build": "dotnet build ./Zylance.Contract.csproj -c Release",
-    "build:msbuild": "pwsh.exe -File ./scripts/build.ps1"
+    "build:msbuild": "pwsh -File ./Scripts/build.ps1"
   },
   "devDependencies": {
     "ts-proto": "^2.11.0"
