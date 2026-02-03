@@ -34,8 +34,6 @@ jobs:
 
       - name: Build
         run: dotnet build --no-restore --configuration Release
-        env:
-          NODE_HOME: /opt/hostedtoolcache/node/24.13.0
 
       - name: Run Core tests
         run: dotnet test Zylance.Core.Tests/Zylance.Core.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=core-test-results.trx"
@@ -116,18 +114,12 @@ jobs:
 
       - name: Build Core for ${{ matrix.name }}
         run: dotnet build Zylance.Core/Zylance.Core.csproj -c Release -r ${{ matrix.runtime }} --no-restore
-        env:
-          NODE_HOME: /opt/hostedtoolcache/node/24.13.0
 
       - name: Build Contract for ${{ matrix.name }}
         run: dotnet build Zylance.Contract/Zylance.Contract.csproj -c Release -r ${{ matrix.runtime }} --no-restore
-        env:
-          NODE_HOME: /opt/hostedtoolcache/node/24.13.0
 
       - name: Build UI for ${{ matrix.name }}
         run: dotnet build Zylance.UI/Zylance.UI.csproj -c Release -r ${{ matrix.runtime }} --no-restore
-        env:
-          NODE_HOME: /opt/hostedtoolcache/node/24.13.0
 
       - name: Build Desktop for ${{ matrix.name }}
         if: matrix.runtime != 'browser-wasm'

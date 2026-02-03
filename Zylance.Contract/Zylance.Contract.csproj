@@ -15,8 +15,8 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(NODE_HOME)\yarn.cmd</YarnExe>
-        <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows'))">$(NODE_HOME)/bin/yarn</YarnExe>
+        <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">yarn.cmd</YarnExe>
+        <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows'))">yarn</YarnExe>
         <TsOutputPath>../Zylance.UI/Generated/</TsOutputPath>
     </PropertyGroup>
 
