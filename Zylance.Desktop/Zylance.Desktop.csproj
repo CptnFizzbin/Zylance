@@ -6,8 +6,6 @@
         <Platforms>AnyCPU</Platforms>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <!-- Generate embedded file manifest when using the Photino.NET StaticFileServer -->
-        <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     </PropertyGroup>
 
     <ItemGroup>
@@ -23,7 +21,17 @@
         <ProjectReference Include="..\Zylance.Vault.Local\Zylance.Vault.Local.csproj"/>
     </ItemGroup>
 
+    <Target Name="CopyUIAssets" AfterTargets="Build">
+        <ItemGroup>
+            <UIDistFiles Include="..\Zylance.UI\dist\**\*"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(UIDistFiles)"
+              DestinationFolder="$(OutputPath)wwwroot\%(RecursiveDir)"
+              SkipUnchangedFiles="true"/>
+    </Target>
+
+    <!-- Include wwwroot in publish output -->
     <ItemGroup>
-        <EmbeddedResource Include="Resources\**"/>
+        <Content Include="$(OutputPath)wwwroot\**\*" CopyToPublishDirectory="PreserveNewest" Link="wwwroot\%(RecursiveDir)%(FileName)%(Extension)"/>
     </ItemGroup>
 </Project>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix
+        xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="Zylance"
+             Version="1.0.0"
+             Manufacturer="CptnFizzbin"
+             UpgradeCode="c3ed3fee-61e5-4226-bfc0-968d00bf388a"
+             Compressed="yes">
+        <MajorUpgrade DowngradeErrorMessage="A newer version of Zylance is already installed."/>
+        <MediaTemplate EmbedCab="yes"/>
+
+        <Feature Id="Main">
+            <ComponentGroupRef Id="ZylanceFiles"/>
+            <ComponentRef Id="ZylanceExe"/>
+            <ComponentRef Id="StartMenuShortcut"/>
+        </Feature>
+
+        <ComponentGroup Id="ZylanceFiles" Directory="INSTALL_FOLDER">
+            <Files Include="$(Zylance.Desktop.TargetDir)**">
+                <Exclude Files="$(Zylance.Desktop.TargetDir)Zylance.Desktop.exe"/>
+            </Files>
+        </ComponentGroup>
+
+        <Component Id="ZylanceExe" Directory="INSTALL_FOLDER" Bitness="always64">
+            <File Source="$(Zylance.Desktop.TargetDir)Zylance.Desktop.exe"/>
+        </Component>
+
+        <Component Id="StartMenuShortcut" Directory="ZylanceStartMenuFolder" Bitness="always64">
+            <Shortcut Name="!(bind.Property.ProductName)"
+                      Directory="ZylanceStartMenuFolder"
+                      Target="[INSTALL_FOLDER]Zylance.Desktop.exe"
+                      WorkingDirectory="INSTALL_FOLDER"/>
+
+            <RemoveFolder Id="RemoveZylanceStartMenuFolder" On="uninstall"/>
+
+            <RegistryValue Root="HKCU"
+                           Key="Software\CptnFizzbin\Zylance"
+                           Name="Installed"
+                           Type="integer"
+                           Value="1"
+                           KeyPath="yes"/>
+        </Component>
+    </Package>
+</Wix>

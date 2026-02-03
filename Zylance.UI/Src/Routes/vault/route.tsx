@@ -7,7 +7,7 @@ export const Route = createFileRoute("/vault")({
   component: RouteComponent,
 })
 
-function RouteComponent () {
+function RouteComponent() {
   console.log("Rendering /vault route")
 
   return (

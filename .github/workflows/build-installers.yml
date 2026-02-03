@@ -1,0 +1,177 @@
+name: Build Installers
+
+on:
+  # Trigger on releases
+  release:
+    types: [ created ]
+
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run all tests
+        run: dotnet test --no-build --configuration Release --verbosity normal
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: "**/TestResults/*"
+
+  verify-runtimes:
+    name: Verify ${{ matrix.runtime }} Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runtime: win-x64
+            os: windows-latest
+          - runtime: linux-x64
+            os: ubuntu-latest
+          - runtime: browser-wasm
+            os: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install WASM workload
+        if: matrix.runtime == 'browser-wasm'
+        run: dotnet workload install wasm-tools
+
+      - name: Build Core for ${{ matrix.runtime }}
+        run: dotnet build Zylance.Core/Zylance.Core.csproj -c Release -r ${{ matrix.runtime }}
+
+      - name: Build Contract for ${{ matrix.runtime }}
+        run: dotnet build Zylance.Contract/Zylance.Contract.csproj -c Release -r ${{ matrix.runtime }}
+
+      - name: Build UI for ${{ matrix.runtime }}
+        run: dotnet build Zylance.UI/Zylance.UI.csproj -c Release -r ${{ matrix.runtime }}
+
+  build-windows:
+    name: Build Windows MSI
+    runs-on: windows-latest
+    needs: [ test, verify-runtimes ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install WiX
+        run: dotnet tool install --global wix --version 6.0.2
+
+      - name: Build MSI
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.inputs.version || github.ref_name }}"
+          dotnet build Zylance.Installer.Windows\Zylance.Installer.Windows.csproj -c Release -p:Version=$($version -replace '^v','') -p:Platform=x64
+
+      - name: Upload MSI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-msi
+          path: Zylance.Installer.Windows/bin/x64/Release/*.msi
+          if-no-files-found: error
+
+      - name: Upload to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: Zylance.Installer.Windows/bin/x64/Release/*.msi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  summary:
+    name: Build Summary
+    runs-on: ubuntu-latest
+    needs: [ test, verify-runtimes, build-windows ]
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: installers
+
+      - name: Display structure
+        run: |
+          echo "📦 Built installers:"
+          ls -lhR installers/
+
+      - name: Create summary
+        run: |
+          echo "## 🎉 Installer Build Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### 🧪 Test Results:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.test.result }}" == "success" ]; then
+            echo "✅ All tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Tests failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### 🏗️ Runtime Verification:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.verify-runtimes.result }}" == "success" ]; then
+            echo "✅ All runtimes verified (win-x64, linux-x64, browser-wasm)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Some runtime builds failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### 📦 Packages Built:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -d "installers/windows-msi" ]; then
+            echo "✅ **Windows MSI**: $(ls installers/windows-msi/*.msi 2>/dev/null | xargs -n1 basename || echo 'Failed')" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -d "installers/linux-appimage" ]; then
+            echo "✅ **Linux AppImage**: $(ls installers/linux-appimage/*.AppImage 2>/dev/null | xargs -n1 basename || echo 'Failed')" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -d "installers/linux-deb" ]; then
+            echo "✅ **Linux DEB**: $(ls installers/linux-deb/*.deb 2>/dev/null | xargs -n1 basename || echo 'Failed')" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -d "installers/linux-rpm" ]; then
+            echo "✅ **Linux RPM**: $(ls installers/linux-rpm/*.rpm 2>/dev/null | xargs -n1 basename || echo 'Failed')" >> $GITHUB_STEP_SUMMARY
+          fi

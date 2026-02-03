@@ -1,4 +1,3 @@
-import type { FC } from "react"
 import {
   Box,
   Button,
@@ -10,6 +9,7 @@ import {
   Link,
   Typography,
 } from "@mui/material"
+import type { FC } from "react"
 
 export interface AboutDialogProps extends DialogProps {
   onClose?: () => void

@@ -1,0 +1,156 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run Core tests
+        run: dotnet test Zylance.Core.Tests/Zylance.Core.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=core-test-results.trx"
+
+      - name: Run Desktop tests
+        run: dotnet test Zylance.Desktop.Tests/Zylance.Desktop.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=desktop-test-results.trx"
+
+      - name: Run Vault.Local tests
+        run: dotnet test Zylance.Vault.Local.Tests/Zylance.Vault.Local.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=vault-local-test-results.trx"
+
+      - name: Run Vault.Remote tests
+        run: dotnet test Zylance.Vault.Remote.Tests/Zylance.Vault.Remote.Tests.csproj --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=vault-remote-test-results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            **/TestResults/*.trx
+            **/TestResults/*.xml
+
+  build-runtimes:
+    name: Build for ${{ matrix.runtime }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Windows x64
+          - runtime: win-x64
+            os: windows-latest
+            name: Windows x64
+
+          # Linux x64
+          - runtime: linux-x64
+            os: ubuntu-latest
+            name: Linux x64
+
+          # macOS x64 (Intel)
+          - runtime: osx-x64
+            os: macos-13
+            name: macOS x64
+
+          # macOS ARM64 (Apple Silicon)
+          - runtime: osx-arm64
+            os: macos-latest
+            name: macOS ARM64
+
+          # Browser WebAssembly
+          - runtime: browser-wasm
+            os: ubuntu-latest
+            name: Browser WASM
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install WASM workload
+        if: matrix.runtime == 'browser-wasm'
+        run: dotnet workload install wasm-tools
+
+      - name: Restore for ${{ matrix.name }}
+        run: dotnet restore -r ${{ matrix.runtime }}
+
+      - name: Build Core for ${{ matrix.name }}
+        run: dotnet build Zylance.Core/Zylance.Core.csproj -c Release -r ${{ matrix.runtime }} --no-restore
+
+      - name: Build Contract for ${{ matrix.name }}
+        run: dotnet build Zylance.Contract/Zylance.Contract.csproj -c Release -r ${{ matrix.runtime }} --no-restore
+
+      - name: Build UI for ${{ matrix.name }}
+        run: dotnet build Zylance.UI/Zylance.UI.csproj -c Release -r ${{ matrix.runtime }} --no-restore
+
+      - name: Build Desktop for ${{ matrix.name }}
+        if: matrix.runtime != 'browser-wasm'
+        run: dotnet build Zylance.Desktop/Zylance.Desktop.csproj -c Release -r ${{ matrix.runtime }} --no-restore
+
+      - name: Publish Desktop for ${{ matrix.name }}
+        if: matrix.runtime != 'browser-wasm'
+        run: dotnet publish Zylance.Desktop/Zylance.Desktop.csproj -c Release -r ${{ matrix.runtime }} --no-restore --self-contained -o publish-${{ matrix.runtime }}
+
+      - name: Upload build artifact
+        if: matrix.runtime != 'browser-wasm'
+        uses: actions/upload-artifact@v4
+        with:
+          name: zylance-${{ matrix.runtime }}
+          path: publish-${{ matrix.runtime }}/*
+          retention-days: 7
+
+  build-summary:
+    name: Build Summary
+    runs-on: ubuntu-latest
+    needs: [ test, build-runtimes ]
+    if: always()
+
+    steps:
+      - name: Check test results
+        run: |
+          echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.test.result }}" == "success" ]; then
+            echo "✅ All tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Tests failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check runtime builds
+        run: |
+          echo "## 🏗️ Runtime Builds" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.build-runtimes.result }}" == "success" ]; then
+            echo "✅ All runtimes built successfully" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ Windows x64" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ Linux x64" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ macOS x64" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ macOS ARM64" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ Browser WASM" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Some runtime builds failed (check individual jobs)" >> $GITHUB_STEP_SUMMARY
+          fi

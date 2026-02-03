@@ -11,7 +11,7 @@ export interface BackgroundTaskWithProgress extends BackgroundTask {
   progress: number
 }
 
-export function isTaskWithProgress (
+export function isTaskWithProgress(
   task: BackgroundTask,
 ): task is BackgroundTaskWithProgress {
   return task.progress !== undefined

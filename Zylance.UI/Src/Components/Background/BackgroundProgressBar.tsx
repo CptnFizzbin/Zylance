@@ -19,7 +19,7 @@ export const BackgroundProgressBar: FC = () => {
 
   const aggregateProgress = hasProgress
     ? tasksWithProgress.reduce((sum, task) => sum + task.progress, 0) /
-    tasksWithProgress.length
+      tasksWithProgress.length
     : 0
 
   return (

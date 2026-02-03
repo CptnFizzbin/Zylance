@@ -1,7 +1,12 @@
 import { useZylance, type ZylanceState } from "@Lib/ZylanceContext"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import type { QueryClient } from "@tanstack/react-query"
-import { createRootRouteWithContext, Navigate, Outlet, useLocation } from "@tanstack/react-router"
+import {
+  createRootRouteWithContext,
+  Navigate,
+  Outlet,
+  useLocation,
+} from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import TanStackQueryDevtools from "@/Integrations/tanstack-query/devtools"
 
@@ -14,7 +19,7 @@ export const Route = createRootRouteWithContext<ZylanceRouterContext>()({
   component: RootComponent,
 })
 
-function RootComponent () {
+function RootComponent() {
   const { currentVault } = useZylance()
   const location = useLocation()
 

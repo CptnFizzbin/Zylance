@@ -1,11 +1,11 @@
+import InfoOutlineIcon from "@mui/icons-material/InfoOutline"
+import { ListItemIcon, ListItemText, MenuItem } from "@mui/material"
+import { type FC, useState } from "react"
 import { AboutDialog } from "@/Components/About/AboutDialog.tsx"
 import {
   FileBarMenu,
   type MenuBarMenuProps,
 } from "@/Components/Desktop/FileBar/Menus/MenuBase.tsx"
-import InfoOutlineIcon from "@mui/icons-material/InfoOutline"
-import { ListItemIcon, ListItemText, MenuItem } from "@mui/material"
-import { type FC, useState } from "react"
 
 export const HelpMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
   onClose,

@@ -4,12 +4,9 @@ import { devtools } from "@tanstack/devtools-vite"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
 import viteReact from "@vitejs/plugin-react"
 import * as path from "node:path"
-import { fileURLToPath } from "node:url"
 import { defineConfig } from "vite"
 
-const ZYLANCE_ROOT = fileURLToPath(new URL("..", import.meta.url))
-const ZYLANCE_UI_DIR = path.join(ZYLANCE_ROOT, "Zylance.UI")
-const ZYLANCE_DESKTOP_DIR = path.join(ZYLANCE_ROOT, "Zylance.Desktop")
+const ZYLANCE_UI_DIR = import.meta.dirname
 
 export default defineConfig({
   plugins: [
@@ -32,7 +29,7 @@ export default defineConfig({
   publicDir: path.join(ZYLANCE_UI_DIR, "Public"),
 
   build: {
-    outDir: path.join(ZYLANCE_DESKTOP_DIR, "Resources", "wwwroot"),
+    outDir: path.join(ZYLANCE_UI_DIR, "dist"),
     emptyOutDir: true,
     sourcemap: true,
   },

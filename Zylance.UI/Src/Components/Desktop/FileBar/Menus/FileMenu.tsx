@@ -3,9 +3,18 @@ import AddIcon from "@mui/icons-material/Add"
 import CloseIcon from "@mui/icons-material/Close"
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
 import FolderOpenIcon from "@mui/icons-material/FolderOpen"
-import { Divider, ListItemIcon, ListItemText, MenuItem, Typography } from "@mui/material"
+import {
+  Divider,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Typography,
+} from "@mui/material"
 import type { FC } from "react"
-import { FileBarMenu, type MenuBarMenuProps } from "@/Components/Desktop/FileBar/Menus/MenuBase"
+import {
+  FileBarMenu,
+  type MenuBarMenuProps,
+} from "@/Components/Desktop/FileBar/Menus/MenuBase"
 
 export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
   onClose,
