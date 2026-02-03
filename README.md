@@ -28,9 +28,9 @@ An OpenSource finance and budgeting app
    corepack enable
    corepack prepare yarn@stable --activate
    ```
-5. Set the `NODE_HOME` environment variable to your Node.js installation directory:
-   > **Note:** The build process uses `NODE_HOME` to locate yarn. Adjust the path based on your Node.js installation
-   method.
+5. **(Optional)** Set the `NODE_HOME` environment variable if you have multiple Node.js versions installed:
+   > **Note:** The build process will use yarn from PATH by default. Only set `NODE_HOME` if you need to specify a
+   particular Node.js installation when multiple versions are present.
 
    **Windows (PowerShell):**
    ```pwsh
