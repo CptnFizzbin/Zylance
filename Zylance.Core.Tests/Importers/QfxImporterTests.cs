@@ -1,3 +1,4 @@
+using Zylance.Contract.Models.File;
 using Zylance.Core.Importers;
 using Zylance.Core.Lib.Importers;
 
@@ -54,107 +55,116 @@ public class QfxImporterTests
     }
 
     [Fact]
-    public async Task CanImportAsync_WithNullPath_ThrowsNotImplementedException()
+    public async Task CanImportAsync_WithNullFileRef_ThrowsNotImplementedException()
     {
         // Arrange
-        string? nullPath = null;
+        FileRef? nullFileRef = null;
+        using var stream = new MemoryStream();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.CanImportAsync(nullPath!));
+            _importer.CanImportAsync(nullFileRef!, stream));
     }
 
     [Fact]
-    public async Task CanImportAsync_WithEmptyPath_ThrowsNotImplementedException()
+    public async Task CanImportAsync_WithNullStream_ThrowsNotImplementedException()
     {
         // Arrange
-        var emptyPath = string.Empty;
+        var fileRef = new FileRef { Id = "test", Filename = "test.qfx", ReadOnly = true };
+        Stream? nullStream = null;
 
         // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.CanImportAsync(emptyPath));
+            _importer.CanImportAsync(fileRef, nullStream!));
     }
 
     [Fact]
-    public async Task CanImportAsync_WithValidQfxPath_ThrowsNotImplementedException()
+    public async Task CanImportAsync_WithValidQfxFile_ThrowsNotImplementedException()
     {
         // Arrange
-        var qfxPath = "/path/to/file.qfx";
+        var fileRef = new FileRef { Id = "test", Filename = "transactions.qfx", ReadOnly = true };
+        using var stream = new MemoryStream();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.CanImportAsync(qfxPath));
+            _importer.CanImportAsync(fileRef, stream));
     }
 
     [Fact]
-    public async Task CanImportAsync_WithNonQfxPath_ThrowsNotImplementedException()
+    public async Task CanImportAsync_WithNonQfxFile_ThrowsNotImplementedException()
     {
         // Arrange
-        var txtPath = "/path/to/file.txt";
+        var fileRef = new FileRef { Id = "test", Filename = "document.txt", ReadOnly = true };
+        using var stream = new MemoryStream();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.CanImportAsync(txtPath));
+            _importer.CanImportAsync(fileRef, stream));
     }
 
     [Fact]
-    public async Task ImportAsync_WithNullPath_ThrowsNotImplementedException()
+    public async Task ImportAsync_WithNullFileRef_ThrowsNotImplementedException()
     {
         // Arrange
-        string? nullPath = null;
+        FileRef? nullFileRef = null;
+        using var stream = new MemoryStream();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(nullPath!));
+            _importer.ImportAsync(nullFileRef!, stream));
     }
 
     [Fact]
-    public async Task ImportAsync_WithEmptyPath_ThrowsNotImplementedException()
+    public async Task ImportAsync_WithNullStream_ThrowsNotImplementedException()
     {
         // Arrange
-        var emptyPath = string.Empty;
+        var fileRef = new FileRef { Id = "test", Filename = "test.qfx", ReadOnly = true };
+        Stream? nullStream = null;
 
         // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(emptyPath));
+            _importer.ImportAsync(fileRef, nullStream!));
     }
 
     [Fact]
-    public async Task ImportAsync_WithValidPath_ThrowsNotImplementedException()
+    public async Task ImportAsync_WithValidFile_ThrowsNotImplementedException()
     {
         // Arrange
-        var validPath = "/path/to/file.qfx";
+        var fileRef = new FileRef { Id = "test", Filename = "transactions.qfx", ReadOnly = true };
+        using var stream = new MemoryStream();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(validPath));
+            _importer.ImportAsync(fileRef, stream));
     }
 
     [Fact]
     public async Task ImportAsync_WithCancellationToken_ThrowsNotImplementedException()
     {
         // Arrange
-        var validPath = "/path/to/file.qfx";
+        var fileRef = new FileRef { Id = "test", Filename = "transactions.qfx", ReadOnly = true };
+        using var stream = new MemoryStream();
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
         // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(validPath, cancellationToken));
+            _importer.ImportAsync(fileRef, stream, cancellationToken));
     }
 
     [Fact]
     public async Task ImportAsync_WithCancelledToken_ThrowsNotImplementedException()
     {
         // Arrange
-        var validPath = "/path/to/file.qfx";
+        var fileRef = new FileRef { Id = "test", Filename = "transactions.qfx", ReadOnly = true };
+        using var stream = new MemoryStream();
         var cancellationTokenSource = new CancellationTokenSource();
         cancellationTokenSource.Cancel();
         var cancellationToken = cancellationTokenSource.Token;
 
         // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(validPath, cancellationToken));
+            _importer.ImportAsync(fileRef, stream, cancellationToken));
     }
 
     [Fact]
