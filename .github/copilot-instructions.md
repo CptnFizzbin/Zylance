@@ -118,6 +118,40 @@ public class RequestDto
 - Use nullable reference types (`string?`) to express nullability explicitly
 - Controllers should be stateless and rely on injected services
 
+### Comments and Documentation
+
+✅ **Comments should explain *why*, not *what*:**
+
+```typescript
+// Bad - explains what the code does
+// Loop through all files and process them
+for (const file of files) {
+  processFile(file);
+}
+
+// Good - explains why we're doing this
+// Process files sequentially to avoid overwhelming the file system
+for (const file of files) {
+  processFile(file);
+}
+
+// Better - use well-named functions to make code self-documenting
+async function processFilesSequentially(files: string[]) {
+  // Sequential processing prevents file system overload
+  for (const file of files) {
+    await processFile(file);
+  }
+}
+```
+
+**Why?** Code should be self-documenting through clear naming. Comments add value by explaining:
+- Business logic decisions
+- Performance considerations
+- Workarounds for bugs or limitations
+- Complex algorithms that aren't immediately obvious
+
+Use descriptive function and variable names to convey *what* the code does, reserving comments for *why* decisions were made.
+
 ## Technology Stack
 
 - **.NET 10.0** - Target framework
