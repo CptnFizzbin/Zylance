@@ -64,18 +64,13 @@ async function parseCommandLineArgs(): Promise<BuildOptions> {
   }
 
   if (!outputDir) {
-    console.error("Error: OutputDir is required");
-    console.error(
-      "Usage: vite-node Scripts/build.ts <path>"
+    throw new Error(
+      "OutputDir is required. Usage: vite-node Scripts/build.ts <path> or --output-dir <path>"
     );
-    console.error(
-      "   or: vite-node Scripts/build.ts --output-dir <path>"
-    );
-    process.exit(1);
   }
 
   return {
-    outputDir: resolve(outputDir as string),
+    outputDir: resolve(outputDir),
   };
 }
 
@@ -283,4 +278,7 @@ function buildProtocArgs(
 }
 
 // Entry point
-await main();
+await main().catch((error) => {
+  console.error(error.message || error);
+  process.exit(error.code || 1);
+});
