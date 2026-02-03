@@ -2,7 +2,7 @@ syntax = "proto3";
 package zylance.contract;
 
 import "zylance/extensions/Zylance.proto";
-import "zylance/models/vault.proto";
+import "zylance/models/Vault.proto";
 
 option csharp_namespace = "Zylance.Contract.Api.Vault";
 
