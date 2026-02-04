@@ -1,0 +1,203 @@
+# Copilot Setup Steps for Zylance Project
+#
+# This file provides automated setup instructions for GitHub Copilot to configure
+# the development environment for the Zylance finance and budgeting application.
+
+name: Zylance Development Environment Setup
+
+description: |
+  Zylance is an open-source finance and budgeting application built with clean architecture.
+  It features a desktop interface powered by Photino.NET with a React/TypeScript frontend,
+  communicating via Protocol Buffers over a custom transport layer.
+
+steps:
+  # Step 1: Prerequisites verification
+  - name: Verify Prerequisites
+    description: Check that required tools are available
+    commands:
+      - description: Check .NET SDK version (requires .NET 10.0)
+        command: dotnet --version
+        expect: 
+          regex: "^10\\.0\\.\\d+"
+          message: ".NET 10.0 SDK is required. Install from https://dotnet.microsoft.com/download"
+
+      - description: Check Node.js version (requires Node.js 24.x)
+        command: node --version
+        expect:
+          regex: "^v24\\."
+          message: "Node.js 24.x is required. Install from https://nodejs.org/ or use fnm/nvm"
+
+  # Step 2: Restore .NET dependencies
+  - name: Restore .NET Dependencies
+    description: Restore all .NET project dependencies
+    commands:
+      - description: Restore NuGet packages for the solution
+        command: dotnet restore
+        working_directory: .
+        expect:
+          exit_code: 0
+          message: "Failed to restore .NET dependencies"
+
+  # Step 3: Enable Yarn and install frontend dependencies
+  - name: Setup Yarn Package Manager
+    description: Enable Corepack and prepare Yarn for frontend development
+    commands:
+      - description: Enable Corepack for Yarn management
+        command: corepack enable
+        expect:
+          exit_code: 0
+          message: "Failed to enable Corepack"
+
+      - description: Install frontend dependencies with Yarn
+        command: yarn install
+        working_directory: Zylance.UI
+        expect:
+          exit_code: 0
+          message: "Failed to install frontend dependencies"
+
+  # Step 4: Build the Protocol Buffers contracts
+  - name: Build Protocol Buffers Contracts
+    description: Build the shared contract layer that defines the communication protocol
+    commands:
+      - description: Build Zylance.Contract project
+        command: dotnet build Zylance.Contract/Zylance.Contract.csproj --configuration Debug
+        expect:
+          exit_code: 0
+          message: "Failed to build Protocol Buffers contracts"
+
+  # Step 5: Build the entire solution
+  - name: Build Solution
+    description: Build all projects in the solution
+    commands:
+      - description: Build the complete solution in Debug configuration
+        command: dotnet build --no-restore
+        expect:
+          exit_code: 0
+          message: "Solution build failed. Check for compilation errors."
+
+  # Step 6: Run tests to verify setup
+  - name: Run Tests
+    description: Execute test suite to verify the development environment is working
+    commands:
+      - description: Run all .NET tests
+        command: dotnet test --no-build --verbosity normal
+        expect:
+          exit_code: 0
+          message: "Tests failed. The development environment may have issues."
+
+  # Step 7: Install code formatting tools
+  - name: Setup Code Formatting
+    description: Install and configure CSharpier for consistent code formatting
+    commands:
+      - description: Install CSharpier as a local tool
+        command: dotnet tool install csharpier
+        expect:
+          exit_code: 0
+          message: "Failed to install CSharpier. You can skip this step if already installed."
+        allow_failure: true
+
+      - description: Verify code formatting compliance
+        command: dotnet csharpier --check .
+        expect:
+          exit_code: 0
+          message: "Code formatting check failed. Run 'dotnet csharpier .' to fix formatting."
+        allow_failure: true
+
+# Project structure information
+project_info:
+  name: Zylance
+  type: desktop-application
+  languages:
+    - csharp
+    - typescript
+  frameworks:
+    - dotnet: "10.0"
+    - react: "19.x"
+    - vite: "7.x"
+  
+  # Key directories and their purposes
+  structure:
+    - path: Zylance.Core
+      description: Core business logic with controllers, services, and Gateway for message routing
+    
+    - path: Zylance.Desktop
+      description: Desktop application using Photino.NET for native windowing
+    
+    - path: Zylance.UI
+      description: React + TypeScript + Vite frontend application
+    
+    - path: Zylance.Contract
+      description: Protocol Buffers message contracts for type-safe communication
+    
+    - path: Zylance.Vault.Local
+      description: Local vault implementation using Entity Framework Core
+    
+    - path: Zylance.Vault.Remote
+      description: Remote vault implementation (future cloud sync)
+    
+    - path: Zylance.SourceGenerators
+      description: Roslyn source generators for automatic controller registration
+    
+    - path: Zylance.Core.Tests
+      description: Unit tests for core business logic
+    
+    - path: Zylance.Desktop.Tests
+      description: Tests for desktop application layer
+    
+    - path: Zylance.Vault.Local.Tests
+      description: Tests for local vault implementation
+    
+    - path: Zylance.Vault.Remote.Tests
+      description: Tests for remote vault implementation
+
+  # Development commands
+  commands:
+    build: "dotnet build"
+    test: "dotnet test --nologo --verbosity normal"
+    run_desktop: "dotnet run --project Zylance.Desktop/Zylance.Desktop.csproj"
+    run_ui_dev: "cd Zylance.UI && yarn start"
+    format_csharp: "dotnet csharpier ."
+    format_typescript: "cd Zylance.UI && yarn format"
+    lint_typescript: "cd Zylance.UI && yarn lint"
+    check_typescript: "cd Zylance.UI && yarn check"
+
+  # Common issues and solutions
+  troubleshooting:
+    - issue: "Build fails with 'NODE_HOME not set'"
+      solution: |
+        Set the NODE_HOME environment variable to your Node.js installation directory.
+        For FNM users on Windows: $env:NODE_HOME = "$env:APPDATA\fnm\node-versions\v24.5.0\installation"
+        For FNM users on Linux/macOS: export NODE_HOME="$HOME/.local/share/fnm/node-versions/v24.5.0/installation"
+    
+    - issue: "Yarn command not found"
+      solution: |
+        Enable Corepack with 'corepack enable' and then run 'corepack prepare yarn@stable --activate'
+    
+    - issue: "Tests fail to run"
+      solution: |
+        Ensure all dependencies are restored with 'dotnet restore' and the solution is built with 'dotnet build'
+
+# Additional configuration
+configuration:
+  # Editor settings
+  recommended_extensions:
+    vscode:
+      - "ms-dotnettools.csharp"
+      - "ms-dotnettools.csdevkit"
+      - "csharpier.csharpier-vscode"
+      - "dbaeumer.vscode-eslint"
+      - "esbenp.prettier-vscode"
+    
+    jetbrains_rider:
+      - "CSharpier plugin"
+  
+  # Code style
+  code_style:
+    csharp:
+      formatter: "CSharpier"
+      config_file: ".csharpierrc.json"
+    
+    typescript:
+      formatter: "Biome"
+      linter: "Biome"
+      config_file: "Zylance.UI/biome.json"
