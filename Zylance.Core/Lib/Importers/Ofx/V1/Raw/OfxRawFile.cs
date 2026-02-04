@@ -14,8 +14,6 @@ internal partial record OfxRawFile
 
         while (content.ReadLine() is { } line)
         {
-            line = line.Trim();
-            
             if (string.IsNullOrWhiteSpace(line) || CommentLineRegex().IsMatch(line))
                 continue;
 
