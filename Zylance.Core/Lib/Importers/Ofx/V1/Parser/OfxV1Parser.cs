@@ -1,4 +1,3 @@
-using Zylance.Core.Lib.Importers.Ofx.Elements;
 using Zylance.Core.Lib.Importers.Ofx.Models;
 using Zylance.Core.Lib.Importers.Ofx.V1.Raw;
 
@@ -15,21 +14,21 @@ public class OfxV1Parser
     /// </summary>
     /// <param name="content">StreamReader containing the OFX file content</param>
     /// <returns>List of OFX statements parsed from the file</returns>
-    public async Task<List<OfxStatement>> ParseAsync(StreamReader content)
+    public Task<List<OfxStatement>> ParseAsync(StreamReader content)
     {
         var rawFile = OfxRawFile.Parse(content);
         
         var statements = new List<OfxStatement>();
-        await ExtractStatementsAsync(rawFile.Root, statements);
+        ExtractStatements(rawFile.Root, statements);
         
-        return statements;
+        return Task.FromResult(statements);
     }
 
-    private async Task ExtractStatementsAsync(OfxRawElement element, List<OfxStatement> statements)
+    private void ExtractStatements(OfxRawElement element, List<OfxStatement> statements)
     {
         if (element.Name == "STMTTRNRS")
         {
-            var statement = await BuildStatementAsync(element);
+            var statement = BuildStatement(element);
             if (statement is not null)
             {
                 statements.Add(statement);
@@ -38,11 +37,11 @@ public class OfxV1Parser
 
         foreach (var child in element.Children)
         {
-            await ExtractStatementsAsync(child, statements);
+            ExtractStatements(child, statements);
         }
     }
 
-    private async Task<OfxStatement?> BuildStatementAsync(OfxRawElement stmtTrnRs)
+    private OfxStatement? BuildStatement(OfxRawElement stmtTrnRs)
     {
         var stmtRsElement = stmtTrnRs.Children.FirstOrDefault(c => c.Name == "STMTRS");
         if (stmtRsElement is null)
@@ -73,11 +72,10 @@ public class OfxV1Parser
         var bankTranListElement = stmtRsElement.Children.FirstOrDefault(c => c.Name == "BANKTRANLIST");
         if (bankTranListElement is not null)
         {
-            foreach (var stmtTrnElement in bankTranListElement.Children.Where(c => c.Name == "STMTTRN"))
-            {
-                var transaction = BuildTransaction(stmtTrnElement);
-                transactions.Add(transaction);
-            }
+            transactions = bankTranListElement.Children
+                .Where(c => c.Name == "STMTTRN")
+                .Select(BuildTransaction)
+                .ToList();
         }
 
         return new OfxStatement

@@ -9,12 +9,10 @@ public class OfxV1ParserTests
     public async Task ParseAsync_WithExampleQfx_ParsesStatement()
     {
         // Arrange
-        var filePath = Path.Combine("Importers", "Fixtures", "Ofx", "V1", "example.qfx");
         var parser = new OfxV1Parser();
 
         // Act
-        using var stream = File.OpenRead(filePath);
-        using var reader = new StreamReader(stream);
+        using var reader = ParserTestHelper.LoadFixture("example.qfx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -32,12 +30,10 @@ public class OfxV1ParserTests
     public async Task ParseAsync_WithExampleQfx_ParsesTransactions()
     {
         // Arrange
-        var filePath = Path.Combine("Importers", "Fixtures", "Ofx", "V1", "example.qfx");
         var parser = new OfxV1Parser();
 
         // Act
-        using var stream = File.OpenRead(filePath);
-        using var reader = new StreamReader(stream);
+        using var reader = ParserTestHelper.LoadFixture("example.qfx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -61,12 +57,10 @@ public class OfxV1ParserTests
     public async Task ParseAsync_WithExampleQfx_ParsesBalances()
     {
         // Arrange
-        var filePath = Path.Combine("Importers", "Fixtures", "Ofx", "V1", "example.qfx");
         var parser = new OfxV1Parser();
 
         // Act
-        using var stream = File.OpenRead(filePath);
-        using var reader = new StreamReader(stream);
+        using var reader = ParserTestHelper.LoadFixture("example.qfx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -85,12 +79,10 @@ public class OfxV1ParserTests
     public async Task ParseAsync_WithExampleOfx_ParsesCorrectly()
     {
         // Arrange
-        var filePath = Path.Combine("Importers", "Fixtures", "Ofx", "V1", "example.ofx");
         var parser = new OfxV1Parser();
 
         // Act
-        using var stream = File.OpenRead(filePath);
-        using var reader = new StreamReader(stream);
+        using var reader = ParserTestHelper.LoadFixture("example.ofx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert

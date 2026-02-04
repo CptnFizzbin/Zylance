@@ -23,7 +23,7 @@ internal partial record OfxRawFile
             }
             else if (OfxRawElement.IsStartLine(line))
             {
-                if (root != null)
+                if (root is not null)
                     throw new InvalidDataException("Multiple root elements found in OFX file.");
 
                 root = OfxRawElement.ParseElement(line, content);

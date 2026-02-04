@@ -59,7 +59,7 @@ public class OfxImporterTests
         var extensions = _importer.SupportedExtensions;
 
         // Assert
-        Assert.IsAssignableFrom<IReadOnlyList<string>>(extensions);
+        Assert.IsAssignableFrom<IReadOnlyList<(string, string[])>>(extensions);
     }
 
     [Fact]

@@ -17,10 +17,7 @@ NEWFILEUID:NONE
       </STATUS>
       <DTSERVER>20250115120000[0:GMT]
       <LANGUAGE>ENG
-      <FI>
-        <ORG>Example Bank
-        <INTU.BID>12345
-      </FI>
+      <INTU.BID>12345
     </SONRS>
   </SIGNONMSGSRSV1>
   <BANKMSGSRSV1>
