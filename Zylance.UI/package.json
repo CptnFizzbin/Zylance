@@ -24,7 +24,6 @@
     "@mui/icons-material": "^7.3.7",
     "@mui/material": "^7.3.7",
     "@t3-oss/env-core": "^0.13.10",
-    "@tailwindcss/vite": "^4.1.18",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/react-devtools": "^0.9.4",
     "@tanstack/react-form": "^1.28.0",

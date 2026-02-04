@@ -1,4 +1,3 @@
-import tailwindcss from "@tailwindcss/vite"
 import { devtools } from "@tanstack/devtools-vite"
 
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
@@ -22,7 +21,6 @@ export default defineConfig({
         plugins: ["babel-plugin-react-compiler"],
       },
     }),
-    tailwindcss(),
   ],
 
   root: ZYLANCE_UI_DIR,
