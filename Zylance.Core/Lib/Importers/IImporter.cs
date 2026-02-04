@@ -10,7 +10,7 @@ public interface IImporter
     /// <summary>
     ///     Gets the supported file extensions for this importer.
     /// </summary>
-    IReadOnlyList<string> SupportedExtensions { get; }
+    IReadOnlyList<(string Name, string[] Extensions)> SupportedExtensions { get; }
 
     /// <summary>
     ///     Imports transactions from the specified file.

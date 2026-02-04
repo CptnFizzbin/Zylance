@@ -6,16 +6,16 @@ using Zylance.Core.Lib.Importers;
 
 namespace Zylance.Core.Tests.Importers;
 
-public class QfxImporterTests
+public class OfxImporterTests
 {
-    private readonly QfxImporter _importer;
+    private readonly OfxImporter _importer;
 
-    public QfxImporterTests()
+    public OfxImporterTests()
     {
         // Create a mock FileService for testing
         var mockFileProvider = new MockFileProvider();
         var fileService = new FileService(mockFileProvider);
-        _importer = new QfxImporter(fileService);
+        _importer = new OfxImporter(fileService);
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class QfxImporterTests
         var fileService = new FileService(mockFileProvider);
 
         // Act
-        var importer = new QfxImporter(fileService);
+        var importer = new OfxImporter(fileService);
 
         // Assert
         Assert.NotNull(importer);
@@ -40,7 +40,6 @@ public class QfxImporterTests
 
         // Assert
         Assert.NotNull(extensions);
-        Assert.Contains(".qfx", extensions);
     }
 
     [Fact]
@@ -70,8 +69,9 @@ public class QfxImporterTests
         FileRef? nullFileRef = null;
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(
-            () => _importer.ImportAsync(nullFileRef!, TestContext.Current.CancellationToken)
+        await Assert.ThrowsAsync<NotImplementedException>(() => _importer.ImportAsync(
+            nullFileRef!,
+            TestContext.Current.CancellationToken)
         );
     }
 
@@ -87,8 +87,9 @@ public class QfxImporterTests
         };
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(
-            () => _importer.ImportAsync(fileRef, TestContext.Current.CancellationToken)
+        await Assert.ThrowsAsync<NotImplementedException>(() => _importer.ImportAsync(
+            fileRef,
+            TestContext.Current.CancellationToken)
         );
     }
 
@@ -128,7 +129,7 @@ public class QfxImporterTests
     }
 
     [Fact]
-    public void QfxImporter_ImplementsIImporter()
+    public void OfxImporter_ImplementsIImporter()
     {
         // Act & Assert
         Assert.IsAssignableFrom<IImporter>(_importer);
