@@ -28,6 +28,7 @@ Before building the project, ensure the following are installed and configured:
 - **Zylance.Contract** - Protocol Buffers message contracts for type-safe communication
 - **Zylance.Vault.Local** - Local vault implementation using Entity Framework Core
 - **Zylance.SourceGenerators** - Source generators for automatic controller registration
+- **Docs** - Project documentation including format specifications and design documents
 
 ### Key Patterns
 
