@@ -25,7 +25,7 @@ steps:
         command: node --version
         expect:
           regex: "^v24\\."
-          message: "Node.js 24.x is required. Install from https://nodejs.org/ or use fnm/nvm"
+          message: "Node.js 24.x is required. Install from https://nodejs.org/ or use fnm"
 
   # Step 2: Restore .NET dependencies
   - name: Restore .NET Dependencies
@@ -55,17 +55,7 @@ steps:
           exit_code: 0
           message: "Failed to install frontend dependencies"
 
-  # Step 4: Build the Protocol Buffers contracts
-  - name: Build Protocol Buffers Contracts
-    description: Build the shared contract layer that defines the communication protocol
-    commands:
-      - description: Build Zylance.Contract project
-        command: dotnet build Zylance.Contract/Zylance.Contract.csproj --configuration Debug
-        expect:
-          exit_code: 0
-          message: "Failed to build Protocol Buffers contracts"
-
-  # Step 5: Build the entire solution
+  # Step 4: Build the entire solution
   - name: Build Solution
     description: Build all projects in the solution
     commands:
@@ -75,7 +65,7 @@ steps:
           exit_code: 0
           message: "Solution build failed. Check for compilation errors."
 
-  # Step 6: Run tests to verify setup
+  # Step 5: Run tests to verify setup
   - name: Run Tests
     description: Execute test suite to verify the development environment is working
     commands:
@@ -85,7 +75,7 @@ steps:
           exit_code: 0
           message: "Tests failed. The development environment may have issues."
 
-  # Step 7: Install code formatting tools
+  # Step 6: Install code formatting tools
   - name: Setup Code Formatting
     description: Install and configure CSharpier for consistent code formatting
     commands:
@@ -166,8 +156,8 @@ project_info:
     - issue: "Build fails with 'NODE_HOME not set'"
       solution: |
         Set the NODE_HOME environment variable to your Node.js installation directory.
-        For FNM users on Windows: $env:NODE_HOME = "$env:APPDATA\fnm\node-versions\v24.5.0\installation"
-        For FNM users on Linux/macOS: export NODE_HOME="$HOME/.local/share/fnm/node-versions/v24.5.0/installation"
+        For FNM users on Windows: $env:NODE_HOME = "$env:APPDATA\fnm\node-versions\v24.13.0\installation"
+        For FNM users on Linux/macOS: export NODE_HOME="$HOME/.local/share/fnm/node-versions/v24.13.0/installation"
     
     - issue: "Yarn command not found"
       solution: |
