@@ -164,10 +164,4 @@ public class OfxV1Parser
             Type = balanceType,
         };
     }
-
-    public OfxFile Parse(StreamReader content)
-    {
-        var rawFile = OfxRawFile.Parse(content);
-        return OfxFile.FromRaw(rawFile);
-    }
 }
