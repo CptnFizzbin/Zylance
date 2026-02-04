@@ -10,15 +10,7 @@ internal static class DateTimeOffsetParser
         // OFX date-time format: YYYYMMDDHHMMSS.XXX[gmt offset:tz name] or YYYYMMDD (date only)
         // Example: 20220101123000.000[-5:EST] or 20220101
         // Time components must be complete (all 6 digits HHMMSS) or absent
-        var pattern = string.Join(
-            "",
-            @"(?'Year'\d{4})",
-            @"(?'Month'\d{2})",
-            @"(?'Day'\d{2})",
-            @"((?'Hour'\d{2})(?'Minute'\d{2})(?'Second'\d{2}))?", // Time is all-or-nothing
-            @"(\.(?'Fraction'\d+))?",
-            @"(\[(?'Offset'[-+]?\d+):.*\])?" // Allow optional sign for offset
-        );
+        var pattern = @"(?'Date'(?'Year'\d{4})(?'Month'\d{2})(?'Day'\d{2}))(?'Time'(?'Hour'\d{2})(?'Minute'\d{2})(?'Second'\d{2})(?:\.(?'Fraction'\d+))?(?:\[(?'Offset'(?:-|\+?)\d{1,2}(?:\.\d{1,2})?)(?::(?'Zone'[^\]]+))?\])?)?";
 
         return new Regex($"^{pattern}$");
     });

@@ -15,7 +15,7 @@ public static class ParserTestHelper
 
     /// <summary>
     /// Converts a string containing OFX content to a StreamReader.
-    /// Lines are automatically trimmed via extension methods during parsing.
+    /// Allows tests to provide indented or formatted OFX content; downstream extension methods trim lines so parsing stays consistent regardless of whitespace.
     /// </summary>
     public static StreamReader StringToStreamReader(string content)
     {
