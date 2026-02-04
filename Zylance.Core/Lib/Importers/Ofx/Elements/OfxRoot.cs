@@ -5,8 +5,8 @@ namespace Zylance.Core.Lib.Importers.Ofx.Elements;
 public record OfxRoot
 {
     public required OfxSignOnMessage SignOnMessage { get; init; }
-    public OfxBankMessage BankMessage { get; init; }
-    public OfxCreditCardMessage CreditCardMessage { get; init; }
+    public OfxBankMessage? BankMessage { get; init; }
+    public OfxCreditCardMessage? CreditCardMessage { get; init; }
 
     internal static OfxRoot FromRaw(OfxRawElement rawFileRoot)
     {

@@ -71,6 +71,7 @@ DATA:OFXSGML
         // Act
         using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
         var line = reader.ReadLine();
+        Assert.NotNull(line);
         var element = OfxRawElement.ParseElement(line, reader);
 
         // Assert
@@ -96,6 +97,7 @@ DATA:OFXSGML
         // Act
         using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
         var line = reader.ReadLine();
+        Assert.NotNull(line);
         var element = OfxRawElement.ParseElement(line, reader);
 
         // Assert
@@ -181,6 +183,7 @@ DATA:OFXSGML
 
         using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
         var line = reader.ReadLine();
+        Assert.NotNull(line);
         var element = OfxRawElement.ParseElement(line, reader);
 
         // Act
@@ -204,6 +207,7 @@ DATA:OFXSGML
 
         using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
         var line = reader.ReadLine();
+        Assert.NotNull(line);
         var element = OfxRawElement.ParseElement(line, reader);
 
         // Act & Assert

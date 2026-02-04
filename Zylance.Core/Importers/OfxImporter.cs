@@ -6,6 +6,9 @@ namespace Zylance.Core.Importers;
 
 public class OfxImporter(FileService fileService) : IImporter
 {
+    // FileService will be used when ImportAsync is implemented
+    private readonly FileService _fileService = fileService;
+
     public IReadOnlyList<(string Name, string[] Extensions)> SupportedExtensions { get; } =
         [("Open Financial Exchange", [".ofx"]), ("Quicken Financial Exchange", [".qfx"])];
 
