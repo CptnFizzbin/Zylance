@@ -160,8 +160,6 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "- ✅ Windows x64" >> $GITHUB_STEP_SUMMARY
             echo "- ✅ Linux x64" >> $GITHUB_STEP_SUMMARY
-            echo "- ✅ macOS x64" >> $GITHUB_STEP_SUMMARY
-            echo "- ✅ macOS ARM64" >> $GITHUB_STEP_SUMMARY
             echo "- ✅ Browser WASM" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ Some runtime builds failed (check individual jobs)" >> $GITHUB_STEP_SUMMARY
