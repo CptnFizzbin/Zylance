@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Zylance.Core.Lib.Importers.Ofx.Parser;
 
-internal class DateTimeOffsetParser
+internal static class DateTimeOffsetParser
 {
     // NOTE: Not using [GeneratedRegex] for this pattern due to its complexity
     private readonly static Lazy<Regex> DateTimeRegex = new(() =>
@@ -18,7 +18,7 @@ internal class DateTimeOffsetParser
             @"(?'Minute'\d{2})",
             @"(?'Second'\d{2})",
             @"(\.(?'Fraction'\d+))?",
-            @"(\[(?'Offset'[-+]\d+):.*\])?"
+            @"(\[(?'Offset'[-+]?\d+):.*\])?" // Allow optional sign for offset
         );
 
         return new Regex($"^{pattern}$");
