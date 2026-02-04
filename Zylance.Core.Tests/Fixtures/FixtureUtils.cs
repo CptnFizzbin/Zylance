@@ -5,11 +5,12 @@ namespace Zylance.Core.Tests.Fixtures;
 public static class FixtureUtils
 {
     /// <summary>
-    /// Loads an OFX fixture file from the Fixtures directory
+    /// Loads a fixture file from the Fixtures directory
     /// </summary>
-    public static StreamReader LoadFixture(string filename)
+    /// <param name="relativePath">Path relative to Fixtures/ directory (e.g., "Importers/Ofx/V1/example.ofx")</param>
+    public static StreamReader LoadFixture(string relativePath)
     {
-        var filePath = Path.Combine("Fixtures", "Importers", "Ofx", "V1", filename);
+        var filePath = Path.Combine("Fixtures", relativePath);
         return new StreamReader(File.OpenRead(filePath));
     }
 

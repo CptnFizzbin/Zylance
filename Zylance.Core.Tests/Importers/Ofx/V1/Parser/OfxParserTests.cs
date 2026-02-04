@@ -13,7 +13,7 @@ public class OfxV1ParserTests
         var parser = new OfxV1Parser();
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("example.qfx");
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.qfx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -34,7 +34,7 @@ public class OfxV1ParserTests
         var parser = new OfxV1Parser();
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("example.qfx");
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.qfx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -43,7 +43,7 @@ public class OfxV1ParserTests
 
         var firstTransaction = statement.Transactions[0];
         Assert.Equal("DEBIT", firstTransaction.Type);
-        Assert.Equal(new DateTimeOffset(2025, 1, 2, 12, 0, 0, TimeSpan.Zero), firstTransaction.DatePosted);
+        Assert.Equal("2025-01-02T12:00:00+00:00", firstTransaction.DatePosted.ToString("yyyy-MM-ddTHH:mm:sszzz"));
         Assert.Equal(-87.50m, firstTransaction.Amount);
         Assert.Equal("2025010201", firstTransaction.FitId);
         Assert.Equal("WHOLE FOODS MARKET #123", firstTransaction.Name);
@@ -61,7 +61,7 @@ public class OfxV1ParserTests
         var parser = new OfxV1Parser();
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("example.qfx");
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.qfx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -83,7 +83,7 @@ public class OfxV1ParserTests
         var parser = new OfxV1Parser();
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("example.ofx");
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.ofx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -112,7 +112,7 @@ public class OfxV1ParserTests
         var parser = new OfxV1Parser();
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("transfer.ofx");
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/transfer.ofx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert

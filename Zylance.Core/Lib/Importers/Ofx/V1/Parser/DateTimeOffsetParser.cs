@@ -7,9 +7,8 @@ internal static class DateTimeOffsetParser
     // NOTE: Not using [GeneratedRegex] for this pattern due to its complexity
     private readonly static Lazy<Regex> DateTimeRegex = new(() =>
     {
-        // OFX date-time format: YYYYMMDDHHMMSS.XXX[gmt offset:tz name] or YYYYMMDD (date only)
+        // OFX date-time format: YYYYMMDDHHMMSS.XXX[offset:tz] or YYYYMMDD (date only)
         // Example: 20220101123000.000[-5:EST] or 20220101
-        // Time components must be complete (all 6 digits HHMMSS) or absent
         
         // Build regex pattern from smaller, readable components
         var year = @"(?'Year'\d{4})";

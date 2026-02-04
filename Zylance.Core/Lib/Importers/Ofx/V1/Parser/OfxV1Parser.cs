@@ -8,6 +8,37 @@ namespace Zylance.Core.Lib.Importers.Ofx.V1.Parser;
 /// </summary>
 public class OfxV1Parser
 {
+    private static class TagNames
+    {
+        public const string StatementTransactionResponse = "STMTTRNRS";
+        public const string CreditCardStatementTransactionResponse = "CCSTMTTRNRS";
+        public const string StatementResponse = "STMTRS";
+        public const string CreditCardStatementResponse = "CCSTMTRS";
+        public const string BankAccountFrom = "BANKACCTFROM";
+        public const string CreditCardAccountFrom = "CCACCTFROM";
+        public const string LedgerBalance = "LEDGERBAL";
+        public const string AvailableBalance = "AVAILBAL";
+        public const string BankTransactionList = "BANKTRANLIST";
+        public const string CreditCardTransactionList = "CCSTMTTRN";
+        public const string StatementTransaction = "STMTTRN";
+        public const string CurrencyDefinition = "CURDEF";
+        public const string BankId = "BANKID";
+        public const string AccountId = "ACCTID";
+        public const string AccountType = "ACCTTYPE";
+        public const string BalanceAmount = "BALAMT";
+        public const string DateAsOf = "DTASOF";
+        public const string DateStart = "DTSTART";
+        public const string DateEnd = "DTEND";
+        public const string TransactionType = "TRNTYPE";
+        public const string DatePosted = "DTPOSTED";
+        public const string TransactionAmount = "TRNAMT";
+        public const string FitId = "FITID";
+        public const string Name = "NAME";
+        public const string Memo = "MEMO";
+        public const string CheckNumber = "CHECKNUM";
+        public const string ReferenceNumber = "REFNUM";
+    }
+
     /// <summary>
     /// Parses an OFX V1 file and returns a list of statements.
     /// Each statement contains an account, balance information, and transactions.
@@ -17,18 +48,25 @@ public class OfxV1Parser
     public Task<List<OfxStatement>> ParseAsync(StreamReader content)
     {
         var rawFile = OfxRawFile.Parse(content);
-        
-        var statements = new List<OfxStatement>();
-        ExtractStatements(rawFile.Root, statements);
-        
+        var statements = ExtractStatements(rawFile.Root);
         return Task.FromResult(statements);
     }
 
-    private void ExtractStatements(OfxRawElement element, List<OfxStatement> statements)
+    private List<OfxStatement> ExtractStatements(OfxRawElement element)
     {
-        if (element.Name == "STMTTRNRS")
+        var statements = new List<OfxStatement>();
+
+        if (element.Name == TagNames.StatementTransactionResponse)
         {
             var statement = BuildStatement(element);
+            if (statement is not null)
+            {
+                statements.Add(statement);
+            }
+        }
+        else if (element.Name == TagNames.CreditCardStatementTransactionResponse)
+        {
+            var statement = BuildCreditCardStatement(element);
             if (statement is not null)
             {
                 statements.Add(statement);
@@ -37,61 +75,36 @@ public class OfxV1Parser
 
         foreach (var child in element.Children)
         {
-            ExtractStatements(child, statements);
+            statements.AddRange(ExtractStatements(child));
         }
+
+        return statements;
     }
 
-    private OfxStatement? BuildStatement(OfxRawElement stmtTrnRs)
+    private OfxStatement? BuildStatement(OfxRawElement statementTransactionResponse)
     {
-        var stmtRsElement = stmtTrnRs.Children.FirstOrDefault(c => c.Name == "STMTRS");
-        if (stmtRsElement is null)
+        var statementResponseElement = statementTransactionResponse.Children.FirstOrDefault(c =>
+            c.Name == TagNames.StatementResponse
+        );
+        if (statementResponseElement is null)
             return null;
 
-        var currency = stmtRsElement.Tokens.TryGetValue("CURDEF", out var curToken)
-            ? curToken.Value
-            : null;
+        var currency = GetCurrency(statementResponseElement);
 
-        var bankAcctFromElement = stmtRsElement.Children.FirstOrDefault(c => c.Name == "BANKACCTFROM");
-        if (bankAcctFromElement is null)
+        var bankAccountFromElement = statementResponseElement.Children.FirstOrDefault(c =>
+            c.Name == TagNames.BankAccountFrom
+        );
+        if (bankAccountFromElement is null)
             return null;
 
-        var account = BuildBankAccount(bankAcctFromElement, currency);
+        var account = BuildBankAccount(bankAccountFromElement, currency, "BANK");
 
-        var ledgerBalElement = stmtRsElement.Children.FirstOrDefault(c => c.Name == "LEDGERBAL");
-        if (ledgerBalElement is null)
-            return null;
+        var (ledgerBalance, availableBalance) = GetBalances(statementResponseElement);
 
-        var ledgerBalance = BuildBalance(ledgerBalElement, "LEDGER");
-
-        var availBalElement = stmtRsElement.Children.FirstOrDefault(c => c.Name == "AVAILBAL");
-        var availableBalance = availBalElement is not null
-            ? BuildBalance(availBalElement, "AVAIL")
-            : null;
-
-        var transactions = new List<OfxTransaction>();
-        DateTimeOffset? dateStart = null;
-        DateTimeOffset? dateEnd = null;
-        var bankTranListElement = stmtRsElement.Children.FirstOrDefault(c => c.Name == "BANKTRANLIST");
-        if (bankTranListElement is not null)
-        {
-            transactions = bankTranListElement.Children
-                .Where(c => c.Name == "STMTTRN")
-                .Select(BuildTransaction)
-                .ToList();
-            
-            // Extract statement period dates
-            if (bankTranListElement.Tokens.TryGetValue("DTSTART", out var dtStartToken) &&
-                DateTimeOffsetParser.TryParse(dtStartToken.Value, out var start))
-            {
-                dateStart = start;
-            }
-            
-            if (bankTranListElement.Tokens.TryGetValue("DTEND", out var dtEndToken) &&
-                DateTimeOffsetParser.TryParse(dtEndToken.Value, out var end))
-            {
-                dateEnd = end;
-            }
-        }
+        var (transactions, dateStart, dateEnd) = GetTransactions(
+            statementResponseElement,
+            TagNames.BankTransactionList
+        );
 
         return new OfxStatement
         {
@@ -104,47 +117,145 @@ public class OfxV1Parser
         };
     }
 
-    private OfxBankAccount BuildBankAccount(OfxRawElement element, string? currency)
+    private OfxStatement? BuildCreditCardStatement(OfxRawElement creditCardStatementTransactionResponse)
     {
-        var bankId = element.Tokens.TryGetValue("BANKID", out var bankIdToken)
-            ? bankIdToken.Value
-            : throw new InvalidDataException("Missing BANKID in BANKACCTFROM");
+        var creditCardStatementResponseElement = creditCardStatementTransactionResponse.Children.FirstOrDefault(c =>
+            c.Name == TagNames.CreditCardStatementResponse
+        );
+        if (creditCardStatementResponseElement is null)
+            return null;
 
-        var accountId = element.Tokens.TryGetValue("ACCTID", out var acctIdToken)
-            ? acctIdToken.Value
-            : throw new InvalidDataException("Missing ACCTID in BANKACCTFROM");
+        var currency = GetCurrency(creditCardStatementResponseElement);
 
-        var accountType = element.Tokens.TryGetValue("ACCTTYPE", out var acctTypeToken)
-            ? acctTypeToken.Value
-            : throw new InvalidDataException("Missing ACCTTYPE in BANKACCTFROM");
+        var creditCardAccountFromElement = creditCardStatementResponseElement.Children.FirstOrDefault(c =>
+            c.Name == TagNames.CreditCardAccountFrom
+        );
+        if (creditCardAccountFromElement is null)
+            return null;
+
+        var account = BuildBankAccount(creditCardAccountFromElement, currency, "CREDITCARD");
+
+        var (ledgerBalance, availableBalance) = GetBalances(creditCardStatementResponseElement);
+
+        var (transactions, dateStart, dateEnd) = GetTransactions(
+            creditCardStatementResponseElement,
+            TagNames.BankTransactionList
+        );
+
+        return new OfxStatement
+        {
+            Account = account,
+            LedgerBalance = ledgerBalance,
+            AvailableBalance = availableBalance,
+            Transactions = transactions,
+            DateStart = dateStart,
+            DateEnd = dateEnd,
+        };
+    }
+
+    private string? GetCurrency(OfxRawElement element)
+    {
+        return element.Tokens.TryGetValue(TagNames.CurrencyDefinition, out var currencyToken)
+            ? currencyToken.Value
+            : null;
+    }
+
+    private (OfxBalance ledger, OfxBalance? available) GetBalances(OfxRawElement element)
+    {
+        var ledgerBalanceElement = element.Children.FirstOrDefault(c => c.Name == TagNames.LedgerBalance);
+        if (ledgerBalanceElement is null)
+            throw new InvalidDataException("Missing LEDGERBAL element");
+
+        var ledgerBalance = BuildBalance(ledgerBalanceElement, "LEDGER");
+
+        var availableBalanceElement = element.Children.FirstOrDefault(c => c.Name == TagNames.AvailableBalance);
+        var availableBalance = availableBalanceElement is not null
+            ? BuildBalance(availableBalanceElement, "AVAIL")
+            : null;
+
+        return (ledgerBalance, availableBalance);
+    }
+
+    private (List<OfxTransaction> transactions, DateTimeOffset? start, DateTimeOffset? end) GetTransactions(
+        OfxRawElement element,
+        string transactionListTagName
+    )
+    {
+        var transactions = new List<OfxTransaction>();
+        DateTimeOffset? dateStart = null;
+        DateTimeOffset? dateEnd = null;
+
+        var bankTransactionListElement = element.Children.FirstOrDefault(c => c.Name == transactionListTagName);
+        if (bankTransactionListElement is not null)
+        {
+            transactions = bankTransactionListElement
+                .Children.Where(c => c.Name == TagNames.StatementTransaction)
+                .Select(BuildTransaction)
+                .ToList();
+
+            if (
+                bankTransactionListElement.Tokens.TryGetValue(TagNames.DateStart, out var dateStartToken)
+                && DateTimeOffsetParser.TryParse(dateStartToken.Value, out var start)
+            )
+            {
+                dateStart = start;
+            }
+
+            if (
+                bankTransactionListElement.Tokens.TryGetValue(TagNames.DateEnd, out var dateEndToken)
+                && DateTimeOffsetParser.TryParse(dateEndToken.Value, out var end)
+            )
+            {
+                dateEnd = end;
+            }
+        }
+
+        return (transactions, dateStart, dateEnd);
+    }
+
+    private OfxBankAccount BuildBankAccount(OfxRawElement element, string? currency, string accountType)
+    {
+        var bankId = element.Tokens.TryGetValue(TagNames.BankId, out var bankIdToken) 
+            ? bankIdToken.Value 
+            : throw new InvalidDataException("Missing BANKID in account element");
+
+        var accountId = element.Tokens.TryGetValue(TagNames.AccountId, out var accountIdToken)
+            ? accountIdToken.Value
+            : throw new InvalidDataException("Missing ACCTID in account element");
+
+        var accountTypeValue = element.Tokens.TryGetValue(TagNames.AccountType, out var accountTypeToken)
+            ? accountTypeToken.Value
+            : throw new InvalidDataException("Missing ACCTTYPE in account element");
 
         return new OfxBankAccount
         {
             BankId = bankId,
             AccountId = accountId,
-            AccountType = accountType,
+            AccountType = accountTypeValue,
             Currency = currency,
-            // Currently hardcoded to "BANK" since V1 parser only handles STMTTRNRS (bank statements)
-            // When credit card support is added (CCSTMTTRNRS), this will need to be set based on context
-            Type = "BANK",
+            Type = accountType,
         };
     }
 
     private OfxTransaction BuildTransaction(OfxRawElement element)
     {
-        var type = element.Tokens.TryGetValue("TRNTYPE", out var typeToken)
+        var type = element.Tokens.TryGetValue(TagNames.TransactionType, out var typeToken)
             ? typeToken.Value
             : throw new InvalidDataException("Missing TRNTYPE in STMTTRN");
 
-        var datePosted = element.Tokens.TryGetValue("DTPOSTED", out var dtPostedToken) && dtPostedToken.DateTimeValue.HasValue
-            ? dtPostedToken.DateTimeValue.Value
-            : throw new InvalidDataException("Missing or invalid DTPOSTED in STMTTRN");
+        var datePosted =
+            element.Tokens.TryGetValue(TagNames.DatePosted, out var datePostedToken)
+            && datePostedToken.DateTimeValue.HasValue
+                ? datePostedToken.DateTimeValue.Value
+                : throw new InvalidDataException("Missing or invalid DTPOSTED in STMTTRN");
 
-        var amount = element.Tokens.TryGetValue("TRNAMT", out var amtToken) && amtToken.DecimalValue.HasValue
-            ? amtToken.DecimalValue.Value
-            : throw new InvalidDataException("Missing or invalid TRNAMT in STMTTRN");
+        var amount =
+            element.Tokens.TryGetValue(TagNames.TransactionAmount, out var amountToken)
+            && amountToken.DecimalValue.HasValue
+                ? amountToken.DecimalValue.Value
+                : throw new InvalidDataException("Missing or invalid TRNAMT in STMTTRN");
 
-        var fitId = element.Tokens.TryGetValue("FITID", out var fitIdToken)
+        var fitId = element.Tokens.TryGetValue(TagNames.FitId, out var fitIdToken)
             ? fitIdToken.Value
             : throw new InvalidDataException("Missing FITID in STMTTRN");
 
@@ -156,23 +267,29 @@ public class OfxV1Parser
             DatePosted = datePosted,
             Amount = amount,
             FitId = fitId,
-            Name = element.Tokens.TryGetValue("NAME", out var nameToken) ? nameToken.Value : null,
-            Memo = element.Tokens.TryGetValue("MEMO", out var memoToken) ? memoToken.Value : null,
-            CheckNumber = element.Tokens.TryGetValue("CHECKNUM", out var checkToken) ? checkToken.Value : null,
-            ReferenceNumber = element.Tokens.TryGetValue("REFNUM", out var refToken) ? refToken.Value : null,
+            Name = element.Tokens.TryGetValue(TagNames.Name, out var nameToken) ? nameToken.Value : null,
+            Memo = element.Tokens.TryGetValue(TagNames.Memo, out var memoToken) ? memoToken.Value : null,
+            CheckNumber = element.Tokens.TryGetValue(TagNames.CheckNumber, out var checkToken)
+                ? checkToken.Value
+                : null,
+            ReferenceNumber = element.Tokens.TryGetValue(TagNames.ReferenceNumber, out var refToken)
+                ? refToken.Value
+                : null,
             IsTransfer = isTransfer,
         };
     }
 
     private OfxBalance BuildBalance(OfxRawElement element, string balanceType)
     {
-        var amount = element.Tokens.TryGetValue("BALAMT", out var amtToken) && amtToken.DecimalValue.HasValue
-            ? amtToken.DecimalValue.Value
-            : throw new InvalidDataException($"Missing or invalid BALAMT in {balanceType}BAL");
+        var amount =
+            element.Tokens.TryGetValue(TagNames.BalanceAmount, out var amountToken) && amountToken.DecimalValue.HasValue
+                ? amountToken.DecimalValue.Value
+                : throw new InvalidDataException($"Missing or invalid BALAMT in {balanceType}BAL");
 
-        var asOfDate = element.Tokens.TryGetValue("DTASOF", out var dtAsOfToken) && dtAsOfToken.DateTimeValue.HasValue
-            ? dtAsOfToken.DateTimeValue.Value
-            : throw new InvalidDataException($"Missing or invalid DTASOF in {balanceType}BAL");
+        var asOfDate =
+            element.Tokens.TryGetValue(TagNames.DateAsOf, out var dateAsOfToken) && dateAsOfToken.DateTimeValue.HasValue
+                ? dateAsOfToken.DateTimeValue.Value
+                : throw new InvalidDataException($"Missing or invalid DTASOF in {balanceType}BAL");
 
         return new OfxBalance
         {

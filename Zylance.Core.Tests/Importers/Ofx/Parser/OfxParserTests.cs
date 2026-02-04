@@ -12,7 +12,7 @@ public class OfxParserTests
         var parser = new OfxParser();
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("example.ofx");
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.ofx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -32,7 +32,7 @@ public class OfxParserTests
         var parser = new OfxParser();
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("example.qfx");
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.qfx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -52,7 +52,7 @@ public class OfxParserTests
         var parser = new OfxParser();
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("transfer.ofx");
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/transfer.ofx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -68,7 +68,7 @@ public class OfxParserTests
         var parser = new OfxParser();
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("example.qfx");
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.qfx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -83,7 +83,7 @@ public class OfxParserTests
         var parser = new OfxParser();
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("example.qfx");
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.qfx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
