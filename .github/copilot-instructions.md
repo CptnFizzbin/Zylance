@@ -150,6 +150,34 @@ private readonly static Lazy<Regex> DateTimeRegex = new(() =>
 - Complex patterns benefit from builder pattern for maintainability
 - Add a comment explaining why you're using `Lazy<Regex>` instead of `[GeneratedRegex]`
 
+### Naming Conventions
+
+✅ **Use full, descriptive variable names - do NOT shorten:**
+
+```csharp
+// Good
+var statementTransactionResponse = element.GetChild("STMTTRNRS");
+var bankAccountFromElement = element.GetChild("BANKACCTFROM");
+var datePostedToken = element.Tokens["DTPOSTED"];
+
+// Avoid - shortened names
+var stmtTrnRs = element.GetChild("STMTTRNRS");
+var bankAcctFromElem = element.GetChild("BANKACCTFROM");
+var dtPostedTok = element.Tokens["DTPOSTED"];
+```
+
+**Why?** Full names improve readability and make code self-documenting. Modern IDEs handle autocomplete, so verbosity is not a burden.
+
+### Code Formatting
+
+✅ **Always run CSharpier before committing:**
+
+```bash
+dotnet csharpier .
+```
+
+**Why?** Consistent formatting across the codebase improves readability and reduces diff noise. The CI pipeline will fail if code is not properly formatted.
+
 ### Additional Guidelines
 
 - Use `required` keyword for mandatory properties on records/classes

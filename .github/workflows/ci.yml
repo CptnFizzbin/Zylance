@@ -36,6 +36,9 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+      - name: Check code formatting (CSharpier)
+        run: dotnet csharpier --check .
+
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
