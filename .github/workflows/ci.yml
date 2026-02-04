@@ -3,8 +3,7 @@ name: CI
 on:
   push:
     branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop, 'copilot/*' ]
+  pull_request:  # Run on all PRs regardless of target branch
   workflow_dispatch:
 
 jobs:
