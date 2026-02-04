@@ -134,17 +134,12 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
 
         // Apply text search to payee and memo fields
         if (!string.IsNullOrWhiteSpace(searchText))
-            query = query.Where(e =>
-                EF.Functions.Like(e.Payee, $"%{searchText}%") || EF.Functions.Like(e.Memo, $"%{searchText}%")
-            );
+            query = query.Where(e => e.Payee.Contains(searchText) || e.Memo.Contains(searchText));
 
         query = query.OrderByDescending(e => e.Timestamp).ThenByDescending(e => e.Id);
 
         // Get total count before pagination
         var totalCount = await query.CountAsync();
-
-        // Order by timestamp descending (most recent first), then by ID for stability
-        query = query.OrderByDescending(e => e.Timestamp).ThenByDescending(e => e.Id);
 
         var pageSize =
             filter is not null && filter.PageSize > 0

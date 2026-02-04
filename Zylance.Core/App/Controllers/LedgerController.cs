@@ -60,7 +60,7 @@ public class LedgerController(VaultContext vaultContext)
         var data = req.GetData();
         var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
-        if (!Guid.TryParse(data.Id, out var entryId))
+        if (!Guid.TryParse(data.Id, out _))
             throw new ArgumentException($"Invalid ledger entry ID format: {data.Id}");
 
         // Ensure the entry ID matches the request ID

@@ -9,14 +9,13 @@ namespace Zylance.Core.Tests.Importers;
 public class QfxImporterTests
 {
     private readonly QfxImporter _importer;
-    private readonly FileService _fileService;
 
     public QfxImporterTests()
     {
         // Create a mock FileService for testing
         var mockFileProvider = new MockFileProvider();
-        _fileService = new FileService(mockFileProvider);
-        _importer = new QfxImporter(_fileService);
+        var fileService = new FileService(mockFileProvider);
+        _importer = new QfxImporter(fileService);
     }
 
     [Fact]
@@ -71,46 +70,61 @@ public class QfxImporterTests
         FileRef? nullFileRef = null;
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(nullFileRef!));
+        await Assert.ThrowsAsync<NotImplementedException>(
+            () => _importer.ImportAsync(nullFileRef!, TestContext.Current.CancellationToken)
+        );
     }
 
     [Fact]
     public async Task ImportAsync_WithValidFile_ThrowsNotImplementedException()
     {
         // Arrange
-        var fileRef = new FileRef { Id = "test", Filename = "transactions.qfx", ReadOnly = true };
+        var fileRef = new FileRef
+        {
+            Id = "test",
+            Filename = "transactions.qfx",
+            ReadOnly = true,
+        };
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(fileRef));
+        await Assert.ThrowsAsync<NotImplementedException>(
+            () => _importer.ImportAsync(fileRef, TestContext.Current.CancellationToken)
+        );
     }
 
     [Fact]
     public async Task ImportAsync_WithCancellationToken_ThrowsNotImplementedException()
     {
         // Arrange
-        var fileRef = new FileRef { Id = "test", Filename = "transactions.qfx", ReadOnly = true };
+        var fileRef = new FileRef
+        {
+            Id = "test",
+            Filename = "transactions.qfx",
+            ReadOnly = true,
+        };
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(fileRef, cancellationToken));
+        await Assert.ThrowsAsync<NotImplementedException>(() => _importer.ImportAsync(fileRef, cancellationToken));
     }
 
     [Fact]
     public async Task ImportAsync_WithCancelledToken_ThrowsNotImplementedException()
     {
         // Arrange
-        var fileRef = new FileRef { Id = "test", Filename = "transactions.qfx", ReadOnly = true };
+        var fileRef = new FileRef
+        {
+            Id = "test",
+            Filename = "transactions.qfx",
+            ReadOnly = true,
+        };
         var cancellationTokenSource = new CancellationTokenSource();
         cancellationTokenSource.Cancel();
         var cancellationToken = cancellationTokenSource.Token;
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(() => 
-            _importer.ImportAsync(fileRef, cancellationToken));
+        await Assert.ThrowsAsync<NotImplementedException>(() => _importer.ImportAsync(fileRef, cancellationToken));
     }
 
     [Fact]
@@ -124,31 +138,86 @@ public class QfxImporterTests
 // Mock FileProvider for testing
 internal class MockFileProvider : IFileProvider
 {
-    public bool Exists(string path) => true;
+    public bool Exists(string path)
+    {
+        return true;
+    }
 
-    public Task<FileRef> SelectFile(string? title = null, (string Name, string[] Extensions)[]? filters = null, bool readOnly = true)
-        => Task.FromResult(new FileRef { Id = "mock", Filename = "mock.qfx", ReadOnly = readOnly });
+    public Task<FileRef> SelectFile(
+        string? title = null,
+        (string Name, string[] Extensions)[]? filters = null,
+        bool readOnly = true
+    )
+    {
+        return Task.FromResult(
+            new FileRef
+            {
+                Id = "mock",
+                Filename = "mock.qfx",
+                ReadOnly = readOnly,
+            }
+        );
+    }
 
-    public Task<FileRef> CreateFile(string? title = null, string? defaultPath = null, (string Name, string[] Extensions)[]? filters = null)
-        => Task.FromResult(new FileRef { Id = "mock", Filename = "mock.qfx", ReadOnly = false });
+    public Task<FileRef> CreateFile(
+        string? title = null,
+        string? defaultPath = null,
+        (string Name, string[] Extensions)[]? filters = null
+    )
+    {
+        return Task.FromResult(
+            new FileRef
+            {
+                Id = "mock",
+                Filename = "mock.qfx",
+                ReadOnly = false,
+            }
+        );
+    }
 
     public Task<Stream> OpenFile(FileRef fileRef)
-        => Task.FromResult<Stream>(new MemoryStream());
+    {
+        return Task.FromResult<Stream>(new MemoryStream());
+    }
 
     public Task TouchFile(FileRef fileRef)
-        => Task.CompletedTask;
+    {
+        return Task.CompletedTask;
+    }
 
     public Task SaveFile(FileRef fileRef, Stream content)
-        => Task.CompletedTask;
+    {
+        return Task.CompletedTask;
+    }
 
     public Task DeleteFile(FileRef fileRef)
-        => Task.CompletedTask;
+    {
+        return Task.CompletedTask;
+    }
 
     public Task<FileRef> GetTempFile(string path)
-        => Task.FromResult(new FileRef { Id = "temp", Filename = path, ReadOnly = false });
+    {
+        return Task.FromResult(
+            new FileRef
+            {
+                Id = "temp",
+                Filename = path,
+                ReadOnly = false,
+            }
+        );
+    }
 
     public Task<FileRef> GetAppDataFile(string path)
-        => Task.FromResult(new FileRef { Id = "appdata", Filename = path, ReadOnly = false });
+    {
+        return Task.FromResult(
+            new FileRef
+            {
+                Id = "appdata",
+                Filename = path,
+                ReadOnly = false,
+            }
+        );
+    }
 }
 
 public class ImportResultTests
@@ -157,10 +226,7 @@ public class ImportResultTests
     public void ImportResult_CanBeCreated_WithRequiredProperties()
     {
         // Arrange & Act
-        var result = new ImportResult
-        {
-            Success = true
-        };
+        var result = new ImportResult { Success = true };
 
         // Assert
         Assert.NotNull(result);
@@ -191,11 +257,7 @@ public class ImportResultTests
     public void ImportResult_ErrorMessage_CanBeNull()
     {
         // Arrange & Act
-        var result = new ImportResult 
-        { 
-            Success = true, 
-            ErrorMessage = null 
-        };
+        var result = new ImportResult { Success = true, ErrorMessage = null };
 
         // Assert
         Assert.Null(result.ErrorMessage);
@@ -208,11 +270,7 @@ public class ImportResultTests
         var errorMessage = "Test error message";
 
         // Act
-        var result = new ImportResult 
-        { 
-            Success = false, 
-            ErrorMessage = errorMessage 
-        };
+        var result = new ImportResult { Success = false, ErrorMessage = errorMessage };
 
         // Assert
         Assert.Equal(errorMessage, result.ErrorMessage);
@@ -235,11 +293,7 @@ public class ImportResultTests
         var count = 42;
 
         // Act
-        var result = new ImportResult 
-        { 
-            Success = true, 
-            TransactionCount = count 
-        };
+        var result = new ImportResult { Success = true, TransactionCount = count };
 
         // Assert
         Assert.Equal(count, result.TransactionCount);
@@ -249,11 +303,7 @@ public class ImportResultTests
     public void ImportResult_Warnings_CanBeNull()
     {
         // Arrange & Act
-        var result = new ImportResult 
-        { 
-            Success = true, 
-            Warnings = null 
-        };
+        var result = new ImportResult { Success = true, Warnings = null };
 
         // Assert
         Assert.Null(result.Warnings);
@@ -263,11 +313,7 @@ public class ImportResultTests
     public void ImportResult_Warnings_CanBeEmpty()
     {
         // Arrange & Act
-        var result = new ImportResult 
-        { 
-            Success = true, 
-            Warnings = Array.Empty<string>() 
-        };
+        var result = new ImportResult { Success = true, Warnings = Array.Empty<string>() };
 
         // Assert
         Assert.NotNull(result.Warnings);
@@ -281,11 +327,7 @@ public class ImportResultTests
         var warnings = new[] { "Warning 1", "Warning 2", "Warning 3" };
 
         // Act
-        var result = new ImportResult 
-        { 
-            Success = true, 
-            Warnings = warnings 
-        };
+        var result = new ImportResult { Success = true, Warnings = warnings };
 
         // Assert
         Assert.NotNull(result.Warnings);
@@ -302,11 +344,7 @@ public class ImportResultTests
         var warnings = new[] { "Warning 1" };
 
         // Act
-        var result = new ImportResult 
-        { 
-            Success = true, 
-            Warnings = warnings 
-        };
+        var result = new ImportResult { Success = true, Warnings = warnings };
 
         // Assert
         Assert.IsAssignableFrom<IReadOnlyList<string>>(result.Warnings);
@@ -321,7 +359,7 @@ public class ImportResultTests
             Success = true,
             TransactionCount = 10,
             ErrorMessage = null,
-            Warnings = null
+            Warnings = null,
         };
 
         // Assert
@@ -343,7 +381,7 @@ public class ImportResultTests
             Success = false,
             TransactionCount = 0,
             ErrorMessage = errorMsg,
-            Warnings = null
+            Warnings = null,
         };
 
         // Assert
@@ -365,7 +403,7 @@ public class ImportResultTests
             Success = true,
             TransactionCount = 5,
             ErrorMessage = null,
-            Warnings = warnings
+            Warnings = warnings,
         };
 
         // Assert
@@ -384,14 +422,14 @@ public class ImportResultTests
         {
             Success = true,
             TransactionCount = 5,
-            ErrorMessage = "Test"
+            ErrorMessage = "Test",
         };
 
         var result2 = new ImportResult
         {
             Success = true,
             TransactionCount = 5,
-            ErrorMessage = "Test"
+            ErrorMessage = "Test",
         };
 
         // Act & Assert
@@ -402,17 +440,9 @@ public class ImportResultTests
     public void ImportResult_IsRecord_DifferentValuesNotEqual()
     {
         // Arrange
-        var result1 = new ImportResult
-        {
-            Success = true,
-            TransactionCount = 5
-        };
+        var result1 = new ImportResult { Success = true, TransactionCount = 5 };
 
-        var result2 = new ImportResult
-        {
-            Success = true,
-            TransactionCount = 10
-        };
+        var result2 = new ImportResult { Success = true, TransactionCount = 10 };
 
         // Act & Assert
         Assert.NotEqual(result1, result2);
