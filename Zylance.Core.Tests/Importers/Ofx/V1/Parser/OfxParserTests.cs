@@ -1,3 +1,4 @@
+using Zylance.Core.Lib.Extensions;
 using Zylance.Core.Lib.Importers.Ofx.Models;
 using Zylance.Core.Lib.Importers.Ofx.V1.Parser;
 using Zylance.Core.Tests.Fixtures;
@@ -43,7 +44,7 @@ public class OfxV1ParserTests
 
         var firstTransaction = statement.Transactions[0];
         Assert.Equal("DEBIT", firstTransaction.Type);
-        Assert.Equal("2025-01-02T12:00:00+00:00", firstTransaction.DatePosted.ToString("yyyy-MM-ddTHH:mm:sszzz"));
+        Assert.Equal("2025-01-02T12:00:00.0000000+00:00", firstTransaction.DatePosted.ToIsoTimestamp());
         Assert.Equal(-87.50m, firstTransaction.Amount);
         Assert.Equal("2025010201", firstTransaction.FitId);
         Assert.Equal("WHOLE FOODS MARKET #123", firstTransaction.Name);

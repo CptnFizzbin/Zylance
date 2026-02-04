@@ -1,3 +1,4 @@
+using Zylance.Core.Lib.Extensions;
 using Zylance.Core.Lib.Importers.Ofx.V1.Raw;
 using Zylance.Core.Tests.Fixtures;
 
@@ -123,7 +124,7 @@ DATA:OFXSGML
         Assert.Equal("DTPOSTED", token.Name);
         Assert.Equal("20260202120000[0:GMT]", token.Value);
         Assert.NotNull(token.DateTimeValue);
-        Assert.Equal("2026-02-02T12:00:00+00:00", token.DateTimeValue.Value.ToString("yyyy-MM-ddTHH:mm:sszzz"));
+        Assert.Equal("2026-02-02T12:00:00.0000000+00:00", token.DateTimeValue.Value.ToIsoTimestamp());
     }
 
     [Fact]
