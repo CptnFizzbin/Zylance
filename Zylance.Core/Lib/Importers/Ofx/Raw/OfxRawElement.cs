@@ -15,6 +15,7 @@ internal partial record OfxRawElement
 
     public static OfxRawElement ParseElement(string startLine, StreamReader content)
     {
+        startLine = startLine.Trim();
         var startMatch = ElementStartRegex().Match(startLine);
         var element = new OfxRawElement
         {
@@ -23,6 +24,12 @@ internal partial record OfxRawElement
 
         while (content.ReadLine() is { } nextLine)
         {
+            nextLine = nextLine.Trim();
+            
+            // Skip empty lines
+            if (string.IsNullOrWhiteSpace(nextLine))
+                continue;
+            
             if (ElementEndRegex().IsMatch(nextLine))
             {
                 var endMatch = ElementEndRegex().Match(nextLine);

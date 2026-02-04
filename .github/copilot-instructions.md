@@ -12,6 +12,12 @@ You are encouraged to update this file with any additional instructions or guide
 and agents understand the project's architecture, coding standards, and best practices. In particular, consider adding:
 - solutions to repeated issues (e.g, using the wrong flags for command-line tools)
 
+## Build Prerequisites
+
+Before building the project, ensure the following are installed and configured:
+- **Node.js** and **Corepack** - Required for frontend builds. Enable corepack with: `corepack enable`
+- **.NET 10.0 SDK** - Required for backend builds
+
 ## Architecture
 
 ### Core Components
