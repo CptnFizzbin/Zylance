@@ -19,7 +19,7 @@ NEWFILEUID:NONE
       <LANGUAGE>ENG
       <FI>
         <ORG>Example Bank
-        <FID>12345
+        <INTU.BID>12345
       </FI>
     </SONRS>
   </SIGNONMSGSRSV1>

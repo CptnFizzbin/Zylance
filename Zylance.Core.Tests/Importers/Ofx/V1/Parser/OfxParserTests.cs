@@ -116,66 +116,10 @@ public class OfxV1ParserTests
     public async Task ParseAsync_TransactionWithXferType_SetsIsTransferFlag()
     {
         // Arrange
-        var ofxContent = @"OFXHEADER:100
-DATA:OFXSGML
-VERSION:102
-SECURITY:NONE
-ENCODING:USASCII
-CHARSET:1252
-COMPRESSION:NONE
-OLDFILEUID:NONE
-NEWFILEUID:NONE
-
-<OFX>
-  <SIGNONMSGSRSV1>
-    <SONRS>
-      <STATUS>
-        <CODE>0
-        <SEVERITY>INFO
-      </STATUS>
-      <DTSERVER>20260204120000[0:GMT]
-      <LANGUAGE>ENG
-    </SONRS>
-  </SIGNONMSGSRSV1>
-  <BANKMSGSRSV1>
-    <STMTTRNRS>
-      <TRNUID>1
-      <STATUS>
-        <CODE>0
-        <SEVERITY>INFO
-      </STATUS>
-      <STMTRS>
-        <CURDEF>CAD
-        <BANKACCTFROM>
-          <BANKID>12345
-          <ACCTID>67890
-          <ACCTTYPE>CHECKING
-        </BANKACCTFROM>
-        <BANKTRANLIST>
-          <DTSTART>20260201120000[0:GMT]
-          <DTEND>20260204120000[0:GMT]
-          <STMTTRN>
-            <TRNTYPE>XFER
-            <DTPOSTED>20260202120000[0:GMT]
-            <TRNAMT>100.00
-            <FITID>XFER001
-            <NAME>Transfer to Savings
-            <MEMO>Internal transfer
-          </STMTTRN>
-        </BANKTRANLIST>
-        <LEDGERBAL>
-          <BALAMT>1000.00
-          <DTASOF>20260204120000[0:GMT]
-        </LEDGERBAL>
-      </STMTRS>
-    </STMTTRNRS>
-  </BANKMSGSRSV1>
-</OFX>";
-
         var parser = new OfxV1Parser();
 
         // Act
-        using var reader = new StreamReader(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(ofxContent)));
+        using var reader = ParserTestHelper.LoadFixture("transfer.ofx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert

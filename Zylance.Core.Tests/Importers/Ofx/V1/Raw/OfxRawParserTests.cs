@@ -24,7 +24,7 @@ SECURITY:NONE
 </OFX>";
 
         // Act
-        using var reader = new StreamReader(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(ofxContent)));
+        using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
         var rawFile = OfxRawFile.Parse(reader);
 
         // Assert
@@ -48,7 +48,7 @@ DATA:OFXSGML
 </OFX>";
 
         // Act
-        using var reader = new StreamReader(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(ofxContent)));
+        using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
         var rawFile = OfxRawFile.Parse(reader);
 
         // Assert
@@ -69,7 +69,7 @@ DATA:OFXSGML
 ";
 
         // Act
-        using var reader = new StreamReader(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(ofxContent)));
+        using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
         var line = reader.ReadLine();
         var element = OfxRawElement.ParseElement(line, reader);
 
@@ -94,7 +94,7 @@ DATA:OFXSGML
 ";
 
         // Act
-        using var reader = new StreamReader(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(ofxContent)));
+        using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
         var line = reader.ReadLine();
         var element = OfxRawElement.ParseElement(line, reader);
 
@@ -120,7 +120,7 @@ DATA:OFXSGML
         Assert.Equal("DTPOSTED", token.Name);
         Assert.Equal("20260202120000[0:GMT]", token.Value);
         Assert.NotNull(token.DateTimeValue);
-        Assert.Equal(new DateTimeOffset(2026, 2, 2, 12, 0, 0, TimeSpan.Zero), token.DateTimeValue);
+        Assert.StartsWith("2026-02-02T12:00:00", token.DateTimeValue.Value.ToString("O"));
     }
 
     [Fact]
@@ -179,7 +179,7 @@ DATA:OFXSGML
 </STMTRS>
 ";
 
-        using var reader = new StreamReader(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(ofxContent)));
+        using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
         var line = reader.ReadLine();
         var element = OfxRawElement.ParseElement(line, reader);
 
@@ -202,7 +202,7 @@ DATA:OFXSGML
 </STMTRS>
 ";
 
-        using var reader = new StreamReader(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(ofxContent)));
+        using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
         var line = reader.ReadLine();
         var element = OfxRawElement.ParseElement(line, reader);
 

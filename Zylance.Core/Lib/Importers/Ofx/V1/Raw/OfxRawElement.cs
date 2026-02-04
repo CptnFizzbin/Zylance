@@ -26,7 +26,6 @@ internal partial record OfxRawElement
         {
             nextLine = nextLine.Trim();
             
-            // Skip empty lines
             if (string.IsNullOrWhiteSpace(nextLine))
                 continue;
             
