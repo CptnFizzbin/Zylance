@@ -19,7 +19,6 @@ public class OfxV1Parser
         public const string LedgerBalance = "LEDGERBAL";
         public const string AvailableBalance = "AVAILBAL";
         public const string BankTransactionList = "BANKTRANLIST";
-        public const string CreditCardTransactionList = "CCSTMTTRN";
         public const string StatementTransaction = "STMTTRN";
         public const string CurrencyDefinition = "CURDEF";
         public const string BankId = "BANKID";
@@ -215,23 +214,25 @@ public class OfxV1Parser
 
     private OfxBankAccount BuildBankAccount(OfxRawElement element, string? currency, string accountType)
     {
-        var bankId = element.Tokens.TryGetValue(TagNames.BankId, out var bankIdToken) 
-            ? bankIdToken.Value 
-            : throw new InvalidDataException("Missing BANKID in account element");
-
         var accountId = element.Tokens.TryGetValue(TagNames.AccountId, out var accountIdToken)
             ? accountIdToken.Value
             : throw new InvalidDataException("Missing ACCTID in account element");
 
+        // BANKID is only present in bank accounts (BANKACCTFROM), not credit card accounts (CCACCTFROM)
+        var bankId = element.Tokens.TryGetValue(TagNames.BankId, out var bankIdToken) 
+            ? bankIdToken.Value 
+            : null;
+
+        // ACCTTYPE is only present in bank accounts (BANKACCTFROM), not credit card accounts (CCACCTFROM)
         var accountTypeValue = element.Tokens.TryGetValue(TagNames.AccountType, out var accountTypeToken)
             ? accountTypeToken.Value
-            : throw new InvalidDataException("Missing ACCTTYPE in account element");
+            : null;
 
         return new OfxBankAccount
         {
-            BankId = bankId,
+            BankId = bankId ?? string.Empty,
             AccountId = accountId,
-            AccountType = accountTypeValue,
+            AccountType = accountTypeValue ?? string.Empty,
             Currency = currency,
             Type = accountType,
         };
