@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
-using Zylance.Core.Lib.Importers.Ofx.Parser;
+using Zylance.Core.Lib.Importers.Ofx.V1.Parser;
 
-namespace Zylance.Core.Lib.Importers.Ofx.Raw;
+namespace Zylance.Core.Lib.Importers.Ofx.V1.Raw;
 
 internal partial record OfxRawToken
 {

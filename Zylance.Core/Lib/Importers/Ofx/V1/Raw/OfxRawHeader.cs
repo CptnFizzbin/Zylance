@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Zylance.Core.Lib.Importers.Ofx.Raw;
+namespace Zylance.Core.Lib.Importers.Ofx.V1.Raw;
 
 internal partial record OfxRawHeader
 {

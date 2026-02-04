@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Zylance.Core.Lib.Importers.Ofx.Parser;
+namespace Zylance.Core.Lib.Importers.Ofx.V1.Parser;
 
 internal static class DateTimeOffsetParser
 {

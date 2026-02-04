@@ -6,4 +6,5 @@ public record OfxBankAccount
     public required string AccountId { get; init; }
     public required string AccountType { get; init; }
     public string? Currency { get; init; }
+    public string? Type { get; init; }
 }

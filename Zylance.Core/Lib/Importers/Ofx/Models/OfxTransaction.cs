@@ -10,4 +10,5 @@ public record OfxTransaction
     public string? Memo { get; init; }
     public string? CheckNumber { get; init; }
     public string? ReferenceNumber { get; init; }
+    public bool IsTransfer { get; init; }
 }

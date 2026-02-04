@@ -1,0 +1,135 @@
+OFXHEADER:100
+DATA:OFXSGML
+VERSION:102
+SECURITY:NONE
+ENCODING:USASCII
+CHARSET:1252
+COMPRESSION:NONE
+OLDFILEUID:NONE
+NEWFILEUID:NONE
+
+<OFX>
+  <SIGNONMSGSRSV1>
+    <SONRS>
+      <STATUS>
+        <CODE>0
+        <SEVERITY>INFO
+      </STATUS>
+      <DTSERVER>20250115120000[0:GMT]
+      <LANGUAGE>ENG
+      <FI>
+        <ORG>Example Bank
+        <FID>12345
+      </FI>
+    </SONRS>
+  </SIGNONMSGSRSV1>
+  <BANKMSGSRSV1>
+    <STMTTRNRS>
+      <TRNUID>1001
+      <STATUS>
+        <CODE>0
+        <SEVERITY>INFO
+      </STATUS>
+      <STMTRS>
+        <CURDEF>USD
+        <BANKACCTFROM>
+          <BANKID>123456789
+          <ACCTID>9876543210
+          <ACCTTYPE>CHECKING
+        </BANKACCTFROM>
+        <BANKTRANLIST>
+          <DTSTART>20250101120000[0:GMT]
+          <DTEND>20250115120000[0:GMT]
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20250102120000[0:GMT]
+            <TRNAMT>-87.50
+            <FITID>2025010201
+            <NAME>WHOLE FOODS MARKET #123
+            <MEMO>Grocery shopping
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20250103120000[0:GMT]
+            <TRNAMT>-45.00
+            <FITID>2025010301
+            <NAME>SHELL OIL 47839583
+            <MEMO>Gas station
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>CREDIT
+            <DTPOSTED>20250105120000[0:GMT]
+            <TRNAMT>2500.00
+            <FITID>2025010501
+            <NAME>DIRECT DEPOSIT ACME CORP
+            <MEMO>Payroll
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20250106120000[0:GMT]
+            <TRNAMT>-1250.00
+            <FITID>2025010601
+            <NAME>RENT PAYMENT
+            <MEMO>Monthly rent
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20250107120000[0:GMT]
+            <TRNAMT>-150.00
+            <FITID>2025010701
+            <NAME>ELECTRIC COMPANY
+            <MEMO>Utility bill
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20250108120000[0:GMT]
+            <TRNAMT>-32.47
+            <FITID>2025010801
+            <NAME>AMAZON.COM
+            <MEMO>Online purchase
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20250110120000[0:GMT]
+            <TRNAMT>-65.00
+            <FITID>2025011001
+            <NAME>RESTAURANT DOWNTOWN
+            <MEMO>Dinner
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20250112120000[0:GMT]
+            <TRNAMT>-12.99
+            <FITID>2025011201
+            <NAME>NETFLIX.COM
+            <MEMO>Subscription
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>CREDIT
+            <DTPOSTED>20250113120000[0:GMT]
+            <TRNAMT>50.00
+            <FITID>2025011301
+            <NAME>TRANSFER FROM SAVINGS
+            <MEMO>Internal transfer
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>DEBIT
+            <DTPOSTED>20250114120000[0:GMT]
+            <TRNAMT>-95.23
+            <FITID>2025011401
+            <NAME>TARGET STORE 1234
+            <MEMO>General merchandise
+          </STMTTRN>
+        </BANKTRANLIST>
+        <LEDGERBAL>
+          <BALAMT>1411.81
+          <DTASOF>20250115120000[0:GMT]
+        </LEDGERBAL>
+        <AVAILBAL>
+          <BALAMT>1411.81
+          <DTASOF>20250115120000[0:GMT]
+        </AVAILBAL>
+      </STMTRS>
+    </STMTTRNRS>
+  </BANKMSGSRSV1>
+</OFX>

@@ -1,4 +1,4 @@
-using Zylance.Core.Lib.Importers.Ofx.Parser;
+using Zylance.Core.Lib.Importers.Ofx.V1.Parser;
 
 namespace Zylance.Core.Tests.Importers.Ofx.Parser;
 
