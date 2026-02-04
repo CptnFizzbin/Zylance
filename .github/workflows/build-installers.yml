@@ -17,6 +17,8 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -46,6 +48,8 @@ jobs:
   verify-runtimes:
     name: Verify ${{ matrix.runtime }} Build
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -83,6 +87,8 @@ jobs:
     name: Build Windows MSI
     runs-on: windows-latest
     needs: [ test, verify-runtimes ]
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
@@ -122,6 +128,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ test, verify-runtimes, build-windows ]
     if: always()
+    permissions:
+      contents: read
 
     steps:
       - name: Download all artifacts
