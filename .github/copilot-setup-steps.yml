@@ -21,11 +21,11 @@ steps:
           regex: "^10\\.0\\.\\d+"
           message: ".NET 10.0 SDK is required. Install from https://dotnet.microsoft.com/download"
 
-      - description: Check Node.js version (requires Node.js 24.13.0)
+      - description: Check Node.js version (requires Node.js 24.x, preferably 24.13.0+)
         command: node --version
         expect:
           regex: "^v24\\."
-          message: "Node.js 24.13.0 or later is required. Install from https://nodejs.org/ or use fnm"
+          message: "Node.js 24.x is required (24.13.0+ recommended). Install from https://nodejs.org/ or use fnm"
 
   # Step 2: Restore .NET dependencies
   - name: Restore .NET Dependencies
