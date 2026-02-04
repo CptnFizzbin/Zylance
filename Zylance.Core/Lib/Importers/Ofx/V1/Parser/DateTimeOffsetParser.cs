@@ -15,7 +15,7 @@ internal static class DateTimeOffsetParser
         var year = @"(?'Year'\d{4})";
         var month = @"(?'Month'\d{2})";
         var day = @"(?'Day'\d{2})";
-        var date = $@"(?'Date'{year}{month}{day})";
+        var date = $@"{year}{month}{day}";
         
         var hour = @"(?'Hour'\d{2})";
         var minute = @"(?'Minute'\d{2})";
