@@ -12,7 +12,7 @@ internal partial record OfxRawFile
         List<OfxRawHeader> headers = [];
         OfxRawElement? root = null;
 
-        while (content.ReadLine() is { } line)
+        while (content.ReadLineTrimmed() is { } line)
         {
             if (string.IsNullOrWhiteSpace(line) || CommentLineRegex().IsMatch(line))
                 continue;

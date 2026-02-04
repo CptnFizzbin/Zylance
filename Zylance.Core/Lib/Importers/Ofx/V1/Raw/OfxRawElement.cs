@@ -21,7 +21,7 @@ internal partial record OfxRawElement
             Name = startMatch.Groups["Name"].Value.Trim().ToUpper(),
         };
 
-        while (content.ReadLine() is { } nextLine)
+        while (content.ReadLineTrimmed() is { } nextLine)
         {
             if (string.IsNullOrWhiteSpace(nextLine))
                 continue;

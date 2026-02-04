@@ -1,5 +1,4 @@
 using System.Text;
-using Zylance.Core.Lib.Importers.Ofx.V1.Raw;
 
 namespace Zylance.Core.Tests.Importers.Ofx.V1;
 
@@ -11,17 +10,17 @@ public static class ParserTestHelper
     public static StreamReader LoadFixture(string filename)
     {
         var filePath = Path.Combine("Importers", "Fixtures", "Ofx", "V1", filename);
-        return new TrimmingStreamReader(File.OpenRead(filePath));
+        return new StreamReader(File.OpenRead(filePath));
     }
 
     /// <summary>
     /// Converts a string containing OFX content to a StreamReader.
-    /// Returns a TrimmingStreamReader that automatically trims whitespace from lines.
+    /// Lines are automatically trimmed via extension methods during parsing.
     /// </summary>
     public static StreamReader StringToStreamReader(string content)
     {
         var bytes = Encoding.UTF8.GetBytes(content);
         var stream = new MemoryStream(bytes);
-        return new TrimmingStreamReader(stream);
+        return new StreamReader(stream);
     }
 }

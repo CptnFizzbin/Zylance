@@ -1,6 +1,5 @@
 using Zylance.Core.Lib.Importers.Ofx.Models;
 using Zylance.Core.Lib.Importers.Ofx.V1.Parser;
-using Zylance.Core.Lib.Importers.Ofx.V1.Raw;
 
 namespace Zylance.Core.Lib.Importers.Ofx.Parser;
 
@@ -18,16 +17,13 @@ public class OfxParser
     /// <remarks>
     /// This method is async to support future V2 parsers that may perform asynchronous I/O operations.
     /// The current V1 implementation is synchronous but wrapped in a Task for API consistency.
-    /// Lines are automatically trimmed to handle indented OFX files consistently.
+    /// Lines are automatically trimmed via extension methods to handle indented OFX files consistently.
     /// </remarks>
     public async Task<List<OfxStatement>> ParseAsync(StreamReader content)
     {
-        // Wrap with TrimmingStreamReader to automatically trim whitespace from all lines
-        using var trimmingReader = new TrimmingStreamReader(content.BaseStream);
-        
         // TODO: Implement version detection logic
         // For now, always use V1 parser
         var v1Parser = new OfxV1Parser();
-        return await v1Parser.ParseAsync(trimmingReader);
+        return await v1Parser.ParseAsync(content);
     }
 }
