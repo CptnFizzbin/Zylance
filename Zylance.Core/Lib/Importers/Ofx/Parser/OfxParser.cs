@@ -14,6 +14,10 @@ public class OfxParser
     /// </summary>
     /// <param name="content">StreamReader containing the OFX file content</param>
     /// <returns>List of OFX statements parsed from the file</returns>
+    /// <remarks>
+    /// This method is async to support future V2 parsers that may perform asynchronous I/O operations.
+    /// The current V1 implementation is synchronous but wrapped in a Task for API consistency.
+    /// </remarks>
     public async Task<List<OfxStatement>> ParseAsync(StreamReader content)
     {
         // TODO: Implement version detection logic

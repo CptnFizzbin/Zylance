@@ -107,6 +107,8 @@ public class OfxV1Parser
             AccountId = accountId,
             AccountType = accountType,
             Currency = currency,
+            // Currently hardcoded to "BANK" since V1 parser only handles STMTTRNRS (bank statements)
+            // When credit card support is added (CCSTMTTRNRS), this will need to be set based on context
             Type = "BANK",
         };
     }
