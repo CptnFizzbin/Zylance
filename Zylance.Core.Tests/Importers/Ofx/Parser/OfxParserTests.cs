@@ -170,4 +170,134 @@ public class OfxParserTests
         Assert.Equal(10, transactionCount);
         Assert.Equal(2, balanceCount);
     }
+
+    [Fact]
+    public async Task ParseAsync_WithSimpleOfx_ExtractsCurrencyCorrectly()
+    {
+        // Arrange
+        var filePath = Path.Combine("Importers", "Fixtures", "simple.ofx");
+        OfxBankAccount? capturedAccount = null;
+
+        var parser = new OfxParser();
+        parser.HandleAccount(account =>
+        {
+            capturedAccount = account;
+            return Task.CompletedTask;
+        });
+
+        // Act
+        using var stream = File.OpenRead(filePath);
+        using var reader = new StreamReader(stream);
+        await parser.ParseAsync(reader);
+
+        // Assert
+        Assert.NotNull(capturedAccount);
+        Assert.Equal("999888777", capturedAccount.BankId);
+        Assert.Equal("1122334455", capturedAccount.AccountId);
+        Assert.Equal("SAVINGS", capturedAccount.AccountType);
+        Assert.Equal("EUR", capturedAccount.Currency);
+    }
+
+    [Fact]
+    public async Task ParseAsync_WithSimpleOfx_ParsesTransactionsCorrectly()
+    {
+        // Arrange
+        var filePath = Path.Combine("Importers", "Fixtures", "simple.ofx");
+        var transactions = new List<OfxTransaction>();
+
+        var parser = new OfxParser();
+        parser.HandleTransaction(transaction =>
+        {
+            transactions.Add(transaction);
+            return Task.CompletedTask;
+        });
+
+        // Act
+        using var stream = File.OpenRead(filePath);
+        using var reader = new StreamReader(stream);
+        await parser.ParseAsync(reader);
+
+        // Assert
+        Assert.Equal(2, transactions.Count);
+
+        // Check credit transaction
+        var credit = transactions.First(t => t.Type == "CREDIT");
+        Assert.Equal(500.00m, credit.Amount);
+        Assert.Equal("SALARY DEPOSIT", credit.Name);
+        Assert.Equal("Monthly salary", credit.Memo);
+
+        // Check debit transaction
+        var debit = transactions.First(t => t.Type == "DEBIT");
+        Assert.Equal(-75.25m, debit.Amount);
+        Assert.Equal("GROCERY STORE", debit.Name);
+        Assert.Equal("Weekly shopping", debit.Memo);
+    }
+
+    [Fact]
+    public async Task HandleAccount_WithSyncHandler_Works()
+    {
+        // Arrange
+        var filePath = Path.Combine("Importers", "Fixtures", "simple.ofx");
+        OfxBankAccount? capturedAccount = null;
+
+        var parser = new OfxParser();
+        parser.HandleAccount(account =>
+        {
+            capturedAccount = account;
+        });
+
+        // Act
+        using var stream = File.OpenRead(filePath);
+        using var reader = new StreamReader(stream);
+        await parser.ParseAsync(reader);
+
+        // Assert
+        Assert.NotNull(capturedAccount);
+        Assert.Equal("999888777", capturedAccount.BankId);
+        Assert.Equal("1122334455", capturedAccount.AccountId);
+    }
+
+    [Fact]
+    public async Task HandleTransaction_WithSyncHandler_Works()
+    {
+        // Arrange
+        var filePath = Path.Combine("Importers", "Fixtures", "simple.ofx");
+        var transactionCount = 0;
+
+        var parser = new OfxParser();
+        parser.HandleTransaction(transaction =>
+        {
+            transactionCount++;
+        });
+
+        // Act
+        using var stream = File.OpenRead(filePath);
+        using var reader = new StreamReader(stream);
+        await parser.ParseAsync(reader);
+
+        // Assert
+        Assert.Equal(2, transactionCount);
+    }
+
+    [Fact]
+    public async Task HandleBalance_WithSyncHandler_Works()
+    {
+        // Arrange
+        var filePath = Path.Combine("Importers", "Fixtures", "simple.ofx");
+        var balanceCount = 0;
+
+        var parser = new OfxParser();
+        parser.HandleBalance(balance =>
+        {
+            balanceCount++;
+        });
+
+        // Act
+        using var stream = File.OpenRead(filePath);
+        using var reader = new StreamReader(stream);
+        await parser.ParseAsync(reader);
+
+        // Assert
+        Assert.Equal(2, balanceCount);
+    }
 }

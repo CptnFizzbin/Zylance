@@ -15,14 +15,41 @@ public class OfxParser
         _accountHandler = handler;
     }
 
+    public void HandleAccount(Action<OfxBankAccount> handler)
+    {
+        _accountHandler = account =>
+        {
+            handler(account);
+            return Task.CompletedTask;
+        };
+    }
+
     public void HandleTransaction(Func<OfxTransaction, Task> handler)
     {
         _transactionHandler = handler;
     }
 
+    public void HandleTransaction(Action<OfxTransaction> handler)
+    {
+        _transactionHandler = transaction =>
+        {
+            handler(transaction);
+            return Task.CompletedTask;
+        };
+    }
+
     public void HandleBalance(Func<OfxBalance, Task> handler)
     {
         _balanceHandler = handler;
+    }
+
+    public void HandleBalance(Action<OfxBalance> handler)
+    {
+        _balanceHandler = balance =>
+        {
+            handler(balance);
+            return Task.CompletedTask;
+        };
     }
 
     public async Task ParseAsync(StreamReader content)
