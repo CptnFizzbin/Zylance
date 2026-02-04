@@ -62,9 +62,9 @@ Located in `<INVSTMTMSGSRSV1>`:
 - **Securities**: Stock symbols, CUSIP numbers, security names
 
 ### 7. Statement Period Information
-Located in `<BANKTRANLIST>` or `<CCSTMTTRANLIST>`:
-- **DateStart**: Beginning date of statement period
-- **DateEnd**: Ending date of statement period
+Located in `<BANKTRANLIST>` or `<CCSTMTTRANLIST>` - Added to `OfxStatement`:
+- **DateStart**: Beginning date of statement period - Available in `OfxStatement.DateStart`
+- **DateEnd**: Ending date of statement period - Available in `OfxStatement.DateEnd`
 
 ### 8. Loan/Mortgage Information
 Located in `<LOANMSGSRSV1>`:
@@ -82,17 +82,12 @@ For inter-account transfers:
 - **Note**: The `IsTransfer` flag on `OfxTransaction` indicates when a transaction is a transfer (Type = XFER). The importer is responsible for matching up the transactions across accounts.
 
 ### 10. Bill Payment Information
-Located in `<BILLPAYMSGSRSV1>`:
+Located in `<BILLPAYMSGSRSV1>` - **Future Feature**:
 - Payee information
 - Payment status
 - Payment amount and date
 - Confirmation numbers
-
-### 11. Tax Information
-Some institutions include:
-- Year-to-date interest earned
-- Tax ID numbers
-- 1099 information
+- Recurrent payment schedules
 
 ## OFX Versions
 
@@ -122,5 +117,4 @@ Additional data types that could be extracted:
 
 ## References
 
-- OFX Specification: https://www.ofx.net/
-- Common Transaction Types: https://www.ofx.net/downloads/OFX%202.2.pdf
+The OFX specification and documentation can be found through financial institution developer resources and banking technology standards organizations.

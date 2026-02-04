@@ -69,6 +69,8 @@ public class OfxV1Parser
             : null;
 
         var transactions = new List<OfxTransaction>();
+        DateTimeOffset? dateStart = null;
+        DateTimeOffset? dateEnd = null;
         var bankTranListElement = stmtRsElement.Children.FirstOrDefault(c => c.Name == "BANKTRANLIST");
         if (bankTranListElement is not null)
         {
@@ -76,6 +78,19 @@ public class OfxV1Parser
                 .Where(c => c.Name == "STMTTRN")
                 .Select(BuildTransaction)
                 .ToList();
+            
+            // Extract statement period dates
+            if (bankTranListElement.Tokens.TryGetValue("DTSTART", out var dtStartToken) &&
+                DateTimeOffsetParser.TryParse(dtStartToken.Value, out var start))
+            {
+                dateStart = start;
+            }
+            
+            if (bankTranListElement.Tokens.TryGetValue("DTEND", out var dtEndToken) &&
+                DateTimeOffsetParser.TryParse(dtEndToken.Value, out var end))
+            {
+                dateEnd = end;
+            }
         }
 
         return new OfxStatement
@@ -84,6 +99,8 @@ public class OfxV1Parser
             LedgerBalance = ledgerBalance,
             AvailableBalance = availableBalance,
             Transactions = transactions,
+            DateStart = dateStart,
+            DateEnd = dateEnd,
         };
     }
 

@@ -12,6 +12,11 @@ public class DateTimeOffsetParserTests
     [InlineData("20240229120000", "2024-02-29T12:00:00+00:00")] // Leap year
     [InlineData("20220101000000", "2022-01-01T00:00:00+00:00")] // Midnight
     [InlineData("20221231235959", "2022-12-31T23:59:59+00:00")] // End of day
+    // Date-only format (YYYYMMDD) - time assumed to be 00:00 GMT
+    [InlineData("20220101", "2022-01-01T00:00:00+00:00")]
+    [InlineData("20231215", "2023-12-15T00:00:00+00:00")]
+    [InlineData("19990630", "1999-06-30T00:00:00+00:00")]
+    [InlineData("20240229", "2024-02-29T00:00:00+00:00")] // Leap year
     // With fractional seconds
     [InlineData("20220101123000.000", "2022-01-01T12:30:00+00:00")]
     [InlineData("20231215083045.123", "2023-12-15T08:30:45+00:00")]
@@ -51,7 +56,7 @@ public class DateTimeOffsetParserTests
     [InlineData("2022-01-01")] // ISO format
     [InlineData("01/01/2022")] // US format
     [InlineData("2022")] // Year only
-    [InlineData("20220101")] // Missing time
+    [InlineData("202201")] // Year and month only (missing day)
     [InlineData("202201011230")] // Incomplete time
     [InlineData("2022010112300")] // Missing one digit
     [InlineData("202201011230000")] // Extra digit

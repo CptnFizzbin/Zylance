@@ -29,7 +29,6 @@ internal static class StreamReaderExtensions
         return line?.Trim();
     }
 
-#if NET5_0_OR_GREATER
     /// <summary>
     /// Asynchronously reads a line from the stream and trims leading and trailing whitespace.
     /// This ensures consistent handling of indented OFX files.
@@ -42,5 +41,4 @@ internal static class StreamReaderExtensions
         var line = await reader.ReadLineAsync(cancellationToken);
         return line?.Trim();
     }
-#endif
 }
