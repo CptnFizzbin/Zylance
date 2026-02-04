@@ -21,11 +21,11 @@ steps:
           regex: "^10\\.0\\.\\d+"
           message: ".NET 10.0 SDK is required. Install from https://dotnet.microsoft.com/download"
 
-      - description: Check Node.js version (requires Node.js 24.x, preferably 24.13.0+)
+      - description: Check Node.js version (requires Node.js 24.13.0 or higher)
         command: node --version
         expect:
-          regex: "^v24\\."
-          message: "Node.js 24.x is required (24.13.0+ recommended). Install from https://nodejs.org/ or use fnm"
+          regex: "^v24\\.(1[3-9]|[2-9][0-9])\\."
+          message: "Node.js 24.13.0 or higher is required. Install from https://nodejs.org/ or use fnm"
 
   # Step 2: Restore .NET dependencies
   - name: Restore .NET Dependencies
@@ -139,6 +139,9 @@ project_info:
     
     - path: Zylance.Vault.Remote.Tests
       description: Tests for remote vault implementation
+    
+    - path: Zylance.Installer.Windows
+      description: Windows installer project using WiX Toolset
 
   # Development commands
   commands:
@@ -175,8 +178,7 @@ configuration:
       - "ms-dotnettools.csharp"
       - "ms-dotnettools.csdevkit"
       - "csharpier.csharpier-vscode"
-      - "dbaeumer.vscode-eslint"
-      - "esbenp.prettier-vscode"
+      - "biomejs.biome"
     
     jetbrains_rider:
       - "CSharpier plugin"
