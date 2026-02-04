@@ -1,5 +1,6 @@
 using Zylance.Core.Lib.Importers.Ofx.Models;
 using Zylance.Core.Lib.Importers.Ofx.V1.Parser;
+using Zylance.Core.Tests.Fixtures;
 
 namespace Zylance.Core.Tests.Importers.Ofx.V1.Parser;
 
@@ -12,7 +13,7 @@ public class OfxV1ParserTests
         var parser = new OfxV1Parser();
 
         // Act
-        using var reader = ParserTestHelper.LoadFixture("example.qfx");
+        using var reader = FixtureUtils.LoadFixture("example.qfx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -33,7 +34,7 @@ public class OfxV1ParserTests
         var parser = new OfxV1Parser();
 
         // Act
-        using var reader = ParserTestHelper.LoadFixture("example.qfx");
+        using var reader = FixtureUtils.LoadFixture("example.qfx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -60,7 +61,7 @@ public class OfxV1ParserTests
         var parser = new OfxV1Parser();
 
         // Act
-        using var reader = ParserTestHelper.LoadFixture("example.qfx");
+        using var reader = FixtureUtils.LoadFixture("example.qfx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -82,7 +83,7 @@ public class OfxV1ParserTests
         var parser = new OfxV1Parser();
 
         // Act
-        using var reader = ParserTestHelper.LoadFixture("example.ofx");
+        using var reader = FixtureUtils.LoadFixture("example.ofx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert
@@ -111,7 +112,7 @@ public class OfxV1ParserTests
         var parser = new OfxV1Parser();
 
         // Act
-        using var reader = ParserTestHelper.LoadFixture("transfer.ofx");
+        using var reader = FixtureUtils.LoadFixture("transfer.ofx");
         var statements = await parser.ParseAsync(reader);
 
         // Assert

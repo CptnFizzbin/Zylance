@@ -1,15 +1,15 @@
 using System.Text;
 
-namespace Zylance.Core.Tests.Importers.Ofx.V1;
+namespace Zylance.Core.Tests.Fixtures;
 
-public static class ParserTestHelper
+public static class FixtureUtils
 {
     /// <summary>
-    /// Loads an OFX fixture file from the V1 fixtures directory
+    /// Loads an OFX fixture file from the Fixtures directory
     /// </summary>
     public static StreamReader LoadFixture(string filename)
     {
-        var filePath = Path.Combine("Importers", "Fixtures", "Ofx", "V1", filename);
+        var filePath = Path.Combine("Fixtures", "Importers", "Ofx", "V1", filename);
         return new StreamReader(File.OpenRead(filePath));
     }
 

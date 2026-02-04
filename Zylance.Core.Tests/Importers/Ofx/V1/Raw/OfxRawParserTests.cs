@@ -1,4 +1,5 @@
 using Zylance.Core.Lib.Importers.Ofx.V1.Raw;
+using Zylance.Core.Tests.Fixtures;
 
 namespace Zylance.Core.Tests.Importers.Ofx.V1.Raw;
 
@@ -24,7 +25,7 @@ SECURITY:NONE
 </OFX>";
 
         // Act
-        using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
+        using var reader = FixtureUtils.StringToStreamReader(ofxContent);
         var rawFile = OfxRawFile.Parse(reader);
 
         // Assert
@@ -48,7 +49,7 @@ DATA:OFXSGML
 </OFX>";
 
         // Act
-        using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
+        using var reader = FixtureUtils.StringToStreamReader(ofxContent);
         var rawFile = OfxRawFile.Parse(reader);
 
         // Assert
@@ -69,7 +70,7 @@ DATA:OFXSGML
 ";
 
         // Act
-        using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
+        using var reader = FixtureUtils.StringToStreamReader(ofxContent);
         var line = reader.ReadLine();
         Assert.NotNull(line);
         var element = OfxRawElement.ParseElement(line, reader);
@@ -95,7 +96,7 @@ DATA:OFXSGML
 ";
 
         // Act
-        using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
+        using var reader = FixtureUtils.StringToStreamReader(ofxContent);
         var line = reader.ReadLine();
         Assert.NotNull(line);
         var element = OfxRawElement.ParseElement(line, reader);
@@ -181,7 +182,7 @@ DATA:OFXSGML
 </STMTRS>
 ";
 
-        using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
+        using var reader = FixtureUtils.StringToStreamReader(ofxContent);
         var line = reader.ReadLine();
         Assert.NotNull(line);
         var element = OfxRawElement.ParseElement(line, reader);
@@ -205,7 +206,7 @@ DATA:OFXSGML
 </STMTRS>
 ";
 
-        using var reader = ParserTestHelper.StringToStreamReader(ofxContent);
+        using var reader = FixtureUtils.StringToStreamReader(ofxContent);
         var line = reader.ReadLine();
         Assert.NotNull(line);
         var element = OfxRawElement.ParseElement(line, reader);
