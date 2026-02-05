@@ -7,13 +7,23 @@ internal static class OfxV1Statement
 {
     public static OfxStatement From(OfxRawElement element)
     {
-        if (element.Name != OfxTagNames.StatementTransactionsRes)
-            throw new InvalidDataException($"Element is not {OfxTagNames.StatementTransactionsRes}");
+        if (
+            element.Name != OfxTagNames.StatementTransactionsRes
+            && element.Name != OfxTagNames.CreditCardStatementTransactionsRes
+        )
+            throw new InvalidDataException(
+                $"Element is not {OfxTagNames.StatementTransactionsRes} or {OfxTagNames.CreditCardStatementTransactionsRes}"
+            );
 
-        var statementRes = element.GetChildElement(OfxTagNames.StatementRes);
+        // Determine statement type and get appropriate child elements
+        var isCreditCard = element.Name == OfxTagNames.CreditCardStatementTransactionsRes;
+        var statementResTag = isCreditCard ? OfxTagNames.CreditCardStatementRes : OfxTagNames.StatementRes;
+        var accountFromTag = isCreditCard ? OfxTagNames.CreditCardAccountFrom : OfxTagNames.BankAccountFrom;
+
+        var statementRes = element.GetChildElement(statementResTag);
         var currency = statementRes.GetToken(OfxTagNames.CurrencyDefinition).Value;
 
-        var accountElm = statementRes.GetChildElement(OfxTagNames.BankAccountFrom);
+        var accountElm = statementRes.GetChildElement(accountFromTag);
         var account = OfxV1Account.From(accountElm, currency);
 
         var ledgerBalanceElm = statementRes.GetChildElement(OfxTagNames.LedgerBalance);

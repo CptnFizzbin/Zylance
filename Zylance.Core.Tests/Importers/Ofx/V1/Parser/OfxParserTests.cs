@@ -119,4 +119,73 @@ public class OfxV1ParserTests
         Assert.Equal("XFER", transaction.Type);
         return Task.CompletedTask;
     }
+
+    [Fact]
+    public Task ParseAsync_WithCreditCardOfx_ParsesStatement()
+    {
+        // Arrange
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/creditcard.ofx");
+
+        // Act
+        var statements = OfxV1Parser.Parse(reader);
+
+        // Assert
+        Assert.Single(statements);
+        var statement = statements[0];
+        Assert.NotNull(statement.Account);
+        Assert.Null(statement.Account.BankId); // Credit cards don't have bank IDs
+        Assert.Equal("4111111111111111", statement.Account.AccountId);
+        Assert.Equal("CREDITCARD", statement.Account.AccountType);
+        Assert.Equal("USD", statement.Account.Currency);
+        return Task.CompletedTask;
+    }
+
+    [Fact]
+    public Task ParseAsync_WithCreditCardOfx_ParsesTransactions()
+    {
+        // Arrange
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/creditcard.ofx");
+
+        // Act
+        var statements = OfxV1Parser.Parse(reader);
+
+        // Assert
+        var statement = statements[0];
+        Assert.Equal(3, statement.Transactions.Count);
+
+        var firstDebit = statement.Transactions[0];
+        Assert.Equal("DEBIT", firstDebit.Type);
+        Assert.Equal("2026-02-02T12:00:00.000+00:00", firstDebit.DatePosted.ToIso8601());
+        Assert.Equal(-125.50m, firstDebit.Amount);
+        Assert.Equal("CC2026020201", firstDebit.Id);
+        Assert.Equal("ONLINE RETAILER", firstDebit.Name);
+        Assert.Equal("Purchase at online store", firstDebit.Memo);
+
+        var creditTransaction = statement.Transactions.First(t => t.Type == "CREDIT");
+        Assert.Equal(200.00m, creditTransaction.Amount);
+        Assert.Equal("PAYMENT RECEIVED", creditTransaction.Name);
+        return Task.CompletedTask;
+    }
+
+    [Fact]
+    public Task ParseAsync_WithCreditCardOfx_ParsesBalances()
+    {
+        // Arrange
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/creditcard.ofx");
+
+        // Act
+        var statements = OfxV1Parser.Parse(reader);
+
+        // Assert
+        var statement = statements[0];
+        Assert.NotNull(statement.LedgerBalance);
+        Assert.Equal(-971.49m, statement.LedgerBalance.Amount);
+        Assert.Equal(new DateTimeOffset(2026, 2, 4, 12, 0, 0, TimeSpan.Zero), statement.LedgerBalance.AsOfDate);
+        Assert.Equal("LEDGER", statement.LedgerBalance.Type);
+
+        Assert.NotNull(statement.AvailableBalance);
+        Assert.Equal(4028.51m, statement.AvailableBalance.Amount);
+        Assert.Equal("AVAIL", statement.AvailableBalance.Type);
+        return Task.CompletedTask;
+    }
 }

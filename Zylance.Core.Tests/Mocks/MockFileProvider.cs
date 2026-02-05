@@ -44,6 +44,7 @@ internal class MockFileProvider : IFileProvider
 
     public Task<Stream> OpenFile(FileRef fileRef)
     {
+        // Return a new MemoryStream - caller is responsible for disposal
         return Task.FromResult<Stream>(new MemoryStream());
     }
 
