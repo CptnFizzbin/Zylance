@@ -71,29 +71,48 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     {
         var dbContext = LocalVaultContextFactory.CreateDbContextFromFile(filePath);
 
-        // Check if database file exists
-        var fileExists = File.Exists(filePath);
-
-        if (fileExists)
+        try
         {
-            // If database exists, verify it's a Zylance vault by checking for the marker table
-            var hasMarkerTable =
-                await dbContext.Database.CanConnectAsync()
-                && await dbContext
-                    .Database.SqlQueryRaw<int>(
-                        "SELECT COUNT(*) as Value FROM sqlite_master WHERE type='table' AND name='_zylance_'"
-                    )
-                    .FirstOrDefaultAsync() > 0;
+            // Check if database file exists
+            var fileExists = File.Exists(filePath);
 
-            if (!hasMarkerTable)
+            if (fileExists)
             {
-                throw new NonZylanceDatabaseException(filePath);
+                // If database exists, verify it's a Zylance vault by checking for the marker table
+                var canConnect = await dbContext.Database.CanConnectAsync();
+                if (canConnect)
+                {
+                    var connection = dbContext.Database.GetDbConnection();
+                    await connection.OpenAsync();
+                    try
+                    {
+                        using var command = connection.CreateCommand();
+                        command.CommandText =
+                            "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='_zylance_'";
+                        var result = await command.ExecuteScalarAsync();
+                        var hasMarkerTable = result is not null && Convert.ToInt32(result) > 0;
+
+                        if (!hasMarkerTable)
+                        {
+                            throw new NonZylanceDatabaseException(filePath);
+                        }
+                    }
+                    finally
+                    {
+                        await connection.CloseAsync();
+                    }
+                }
             }
+
+            // Apply migrations (this will create the marker table for new databases)
+            await dbContext.Database.MigrateAsync();
+
+            return new LocalVault(dbContext);
         }
-
-        // Apply migrations (this will create the marker table for new databases)
-        await dbContext.Database.MigrateAsync();
-
-        return new LocalVault(dbContext);
+        catch
+        {
+            await dbContext.DisposeAsync();
+            throw;
+        }
     }
 }

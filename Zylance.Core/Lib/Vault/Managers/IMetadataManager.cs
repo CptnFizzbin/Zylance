@@ -10,13 +10,15 @@ public interface IMetadataManager
     ///     Retrieves a metadata value by key.
     /// </summary>
     /// <param name="key">The metadata key</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The metadata value, or null if the key does not exist</returns>
-    Task<string?> GetAsync(string key);
+    Task<string?> GetAsync(string key, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Sets a metadata value for a key.
     /// </summary>
     /// <param name="key">The metadata key</param>
     /// <param name="value">The metadata value</param>
-    Task SetAsync(string key, string value);
+    /// <param name="cancellationToken">Cancellation token</param>
+    Task SetAsync(string key, string value, CancellationToken cancellationToken = default);
 }

@@ -30,9 +30,19 @@ public class MarkerTableTests : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private string CreateTempFilePath()
+    private string CreateTempFilePath(string? fileName = null, bool includeUuid = true)
     {
-        var fileName = $"test_{Guid.NewGuid()}.zlv.sqlite";
+        if (fileName is null)
+        {
+            fileName = includeUuid ? $"test_{Guid.NewGuid()}.zlv.sqlite" : "test.zlv.sqlite";
+        }
+        else if (includeUuid)
+        {
+            var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
+            var extension = Path.GetExtension(fileName);
+            fileName = $"{fileNameWithoutExt}_{Guid.NewGuid()}{extension}";
+        }
+
         return Path.Combine(_tempDirectory, fileName);
     }
 
@@ -97,6 +107,24 @@ public class MarkerTableTests : IDisposable
 
         Assert.Contains("not a Zylance vault", exception.Message);
         Assert.Contains(filePath, exception.Message);
+    }
+
+    [Fact]
+    public async Task FromFile_NonZylanceDatabase_DoesNotRunMigrations()
+    {
+        // Arrange - create a SQLite database without the marker table
+        var filePath = CreateTempFilePath();
+
+        using (var connection = new SqliteConnection($"Data Source={filePath}"))
+        {
+            await connection.OpenAsync();
+            using var command = connection.CreateCommand();
+            command.CommandText = "CREATE TABLE SomeOtherTable (Id INTEGER PRIMARY KEY, Name TEXT)";
+            await command.ExecuteNonQueryAsync();
+        }
+
+        // Act & Assert - expect exception
+        await Assert.ThrowsAsync<NonZylanceDatabaseException>(() => LocalVault.FromFile(filePath));
 
         // Verify that migrations were not run - check that Zylance tables don't exist
         var accountsTableExists = await TableExistsAsync(filePath, "Accounts");
@@ -111,13 +139,12 @@ public class MarkerTableTests : IDisposable
     [Fact]
     public async Task FromFile_EmptyDatabase_ThrowsException()
     {
-        // Arrange - create an empty SQLite database
+        // Arrange - create an empty SQLite database by opening and closing a connection
         var filePath = CreateTempFilePath();
 
         using (var connection = new SqliteConnection($"Data Source={filePath}"))
         {
             await connection.OpenAsync();
-            // Just open and close to create an empty database
         }
 
         // Act & Assert
