@@ -3,6 +3,7 @@
   <component name="UserContentModel">
     <attachedFolders>
       <Path>.github</Path>
+      <Path>Docs</Path>
       <Path>Zylance.Installer.Windows</Path>
     </attachedFolders>
     <explicitIncludes />

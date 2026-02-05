@@ -22,4 +22,8 @@
                           OutputItemType="Analyzer"
                           ReferenceOutputAssembly="false"/>
     </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Importers\"/>
+    </ItemGroup>
 </Project>

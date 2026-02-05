@@ -1,6 +1,6 @@
 using Zylance.Contract.Models.File;
 using Zylance.Core.App.Services;
-using Zylance.Core.Importers;
+using Zylance.Core.Importers.Ofx;
 using Zylance.Core.Lib;
 using Zylance.Core.Lib.Importers;
 
@@ -59,7 +59,7 @@ public class OfxImporterTests
         var extensions = _importer.SupportedExtensions;
 
         // Assert
-        Assert.IsAssignableFrom<IReadOnlyList<string>>(extensions);
+        Assert.IsAssignableFrom<IReadOnlyList<(string, string[])>>(extensions);
     }
 
     [Fact]
@@ -69,9 +69,8 @@ public class OfxImporterTests
         FileRef? nullFileRef = null;
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(() => _importer.ImportAsync(
-            nullFileRef!,
-            TestContext.Current.CancellationToken)
+        await Assert.ThrowsAsync<NotImplementedException>(
+            () => _importer.ImportAsync(nullFileRef!, TestContext.Current.CancellationToken)
         );
     }
 
@@ -87,9 +86,8 @@ public class OfxImporterTests
         };
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(() => _importer.ImportAsync(
-            fileRef,
-            TestContext.Current.CancellationToken)
+        await Assert.ThrowsAsync<NotImplementedException>(
+            () => _importer.ImportAsync(fileRef, TestContext.Current.CancellationToken)
         );
     }
 

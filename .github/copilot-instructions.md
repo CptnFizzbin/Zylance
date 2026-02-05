@@ -12,6 +12,12 @@ You are encouraged to update this file with any additional instructions or guide
 and agents understand the project's architecture, coding standards, and best practices. In particular, consider adding:
 - solutions to repeated issues (e.g, using the wrong flags for command-line tools)
 
+## Build Prerequisites
+
+Before building the project, ensure the following are installed and configured:
+- **Node.js** and **Corepack** - Required for frontend builds. Enable corepack with: `corepack enable`
+- **.NET 10.0 SDK** - Required for backend builds
+
 ## Architecture
 
 ### Core Components
@@ -22,6 +28,7 @@ and agents understand the project's architecture, coding standards, and best pra
 - **Zylance.Contract** - Protocol Buffers message contracts for type-safe communication
 - **Zylance.Vault.Local** - Local vault implementation using Entity Framework Core
 - **Zylance.SourceGenerators** - Source generators for automatic controller registration
+- **Docs** - Project documentation including format specifications and design documents
 
 ### Key Patterns
 
@@ -142,6 +149,34 @@ private readonly static Lazy<Regex> DateTimeRegex = new(() =>
 - Source-generated regex is fastest for simple patterns
 - Complex patterns benefit from builder pattern for maintainability
 - Add a comment explaining why you're using `Lazy<Regex>` instead of `[GeneratedRegex]`
+
+### Naming Conventions
+
+✅ **Use full, descriptive variable names - do NOT shorten:**
+
+```csharp
+// Good
+var statementTransactionResponse = element.GetChild("STMTTRNRS");
+var bankAccountFromElement = element.GetChild("BANKACCTFROM");
+var datePostedToken = element.Tokens["DTPOSTED"];
+
+// Avoid - shortened names
+var stmtTrnRs = element.GetChild("STMTTRNRS");
+var bankAcctFromElem = element.GetChild("BANKACCTFROM");
+var dtPostedTok = element.Tokens["DTPOSTED"];
+```
+
+**Why?** Full names improve readability and make code self-documenting. Modern IDEs handle autocomplete, so verbosity is not a burden.
+
+### Code Formatting
+
+✅ **Always run CSharpier before committing:**
+
+```bash
+dotnet csharpier .
+```
+
+**Why?** Consistent formatting across the codebase improves readability and reduces diff noise. The CI pipeline will fail if code is not properly formatted.
 
 ### Additional Guidelines
 
