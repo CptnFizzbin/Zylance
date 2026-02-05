@@ -84,7 +84,7 @@ namespace Zylance.Vault.Local.Entities
 
                     b.HasKey("Key");
 
-                    b.ToTable("_zylance_", (string)null);
+                    b.ToTable("_zylance_");
                 });
 #pragma warning restore 612, 618
         }
