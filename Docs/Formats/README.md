@@ -70,7 +70,8 @@ Potential formats for future consideration:
 - **IIF (Intuit Interchange Format)**: QuickBooks format
 - **YNAB (You Need A Budget)**: CSV variant with specific structure
 - **Mint**: JSON export format
-- **Custom JSON**: Zylance's own export format for backup/restore
+- **Zylance Vault (.zlv)**: Encrypted SQLite database (see [ADR-010: Zylance File Formats](../ADRs/ADR-010-zylance-file-formats.md))
+- **Zylance Database (.zld)**: Plaintext SQLite database (see [ADR-010: Zylance File Formats](../ADRs/ADR-010-zylance-file-formats.md))
 - **Excel**: XLSX import with configurable mapping
 
 ## Format Guidelines
@@ -78,7 +79,7 @@ Potential formats for future consideration:
 When adding support for a new format:
 
 1. **Create a parser**: Implement `ITransactionImporter` interface
-2. **Add tests**: Include real-world sample files (sanitized)
+2. **Add tests**: Include real-world sample files (sanitized/anonymized)
 3. **Document structure**: Add format documentation to this directory
 4. **Error handling**: Provide clear error messages for invalid files
 5. **Validation**: Validate data integrity and ranges
@@ -87,7 +88,7 @@ When adding support for a new format:
 ## Testing with Real Data
 
 **Important**: When testing with real financial data:
-1. **Sanitize files**: Remove account numbers, personal info, real amounts
+1. **Sanitize/anonymize files**: Remove account numbers, personal info, real amounts
 2. **Preserve structure**: Keep format structure intact for testing
 3. **Add to test fixtures**: Include sanitized files in test suite
 4. **Document source**: Note which institution/bank the format comes from

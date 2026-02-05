@@ -1,26 +1,37 @@
-# ADR-001: Local-First Architecture with Multi-Platform Runtime Flags
+# ADR-001: Local-First Architecture
 
 ## Context
 
-Finance and budgeting applications handle sensitive personal data that users rightfully want to keep private and accessible. Many modern apps force users into cloud-first architectures where data immediately syncs to remote servers, creating privacy concerns and vendor lock-in. Additionally, cross-platform applications often maintain separate codebases for each platform, leading to feature fragmentation and increased maintenance burden.
+Finance and budgeting applications handle sensitive personal data that users rightfully want to keep private and accessible. Many modern apps force users into cloud-first architectures where data immediately syncs to remote servers, creating privacy concerns and vendor lock-in.
 
 For Zylance v1, we needed to decide:
 1. Should data be stored locally or in the cloud by default?
-2. How should we architect for future multi-platform support (desktop, web, mobile)?
-3. Should we use compile-time platform separation or runtime detection?
+2. How should we architect storage to support multiple vault providers?
+
+## Implementation
+
+**Status**: In Progress
 
 ## Decision
 
 Zylance will use a **local-first architecture** for v1, where all user data is stored locally on the device by default. No cloud sync or remote storage is required for core functionality.
 
-For multi-platform support, we will use **runtime flags** (`IsDesktop`, `IsWeb`, `IsMobile`) rather than separate platform-specific implementations. The same codebase and UI components will run across all platforms, with platform-specific behavior handled through conditional logic based on these flags.
+Data will be stored in an **encrypted SQLite database** (`.zlv` format - Zylance Vault). An option in the UI to toggle encryption off will be provided for:
+- Development and debug purposes
+- Allowing users to inspect what's stored by Zylance
+- Preventing vendor lock-in and allowing for migrations
+
+The architecture uses `IVaultProvider` and `IVault` interfaces, making **remote and other storage solutions first-class by default**. When the user opens the app, they'll be presented with the choice of provider (defaulting to Local).
+
+**Note**: Multi-platform runtime flag decisions have been split into [ADR-009: Runtime Platform Detection](./ADR-009-runtime-platform-detection.md).
+
+**Note**: Multi-platform runtime flag decisions have been split into [ADR-009: Runtime Platform Detection](./ADR-009-runtime-platform-detection.md).
 
 This means:
-- Desktop, web, and mobile will share the same React/TypeScript UI codebase (`Zylance.UI`)
-- The same business logic layer (`Zylance.Core`) serves all platforms
-- Platform-specific features (like file system access) are abstracted through provider interfaces (`IFileProvider`, `IVaultProvider`)
-- Platform detection happens at runtime, not compile time
-- Feature parity is prioritized—all platforms get the same features wherever possible
+- All user data is stored in an encrypted SQLite database by default
+- The `IVaultProvider` abstraction allows easy swapping between Local, Remote, and other vault types
+- Users maintain full control of their data
+- Remote storage is a first-class option, not an afterthought
 
 ## Consequences
 
@@ -36,27 +47,21 @@ This means:
 
 ### Negative
 
-- **Runtime overhead**: Platform checks add small runtime cost vs. compile-time separation
-- **Bundle size**: All platform code ships to all platforms (though this is minimal)
-- **Sync complexity**: When remote sync is added later, it becomes an opt-in feature rather than a first-class design
+- **Sync complexity**: Remote sync requires careful design to work alongside local-first approach
 - **Initial limitations**: Some platform-specific optimizations may be harder to implement
-- **Conditional complexity**: Runtime flags can lead to complex conditional logic if not managed carefully
 
 ### Mitigations
 
-- Use clear provider abstractions to isolate platform-specific code
-- Establish coding conventions for how to use runtime flags cleanly
-- Consider code-splitting strategies if bundle size becomes an issue
-- Design remote sync as an enhancement to local-first, not a replacement
+- Use clear provider abstractions (`IVaultProvider`, `IFileProvider`) to isolate storage concerns
+- Design remote sync as a first-class feature through the provider pattern
+- Provide encryption toggle for transparency and migration support
 
 ## General Notes
 
 This decision reflects a philosophical stance on data ownership and user privacy. By making local-first the default, we're saying that users should own their financial data without being forced into cloud storage.
 
-The multi-platform runtime flag approach was influenced by modern web frameworks like React Native and Electron, which successfully run the same codebase across platforms. While this adds some runtime checks, the development velocity gains and consistency benefits far outweigh the minor performance cost.
+The use of encrypted SQLite by default provides security while maintaining the ability to inspect data when needed (via the encryption toggle). This transparency helps build user trust and prevents vendor lock-in.
 
-The key insight is that most finance app features are platform-agnostic—budget tracking, transaction categorization, and reporting work the same everywhere. Only a small subset of features (file system access, biometric auth, native notifications) truly need platform-specific implementations.
+The `IVaultProvider` abstraction is key to making remote storage a first-class feature. Users can choose their vault provider at app startup, with local being the default but remote being equally supported architecturally.
 
-This approach also positions us well for WASM. A web version can run the same UI and business logic, with providers that use browser APIs instead of native system calls.
-
-**For future blog post**: Could explore the tension between "one codebase" and "platform-specific optimization." The runtime flag approach is a pragmatic middle ground that prioritizes developer experience and user consistency over theoretical purity.
+**For future blog post**: Could explore the tension between "privacy by default" and "convenience of cloud sync." The provider pattern approach lets users choose their preference without compromising the architecture.

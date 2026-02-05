@@ -13,6 +13,10 @@ We needed to decide:
 2. How do we ensure data privacy even from ourselves as developers?
 3. How do we make the architecture flexible enough to support multiple sync backends?
 
+## Implementation
+
+**Status**: Planned
+
 ## Decision
 
 Future versions of Zylance will support **zero-knowledge remote vault architecture**, where:

@@ -22,6 +22,10 @@ Options considered:
 
 We needed a solution that provides type safety, works across languages, is maintainable, and supports our architectural goals (including future WASM support).
 
+## Implementation
+
+**Status**: Complete
+
 ## Decision
 
 Use **Protocol Buffers (protobuf)** as the serialization format and contract definition language, with auto-generated TypeScript types from the C# contract definitions.
@@ -48,6 +52,10 @@ message EchoResponse {
 
 Both C# and TypeScript get strongly-typed classes/interfaces from this definition.
 
+## Risks
+
+- Running Zylance natively on Android and iOS may not be possible, will need to investigate further. As a last resort, Zylance can run as a PWA at the very least.
+
 ## Consequences
 
 ### Positive
@@ -64,7 +72,7 @@ Both C# and TypeScript get strongly-typed classes/interfaces from this definitio
 
 ### Negative
 
-- **Binary format**: Not human-readable (harder to debug than JSON)
+- **Binary format**: Not human-readable (harder to debug than JSON). Note: We're using JSON strings instead of binary for IPC
 - **Build complexity**: Code generation step required
 - **Learning curve**: Team must understand protobuf syntax and semantics
 - **Schema rigidity**: Contract changes require updates on both sides
@@ -112,7 +120,7 @@ Zylance.Contract/
 └── build/           # Generated code output
 ```
 
-**Schema evolution guidelines:**
+**Schema evolution guidelines** (note: since this is an IPC contract and we're not using binary strings, we don't need to follow these guidelines strictly. Good to still keep in mind though):
 - Never change field numbers (breaks binary compatibility)
 - Use `reserved` for removed fields to prevent reuse
 - Add new fields with default values

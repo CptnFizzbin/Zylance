@@ -15,6 +15,10 @@ We needed to decide:
 3. What operations should the abstraction expose?
 4. How do we handle vault lifecycle (create, open, close)?
 
+## Implementation
+
+**Status**: Complete
+
 ## Decision
 
 Use the **Provider Pattern** with the `IVaultProvider` interface to abstract all vault implementations.

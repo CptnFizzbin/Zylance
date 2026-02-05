@@ -18,7 +18,7 @@ Note: We omit the "Status" field as our ADRs document decisions that have alread
 
 ## Index of ADRs
 
-- [ADR-001: Local-First Architecture with Multi-Platform Runtime Flags](./ADR-001-local-first-architecture.md)
+- [ADR-001: Local-First Architecture](./ADR-001-local-first-architecture.md)
 - [ADR-002: Zero-Knowledge Remote Vault Architecture](./ADR-002-zero-knowledge-remote-vault.md)
 - [ADR-003: Vault Provider Abstraction Pattern](./ADR-003-vault-provider-abstraction.md)
 - [ADR-004: QFX as Initial Import Format](./ADR-004-qfx-initial-import-format.md)
@@ -26,6 +26,8 @@ Note: We omit the "Status" field as our ADRs document decisions that have alread
 - [ADR-006: Copilot as Productivity Tool, Not Vibe Coding](./ADR-006-copilot-productivity-not-vibe-coding.md)
 - [ADR-007: Protocol Buffers for Type-Safe Client-Server Communication](./ADR-007-protocol-buffers-communication.md)
 - [ADR-008: Single UI Codebase Across All Platforms](./ADR-008-single-ui-codebase.md)
+- [ADR-009: Runtime Platform Detection](./ADR-009-runtime-platform-detection.md)
+- [ADR-010: Zylance File Formats](./ADR-010-zylance-file-formats.md)
 
 ## When to Create an ADR
 

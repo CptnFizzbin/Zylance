@@ -17,6 +17,10 @@ For v1, we needed to choose an initial import format that would:
 
 We also needed to decide whether to use existing parsing libraries or write a custom parser.
 
+## Implementation
+
+**Status**: In Progress
+
 ## Decision
 
 Implement **QFX (Quicken Financial eXchange)** as the first supported import format with a **custom parser**.
