@@ -1,6 +1,8 @@
 using Zylance.Core.Lib.Extensions;
-using Zylance.Core.Lib.Importers.Ofx.V1.Raw;
 using Zylance.Core.Tests.Fixtures;
+using OfxRawElement = Zylance.Core.Importers.Ofx.V1.Raw.OfxRawElement;
+using OfxRawFile = Zylance.Core.Importers.Ofx.V1.Raw.OfxRawFile;
+using OfxRawToken = Zylance.Core.Importers.Ofx.V1.Raw.OfxRawToken;
 
 namespace Zylance.Core.Tests.Importers.Ofx.V1.Raw;
 
@@ -10,7 +12,8 @@ public class OfxRawParserTests
     public void OfxRawFile_Parse_ParsesHeadersCorrectly()
     {
         // Arrange
-        var ofxContent = @"OFXHEADER:100
+        var ofxContent =
+            @"OFXHEADER:100
 DATA:OFXSGML
 VERSION:102
 SECURITY:NONE
@@ -41,7 +44,8 @@ SECURITY:NONE
     public void OfxRawFile_Parse_ParsesRootElement()
     {
         // Arrange
-        var ofxContent = @"OFXHEADER:100
+        var ofxContent =
+            @"OFXHEADER:100
 DATA:OFXSGML
 
 <OFX>
@@ -63,7 +67,8 @@ DATA:OFXSGML
     public void OfxRawElement_ParseElement_ParsesTokens()
     {
         // Arrange
-        var ofxContent = @"<BANKACCTFROM>
+        var ofxContent =
+            @"<BANKACCTFROM>
   <BANKID>123456789
   <ACCTID>9876543210
   <ACCTTYPE>CHECKING
@@ -88,7 +93,8 @@ DATA:OFXSGML
     public void OfxRawElement_ParseElement_HandlesNestedElements()
     {
         // Arrange
-        var ofxContent = @"<STMTRS>
+        var ofxContent =
+            @"<STMTRS>
   <CURDEF>USD
   <BANKACCTFROM>
     <BANKID>123
@@ -123,8 +129,7 @@ DATA:OFXSGML
         // Assert
         Assert.Equal("DTPOSTED", token.Name);
         Assert.Equal("20260202120000[0:GMT]", token.Value);
-        Assert.NotNull(token.DateTimeValue);
-        Assert.Equal("2026-02-02T12:00:00.0000000+00:00", token.DateTimeValue.Value.ToIsoTimestamp());
+        Assert.Equal("2026-02-02T12:00:00.000+00:00", token.DateTimeValue.ToIso8601());
     }
 
     [Fact]
@@ -139,7 +144,6 @@ DATA:OFXSGML
         // Assert
         Assert.Equal("TRNAMT", token.Name);
         Assert.Equal("-87.50", token.Value);
-        Assert.NotNull(token.DecimalValue);
         Assert.Equal(-87.50m, token.DecimalValue);
     }
 
@@ -173,7 +177,8 @@ DATA:OFXSGML
     public void OfxRawElement_GetChildElement_ReturnsCorrectChild()
     {
         // Arrange
-        var ofxContent = @"<STMTRS>
+        var ofxContent =
+            @"<STMTRS>
   <BANKACCTFROM>
     <BANKID>123
   </BANKACCTFROM>
@@ -200,7 +205,8 @@ DATA:OFXSGML
     public void OfxRawElement_GetChildElement_ThrowsWhenNotFound()
     {
         // Arrange
-        var ofxContent = @"<STMTRS>
+        var ofxContent =
+            @"<STMTRS>
   <BANKACCTFROM>
     <BANKID>123
   </BANKACCTFROM>

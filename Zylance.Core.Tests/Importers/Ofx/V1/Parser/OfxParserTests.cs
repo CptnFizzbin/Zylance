@@ -1,6 +1,4 @@
-using Zylance.Core.Lib.Extensions;
-using Zylance.Core.Lib.Importers.Ofx.Models;
-using Zylance.Core.Lib.Importers.Ofx.V1.Parser;
+using Zylance.Core.Importers.Ofx.V1;
 using Zylance.Core.Tests.Fixtures;
 
 namespace Zylance.Core.Tests.Importers.Ofx.V1.Parser;
@@ -25,7 +23,6 @@ public class OfxV1ParserTests
         Assert.Equal("9876543210", statement.Account.AccountId);
         Assert.Equal("CHECKING", statement.Account.AccountType);
         Assert.Equal("USD", statement.Account.Currency);
-        Assert.Equal("BANK", statement.Account.Type);
     }
 
     [Fact]
@@ -44,9 +41,9 @@ public class OfxV1ParserTests
 
         var firstTransaction = statement.Transactions[0];
         Assert.Equal("DEBIT", firstTransaction.Type);
-        Assert.Equal("2025-01-02T12:00:00.0000000+00:00", firstTransaction.DatePosted.ToIsoTimestamp());
+        Assert.Equal("2025-01-02T12:00:00.000+00:00", firstTransaction.DatePosted.ToIso8601());
         Assert.Equal(-87.50m, firstTransaction.Amount);
-        Assert.Equal("2025010201", firstTransaction.FitId);
+        Assert.Equal("2025010201", firstTransaction.Id);
         Assert.Equal("WHOLE FOODS MARKET #123", firstTransaction.Name);
         Assert.Equal("Grocery shopping", firstTransaction.Memo);
 
@@ -94,7 +91,7 @@ public class OfxV1ParserTests
         Assert.Equal("1122334455", statement.Account.AccountId);
         Assert.Equal("SAVINGS", statement.Account.AccountType);
         Assert.Equal("CAD", statement.Account.Currency);
-        
+
         Assert.Equal(2, statement.Transactions.Count);
 
         var credit = statement.Transactions.First(t => t.Type == "CREDIT");

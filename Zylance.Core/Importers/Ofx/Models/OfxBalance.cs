@@ -1,4 +1,4 @@
-namespace Zylance.Core.Lib.Importers.Ofx.Models;
+namespace Zylance.Core.Importers.Ofx.Models;
 
 public record OfxBalance
 {

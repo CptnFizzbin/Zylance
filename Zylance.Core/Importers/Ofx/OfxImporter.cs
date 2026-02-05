@@ -2,7 +2,7 @@ using Zylance.Contract.Models.File;
 using Zylance.Core.App.Services;
 using Zylance.Core.Lib.Importers;
 
-namespace Zylance.Core.Importers;
+namespace Zylance.Core.Importers.Ofx;
 
 public class OfxImporter(FileService fileService) : IImporter
 {

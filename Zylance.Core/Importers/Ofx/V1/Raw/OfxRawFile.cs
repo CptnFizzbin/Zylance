@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
+using Zylance.Core.Lib.Extensions;
 
-namespace Zylance.Core.Lib.Importers.Ofx.V1.Raw;
+namespace Zylance.Core.Importers.Ofx.V1.Raw;
 
 internal partial record OfxRawFile
 {
@@ -37,11 +38,7 @@ internal partial record OfxRawFile
         if (root is null)
             throw new InvalidDataException("Missing root element.");
 
-        return new OfxRawFile
-        {
-            Headers = headers,
-            Root = root,
-        };
+        return new OfxRawFile { Headers = headers, Root = root };
     }
 
     [GeneratedRegex(@"^#")]
