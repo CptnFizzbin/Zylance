@@ -15,7 +15,7 @@ public class MarkerTableTests : IDisposable
     public MarkerTableTests()
     {
         // Create a unique temporary directory for all test files
-        _tempDirectory = Path.Combine(Path.GetTempPath(), $"zylance.{Guid.NewGuid()}");
+        _tempDirectory = Path.Combine(Path.GetTempPath(), $"zylance.test.{Guid.NewGuid()}");
         Directory.CreateDirectory(_tempDirectory);
     }
 

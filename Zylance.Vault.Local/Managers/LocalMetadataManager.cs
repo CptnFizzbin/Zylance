@@ -28,6 +28,8 @@ public class LocalMetadataManager(LocalVaultDbContext dbContext) : IMetadataMana
         else
         {
             // Create new entry
+            // Note: For concurrent scenarios, consider using ExecuteUpdateAsync
+            // or handling DbUpdateException for duplicate key violations
             dbContext.ZylanceMetadata.Add(new ZylanceMetadataEntity { Key = key, Value = value });
         }
 
