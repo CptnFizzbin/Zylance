@@ -7,7 +7,8 @@ public class LocalVaultContextFactory : IDesignTimeDbContextFactory<LocalVaultDb
 {
     public LocalVaultDbContext CreateDbContext(string[] args)
     {
-        return CreateDbContextFromFile(args[0]);
+        var filePath = args.Length > 0 ? args[0] : "localvault.zlv";
+        return CreateDbContextFromFile(filePath);
     }
 
     public static LocalVaultDbContext CreateDbContextFromFile(string filePath = "localvault.zlv")

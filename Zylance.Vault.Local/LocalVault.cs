@@ -59,10 +59,36 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     /// </summary>
     /// <param name="filePath">Path to the SQLite database file</param>
     /// <returns>A new LocalVault instance</returns>
+    /// <exception cref="NonZylanceDatabaseException">
+    ///     Thrown when the database exists but does not contain the _zylance_ marker table
+    /// </exception>
     public static async Task<LocalVault> FromFile(string filePath)
     {
         var dbContext = LocalVaultContextFactory.CreateDbContextFromFile(filePath);
+
+        // Check if database file exists
+        var fileExists = File.Exists(filePath);
+
+        if (fileExists)
+        {
+            // If database exists, verify it's a Zylance vault by checking for the marker table
+            var hasMarkerTable =
+                await dbContext.Database.CanConnectAsync()
+                && await dbContext
+                    .Database.SqlQueryRaw<int>(
+                        "SELECT COUNT(*) as Value FROM sqlite_master WHERE type='table' AND name='_zylance_'"
+                    )
+                    .FirstOrDefaultAsync() > 0;
+
+            if (!hasMarkerTable)
+            {
+                throw new NonZylanceDatabaseException(filePath);
+            }
+        }
+
+        // Apply migrations (this will create the marker table for new databases)
         await dbContext.Database.MigrateAsync();
+
         return new LocalVault(dbContext);
     }
 }

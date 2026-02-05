@@ -11,4 +11,17 @@ public class LocalVaultDbContext(DbContextOptions<LocalVaultDbContext> options) 
 {
     public DbSet<AccountEntity> Accounts { get; set; }
     public DbSet<LedgerEntryEntity> LedgerEntries { get; set; }
+    public DbSet<ZylanceMetadataEntity> ZylanceMetadata { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // Configure the _zylance_ marker table
+        modelBuilder.Entity<ZylanceMetadataEntity>(entity =>
+        {
+            entity.ToTable("_zylance_");
+            entity.HasKey(e => e.Key);
+        });
+    }
 }
