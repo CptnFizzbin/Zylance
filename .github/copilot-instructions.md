@@ -168,6 +168,41 @@ var dtPostedTok = element.Tokens["DTPOSTED"];
 
 **Why?** Full names improve readability and make code self-documenting. Modern IDEs handle autocomplete, so verbosity is not a burden.
 
+### Extension Methods
+
+✅ **Use C# 14 extension blocks for cleaner extension method definitions:**
+
+```csharp
+// Good - C# 14 extension block syntax
+namespace MyNamespace;
+
+public static class DateTimeOffsetExtensions
+{
+    extension(DateTimeOffset dateTime)
+    {
+        public string ToIso8601()
+        {
+            return dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffK");
+        }
+    }
+}
+
+// Traditional syntax (still valid, but extension blocks are preferred)
+public static class DateTimeOffsetExtensions
+{
+    public static string ToIso8601(this DateTimeOffset dateTime)
+    {
+        return dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffK");
+    }
+}
+```
+
+**Why?** C# 14's extension blocks provide:
+- Cleaner syntax without repetitive `this` keywords
+- Groups related extension methods logically by the type they extend
+- More readable when defining multiple extensions for the same type
+- The target type (e.g., `DateTimeOffset`) is explicit in the `extension()` declaration
+
 ### Code Formatting
 
 ✅ **Always run CSharpier before committing:**

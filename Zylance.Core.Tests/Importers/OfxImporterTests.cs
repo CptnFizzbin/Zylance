@@ -55,8 +55,8 @@ public class OfxImporterTests
         FileRef? nullFileRef = null;
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(
-            () => _importer.ImportAsync(nullFileRef!, TestContext.Current.CancellationToken)
+        await Assert.ThrowsAsync<NotImplementedException>(() =>
+            _importer.ImportAsync(nullFileRef!, TestContext.Current.CancellationToken)
         );
     }
 
@@ -72,8 +72,8 @@ public class OfxImporterTests
         };
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotImplementedException>(
-            () => _importer.ImportAsync(fileRef, TestContext.Current.CancellationToken)
+        await Assert.ThrowsAsync<NotImplementedException>(() =>
+            _importer.ImportAsync(fileRef, TestContext.Current.CancellationToken)
         );
     }
 
@@ -87,7 +87,7 @@ public class OfxImporterTests
             Filename = "transactions.qfx",
             ReadOnly = true,
         };
-        var cancellationTokenSource = new CancellationTokenSource();
+        using var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
         // Act & Assert
@@ -104,7 +104,7 @@ public class OfxImporterTests
             Filename = "transactions.qfx",
             ReadOnly = true,
         };
-        var cancellationTokenSource = new CancellationTokenSource();
+        using var cancellationTokenSource = new CancellationTokenSource();
         await cancellationTokenSource.CancelAsync();
         var cancellationToken = cancellationTokenSource.Token;
 

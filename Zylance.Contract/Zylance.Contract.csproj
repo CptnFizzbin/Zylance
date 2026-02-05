@@ -1,45 +1,51 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <!-- RID-agnostic library - consuming project specifies RID (browser-wasm, win-x64, etc) -->
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- RID-agnostic library - consuming project specifies RID (browser-wasm, win-x64, etc) -->
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Google.Protobuf" Version="3.33.5"/>
-        <PackageReference Include="Grpc.Tools" Version="2.76.0">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.33.5" />
+    <PackageReference Include="Grpc.Tools" Version="2.76.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
-    <PropertyGroup>
-        <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)\yarn.cmd</YarnExe>
-        <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn.cmd</YarnExe>
-        <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)/bin/yarn</YarnExe>
-        <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn</YarnExe>
-        <TsOutputPath>../Zylance.UI/Generated/</TsOutputPath>
-    </PropertyGroup>
+  <PropertyGroup>
+    <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)\yarn.cmd</YarnExe>
+    <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn.cmd</YarnExe>
+    <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)/bin/yarn</YarnExe>
+    <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn</YarnExe>
+    <TsOutputPath>../Zylance.UI/Generated/</TsOutputPath>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <Protobuf Include="./zylance/**/*.proto" GrpcServices="None"/>
-    </ItemGroup>
+  <ItemGroup>
+    <Protobuf Include="./zylance/**/*.proto" GrpcServices="None" />
+  </ItemGroup>
 
-    <Target Name="YarnInstall"
-            BeforeTargets="Build"
-            Inputs="package.json;yarn.lock"
-            Outputs="$(IntermediateOutputPath)yarn.install.marker"
-    >
-        <Exec Command="$(YarnExe) install"/>
-        <Touch Files="$(IntermediateOutputPath)yarn.install.marker" AlwaysCreate="true"/>
-    </Target>
+  <Target
+    Name="YarnInstall"
+    BeforeTargets="Build"
+    Inputs="package.json;yarn.lock"
+    Outputs="$(IntermediateOutputPath)yarn.install.marker"
+  >
+    <Exec Command="$(YarnExe) install" />
+    <Touch Files="$(IntermediateOutputPath)yarn.install.marker" AlwaysCreate="true" />
+  </Target>
 
-    <Target Name="GenerateTS"
-            AfterTargets="Build"
-            Inputs="@(Protobuf);$(MSBuildProjectFile)"
-            Outputs="$(TsOutputPath).generated.marker">
-        <Exec Command="$(YarnExe) build:msbuild &quot;$(TsOutputPath)&quot;" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
-        <Touch Files="$(TsOutputPath).generated.marker" AlwaysCreate="true"/>
-    </Target>
+  <Target
+    Name="GenerateTS"
+    AfterTargets="Build"
+    Inputs="@(Protobuf);$(MSBuildProjectFile)"
+    Outputs="$(TsOutputPath).generated.marker"
+  >
+    <Exec
+      Command="$(YarnExe) build:msbuild &quot;$(TsOutputPath)&quot;"
+      EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"
+    />
+    <Touch Files="$(TsOutputPath).generated.marker" AlwaysCreate="true" />
+  </Target>
 </Project>
