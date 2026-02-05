@@ -80,3 +80,8 @@ dotnet csharpier --check .
 - **VS Code**: Install the "CSharpier" extension
 - **Visual Studio**: Install the "CSharpier" extension
 
+## Documentation
+
+- **[Architecture Decision Records (ADRs)](./Docs/ADRs/)** - Documented architectural decisions and rationale
+- **[Import/Export Formats](./Docs/Formats/)** - Supported file formats for financial data import/export
+
