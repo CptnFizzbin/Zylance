@@ -59,7 +59,7 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     /// </summary>
     /// <param name="filePath">Path to the SQLite database file</param>
     /// <returns>A new LocalVault instance</returns>
-    public async static Task<LocalVault> FromFile(string filePath)
+    public static async Task<LocalVault> FromFile(string filePath)
     {
         var dbContext = LocalVaultContextFactory.CreateDbContextFromFile(filePath);
         await dbContext.Database.MigrateAsync();

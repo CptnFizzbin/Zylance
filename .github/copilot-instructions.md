@@ -6,6 +6,18 @@ Zylance is an open-source finance and budgeting application built with a clean a
 features a desktop interface powered by Photino.NET with a React/TypeScript frontend, communicating via Protocol Buffers
 over a custom transport layer.
 
+# Notes to Agents
+
+You are encouraged to update this file with any additional instructions or guidelines that will help future contributors
+and agents understand the project's architecture, coding standards, and best practices. In particular, consider adding:
+- solutions to repeated issues (e.g, using the wrong flags for command-line tools)
+
+## Build Prerequisites
+
+Before building the project, ensure the following are installed and configured:
+- **Node.js** and **Corepack** - Required for frontend builds. Enable corepack with: `corepack enable`
+- **.NET 10.0 SDK** - Required for backend builds
+
 ## Architecture
 
 ### Core Components
@@ -16,6 +28,7 @@ over a custom transport layer.
 - **Zylance.Contract** - Protocol Buffers message contracts for type-safe communication
 - **Zylance.Vault.Local** - Local vault implementation using Entity Framework Core
 - **Zylance.SourceGenerators** - Source generators for automatic controller registration
+- **Docs** - Project documentation including format specifications and design documents
 
 ### Key Patterns
 
@@ -110,6 +123,96 @@ public class RequestDto
 - Work well with `required` keyword for mandatory properties
 - Better express that DTOs/POCOs are immutable data contracts
 
+### Regex Patterns
+
+✅ **Use `[GeneratedRegex]` for simple patterns, `Lazy<Regex>` for complex ones:**
+
+```csharp
+// Good - simple pattern with source generation
+[GeneratedRegex(@"^\<(?'Name'[\w\d\.]+)\>$")]
+private static partial Regex ElementStartRegex();
+
+// Good - complex pattern built with string.Join for readability
+private readonly static Lazy<Regex> DateTimeRegex = new(() =>
+{
+    var pattern = string.Join(
+        "",
+        @"(?'Year'\d{4})",
+        @"(?'Month'\d{2})",
+        @"(?'Day'\d{2})"
+    );
+    return new Regex($"^{pattern}$");
+});
+```
+
+**Why?** 
+- Source-generated regex is fastest for simple patterns
+- Complex patterns benefit from builder pattern for maintainability
+- Add a comment explaining why you're using `Lazy<Regex>` instead of `[GeneratedRegex]`
+
+### Naming Conventions
+
+✅ **Use full, descriptive variable names - do NOT shorten:**
+
+```csharp
+// Good
+var statementTransactionResponse = element.GetChild("STMTTRNRS");
+var bankAccountFromElement = element.GetChild("BANKACCTFROM");
+var datePostedToken = element.Tokens["DTPOSTED"];
+
+// Avoid - shortened names
+var stmtTrnRs = element.GetChild("STMTTRNRS");
+var bankAcctFromElem = element.GetChild("BANKACCTFROM");
+var dtPostedTok = element.Tokens["DTPOSTED"];
+```
+
+**Why?** Full names improve readability and make code self-documenting. Modern IDEs handle autocomplete, so verbosity is not a burden.
+
+### Extension Methods
+
+✅ **Use C# 14 extension blocks for cleaner extension method definitions:**
+
+```csharp
+// Good - C# 14 extension block syntax
+namespace MyNamespace;
+
+public static class DateTimeOffsetExtensions
+{
+    extension(DateTimeOffset dateTime)
+    {
+        public string ToIso8601()
+        {
+            return dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffK");
+        }
+    }
+}
+
+// Traditional syntax (still valid, but extension blocks are preferred)
+public static class DateTimeOffsetExtensions
+{
+    public static string ToIso8601(this DateTimeOffset dateTime)
+    {
+        return dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffK");
+    }
+}
+```
+
+**Why?** C# 14's extension blocks provide:
+- Cleaner syntax without repetitive `this` keywords
+- Groups related extension methods logically by the type they extend
+- More readable when defining multiple extensions for the same type
+- The target type (e.g., `DateTimeOffset`) is explicit in the `extension()` declaration
+
+### Code Formatting
+
+✅ **Always run CSharpier before committing:**
+
+```bash
+dotnet csharpier .
+```
+
+**Why?** Consistent formatting across the codebase improves readability and reduces diff noise. The CI pipeline will fail if code is not properly formatted.
+
 ### Additional Guidelines
 
 - Use `required` keyword for mandatory properties on records/classes
@@ -117,6 +220,7 @@ public class RequestDto
 - Follow async/await patterns for I/O operations
 - Use nullable reference types (`string?`) to express nullability explicitly
 - Controllers should be stateless and rely on injected services
+- Make internal classes testable via `[assembly: InternalsVisibleTo("ProjectName.Tests")]` in `Properties/AssemblyInfo.cs`
 
 ### Comments and Documentation
 
@@ -145,12 +249,66 @@ async function processFilesSequentially(files: string[]) {
 ```
 
 **Why?** Code should be self-documenting through clear naming. Comments add value by explaining:
+
 - Business logic decisions
 - Performance considerations
 - Workarounds for bugs or limitations
 - Complex algorithms that aren't immediately obvious
 
-Use descriptive function and variable names to convey *what* the code does, reserving comments for *why* decisions were made.
+Use descriptive function and variable names to convey *what* the code does, reserving comments for *why* decisions were
+made.
+
+## Testing Guidelines
+
+### Test Organization
+
+✅ **Use xUnit theory tests with inline data for parameterized testing:**
+
+```csharp
+// Good - concise and readable test data
+[Theory]
+[InlineData("20220101123000", "2022-01-01T12:30:00+00:00")]
+[InlineData("20231215083045", "2023-12-15T08:30:45+00:00")]
+public void Parse_ValidInput_ParsesCorrectly(string input, string expected)
+{
+    var result = Parser.Parse(input);
+    Assert.Equal(expected, result);
+}
+
+// Avoid - separate test methods for similar cases
+[Fact]
+public void Parse_FirstCase_Works() { /* ... */ }
+
+[Fact]
+public void Parse_SecondCase_Works() { /* ... */ }
+```
+
+### Test Naming
+
+✅ **Use descriptive test names that indicate: Method_Scenario_ExpectedResult:**
+
+```csharp
+// Good
+TryParse_ValidInput_ParsesCorrectly
+TryParse_InvalidInput_ReturnsFalse
+GetChildElement_MissingChild_ThrowsException
+
+// Avoid
+Test1
+ParseTest
+TestParser
+```
+
+### Test Coverage
+
+Ensure tests cover:
+- **Happy path** - valid inputs with expected outputs
+- **Edge cases** - boundary conditions, special values
+- **Error cases** - invalid inputs, null handling, exceptions
+- **Format variations** - different valid input formats where applicable
+
+**Why?** Well-organized parameterized tests are easier to maintain and extend. Clear test names make failures immediately
+understandable.
 
 ## Technology Stack
 
@@ -161,3 +319,95 @@ Use descriptive function and variable names to convey *what* the code does, rese
 - **Protocol Buffers** - Serialization format
 - **Entity Framework Core** - Database ORM (Local vault)
 - **Roslyn Source Generators** - Code generation
+
+### Key Libraries & Tools
+
+#### Backend (.NET)
+
+**Microsoft.Extensions.DependencyInjection** (10.0.2+)
+- Built-in .NET dependency injection container
+- Used throughout the application for service registration and resolution
+- All controllers, services, and providers are registered via DI
+
+**Microsoft.EntityFrameworkCore** (10.0.2+)
+- ORM for database access in `Zylance.Vault.Local`
+- Handles migrations, change tracking, and LINQ queries
+- SQLite provider used for local vault storage
+
+**Photino.NET**
+- Cross-platform desktop application framework
+- Provides native windowing with embedded web view
+- Lightweight alternative to Electron - uses OS native WebView
+- Used in `Zylance.Desktop` project
+
+**Protocol Buffers (protobuf-net or Google.Protobuf)**
+- Binary serialization format for efficient communication
+- Type-safe contracts defined in `Zylance.Contract`
+- Used for communication between UI and backend via custom transport layer
+
+#### Frontend (React/TypeScript)
+
+**React 19+**
+- Component-based UI library
+- Located in `Zylance.UI/Src`
+
+**TypeScript**
+- Type-safe JavaScript with compile-time checks
+- All frontend code uses strict TypeScript
+
+**Vite**
+- Fast frontend build tool and dev server
+- Hot module replacement (HMR) for development
+- Configured in `Zylance.UI/vite.config.ts`
+
+**Biome**
+- Fast linter and formatter for JavaScript/TypeScript
+- Replaces ESLint and Prettier
+- Configuration in `Zylance.UI/biome.json`
+
+#### Testing
+
+**xUnit v3** (3.2.2+)
+- Modern testing framework for .NET
+- Uses `Microsoft.Testing.Platform` v2 (not the old test runners)
+- Theory tests with `[InlineData]` for parameterized testing
+- Test projects: `Zylance.Core.Tests`, `Zylance.Vault.Local.Tests`, etc.
+
+**Important:** xUnit v3 uses different CLI arguments than v2:
+```bash
+# Use --filter-class, --filter-method, --filter-namespace
+dotnet test --filter-class "*DateTimeOffsetParserTests"
+
+# NOT the old --filter syntax
+```
+
+#### Development Tools
+
+**Roslyn Source Generators** (`Zylance.SourceGenerators`)
+- Compile-time code generation
+- Automatically generates controller registration code
+- Must be referenced as `Analyzer` in project references
+- Generated files output to `obj/` when `EmitCompilerGeneratedFiles` is enabled
+
+**JetBrains Rider / Visual Studio**
+- Primary IDEs for development
+- `.sln.DotSettings` files contain team-shared settings
+
+### Common Patterns in Libraries
+
+**Lazy<T>**
+- Thread-safe lazy initialization
+- Used for expensive resources like compiled Regex patterns
+- Initialized only once on first access
+
+**Source-Generated Regex** (`[GeneratedRegex]`)
+- Compile-time regex generation (C# 11+)
+- Faster than runtime-compiled regex
+- Requires `partial` class/method
+- Use for simple patterns; fall back to `Lazy<Regex>` for complex patterns
+
+**InternalsVisibleTo**
+- Makes `internal` classes visible to test projects
+- Defined in `Properties/AssemblyInfo.cs`
+- Enables testing of internal implementation details
+
