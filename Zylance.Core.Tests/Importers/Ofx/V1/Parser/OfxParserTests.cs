@@ -1,4 +1,5 @@
 using Zylance.Core.Importers.Ofx.V1;
+using Zylance.Core.Lib.Extensions;
 using Zylance.Core.Tests.Fixtures;
 
 namespace Zylance.Core.Tests.Importers.Ofx.V1.Parser;
@@ -6,14 +7,13 @@ namespace Zylance.Core.Tests.Importers.Ofx.V1.Parser;
 public class OfxV1ParserTests
 {
     [Fact]
-    public async Task ParseAsync_WithExampleQfx_ParsesStatement()
+    public Task ParseAsync_WithExampleQfx_ParsesStatement()
     {
         // Arrange
-        var parser = new OfxV1Parser();
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.qfx");
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.qfx");
-        var statements = await parser.ParseAsync(reader);
+        var statements = OfxV1Parser.Parse(reader);
 
         // Assert
         Assert.Single(statements);
@@ -23,17 +23,17 @@ public class OfxV1ParserTests
         Assert.Equal("9876543210", statement.Account.AccountId);
         Assert.Equal("CHECKING", statement.Account.AccountType);
         Assert.Equal("USD", statement.Account.Currency);
+        return Task.CompletedTask;
     }
 
     [Fact]
-    public async Task ParseAsync_WithExampleQfx_ParsesTransactions()
+    public Task ParseAsync_WithExampleQfx_ParsesTransactions()
     {
         // Arrange
-        var parser = new OfxV1Parser();
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.qfx");
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.qfx");
-        var statements = await parser.ParseAsync(reader);
+        var statements = OfxV1Parser.Parse(reader);
 
         // Assert
         var statement = statements[0];
@@ -50,17 +50,17 @@ public class OfxV1ParserTests
         var creditTransaction = statement.Transactions.First(t => t.Type == "CREDIT");
         Assert.Equal(2500.00m, creditTransaction.Amount);
         Assert.Equal("DIRECT DEPOSIT ACME CORP", creditTransaction.Name);
+        return Task.CompletedTask;
     }
 
     [Fact]
-    public async Task ParseAsync_WithExampleQfx_ParsesBalances()
+    public Task ParseAsync_WithExampleQfx_ParsesBalances()
     {
         // Arrange
-        var parser = new OfxV1Parser();
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.qfx");
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.qfx");
-        var statements = await parser.ParseAsync(reader);
+        var statements = OfxV1Parser.Parse(reader);
 
         // Assert
         var statement = statements[0];
@@ -72,17 +72,17 @@ public class OfxV1ParserTests
         Assert.NotNull(statement.AvailableBalance);
         Assert.Equal(1411.81m, statement.AvailableBalance.Amount);
         Assert.Equal("AVAIL", statement.AvailableBalance.Type);
+        return Task.CompletedTask;
     }
 
     [Fact]
-    public async Task ParseAsync_WithExampleOfx_ParsesCorrectly()
+    public Task ParseAsync_WithExampleOfx_ParsesCorrectly()
     {
         // Arrange
-        var parser = new OfxV1Parser();
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.ofx");
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/example.ofx");
-        var statements = await parser.ParseAsync(reader);
+        var statements = OfxV1Parser.Parse(reader);
 
         // Assert
         Assert.Single(statements);
@@ -101,21 +101,23 @@ public class OfxV1ParserTests
         var debit = statement.Transactions.First(t => t.Type == "DEBIT");
         Assert.Equal(-75.25m, debit.Amount);
         Assert.Equal("GROCERY STORE", debit.Name);
+        return Task.CompletedTask;
     }
 
     [Fact]
-    public async Task ParseAsync_TransactionWithXferType_SetsIsTransferFlag()
+    public Task ParseAsync_TransactionWithXferType_SetsIsTransferFlag()
     {
         // Arrange
         var parser = new OfxV1Parser();
 
         // Act
         using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/transfer.ofx");
-        var statements = await parser.ParseAsync(reader);
+        var statements = parser.Parse(reader);
 
         // Assert
         var transaction = statements[0].Transactions[0];
         Assert.True(transaction.IsTransfer);
         Assert.Equal("XFER", transaction.Type);
+        return Task.CompletedTask;
     }
 }
