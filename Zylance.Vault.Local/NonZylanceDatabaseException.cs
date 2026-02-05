@@ -6,9 +6,11 @@ namespace Zylance.Vault.Local;
 /// </summary>
 public class NonZylanceDatabaseException : Exception
 {
+    public string Reason { get; }
+
     public NonZylanceDatabaseException(string filePath)
-        : base(
-            $"The database at '{filePath}' is not a Zylance vault. "
-                + "The required '_zylance_' marker table was not found."
-        ) { }
+        : base($"The database at '{filePath}' is not a Zylance vault.")
+    {
+        Reason = "The required '_zylance_' marker table was not found.";
+    }
 }

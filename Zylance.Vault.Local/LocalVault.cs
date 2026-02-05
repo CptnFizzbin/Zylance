@@ -21,6 +21,11 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     /// </summary>
     public ILedgerManager Ledgers { get; } = new LocalLedgerManager(dbContext);
 
+    /// <summary>
+    ///     Gets the metadata manager for managing vault metadata.
+    /// </summary>
+    public IMetadataManager Metadata { get; } = new LocalMetadataManager(dbContext);
+
     public Guid VaultId { get; } = Guid.CreateVersion7();
     public bool Locked => false; // TODO: Implement lock state management
 

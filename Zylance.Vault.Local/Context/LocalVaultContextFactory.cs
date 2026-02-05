@@ -7,11 +7,11 @@ public class LocalVaultContextFactory : IDesignTimeDbContextFactory<LocalVaultDb
 {
     public LocalVaultDbContext CreateDbContext(string[] args)
     {
-        var filePath = args.Length > 0 ? args[0] : "localvault.zlv";
+        var filePath = args.Length > 0 ? args[0] : "localvault.zlv.sqlite";
         return CreateDbContextFromFile(filePath);
     }
 
-    public static LocalVaultDbContext CreateDbContextFromFile(string filePath = "localvault.zlv")
+    public static LocalVaultDbContext CreateDbContextFromFile(string filePath = "localvault.zlv.sqlite")
     {
         var connectionString = $"Data Source={filePath}";
         return CreateDbContext(connectionString);

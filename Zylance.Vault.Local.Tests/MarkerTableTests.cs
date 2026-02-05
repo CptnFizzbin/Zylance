@@ -10,17 +10,21 @@ namespace Zylance.Vault.Local.Tests;
 /// </summary>
 public class MarkerTableTests : IDisposable
 {
-    private readonly List<string> _tempFiles = new();
+    private readonly string _tempDirectory;
+
+    public MarkerTableTests()
+    {
+        // Create a unique temporary directory for all test files
+        _tempDirectory = Path.Combine(Path.GetTempPath(), $"zylance.{Guid.NewGuid()}");
+        Directory.CreateDirectory(_tempDirectory);
+    }
 
     public void Dispose()
     {
-        // Clean up any temporary files created during tests
-        foreach (var file in _tempFiles)
+        // Delete the entire temporary directory
+        if (Directory.Exists(_tempDirectory))
         {
-            if (File.Exists(file))
-            {
-                File.Delete(file);
-            }
+            Directory.Delete(_tempDirectory, recursive: true);
         }
 
         GC.SuppressFinalize(this);
@@ -28,9 +32,8 @@ public class MarkerTableTests : IDisposable
 
     private string CreateTempFilePath()
     {
-        var path = Path.Combine(Path.GetTempPath(), $"test_{Guid.NewGuid()}.zlv.sqlite");
-        _tempFiles.Add(path);
-        return path;
+        var fileName = $"test_{Guid.NewGuid()}.zlv.sqlite";
+        return Path.Combine(_tempDirectory, fileName);
     }
 
     private async Task<bool> TableExistsAsync(string filePath, string tableName)
@@ -94,6 +97,15 @@ public class MarkerTableTests : IDisposable
 
         Assert.Contains("not a Zylance vault", exception.Message);
         Assert.Contains(filePath, exception.Message);
+
+        // Verify that migrations were not run - check that Zylance tables don't exist
+        var accountsTableExists = await TableExistsAsync(filePath, "Accounts");
+        var ledgerEntriesTableExists = await TableExistsAsync(filePath, "LedgerEntries");
+        var markerTableExists = await TableExistsAsync(filePath, "_zylance_");
+
+        Assert.False(accountsTableExists, "Accounts table should not exist");
+        Assert.False(ledgerEntriesTableExists, "LedgerEntries table should not exist");
+        Assert.False(markerTableExists, "_zylance_ table should not exist");
     }
 
     [Fact]
@@ -121,27 +133,43 @@ public class MarkerTableTests : IDisposable
         var filePath = CreateTempFilePath();
         var vault = await LocalVault.FromFile(filePath);
 
-        // Act - insert and read metadata
-        using (var connection = new SqliteConnection($"Data Source={filePath}"))
-        {
-            await connection.OpenAsync();
+        // Act - set and get metadata using the Metadata API
+        await vault.Metadata.SetAsync("version", "1.0.0");
+        var value = await vault.Metadata.GetAsync("version");
 
-            // Insert metadata
-            using (var insertCommand = connection.CreateCommand())
-            {
-                insertCommand.CommandText = "INSERT INTO _zylance_ (Key, Value) VALUES ('version', '1.0.0')";
-                await insertCommand.ExecuteNonQueryAsync();
-            }
+        // Assert
+        Assert.NotNull(value);
+        Assert.Equal("1.0.0", value);
+    }
 
-            // Read metadata
-            using var selectCommand = connection.CreateCommand();
-            selectCommand.CommandText = "SELECT Value FROM _zylance_ WHERE Key = 'version'";
-            var value = await selectCommand.ExecuteScalarAsync();
+    [Fact]
+    public async Task Metadata_GetAsync_NonExistentKey_ReturnsNull()
+    {
+        // Arrange
+        var filePath = CreateTempFilePath();
+        var vault = await LocalVault.FromFile(filePath);
 
-            // Assert
-            Assert.NotNull(value);
-            Assert.Equal("1.0.0", value.ToString());
-        }
+        // Act
+        var value = await vault.Metadata.GetAsync("nonexistent");
+
+        // Assert
+        Assert.Null(value);
+    }
+
+    [Fact]
+    public async Task Metadata_SetAsync_UpdatesExistingValue()
+    {
+        // Arrange
+        var filePath = CreateTempFilePath();
+        var vault = await LocalVault.FromFile(filePath);
+        await vault.Metadata.SetAsync("version", "1.0.0");
+
+        // Act - update the value
+        await vault.Metadata.SetAsync("version", "2.0.0");
+        var value = await vault.Metadata.GetAsync("version");
+
+        // Assert
+        Assert.Equal("2.0.0", value);
     }
 
     [Fact]
