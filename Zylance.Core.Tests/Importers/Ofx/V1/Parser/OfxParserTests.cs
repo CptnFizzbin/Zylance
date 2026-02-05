@@ -108,11 +108,10 @@ public class OfxV1ParserTests
     public Task ParseAsync_TransactionWithXferType_SetsIsTransferFlag()
     {
         // Arrange
-        var parser = new OfxV1Parser();
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/transfer.ofx");
 
         // Act
-        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/transfer.ofx");
-        var statements = parser.Parse(reader);
+        var statements = OfxV1Parser.Parse(reader);
 
         // Assert
         var transaction = statements[0].Transactions[0];
