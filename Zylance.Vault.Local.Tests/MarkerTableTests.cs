@@ -21,7 +21,6 @@ public class MarkerTableTests : IDisposable
 
     public void Dispose()
     {
-        // Delete the entire temporary directory
         if (Directory.Exists(_tempDirectory))
         {
             Directory.Delete(_tempDirectory, recursive: true);

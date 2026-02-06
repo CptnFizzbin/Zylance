@@ -78,30 +78,7 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
 
             if (fileExists)
             {
-                // If database exists, verify it's a Zylance vault by checking for the marker table
-                var canConnect = await dbContext.Database.CanConnectAsync();
-                if (canConnect)
-                {
-                    var connection = dbContext.Database.GetDbConnection();
-                    await connection.OpenAsync();
-                    try
-                    {
-                        using var command = connection.CreateCommand();
-                        command.CommandText =
-                            "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='_zylance_'";
-                        var result = await command.ExecuteScalarAsync();
-                        var hasMarkerTable = result is not null && Convert.ToInt32(result) > 0;
-
-                        if (!hasMarkerTable)
-                        {
-                            throw new NonZylanceDatabaseException(filePath);
-                        }
-                    }
-                    finally
-                    {
-                        await connection.CloseAsync();
-                    }
-                }
+                await AssertZylanceVault(dbContext, filePath);
             }
 
             // Apply migrations (this will create the marker table for new databases)
@@ -113,6 +90,35 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
         {
             await dbContext.DisposeAsync();
             throw;
+        }
+    }
+
+    private static async Task AssertZylanceVault(LocalVaultDbContext dbContext, string filePath)
+    {
+        var canConnect = await dbContext.Database.CanConnectAsync();
+        if (canConnect)
+        {
+            var connection = dbContext.Database.GetDbConnection();
+            await connection.OpenAsync();
+            try
+            {
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='_zylance_'";
+                var result = await command.ExecuteScalarAsync();
+                var hasMarkerTable = result is not null && Convert.ToInt32(result) > 0;
+
+                if (!hasMarkerTable)
+                {
+                    throw new NonZylanceDatabaseException(
+                        filePath,
+                        "The required '_zylance_' marker table was not found."
+                    );
+                }
+            }
+            finally
+            {
+                await connection.CloseAsync();
+            }
         }
     }
 }
