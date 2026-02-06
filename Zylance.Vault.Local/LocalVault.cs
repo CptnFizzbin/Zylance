@@ -74,7 +74,6 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
 
         try
         {
-            // Check if database file exists
             var fileExists = File.Exists(filePath);
 
             if (fileExists)
@@ -82,7 +81,6 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
                 await AssertZylanceVault(dbContext, filePath, cancellationToken);
             }
 
-            // Apply migrations (this will create the marker table for new databases)
             await dbContext.Database.MigrateAsync(cancellationToken);
 
             return new LocalVault(dbContext);

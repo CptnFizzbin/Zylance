@@ -66,7 +66,6 @@ public class MarkerTableTests : IDisposable
         // Assert
         Assert.NotNull(vault);
 
-        // Verify the marker table exists
         var tableExists = await TableExistsAsync(filePath, "_zylance_");
         Assert.True(tableExists);
     }
