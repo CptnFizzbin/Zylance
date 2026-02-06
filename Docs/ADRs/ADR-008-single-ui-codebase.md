@@ -53,11 +53,12 @@ function FileImportButton() {
 The UI project structure:
 ```
 Zylance.UI/
-├── src/
-│   ├── components/   # Shared components
-│   ├── features/     # Feature modules
-│   ├── platform/     # Platform detection and utilities
-│   └── providers/    # Platform-specific provider implementations
+├── Src/
+│   ├── Routes/          # Route components
+│   ├── Components/      # Shared components
+│   ├── Integrations/    # Third-party integrations
+│   └── Hooks/           # Custom React hooks
+├── Public/              # Static assets
 ├── package.json
 └── vite.config.ts
 ```
@@ -136,20 +137,14 @@ This keeps platform-specific code isolated and testable.
 **React Native:**
 - Also uses single codebase with runtime platform detection
 - More mature ecosystem but heavier runtime
-- Our approach is lighter (web-first with native wrappers)
+- Not chosen because we wanted to use familiar web tools like MUI (Material-UI)
+- Unfamiliarity with React Native's design flexibility constraints
 
 **Electron:**
 - Single codebase, but desktop-only
-- We extend this concept to mobile and web
-
-**Flutter:**
-- Similar philosophy (single codebase, multiple platforms)
-- But requires Dart instead of leveraging existing web skills
-
-**Native per platform:**
-- Maximum optimization but massive duplication
-- Hard to keep feature parity
-- We explicitly reject this for Zylance
+- Not chosen because it was too heavy of an engine
+- Photino is similar to Rust's Tauri project: provides lightweight wrappers around native web views
+- Cross-platform with significantly smaller footprint
 
 **The bundle size concern:**
 The worry about shipping all platform code to all platforms is mostly theoretical. Platform-specific code is tiny compared to the shared business logic and UI components. With code splitting and tree-shaking, the actual overhead is negligible.

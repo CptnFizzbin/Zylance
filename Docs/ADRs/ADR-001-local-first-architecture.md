@@ -25,8 +25,6 @@ The architecture uses `IVaultProvider` and `IVault` interfaces, making **remote 
 
 **Note**: Multi-platform runtime flag decisions have been split into [ADR-009: Runtime Platform Detection](./ADR-009-runtime-platform-detection.md).
 
-**Note**: Multi-platform runtime flag decisions have been split into [ADR-009: Runtime Platform Detection](./ADR-009-runtime-platform-detection.md).
-
 This means:
 - All user data is stored in an encrypted SQLite database by default
 - The `IVaultProvider` abstraction allows easy swapping between Local, Remote, and other vault types

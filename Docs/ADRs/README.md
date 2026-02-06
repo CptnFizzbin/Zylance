@@ -18,6 +18,7 @@ Note: We omit the "Status" field as our ADRs document decisions that have alread
 
 ## Index of ADRs
 
+- [ADR-000: Technology Stack](./ADR-000-technology-stack.md) *(placeholder)*
 - [ADR-001: Local-First Architecture](./ADR-001-local-first-architecture.md)
 - [ADR-002: Zero-Knowledge Remote Vault Architecture](./ADR-002-zero-knowledge-remote-vault.md)
 - [ADR-003: Vault Provider Abstraction Pattern](./ADR-003-vault-provider-abstraction.md)

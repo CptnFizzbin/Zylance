@@ -32,12 +32,13 @@ Zylance will use **SQLite database** as the storage format with two variants:
 - Requires passphrase/key to open
 - Standard SQLite format underneath (once decrypted)
 
-### 2. Zylance Database (.zld) - Plaintext SQLite Database
+### 2. Zylance Database (.zlv.sqlite) - Plaintext SQLite Database
 
 **Optional format** for specific use cases:
 - Unencrypted SQLite database
-- File extension: `.zld` (Zylance Database)
+- File extension: `.zlv.sqlite` (Zylance Database)
 - Can be opened with any SQLite browser
+- Contains a special `_zylance_` marker table to identify it as a Zylance database and prevent accidentally overwriting other SQLite databases
 - Useful for:
   - Development and debugging
   - Users who want to inspect stored data
@@ -99,19 +100,22 @@ The plaintext option serves multiple purposes:
 4. **Migration**: Users aren't locked into Zylance forever
 
 **SQLite was chosen because:**
-- It's the most deployed database engine in the world
-- Zero configuration required
-- Single file per database (easy backups)
-- Cross-platform and stable
-- Well-documented and widely understood
-- Good performance for local-first apps
-- Strong ecosystem of tools and libraries
+- **Single file**: Allows for easy backup and transfer
+- **Relational database with SQL**: Powerful querying and data modeling capabilities
+- **Cross-platform**: Works on all platforms without modification
+- **Supports encryption**: Can use SQLCipher for transparent encryption
+- **Widely used**: Most deployed database engine in the world
+- **Zero configuration required**: Embedded database with no server setup
+- **Well-documented and widely understood**: Extensive documentation and community support
+- **Good performance for local-first apps**: Optimized for single-user scenarios
+- **Strong ecosystem of tools and libraries**: Many tools available for inspection and management
 
 **File extension choices:**
 - `.zlv` suggests "vault" (secure, encrypted)
-- `.zld` suggests "database" (standard, inspectable)
+- `.zlv.sqlite` makes it clear it's an unencrypted SQLite file
 - Both clearly indicate Zylance format
 - Different extensions prevent accidental opening with wrong tools
+- The `_zylance_` marker table prevents overwriting non-Zylance databases
 
 **Encryption approach:**
 The encryption will likely use SQLCipher or a similar solution that provides transparent encryption at the SQLite layer. This means:
