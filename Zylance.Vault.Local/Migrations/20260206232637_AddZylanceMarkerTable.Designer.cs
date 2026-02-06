@@ -8,11 +8,11 @@ using Zylance.Vault.Local.Context;
 
 #nullable disable
 
-namespace Zylance.Vault.Local.Entities
+namespace Zylance.Vault.Local.Migrations
 {
     [DbContext(typeof(LocalVaultDbContext))]
-    [Migration("20260201023435_Initial")]
-    partial class Initial
+    [Migration("20260206232637_AddZylanceMarkerTable")]
+    partial class AddZylanceMarkerTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,12 +30,10 @@ namespace Zylance.Vault.Local.Entities
                         .HasColumnType("REAL");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Type")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
@@ -57,12 +55,10 @@ namespace Zylance.Vault.Local.Entities
                         .HasColumnType("REAL");
 
                     b.Property<string>("Memo")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Payee")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
@@ -72,6 +68,22 @@ namespace Zylance.Vault.Local.Entities
                     b.HasKey("Id");
 
                     b.ToTable("LedgerEntries");
+                });
+
+            modelBuilder.Entity("Zylance.Vault.Local.Entities.ZylanceMetadataEntity", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("_zylance_");
                 });
 #pragma warning restore 612, 618
         }

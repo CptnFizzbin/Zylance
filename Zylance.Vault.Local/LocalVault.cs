@@ -99,29 +99,31 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     )
     {
         var canConnect = await dbContext.Database.CanConnectAsync(cancellationToken);
-        if (canConnect)
+        if (!canConnect)
         {
-            var connection = dbContext.Database.GetDbConnection();
-            await connection.OpenAsync(cancellationToken);
-            try
-            {
-                using var command = connection.CreateCommand();
-                command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='_zylance_'";
-                var result = await command.ExecuteScalarAsync(cancellationToken);
-                var hasMarkerTable = result is not null && Convert.ToInt32(result) > 0;
+            throw new NonZylanceDatabaseException(
+                filePath,
+                "The existing database file could not be opened. The file may be corrupt or is not a valid SQLite database."
+            );
+        }
 
-                if (!hasMarkerTable)
-                {
-                    throw new NonZylanceDatabaseException(
-                        filePath,
-                        "The required '_zylance_' marker table was not found."
-                    );
-                }
-            }
-            finally
+        var connection = dbContext.Database.GetDbConnection();
+        await connection.OpenAsync(cancellationToken);
+        try
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='_zylance_'";
+            var result = await command.ExecuteScalarAsync(cancellationToken);
+            var hasMarkerTable = result is not null && Convert.ToInt32(result) > 0;
+
+            if (!hasMarkerTable)
             {
-                await connection.CloseAsync();
+                throw new NonZylanceDatabaseException(filePath, "The required '_zylance_' marker table was not found.");
             }
+        }
+        finally
+        {
+            await connection.CloseAsync();
         }
     }
 }

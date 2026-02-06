@@ -1,6 +1,4 @@
 using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using Zylance.Vault.Local.Context;
 
 namespace Zylance.Vault.Local.Tests;
 
@@ -23,7 +21,24 @@ public class MarkerTableTests : IDisposable
     {
         if (Directory.Exists(_tempDirectory))
         {
-            Directory.Delete(_tempDirectory, recursive: true);
+            try
+            {
+                SqliteConnection.ClearAllPools();
+                Directory.Delete(_tempDirectory, recursive: true);
+            }
+            catch (IOException)
+            {
+                // If deletion fails due to file locking, try again after a brief delay
+                Thread.Sleep(100);
+                try
+                {
+                    Directory.Delete(_tempDirectory, recursive: true);
+                }
+                catch
+                {
+                    // Ignore if still locked - OS will clean up eventually
+                }
+            }
         }
 
         GC.SuppressFinalize(this);
