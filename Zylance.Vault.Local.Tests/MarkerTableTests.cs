@@ -37,9 +37,7 @@ public class MarkerTableTests : IDisposable
         }
         else if (includeUuid)
         {
-            var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
-            var extension = Path.GetExtension(fileName);
-            fileName = $"{fileNameWithoutExt}_{Guid.NewGuid()}{extension}";
+            fileName = $"{Guid.NewGuid()}_{fileName}";
         }
 
         return Path.Combine(_tempDirectory, fileName);
@@ -78,7 +76,7 @@ public class MarkerTableTests : IDisposable
     {
         // Arrange - create a Zylance database
         var filePath = CreateTempFilePath();
-        var initialVault = await LocalVault.FromFile(filePath);
+        await LocalVault.FromFile(filePath);
 
         // Act - open the existing database
         var vault = await LocalVault.FromFile(filePath);

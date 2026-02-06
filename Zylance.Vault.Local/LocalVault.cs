@@ -63,11 +63,12 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     ///     Creates a LocalVault instance from a file path.
     /// </summary>
     /// <param name="filePath">Path to the SQLite database file</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>A new LocalVault instance</returns>
     /// <exception cref="NonZylanceDatabaseException">
     ///     Thrown when the database exists but does not contain the _zylance_ marker table
     /// </exception>
-    public static async Task<LocalVault> FromFile(string filePath)
+    public static async Task<LocalVault> FromFile(string filePath, CancellationToken cancellationToken = default)
     {
         var dbContext = LocalVaultContextFactory.CreateDbContextFromFile(filePath);
 
@@ -78,11 +79,11 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
 
             if (fileExists)
             {
-                await AssertZylanceVault(dbContext, filePath);
+                await AssertZylanceVault(dbContext, filePath, cancellationToken);
             }
 
             // Apply migrations (this will create the marker table for new databases)
-            await dbContext.Database.MigrateAsync();
+            await dbContext.Database.MigrateAsync(cancellationToken);
 
             return new LocalVault(dbContext);
         }
@@ -93,18 +94,22 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
         }
     }
 
-    private static async Task AssertZylanceVault(LocalVaultDbContext dbContext, string filePath)
+    private static async Task AssertZylanceVault(
+        LocalVaultDbContext dbContext,
+        string filePath,
+        CancellationToken cancellationToken
+    )
     {
-        var canConnect = await dbContext.Database.CanConnectAsync();
+        var canConnect = await dbContext.Database.CanConnectAsync(cancellationToken);
         if (canConnect)
         {
             var connection = dbContext.Database.GetDbConnection();
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
             try
             {
                 using var command = connection.CreateCommand();
                 command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='_zylance_'";
-                var result = await command.ExecuteScalarAsync();
+                var result = await command.ExecuteScalarAsync(cancellationToken);
                 var hasMarkerTable = result is not null && Convert.ToInt32(result) > 0;
 
                 if (!hasMarkerTable)

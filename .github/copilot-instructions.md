@@ -228,19 +228,19 @@ dotnet csharpier .
 
 ```csharp
 // Good - primary constructor pattern
-public class NonZylanceDatabaseException(string filePath)
-    : Exception($"The database at '{filePath}' is not a Zylance vault.")
+public class NonZylanceDatabaseException(string filePath, string reason)
+    : Exception($"The database at '{filePath}' is not a Zylance vault. Reason: {reason}")
 {
-    public string Reason { get; } = "The required '_zylance_' marker table was not found.";
+    public string Reason { get; } = reason;
 }
 
 // Avoid - traditional constructor
 public class NonZylanceDatabaseException : Exception
 {
-    public NonZylanceDatabaseException(string filePath)
-        : base($"The database at '{filePath}' is not a Zylance vault.")
+    public NonZylanceDatabaseException(string filePath, string reason)
+        : base($"The database at '{filePath}' is not a Zylance vault. Reason: {reason}")
     {
-        Reason = "The required '_zylance_' marker table was not found.";
+        Reason = reason;
     }
     
     public string Reason { get; }
