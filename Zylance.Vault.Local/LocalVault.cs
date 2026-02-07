@@ -108,22 +108,36 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
         }
 
         var connection = dbContext.Database.GetDbConnection();
-        await connection.OpenAsync(cancellationToken);
         try
         {
-            using var command = connection.CreateCommand();
-            command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='_zylance_'";
-            var result = await command.ExecuteScalarAsync(cancellationToken);
-            var hasMarkerTable = result is not null && Convert.ToInt32(result) > 0;
-
-            if (!hasMarkerTable)
+            await connection.OpenAsync(cancellationToken);
+            try
             {
-                throw new NonZylanceDatabaseException(filePath, "The required '_zylance_' marker table was not found.");
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='_zylance_'";
+                var result = await command.ExecuteScalarAsync(cancellationToken);
+                var hasMarkerTable = result is not null && Convert.ToInt32(result) > 0;
+
+                if (!hasMarkerTable)
+                {
+                    throw new NonZylanceDatabaseException(
+                        filePath,
+                        "The required '_zylance_' marker table was not found."
+                    );
+                }
+            }
+            finally
+            {
+                await connection.CloseAsync();
             }
         }
-        finally
+        catch (Exception exception) when (exception is not NonZylanceDatabaseException)
         {
-            await connection.CloseAsync();
+            throw new NonZylanceDatabaseException(
+                filePath,
+                "The existing database file could not be opened. The file may be corrupt or is not a valid SQLite database.",
+                exception
+            );
         }
     }
 }
