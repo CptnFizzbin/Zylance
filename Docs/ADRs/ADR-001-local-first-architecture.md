@@ -23,8 +23,6 @@ Data will be stored in an **encrypted SQLite database** (`.zlv` format - Zylance
 
 The architecture uses `IVaultProvider` and `IVault` interfaces, making **remote and other storage solutions first-class by default**. When the user opens the app, they'll be presented with the choice of provider (defaulting to Local).
 
-**Note**: Multi-platform runtime flag decisions have been split into [ADR-009: Runtime Platform Detection](./ADR-009-runtime-platform-detection.md).
-
 This means:
 - All user data is stored in an encrypted SQLite database by default
 - The `IVaultProvider` abstraction allows easy swapping between Local, Remote, and other vault types

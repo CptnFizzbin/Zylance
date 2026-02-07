@@ -2,22 +2,32 @@
 
 ## Context
 
-Zylance uses a controller-based architecture where controllers handle specific domains (File, Vault, Status, Echo). Each controller has methods decorated with `[RequestHandler]` or `[EventHandler]` attributes that need to be registered with the Gateway for message routing.
+Zylance uses a controller-based architecture where controllers handle specific
+domains (File, Vault, Status, Echo). Each controller has methods decorated with
+`[RequestHandler]` or `[EventHandler]` attributes that need to be registered
+with the Gateway for message routing.
 
 Traditional approaches to controller registration:
-1. **Manual registration**: Explicitly register each controller method in startup code
-2. **Runtime reflection**: Scan assemblies at startup to find and register controllers
+
+1. **Manual registration**: Explicitly register each controller method in
+   startup code
+2. **Runtime reflection**: Scan assemblies at startup to find and register
+   controllers
 3. **Source generators**: Generate registration code at compile time
 
-Manual registration is tedious and error-prone—every new controller method requires boilerplate registration code. Runtime reflection works but has drawbacks:
+Manual registration is tedious and error-prone—every new controller method
+requires boilerplate registration code. Runtime reflection works but has
+drawbacks:
+
 - Performance overhead at startup
-- Doesn't work in AOT scenarios (Native AOT, WASM)
+- Incompatible with WASM (no reflection without bloating the binary)
 - Makes code less discoverable
 - Harder to debug and understand
 
 We needed a solution that:
+
 1. Eliminates manual registration boilerplate
-2. Works with AOT and WASM
+2. Works with WASM
 3. Provides compile-time safety
 4. Maintains good IDE support
 
@@ -27,16 +37,21 @@ We needed a solution that:
 
 ## Decision
 
-Use **C# source generators** to automatically discover controllers at compile time and generate registration code.
+Use **C# source generators** to automatically discover controllers at compile
+time and generate registration code.
 
 The implementation:
+
 1. **`ZylanceSourceGenerator`**: Roslyn analyzer that scans for controllers
-2. **Attribute-based discovery**: Controllers marked with `[Controller]` or methods with `[RequestHandler]`/`[EventHandler]`
-3. **Generated registration code**: Creates `AddZylanceRouter()` extension method
+2. **Attribute-based discovery**: Controllers marked with `[Controller]` or
+   methods with `[RequestHandler]`/`[EventHandler]`
+3. **Generated registration code**: Creates `AddZylanceRouter()` extension
+   method
 4. **Compile-time**: All discovery happens during compilation, not at runtime
 5. **Type-safe**: Generated code is strongly typed, no reflection
 
 The source generator:
+
 ```csharp
 [Generator]
 public class ZylanceSourceGenerator : IIncrementalGenerator
@@ -47,6 +62,7 @@ public class ZylanceSourceGenerator : IIncrementalGenerator
 ```
 
 Generated code example:
+
 ```csharp
 public static class GeneratedControllerRegistration
 {
@@ -64,12 +80,16 @@ public static class GeneratedControllerRegistration
 
 ### Positive
 
-- **Zero boilerplate**: Developers just add attributes, registration is automatic
-- **AOT compatible**: No runtime reflection means works with Native AOT and WASM
-- **Compile-time safety**: Errors in controller setup are caught during compilation
-- **IDE support**: Generated code is available to IDEs (IntelliSense, Go to Definition)
+- **Zero boilerplate**: Developers just add attributes, registration is
+  automatic
+- **WASM compatible**: No runtime reflection means works WASM
+- **Compile-time safety**: Errors in controller setup are caught during
+  compilation
+- **IDE support**: Generated code is available to IDEs (IntelliSense, Go to
+  Definition)
 - **Performance**: No reflection overhead at startup
-- **Discoverability**: Easy to see what's registered by looking at generated code
+- **Discoverability**: Easy to see what's registered by looking at generated
+  code
 - **Maintainability**: Less code to maintain, no registration bookkeeping
 - **Consistency**: All controllers are registered the same way
 
@@ -95,21 +115,34 @@ public static class GeneratedControllerRegistration
 
 ## General Notes
 
-This decision was influenced by a **Copilot suggestion** during early development. While reviewing controller registration code, Copilot suggested using source generators to eliminate the boilerplate. This was a valuable suggestion that we investigated and adopted.
+This decision was influenced by a **Copilot suggestion** during early
+development. While reviewing controller registration code, Copilot suggested
+using source generators to eliminate the boilerplate. This was a valuable
+suggestion that we investigated and adopted.
 
-Source generators are a C# 9+ feature that enables compile-time metaprogramming. They're similar to T4 templates or code generation scripts, but better integrated into the build process. The key advantage is that generated code is available to the IDE immediately after compilation.
+Source generators are a C# 9+ feature that enables compile-time metaprogramming.
+They're similar to T4 templates or code generation scripts, but better
+integrated into the build process. The key advantage is that generated code is
+available to the IDE immediately after compilation.
 
-The source generator uses incremental generation (`IIncrementalGenerator`), which means it only regenerates code when relevant source files change. This keeps build times reasonable even in large projects.
+The source generator uses incremental generation (`IIncrementalGenerator`),
+which means it only regenerates code when relevant source files change. This
+keeps build times reasonable even in large projects.
 
 **Implementation insights:**
+
 - The generator uses Roslyn syntax analysis to find controller classes
 - It checks for `[Controller]` attribute or presence of handler attributes
 - Generated code is added to the compilation as additional source files
 - Diagnostics from the generator show up as build warnings/errors
 
-The WASM compatibility was a critical factor. We plan to support a web version of Zylance that could run entirely in the browser via WebAssembly. WASM and Native AOT both restrict or prohibit runtime reflection, making source generators essential for scenarios that traditionally used reflection.
+The WASM compatibility was a critical factor. We plan to support a web version
+of Zylance that could run entirely in the browser via WebAssembly. WASM
+restricts or prohibit runtime reflection, making source generators essential for
+scenarios that traditionally used reflection.
 
 **Comparison with other frameworks:**
+
 - ASP.NET Core MVC uses runtime reflection for controller discovery
 - ASP.NET Core Minimal APIs use source generators in .NET 7+
 - Blazor uses source generators for component parameter binding
@@ -117,6 +150,15 @@ The WASM compatibility was a critical factor. We plan to support a web version o
 
 We're following the modern .NET pattern of "compile-time whenever possible."
 
-One interesting aspect is that source generators enable new architectural patterns. For example, we could generate type-safe clients for our Protocol Buffers messages, or auto-implement repository patterns, or generate validation code. The controller registration generator is just the first application.
+One interesting aspect is that source generators enable new architectural
+patterns. For example, we could generate type-safe clients for our Protocol
+Buffers messages, auto-implement repository patterns, or generate validation
+code. The controller registration generator is just the first application.
 
-**For future blog post**: This could be a great blog post about practical source generator usage. Topics: when to use source generators vs. reflection, debugging techniques, performance comparisons, WASM/AOT considerations, and the "Copilot suggested it" origin story. Also worth discussing how AI coding assistants can suggest architectural patterns you weren't considering.
+---
+
+**For future blog post**: This could be a great blog post about practical source
+generator usage. Topics: when to use source generators vs. reflection, debugging
+techniques, performance comparisons, WASM/AOT considerations, and the "Copilot
+suggested it" origin story. Also worth discussing how AI coding assistants can
+suggest architectural patterns you weren't considering.
