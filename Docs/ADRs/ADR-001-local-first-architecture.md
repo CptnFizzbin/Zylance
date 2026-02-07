@@ -43,13 +43,11 @@ This means:
 
 ### Negative
 
-- **Sync complexity**: Remote sync requires careful design to work alongside local-first approach
 - **Initial limitations**: Some platform-specific optimizations may be harder to implement
 
 ### Mitigations
 
 - Use clear provider abstractions (`IVaultProvider`, `IFileProvider`) to isolate storage concerns
-- Design remote sync as a first-class feature through the provider pattern
 - Provide encryption toggle for transparency and migration support
 
 ## General Notes

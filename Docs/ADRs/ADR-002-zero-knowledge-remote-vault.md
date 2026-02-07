@@ -28,6 +28,9 @@ We needed to decide:
 
 **Status**: Planned
 
+**Action Items**:
+- Explore mitigation strategies for sync conflict resolution when server cannot read encrypted data to perform smart merging
+
 ## Decision
 
 Future versions of Zylance will support **zero-knowledge remote vault
@@ -58,6 +61,8 @@ This means:
 - **Maximum privacy**: Even the developer cannot access user data
 - **User choice**: Users can self-host or use managed services
 - **Zero trust**: No need to trust the service provider
+- **Self-hostable**: Users can run their own sync servers for complete control
+- **Portable architecture**: Easy to add new vault types (Dropbox, Google Drive, etc.)
 - **Local-first compatible**: Remote sync is an enhancement, not a replacement
 - **Open source friendly**: Community can audit the encryption implementation
 - **Regulatory compliance**: Easier to comply with privacy laws (GDPR, etc.)
@@ -67,7 +72,7 @@ This means:
 - **Key management complexity**: Users must manage their encryption keys safely
 - **Recovery challenges**: Lost keys = lost data (by design, but users may
   struggle)
-- **Performance overhead**: Client-side encryption adds computational cost
+- **Performance overhead**: Client-side encryption adds computational cost when reading or writing data from a remote source. However, this will happen seamlessly in the background, and the overhead of working with a remote database will be larger than the overhead of encryption
 - **Sync conflict resolution**: More complex when server can't read data to
   merge
 - **Development complexity**: Encryption and key management add significant code
