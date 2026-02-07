@@ -101,43 +101,37 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
         var canConnect = await dbContext.Database.CanConnectAsync(cancellationToken);
         if (!canConnect)
         {
-            throw new NonZylanceDatabaseException(
-                filePath,
-                "The existing database file could not be opened. The file may be corrupt or is not a valid SQLite database."
-            );
+            throw NonZylanceDatabaseException.InvalidFile(filePath);
         }
 
         var connection = dbContext.Database.GetDbConnection();
         try
         {
             await connection.OpenAsync(cancellationToken);
-            try
-            {
-                using var command = connection.CreateCommand();
-                command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='_zylance_'";
-                var result = await command.ExecuteScalarAsync(cancellationToken);
-                var hasMarkerTable = result is not null && Convert.ToInt32(result) > 0;
-
-                if (!hasMarkerTable)
-                {
-                    throw new NonZylanceDatabaseException(
-                        filePath,
-                        "The required '_zylance_' marker table was not found."
-                    );
-                }
-            }
-            finally
-            {
-                await connection.CloseAsync();
-            }
         }
-        catch (Exception exception) when (exception is not NonZylanceDatabaseException)
+        catch (Exception exception)
         {
+            throw NonZylanceDatabaseException.InvalidFile(filePath, exception);
+        }
+
+        try
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='_zylance_'";
+            var result = await command.ExecuteScalarAsync(cancellationToken);
+            var hasMarkerTable = result is not null && Convert.ToInt32(result) > 0;
+
+            if (hasMarkerTable)
+                return;
+
             throw new NonZylanceDatabaseException(
                 filePath,
-                "The existing database file could not be opened. The file may be corrupt or is not a valid SQLite database.",
-                exception
+                "The required '_zylance_' marker table was not found."
             );
+        }
+        finally
+        {
+            await connection.CloseAsync();
         }
     }
 }
