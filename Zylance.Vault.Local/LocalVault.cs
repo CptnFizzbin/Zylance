@@ -21,6 +21,11 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     /// </summary>
     public ILedgerManager Ledgers { get; } = new LocalLedgerManager(dbContext);
 
+    /// <summary>
+    ///     Gets the metadata manager for managing vault metadata.
+    /// </summary>
+    public IMetadataManager Metadata { get; } = new LocalMetadataManager(dbContext);
+
     public Guid VaultId { get; } = Guid.CreateVersion7();
     public bool Locked => false; // TODO: Implement lock state management
 
@@ -58,11 +63,75 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     ///     Creates a LocalVault instance from a file path.
     /// </summary>
     /// <param name="filePath">Path to the SQLite database file</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>A new LocalVault instance</returns>
-    public static async Task<LocalVault> FromFile(string filePath)
+    /// <exception cref="NonZylanceDatabaseException">
+    ///     Thrown when the database exists but does not contain the _zylance_ marker table
+    /// </exception>
+    public static async Task<LocalVault> FromFile(string filePath, CancellationToken cancellationToken = default)
     {
         var dbContext = LocalVaultContextFactory.CreateDbContextFromFile(filePath);
-        await dbContext.Database.MigrateAsync();
-        return new LocalVault(dbContext);
+
+        try
+        {
+            var fileExists = File.Exists(filePath);
+
+            if (fileExists)
+            {
+                await AssertZylanceVault(dbContext, filePath, cancellationToken);
+            }
+
+            await dbContext.Database.MigrateAsync(cancellationToken);
+
+            return new LocalVault(dbContext);
+        }
+        catch
+        {
+            await dbContext.DisposeAsync();
+            throw;
+        }
+    }
+
+    private static async Task AssertZylanceVault(
+        LocalVaultDbContext dbContext,
+        string filePath,
+        CancellationToken cancellationToken
+    )
+    {
+        var canConnect = await dbContext.Database.CanConnectAsync(cancellationToken);
+        if (!canConnect)
+        {
+            throw NonZylanceDatabaseException.InvalidFile(filePath);
+        }
+
+        var connection = dbContext.Database.GetDbConnection();
+        try
+        {
+            await connection.OpenAsync(cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            throw NonZylanceDatabaseException.InvalidFile(filePath, exception);
+        }
+
+        try
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='_zylance_'";
+            var result = await command.ExecuteScalarAsync(cancellationToken);
+            var hasMarkerTable = result is not null && Convert.ToInt32(result) > 0;
+
+            if (hasMarkerTable)
+                return;
+
+            throw new NonZylanceDatabaseException(
+                filePath,
+                "The required '_zylance_' marker table was not found."
+            );
+        }
+        finally
+        {
+            await connection.CloseAsync();
+        }
     }
 }

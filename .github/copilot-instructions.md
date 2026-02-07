@@ -222,6 +222,93 @@ dotnet csharpier .
 - Controllers should be stateless and rely on injected services
 - Make internal classes testable via `[assembly: InternalsVisibleTo("ProjectName.Tests")]` in `Properties/AssemblyInfo.cs`
 
+### Exception Classes
+
+✅ **Use primary constructor pattern for exception classes:**
+
+```csharp
+// Good - primary constructor pattern
+public class NonZylanceDatabaseException(string filePath, string reason)
+    : Exception($"The database at '{filePath}' is not a Zylance vault. Reason: {reason}")
+{
+    public string Reason { get; } = reason;
+}
+
+// Avoid - traditional constructor
+public class NonZylanceDatabaseException : Exception
+{
+    public NonZylanceDatabaseException(string filePath, string reason)
+        : base($"The database at '{filePath}' is not a Zylance vault. Reason: {reason}")
+    {
+        Reason = reason;
+    }
+    
+    public string Reason { get; }
+}
+```
+
+**Why?** Primary constructors are more concise and consistent with modern C# patterns (C# 12+). They reduce boilerplate while maintaining readability.
+
+### Async Methods and Cancellation Tokens
+
+✅ **Always include CancellationToken parameter in async methods:**
+
+```csharp
+// Good - includes cancellation token with default
+public interface IMetadataManager
+{
+    Task<string?> GetAsync(string key, CancellationToken cancellationToken = default);
+    Task SetAsync(string key, string value, CancellationToken cancellationToken = default);
+}
+
+// Avoid - missing cancellation token
+public interface IMetadataManager
+{
+    Task<string?> GetAsync(string key);
+    Task SetAsync(string key, string value);
+}
+```
+
+**Why?** Cancellation tokens allow:
+- Responsive cancellation of long-running operations
+- Better resource management
+- Improved user experience in UI applications
+- Standard pattern for all async operations
+
+### Entity Framework Configuration
+
+✅ **Prefer data annotations on entity classes over Fluent API when possible:**
+
+```csharp
+// Good - declarative attributes on entity
+[Table("_zylance_")]
+public class ZylanceMetadataEntity
+{
+    [Key]
+    [MaxLength(255)]
+    public required string Key { get; init; }
+    
+    [MaxLength(255)]
+    public required string Value { get; set; }
+}
+
+// Avoid - Fluent API in OnModelCreating (unless complex relationships require it)
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    modelBuilder.Entity<ZylanceMetadataEntity>(entity =>
+    {
+        entity.ToTable("_zylance_");
+        entity.HasKey(e => e.Key);
+    });
+}
+```
+
+**Why?** Data annotations:
+- Keep configuration close to the entity definition
+- Are easier to discover and maintain
+- Make the entity's database mapping immediately visible
+- Fluent API should be reserved for complex relationships and configurations that can't be expressed with attributes
+
 ### Comments and Documentation
 
 ✅ **Comments should explain *why*, not *what*:**
