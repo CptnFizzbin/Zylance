@@ -1,4 +1,4 @@
-# ADR-010: Window:SyncStateReq Message for UI-Core State Synchronization
+# ADR-010: WindowSyncStateReq Message for UI-Core State Synchronization
 
 ## Context
 
@@ -48,7 +48,7 @@ We needed a solution that provides a clean initialization point, coordinates sta
 
 ## Decision
 
-Introduce a **`Window:SyncStateReq` / `Window:SyncStateRes`** message pair that the UI calls once on window load to synchronize all relevant application state from Core in a single coordinated request.
+Introduce a **`WindowSyncStateReq` / `WindowSyncStateRes`** message pair (with action `Window:SyncState`) that the UI calls once on window load to synchronize all relevant application state from Core in a single coordinated request.
 
 The implementation:
 
@@ -81,6 +81,13 @@ message WindowSyncStateRes {
   
   // Window state (desktop only, future)
   // WindowState window_state = 4;
+}
+
+message WindowHeartbeatEvt {
+  option (eventName) = "Window:Heartbeat";
+  
+  // UUIDv7 identifying this window instance
+  string window_id = 1;
 }
 ```
 
@@ -120,6 +127,37 @@ useEffect(() => {
 ```
 
 4. **Gradual Migration**: Initially implement with just vault state, then gradually add more state fields as needed. The old individual queries can remain during transition and be removed once `Window:SyncState` fully replaces them.
+
+### Window:Heartbeat Event
+
+In addition to the sync state request, introduce a **`WindowHeartbeatEvt`** event that the UI sends periodically to Core to indicate the window is alive and responsive:
+
+```protobuf
+message WindowHeartbeatEvt {
+  option (eventName) = "Window:Heartbeat";
+  
+  // UUIDv7 identifying this window instance
+  // Generated on window creation and persists for window lifetime
+  string window_id = 1;
+}
+```
+
+**Purpose**: Allows Core to detect:
+- **Hung UI**: If heartbeats stop arriving, the UI may be frozen or unresponsive
+- **Restarted UI**: A new `window_id` indicates the window was closed and reopened
+- **Multiple windows**: Each window instance has a unique ID (future multi-window support)
+
+**Implementation**:
+- UI sends heartbeat every 30 seconds (configurable)
+- Core tracks last heartbeat timestamp per `window_id`
+- Core can emit warnings or take action if heartbeat is overdue
+- UUIDv7 provides time-ordered IDs for debugging and correlation
+
+**Use cases**:
+- Debugging: Correlate Core logs with specific window instances
+- Recovery: Core can clean up resources for dead windows
+- Monitoring: Track UI responsiveness in production
+- Multi-window: Distinguish between multiple simultaneous windows
 
 Key principles:
 
@@ -169,6 +207,32 @@ The `Window:SyncState` message represents a common pattern in client-server arch
 **Why a dedicated Window namespace:**
 
 In Protocol Buffers communication, we organize messages by domain (Vault, File, Ledger). Window lifecycle events (load, close, focus, blur) are their own domain, distinct from business logic. The `Window:` namespace makes this clear and provides a natural home for other window-related messages in the future.
+
+**Window:Heartbeat for liveness detection:**
+
+The `WindowHeartbeatEvt` complements the sync state request by providing ongoing liveness monitoring. Unlike the sync request which is called once on load, heartbeats are sent continuously to prove the UI is responsive.
+
+**Why UUIDv7 for window_id:**
+- **Time-ordered**: UUIDv7 embeds timestamp, making IDs naturally sortable by creation time
+- **Unique**: Globally unique across all windows and sessions
+- **Debugging**: Timestamp embedded in ID helps correlate events temporally
+- **Standards-compliant**: UUIDv7 is the latest UUID standard (RFC 9562)
+
+The heartbeat interval (30 seconds by default) balances:
+- **Network overhead**: Frequent heartbeats waste bandwidth
+- **Detection latency**: Infrequent heartbeats delay hung UI detection
+- **Battery life**: On mobile, minimize background activity
+
+Core behavior on missing heartbeats:
+- **Grace period**: Allow 2-3 missed heartbeats before considering UI hung
+- **No automatic action**: Core should log warnings but not take destructive action
+- **Cleanup on reconnect**: When UI reconnects with new `window_id`, clean up old resources
+
+This pattern is common in distributed systems:
+- **HTTP keep-alive**: Similar concept for connection liveness
+- **gRPC health checks**: Standard health checking protocol
+- **WebSocket ping/pong**: Protocol-level liveness detection
+- **Database connection pools**: Validate connections before use
 
 **What belongs in WindowSyncStateRes:**
 
