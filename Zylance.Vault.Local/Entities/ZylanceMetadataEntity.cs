@@ -14,7 +14,6 @@ public class ZylanceMetadataEntity
     [MaxLength(255)]
     public required string Key { get; init; }
 
-    [Required]
     [MaxLength(255)]
     public required string Value { get; set; }
 }

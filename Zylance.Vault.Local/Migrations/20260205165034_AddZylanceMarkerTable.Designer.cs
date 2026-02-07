@@ -8,11 +8,11 @@ using Zylance.Vault.Local.Context;
 
 #nullable disable
 
-namespace Zylance.Vault.Local.Migrations
+namespace Zylance.Vault.Local.Entities
 {
     [DbContext(typeof(LocalVaultDbContext))]
-    [Migration("20260206232626_Initial")]
-    partial class Initial
+    [Migration("20260205165034_AddZylanceMarkerTable")]
+    partial class AddZylanceMarkerTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,10 +30,12 @@ namespace Zylance.Vault.Local.Migrations
                         .HasColumnType("REAL");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Type")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
@@ -55,10 +57,12 @@ namespace Zylance.Vault.Local.Migrations
                         .HasColumnType("REAL");
 
                     b.Property<string>("Memo")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Payee")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
@@ -83,7 +87,7 @@ namespace Zylance.Vault.Local.Migrations
 
                     b.HasKey("Key");
 
-                    b.ToTable("_zylance_");
+                    b.ToTable("_zylance_", (string)null);
                 });
 #pragma warning restore 612, 618
         }

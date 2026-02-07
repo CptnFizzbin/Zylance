@@ -7,7 +7,7 @@ using Zylance.Vault.Local.Context;
 
 #nullable disable
 
-namespace Zylance.Vault.Local.Migrations
+namespace Zylance.Vault.Local.Entities
 {
     [DbContext(typeof(LocalVaultDbContext))]
     partial class LocalVaultDbContextModelSnapshot : ModelSnapshot
@@ -27,10 +27,12 @@ namespace Zylance.Vault.Local.Migrations
                         .HasColumnType("REAL");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Type")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
@@ -52,10 +54,12 @@ namespace Zylance.Vault.Local.Migrations
                         .HasColumnType("REAL");
 
                     b.Property<string>("Memo")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Payee")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 

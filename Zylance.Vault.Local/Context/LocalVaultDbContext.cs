@@ -9,7 +9,7 @@ namespace Zylance.Vault.Local.Context;
 /// </summary>
 public class LocalVaultDbContext(DbContextOptions<LocalVaultDbContext> options) : DbContext(options)
 {
-    public DbSet<AccountEntity> Accounts { get; set; }
-    public DbSet<LedgerEntryEntity> LedgerEntries { get; set; }
-    public DbSet<ZylanceMetadataEntity> ZylanceMetadata { get; set; }
+    public DbSet<AccountEntity> Accounts { get; set; } = null!;
+    public DbSet<LedgerEntryEntity> LedgerEntries { get; set; } = null!;
+    public DbSet<ZylanceMetadataEntity> ZylanceMetadata { get; set; } = null!;
 }
