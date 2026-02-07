@@ -27,9 +27,7 @@ Note: We omit the "Status" field as our ADRs document decisions that have alread
 - [ADR-006: Copilot as Productivity Tool, Not Vibe Coding](./ADR-006-copilot-productivity-not-vibe-coding.md)
 - [ADR-007: Protocol Buffers for Type-Safe Client-Server Communication](./ADR-007-protocol-buffers-communication.md)
 - [ADR-008: Single UI Codebase Across All Platforms](./ADR-008-single-ui-codebase.md)
-- [ADR-009: Runtime Platform Detection](./ADR-009-runtime-platform-detection.md)
-- [ADR-010: Zylance File Formats](./ADR-010-zylance-file-formats.md)
-
+- [ADR-009: Zylance File Formats](./ADR-009-zylance-file-formats.md)
 ## When to Create an ADR
 
 Create an ADR when making a decision that:

@@ -44,7 +44,7 @@ The implementation:
    files
 2. **Code generation**:
     - C# types generated via `protoc` and `Google.Protobuf`
-    - TypeScript types generated via `protoc` and `protobuf-ts`
+    - TypeScript types generated via `protoc` and `ts-proto`
 3. **Shared types**: Both languages use generated code from the same `.proto`
    definitions
 4. **Transport agnostic**: Protobuf messages can be sent over any transport (

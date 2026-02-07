@@ -70,8 +70,8 @@ Potential formats for future consideration:
 - **IIF (Intuit Interchange Format)**: QuickBooks format
 - **YNAB (You Need A Budget)**: CSV variant with specific structure
 - **Mint**: JSON export format
-- **Zylance Vault (.zlv)**: Encrypted SQLite database (see [ADR-010: Zylance File Formats](../ADRs/ADR-010-zylance-file-formats.md))
-- **Zylance Database (.zld)**: Plaintext SQLite database (see [ADR-010: Zylance File Formats](../ADRs/ADR-010-zylance-file-formats.md))
+- **Zylance Vault (.zlv)**: Encrypted SQLite database (see [ADR-010: Zylance File Formats](../ADRs/ADR-010-zylance-vault-file-formats.md))
+- **Zylance Database (.zlv.sqlite)**: Plaintext SQLite database (see [ADR-010: Zylance File Formats](../ADRs/ADR-010-zylance-vault-file-formats.md))
 - **Excel**: XLSX import with configurable mapping
 
 ## Format Guidelines

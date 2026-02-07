@@ -1,4 +1,4 @@
-# ADR-010: Zylance File Formats
+# ADR-009: Zylance File Formats
 
 ## Context
 

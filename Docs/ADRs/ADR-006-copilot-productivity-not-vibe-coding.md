@@ -184,7 +184,7 @@ system you're building.
 > My personal stance on AI in Feb 2026: After having a mental breakdown in
 > September 2025 around AI (and more specifically AGI), I've been coming to terms
 > with it more. Right now, I'm seeing the genuine actual usefulness of Generative
-> AI for programming and documentation. Heck, i've been using it to write up these
+> AI for programming and documentation. Heck, I've been using it to write up these
 > ADRs, and implement the code review changes that it and I identify.
 >
 > I feel like it's helping me be a better developer by assisting with planning,
