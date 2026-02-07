@@ -10,7 +10,7 @@ This directory contains documentation and specifications for the various file fo
 **Priority**: Primary import format  
 **Specification**: [OFX Specification Files](./Ofx/)
 
-QFX (Quicken Financial eXchange) and OFX (Open Financial Exchange) are XML-based formats for exchanging financial data between institutions and personal finance software. QFX is Quicken's proprietary variant of the open OFX standard.
+QFX (Quicken Financial eXchange) and OFX (Open Financial Exchange) are formats for exchanging financial data between institutions and personal finance software. QFX is Quicken's proprietary variant of the open OFX standard. OFX v2+ uses XML, while QFX/OFX v1.x uses an SGML-based format.
 
 **Key Features:**
 - **Wide bank support**: Most US financial institutions support OFX/QFX exports

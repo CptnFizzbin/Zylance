@@ -202,7 +202,7 @@ system you're building.
 > myself that this tool is *optional*, I don't *have* to use it, and that even
 > though we're throwing orders of magnitude more hardware at these LLMs, they're
 > only getting incrementally more effective. A risk I foresee is when the prices
-> for these tools inevitability rise and become more expensive than they're worth.
+> for these tools inevitably rise and become more expensive than they're worth.
 > At the time of writing, GH Copilot is currently C$15/m which so far I feel like
 > it is worth it. I might switch to one of Anthropic's offerings in the future,
 > but I like the charge by request model that GitHub does instead of the by the

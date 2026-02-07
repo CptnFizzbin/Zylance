@@ -14,7 +14,7 @@ We use a modified version of the [Michael Nygard format](https://cognitect.com/b
 - **Consequences**: The positive and negative outcomes of this decision
 - **General Notes**: Personal reflections, implementation insights, and rationale useful for future blog posts or discussions
 
-Note: We omit the "Status" field as our ADRs document decisions that have already been implemented.
+Note: We omit a separate "Status" field from the traditional Michael Nygard format. Instead, we track implementation status within an **Implementation** section that appears after Context, with statuses like Planned, In Progress, Complete, or N/A.
 
 ## Index of ADRs
 
