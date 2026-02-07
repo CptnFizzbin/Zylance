@@ -28,6 +28,7 @@ Note: We omit a separate "Status" field from the traditional Michael Nygard form
 - [ADR-007: Protocol Buffers for Type-Safe Client-Server Communication](./ADR-007-protocol-buffers-communication.md)
 - [ADR-008: Single UI Codebase Across All Platforms](./ADR-008-single-ui-codebase.md)
 - [ADR-009: Zylance File Formats](./ADR-009-zylance-file-formats.md)
+- [ADR-010: Window:SyncStateReq Message for UI-Core State Synchronization](./ADR-010-window-syncstate-message.md)
 ## When to Create an ADR
 
 Create an ADR when making a decision that:
