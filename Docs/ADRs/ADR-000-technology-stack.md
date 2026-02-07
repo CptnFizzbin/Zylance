@@ -35,7 +35,7 @@ This prevents overwhelming the developer with too many new concepts simultaneous
 **Entity Framework Core v10.0.2**
 - Chosen as the most widely-known and widely-used ORM in the .NET ecosystem
 - Standard choice for .NET projects with excellent documentation
-- Used only for local vault implementation (`Zylance.Vault.Local`)
+- Used for the local vault implementation (`Zylance.Vault.Local`) and referenced in `Zylance.Core` for shared infrastructure
 - Provides migrations, change tracking, and LINQ queries out of the box
 
 **Microsoft.Extensions.DependencyInjection**
@@ -203,8 +203,8 @@ The decision to use C# despite being relatively new to the developer is intentio
 **Why Entity Framework Core:**
 As the most widely-known ORM in .NET, Entity Framework Core is the "boring" choice - and that's exactly why it's right. It has extensive documentation, huge community, and won't become unmaintained. For a learning project, choosing the standard tool means more resources when stuck and more transferable knowledge.
 
-**Why Material-UI over alternatives:**
-While libraries like Chakra UI or Ant Design have their merits, Material-UI's combination of excellent theming, the flexible `sx` prop, and developer familiarity made it the pragmatic choice. The theming system in particular enables consistent design without fighting the framework.
+**Why Material-UI:**
+Material-UI's combination of excellent theming, the flexible `sx` prop, and developer familiarity made it the pragmatic choice. The theming system in particular enables consistent design without fighting the framework.
 
 **Why TanStack over alternatives:**
 The TanStack suite (formerly React Query, React Router, etc.) provides superior TypeScript support and modern API design compared to alternatives. Each library in the suite is focused and composable, and the ecosystem is well-maintained. TanStack Table specifically was chosen as a learning opportunity - a new library to master as part of the project.
@@ -229,6 +229,8 @@ This approach has proven effective: the developer can focus cognitive effort on 
 3. **Transfer your patterns**: DI experience from Spring Boot directly informed the .NET architecture
 4. **Accept trade-offs**: Photino.NET's documentation is painful, but the alternative (Electron bloat or Rust complexity) is worse
 5. **One new thing deeply**: Focus on learning C# deeply rather than surface-level knowledge of many tools
+
+---
 
 **For future blog post**: Could write about "Strategic Learning in Side Projects" covering:
 - How to balance learning new technologies with shipping features
