@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Zylance.Vault.Local.Context;
 
@@ -10,9 +11,11 @@ using Zylance.Vault.Local.Context;
 namespace Zylance.Vault.Local.Entities
 {
     [DbContext(typeof(LocalVaultDbContext))]
-    partial class LocalVaultDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260205165034_AddZylanceMarkerTable")]
+    partial class AddZylanceMarkerTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
@@ -84,7 +87,7 @@ namespace Zylance.Vault.Local.Entities
 
                     b.HasKey("Key");
 
-                    b.ToTable("_zylance_");
+                    b.ToTable("_zylance_", (string)null);
                 });
 #pragma warning restore 612, 618
         }
