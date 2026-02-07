@@ -18,17 +18,28 @@ Note: We omit a separate "Status" field from the traditional Michael Nygard form
 
 ## Index of ADRs
 
-- [ADR-000: Technology Stack](./ADR-000-technology-stack.md)
-- [ADR-001: Local-First Architecture](./ADR-001-local-first-architecture.md)
-- [ADR-002: Zero-Knowledge Remote Vault Architecture](./ADR-002-zero-knowledge-remote-vault.md)
+### Complete
+
 - [ADR-003: Vault Provider Abstraction Pattern](./ADR-003-vault-provider-abstraction.md)
-- [ADR-004: QFX as Initial Import Format](./ADR-004-qfx-initial-import-format.md)
 - [ADR-005: Source Generators for Controller Auto-Registration](./ADR-005-source-generators-controller-registration.md)
-- [ADR-006: Copilot as Productivity Tool, Not Vibe Coding](./ADR-006-copilot-productivity-not-vibe-coding.md)
 - [ADR-007: Protocol Buffers for Type-Safe Client-Server Communication](./ADR-007-protocol-buffers-communication.md)
 - [ADR-008: Single UI Codebase Across All Platforms](./ADR-008-single-ui-codebase.md)
+
+### In Progress
+
+- [ADR-001: Local-First Architecture](./ADR-001-local-first-architecture.md)
+- [ADR-004: QFX as Initial Import Format](./ADR-004-qfx-initial-import-format.md)
 - [ADR-009: Zylance File Formats](./ADR-009-zylance-file-formats.md)
+
+### Planned
+
+- [ADR-002: Zero-Knowledge Remote Vault Architecture](./ADR-002-zero-knowledge-remote-vault.md)
 - [ADR-010: WindowSyncStateReq Message for UI-Core State Synchronization](./ADR-010-window-syncstate-message.md)
+
+### Reference / Guidelines
+
+- [ADR-000: Technology Stack](./ADR-000-technology-stack.md)
+- [ADR-006: Copilot as Productivity Tool, Not Vibe Coding](./ADR-006-copilot-productivity-not-vibe-coding.md)
 ## When to Create an ADR
 
 Create an ADR when making a decision that:
