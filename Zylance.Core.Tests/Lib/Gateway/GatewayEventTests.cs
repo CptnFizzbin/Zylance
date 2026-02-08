@@ -140,14 +140,14 @@ public class GatewayEventTests
 
     #endregion
 
-    #region ObserveEvent.FirstAsync Tests
+    #region ObserveEvent.TakeFirstAsync Tests
 
     [Fact]
-    public async Task ObserveEvent_FirstAsync_ReturnsEventWhenReceived()
+    public async Task ObserveEvent_TakeFirstAsync_ReturnsEventWhenReceived()
     {
         // Arrange
         var eventName = "Test:WaitEvent";
-        var task = _gatewayService.ObserveEvent(eventName).FirstAsync(TestContext.Current.CancellationToken);
+        var task = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         _gatewayService.TriggerEvent(eventName);
@@ -160,14 +160,14 @@ public class GatewayEventTests
     }
 
     [Fact]
-    public async Task ObserveEvent_FirstAsync_PredicateFiltersEvents()
+    public async Task ObserveEvent_TakeFirstAsync_PredicateFiltersEvents()
     {
         // Arrange
         var eventName = "Test:FilterEvent";
         var task = _gatewayService
             .ObserveEvent(eventName)
             .Where(evt => evt.Name == eventName && evt.Payload.DataJson == "target")
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act - Send non-matching event
         _gatewayService.TriggerEvent(eventName, "other");
@@ -183,11 +183,11 @@ public class GatewayEventTests
     }
 
     [Fact]
-    public async Task ObserveEvent_FirstAsync_DefaultPredicateAcceptsAnyEvent()
+    public async Task ObserveEvent_TakeFirstAsync_DefaultPredicateAcceptsAnyEvent()
     {
         // Arrange
         var eventName = "Test:DefaultPredicateEvent";
-        var task = _gatewayService.ObserveEvent(eventName).FirstAsync(TestContext.Current.CancellationToken);
+        var task = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         _gatewayService.TriggerEvent(eventName, "any data");
@@ -200,13 +200,13 @@ public class GatewayEventTests
     }
 
     [Fact]
-    public async Task ObserveEvent_FirstAsync_UnsubscribesAfterCompletion_AlternateTest()
+    public async Task ObserveEvent_TakeFirstAsync_UnsubscribesAfterCompletion_AlternateTest()
     {
         // Arrange
         var eventName = "Test:UnsubEvent";
         var handlerCallCount = 0;
 
-        var task = _gatewayService.ObserveEvent(eventName).FirstAsync(TestContext.Current.CancellationToken);
+        var task = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(TestContext.Current.CancellationToken);
         _gatewayService.SubscribeToEvent(eventName, _ => handlerCallCount++);
 
         // Act
@@ -218,17 +218,17 @@ public class GatewayEventTests
         _gatewayService.TriggerEvent(eventName);
 
         // Assert - Handler should be called twice (both events)
-        // but the internal ObserveEvent().FirstAsync() subscription should be cleaned up
+        // but the internal ObserveEvent().TakeFirstAsync() subscription should be cleaned up
         Assert.Equal(2, handlerCallCount);
     }
 
     [Fact]
-    public async Task ObserveEvent_FirstAsync_CanCancelWithCancellationToken()
+    public async Task ObserveEvent_TakeFirstAsync_CanCancelWithCancellationToken()
     {
         // Arrange
         var eventName = "Test:CancelEvent";
         using var cts = new CancellationTokenSource();
-        var task = _gatewayService.ObserveEvent(eventName).FirstAsync(cts.Token);
+        var task = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(cts.Token);
 
         // Act
         await cts.CancelAsync();
@@ -238,24 +238,24 @@ public class GatewayEventTests
     }
 
     [Fact]
-    public async Task ObserveEvent_FirstAsync_TimeoutBehavior()
+    public async Task ObserveEvent_TakeFirstAsync_TimeoutBehavior()
     {
         // Arrange
         var eventName = "Test:TimeoutEvent";
         using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
-        var task = _gatewayService.ObserveEvent(eventName).FirstAsync(cts.Token);
+        var task = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(cts.Token);
 
         // Act & Assert
         await Assert.ThrowsAsync<TaskCanceledException>(async () => await task);
     }
 
     [Fact]
-    public async Task ObserveEvent_FirstAsync_MultipleWaitersOnSameEvent()
+    public async Task ObserveEvent_TakeFirstAsync_MultipleWaitersOnSameEvent()
     {
         // Arrange
         var eventName = "Test:MultiWaiterEvent";
-        var task1 = _gatewayService.ObserveEvent(eventName).FirstAsync(TestContext.Current.CancellationToken);
-        var task2 = _gatewayService.ObserveEvent(eventName).FirstAsync(TestContext.Current.CancellationToken);
+        var task1 = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(TestContext.Current.CancellationToken);
+        var task2 = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         var eventPayload = new EventPayload { EventName = eventName, DataJson = "data" };
@@ -272,7 +272,7 @@ public class GatewayEventTests
     }
 
     [Fact]
-    public async Task ObserveEvent_FirstAsync_PredicateThrowingDoesNotBreakWait()
+    public async Task ObserveEvent_TakeFirstAsync_PredicateException_PropagatesError()
     {
         // Arrange
         var eventName = "Test:ErrorEvent";
@@ -285,33 +285,27 @@ public class GatewayEventTests
 
                 return evt.Payload.DataJson == "target";
             })
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         var throwingPayload = new EventPayload { EventName = eventName, DataJson = "throw" };
         var throwingEnvelope = new GatewayEnvelope { Event = throwingPayload };
 
-        // This should not crash the wait
+        // This should propagate the exception
         _transport.SendToGateway(MessageUtils.ToJson(throwingEnvelope));
 
-        var targetPayload = new EventPayload { EventName = eventName, DataJson = "target" };
-        var targetEnvelope = new GatewayEnvelope { Event = targetPayload };
-        _transport.SendToGateway(MessageUtils.ToJson(targetEnvelope));
-
-        var result = await task;
-
-        // Assert
-        Assert.True("target" == result.Payload.DataJson);
+        // Assert - exception should propagate to the awaiter
+        await Assert.ThrowsAsync<InvalidOperationException>(async () => await task);
     }
 
     [Fact]
-    public async Task ObserveEvent_FirstAsync_CorrectEventNameRequired()
+    public async Task ObserveEvent_TakeFirstAsync_CorrectEventNameRequired()
     {
         // Arrange
         var eventName1 = "Test:Event1";
         var eventName2 = "Test:Event2";
         using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
-        var task = _gatewayService.ObserveEvent(eventName1).FirstAsync(cts.Token);
+        var task = _gatewayService.ObserveEvent(eventName1).TakeFirstAsync(cts.Token);
 
         // Act - Send event with different name
         var wrongPayload = new EventPayload { EventName = eventName2, DataJson = "" };
@@ -323,12 +317,12 @@ public class GatewayEventTests
     }
 
     [Fact]
-    public async Task ObserveEvent_FirstAsync_CancellationRemovesSubscription()
+    public async Task ObserveEvent_TakeFirstAsync_CancellationRemovesSubscription()
     {
         // Arrange
         var eventName = "Test:CancelCleanup";
         using var cts = new CancellationTokenSource();
-        var task = _gatewayService.ObserveEvent(eventName).FirstAsync(cts.Token);
+        var task = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(cts.Token);
 
         // Act
         await cts.CancelAsync();
@@ -339,12 +333,12 @@ public class GatewayEventTests
     }
 
     [Fact]
-    public async Task ObserveEvent_FirstAsync_TimeoutRemovesSubscription()
+    public async Task ObserveEvent_TakeFirstAsync_TimeoutRemovesSubscription()
     {
         // Arrange
         var eventName = "Test:TimeoutCleanup";
         using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
-        var task = _gatewayService.ObserveEvent(eventName).FirstAsync(cts.Token);
+        var task = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(cts.Token);
 
         // Act
         await Assert.ThrowsAsync<TaskCanceledException>(async () => await task);

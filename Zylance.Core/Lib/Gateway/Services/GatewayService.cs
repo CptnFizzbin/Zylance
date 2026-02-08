@@ -153,7 +153,7 @@ public class GatewayService
 
         if (_eventListeners.TryGetValue(payload.EventName, out var listeners))
             // Iterate over a copy to avoid collection modified exception
-            // when handlers unsubscribe during invocation (e.g., ObserveEvent().FirstAsync())
+            // when handlers unsubscribe during invocation (e.g., ObserveEvent().TakeTakeFirstAsync())
             foreach (var listener in listeners.ToList())
                 listener.Handler(evt);
 

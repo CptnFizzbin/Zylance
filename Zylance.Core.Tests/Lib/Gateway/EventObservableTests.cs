@@ -26,11 +26,11 @@ public class EventObservableTests
         var eventName = "item:added";
         var task = _gatewayService
             .ObserveEvent(eventName)
-            .Where(evt => evt.Payload.DataJson.StartsWith("{"))
+            .Where(evt => evt.Payload.DataJson.StartsWith('{'))
             .Select(evt => evt.Payload.DataJson.Length)
             .Where(length => length > 10)
             .Where(length => length < 50)
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         _gatewayService.TriggerEvent(eventName, "invalid");
@@ -46,20 +46,14 @@ public class EventObservableTests
 
     #endregion
 
-    #region Helper Methods
-
-    // TriggerEvent extension is available via GatewayTestExtensions
-
-    #endregion
-
-    #region FirstAsync Tests
+    #region TakeFirstAsync Tests
 
     [Fact]
-    public async Task ObserveEvent_FirstAsync_ReturnsFirstEvent()
+    public async Task ObserveEvent_TakeFirstAsync_ReturnsFirstEvent()
     {
         // Arrange
         var eventName = "test:event";
-        var task = _gatewayService.ObserveEvent(eventName).FirstAsync(TestContext.Current.CancellationToken);
+        var task = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         _gatewayService.TriggerEvent(eventName, "first");
@@ -73,12 +67,12 @@ public class EventObservableTests
     }
 
     [Fact]
-    public async Task ObserveEvent_FirstAsync_WithCancellationToken()
+    public async Task ObserveEvent_TakeFirstAsync_WithCancellationToken()
     {
         // Arrange
         var eventName = "test:cancellable";
         using var cts = new CancellationTokenSource();
-        var task = _gatewayService.ObserveEvent(eventName).FirstAsync(cts.Token);
+        var task = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(cts.Token);
 
         // Act
         cts.Cancel();
@@ -99,7 +93,7 @@ public class EventObservableTests
         var task = _gatewayService
             .ObserveEvent(eventName)
             .Where(evt => evt.Payload.DataJson == "target")
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act - Send non-matching event
         _gatewayService.TriggerEvent(eventName, "wrong");
@@ -122,7 +116,7 @@ public class EventObservableTests
             .ObserveEvent(eventName)
             .Where(evt => evt.Payload.DataJson.Contains("foo"))
             .Where(evt => evt.Payload.DataJson.Contains("bar"))
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         _gatewayService.TriggerEvent(eventName, "foo");
@@ -147,7 +141,7 @@ public class EventObservableTests
         var task = _gatewayService
             .ObserveEvent(eventName)
             .Select(evt => evt.Payload.DataJson)
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         _gatewayService.TriggerEvent(eventName, "projected-value");
@@ -171,7 +165,7 @@ public class EventObservableTests
                 Data = evt.Payload.DataJson,
                 evt.Payload.DataJson.Length,
             })
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         _gatewayService.TriggerEvent(eventName, "test");
@@ -179,7 +173,7 @@ public class EventObservableTests
         var result = await task;
 
         // Assert
-        Assert.Equal("test", result.Name);
+        Assert.Equal(eventName, result.Name);
         Assert.Equal("test", result.Data);
         Assert.Equal(4, result.Length);
     }
@@ -197,7 +191,7 @@ public class EventObservableTests
             .ObserveEvent(eventName)
             .Select(evt => evt.Payload.DataJson.Length)
             .Where(length => length > 5)
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         _gatewayService.TriggerEvent(eventName, "hi");
@@ -221,7 +215,7 @@ public class EventObservableTests
             .Where(num => num > 5)
             .Where(num => num < 20)
             .Where(num => num % 2 == 0)
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         _gatewayService.TriggerEvent(eventName, "3");
@@ -244,7 +238,7 @@ public class EventObservableTests
             .ObserveEvent(eventName)
             .Where(evt => evt.Payload.DataJson.StartsWith("valid"))
             .Select(evt => evt.Payload.DataJson.Length)
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         _gatewayService.TriggerEvent(eventName, "invalid");
@@ -261,7 +255,7 @@ public class EventObservableTests
     #region Error Handling Tests
 
     [Fact]
-    public async Task ObserveEvent_Select_HandlesProjectionException()
+    public async Task ObserveEvent_Select_PropagatesProjectionException()
     {
         // Arrange
         var eventName = "test:error";
@@ -269,49 +263,37 @@ public class EventObservableTests
             .ObserveEvent(eventName)
             .Select(evt => int.Parse(evt.Payload.DataJson))
             .Where(num => num > 0)
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act - Send invalid data that will throw during parse
         _gatewayService.TriggerEvent(eventName, "not-a-number");
 
-        // Send valid data
-        _gatewayService.TriggerEvent(eventName, "42");
-
-        var result = await task;
-
-        // Assert - Should skip the exception and wait for valid event
-        Assert.Equal(42, result);
+        // Assert - Should propagate the exception
+        await Assert.ThrowsAsync<FormatException>(async () => await task);
     }
 
     [Fact]
-    public async Task ObserveEvent_Where_HandlesPredicateException()
+    public async Task ObserveEvent_Where_PropagatesPredicateException()
     {
         // Arrange
         var eventName = "test:predicate-error";
-        var receivedEvents = new List<string>();
 
         var task = _gatewayService
             .ObserveEvent(eventName)
             .Where(evt =>
             {
-                receivedEvents.Add(evt.Payload.DataJson);
                 if (evt.Payload.DataJson == "throw")
                     throw new InvalidOperationException("Test exception");
 
                 return evt.Payload.DataJson == "valid";
             })
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
-        // Act
-        _gatewayService.TriggerEvent(eventName, "invalid");
+        // Act - Send data that will throw in predicate
         _gatewayService.TriggerEvent(eventName, "throw");
-        _gatewayService.TriggerEvent(eventName, "valid");
 
-        var result = await task;
-
-        // Assert
-        Assert.Equal("valid", result.Payload.DataJson);
-        Assert.Equal(3, receivedEvents.Count);
+        // Assert - Should propagate the exception
+        await Assert.ThrowsAsync<InvalidOperationException>(async () => await task);
     }
 
     #endregion
@@ -323,9 +305,9 @@ public class EventObservableTests
     {
         // Arrange
         var eventName = "test:multi-waiter";
-        var task1 = _gatewayService.ObserveEvent(eventName).FirstAsync(TestContext.Current.CancellationToken);
-        var task2 = _gatewayService.ObserveEvent(eventName).FirstAsync(TestContext.Current.CancellationToken);
-        var task3 = _gatewayService.ObserveEvent(eventName).FirstAsync(TestContext.Current.CancellationToken);
+        var task1 = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(TestContext.Current.CancellationToken);
+        var task2 = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(TestContext.Current.CancellationToken);
+        var task3 = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         _gatewayService.TriggerEvent(eventName, "broadcast");
@@ -344,12 +326,12 @@ public class EventObservableTests
         var task1 = _gatewayService
             .ObserveEvent(eventName)
             .Where(evt => evt.Payload.DataJson.Contains("A"))
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         var task2 = _gatewayService
             .ObserveEvent(eventName)
             .Where(evt => evt.Payload.DataJson.Contains("B"))
-            .FirstAsync(TestContext.Current.CancellationToken);
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
         _gatewayService.TriggerEvent(eventName, "value-A");
@@ -479,27 +461,38 @@ public class EventObservableTests
     }
 
     [Fact]
-    public void ObserveEvent_Subscribe_WithProjectionError_SkipsFailedEvents()
+    public void ObserveEvent_Subscribe_WithProjectionError_PropagatesException()
     {
         // Arrange
         var eventName = "test:projection-error-subscribe";
         var receivedValues = new List<int>();
+        Exception? caughtException = null;
 
         _ = _gatewayService
             .ObserveEvent(eventName)
-            .Select(evt => int.Parse(evt.Payload.DataJson))
+            .Select(evt =>
+            {
+                try
+                {
+                    return int.Parse(evt.Payload.DataJson);
+                }
+                catch (Exception ex)
+                {
+                    caughtException = ex;
+                    throw;
+                }
+            })
             .Subscribe(num => receivedValues.Add(num));
 
         // Act
         _gatewayService.TriggerEvent(eventName, "1");
-        _gatewayService.TriggerEvent(eventName, "not-a-number");
-        _gatewayService.TriggerEvent(eventName, "2");
-        _gatewayService.TriggerEvent(eventName, "invalid");
-        _gatewayService.TriggerEvent(eventName, "3");
+        _gatewayService.TriggerEvent(eventName, "not-a-number"); // This should throw
 
-        // Assert
-        Assert.Equal(3, receivedValues.Count);
-        Assert.Equal([1, 2, 3], receivedValues);
+        // Assert - First event succeeded, second event threw exception
+        Assert.Single(receivedValues);
+        Assert.Equal(1, receivedValues[0]);
+        Assert.NotNull(caughtException);
+        Assert.IsType<FormatException>(caughtException);
     }
 
     [Fact]
@@ -519,6 +512,127 @@ public class EventObservableTests
         // Assert
         Assert.Single(received1);
         Assert.Single(received2);
+    }
+
+    #endregion
+
+    #region TrySelect Tests
+
+    [Fact]
+    public async Task ObserveEvent_TrySelect_SkipsEventsWithProjectionErrors()
+    {
+        // Arrange
+        var eventName = "test:try-select";
+        var task = _gatewayService
+            .ObserveEvent(eventName)
+            .TrySelect(evt => int.Parse(evt.Payload.DataJson))
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
+
+        // Act - Send invalid data first (will be skipped), then valid data
+        _gatewayService.TriggerEvent(eventName, "not-a-number");
+        _gatewayService.TriggerEvent(eventName, "also-invalid");
+        _gatewayService.TriggerEvent(eventName, "42");
+
+        var result = await task;
+
+        // Assert - Should skip the exceptions and wait for valid event
+        Assert.Equal(42, result);
+    }
+
+    [Fact]
+    public void ObserveEvent_TrySelect_Subscribe_SkipsFailedProjections()
+    {
+        // Arrange
+        var eventName = "test:try-select-subscribe";
+        var receivedValues = new List<int>();
+
+        _ = _gatewayService
+            .ObserveEvent(eventName)
+            .TrySelect(evt => int.Parse(evt.Payload.DataJson))
+            .Subscribe(num => receivedValues.Add(num));
+
+        // Act
+        _gatewayService.TriggerEvent(eventName, "1");
+        _gatewayService.TriggerEvent(eventName, "not-a-number");
+        _gatewayService.TriggerEvent(eventName, "2");
+        _gatewayService.TriggerEvent(eventName, "invalid");
+        _gatewayService.TriggerEvent(eventName, "3");
+
+        // Assert - Only valid numbers should be received
+        Assert.Equal(3, receivedValues.Count);
+        Assert.Equal([1, 2, 3], receivedValues);
+    }
+
+    [Fact]
+    public void ObserveEvent_TrySelect_WithWhere_FiltersCorrectly()
+    {
+        // Arrange
+        var eventName = "test:try-select-where";
+        var receivedValues = new List<int>();
+
+        _ = _gatewayService
+            .ObserveEvent(eventName)
+            .TrySelect(evt => int.Parse(evt.Payload.DataJson))
+            .Where(num => num > 5)
+            .Subscribe(num => receivedValues.Add(num));
+
+        // Act
+        _gatewayService.TriggerEvent(eventName, "1");
+        _gatewayService.TriggerEvent(eventName, "not-a-number"); // Skipped by TrySelect
+        _gatewayService.TriggerEvent(eventName, "3"); // Filtered by Where
+        _gatewayService.TriggerEvent(eventName, "10"); // Passes
+        _gatewayService.TriggerEvent(eventName, "invalid"); // Skipped by TrySelect
+        _gatewayService.TriggerEvent(eventName, "7"); // Passes
+
+        // Assert
+        Assert.Equal(2, receivedValues.Count);
+        Assert.Equal([10, 7], receivedValues);
+    }
+
+    [Fact]
+    public void ObserveEvent_TrySelect_ChainedProjections()
+    {
+        // Arrange
+        var eventName = "test:try-select-chain";
+        var receivedValues = new List<string>();
+
+        _ = _gatewayService
+            .ObserveEvent(eventName)
+            .TrySelect(evt => int.Parse(evt.Payload.DataJson)) // Parse to int
+            .TrySelect(num => num * 2) // Double it
+            .Select(num => num.ToString()) // Convert back to string
+            .Subscribe(str => receivedValues.Add(str));
+
+        // Act
+        _gatewayService.TriggerEvent(eventName, "5");
+        _gatewayService.TriggerEvent(eventName, "not-a-number");
+        _gatewayService.TriggerEvent(eventName, "10");
+
+        // Assert
+        Assert.Equal(2, receivedValues.Count);
+        Assert.Equal(["10", "20"], receivedValues);
+    }
+
+    [Fact]
+    public async Task ObserveEvent_TrySelect_WithExistingPredicate()
+    {
+        // Arrange
+        var eventName = "test:try-select-predicate";
+        var task = _gatewayService
+            .ObserveEvent(eventName)
+            .Where(evt => evt.Payload.DataJson.Length > 1) // Filter first
+            .TrySelect(evt => int.Parse(evt.Payload.DataJson)) // Then try parse
+            .TakeFirstAsync(TestContext.Current.CancellationToken);
+
+        // Act
+        _gatewayService.TriggerEvent(eventName, "x"); // Filtered by Where
+        _gatewayService.TriggerEvent(eventName, "ab"); // Passes Where, fails TrySelect
+        _gatewayService.TriggerEvent(eventName, "42"); // Passes both
+
+        var result = await task;
+
+        // Assert
+        Assert.Equal(42, result);
     }
 
     #endregion
