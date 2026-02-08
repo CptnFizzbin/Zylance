@@ -24,7 +24,6 @@ const PROTO_DIR = join(CONTRACT_DIR, "zylance");
 interface ActionOrEvent {
   name: string;
   type: "action" | "event";
-  messageName: string;
   file: string;
 }
 
@@ -44,7 +43,6 @@ function parseProtoFile(filePath: string): ActionOrEvent[] {
     results.push({
       name: value,
       type: optionType === "action" ? "action" : "event",
-      messageName: "", // Not needed for constant generation
       file: relative(CONTRACT_DIR, filePath),
     });
   }

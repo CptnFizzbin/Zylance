@@ -34,6 +34,7 @@ public static class TypeSafeConstantsExample
     /// <summary>
     /// Example: Using event constants when emitting events.
     /// </summary>
+    /// <returns>An EventPayload with the type-safe event name and serialized event data.</returns>
     public static EventPayload CreateEventExample()
     {
         // The event name is guaranteed to match the proto definition
@@ -51,6 +52,8 @@ public static class TypeSafeConstantsExample
     /// <summary>
     /// Example: Checking if an action matches a known constant.
     /// </summary>
+    /// <param name="action">The action name to check.</param>
+    /// <returns>True if the action is a vault-related action; otherwise, false.</returns>
     public static bool IsVaultAction(string action)
     {
         // Use constants for comparison to avoid typos
@@ -63,6 +66,8 @@ public static class TypeSafeConstantsExample
     /// <summary>
     /// Example: Using constants in logging or metrics.
     /// </summary>
+    /// <param name="action">The action name that was completed.</param>
+    /// <param name="duration">The duration of the action in milliseconds.</param>
     public static void MetricsExample(string action, long duration)
     {
         // Constants ensure consistent naming in logs and metrics
