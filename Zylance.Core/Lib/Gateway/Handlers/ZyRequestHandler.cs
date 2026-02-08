@@ -1,7 +1,7 @@
 using Google.Protobuf;
 using Zylance.Core.Lib.Gateway.Models;
 
-namespace Zylance.Core.Lib.Gateway.Delegates;
+namespace Zylance.Core.Lib.Gateway.Handlers;
 
 /// <summary>
 ///     Async request handler that processes a request and returns a response.

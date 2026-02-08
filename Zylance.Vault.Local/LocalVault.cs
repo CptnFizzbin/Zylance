@@ -124,10 +124,7 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
             if (hasMarkerTable)
                 return;
 
-            throw new NonZylanceDatabaseException(
-                filePath,
-                "The required '_zylance_' marker table was not found."
-            );
+            throw new NonZylanceDatabaseException(filePath, "The required '_zylance_' marker table was not found.");
         }
         finally
         {

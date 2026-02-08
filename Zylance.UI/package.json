@@ -14,7 +14,8 @@
     "test": "yarn build:contract && vitest run",
     "format": "biome format",
     "lint": "biome lint",
-    "check": "biome check"
+    "check": "biome check",
+    "fix": "yarn check --fix"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
