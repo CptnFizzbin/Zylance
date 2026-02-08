@@ -362,9 +362,7 @@ public class GatewayEventTests
             return 0;
 
         var countProperty = list.GetType().GetProperty("Count");
-        return countProperty is null
-            ? 0
-            : (int)countProperty.GetValue(list)!;
+        return countProperty is null ? 0 : (int)countProperty.GetValue(list)!;
     }
 
     private async Task WaitForListenerCountAsync(string eventName, int expectedCount)

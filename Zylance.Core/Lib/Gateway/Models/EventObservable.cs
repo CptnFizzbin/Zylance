@@ -52,7 +52,7 @@ public class EventObservable<TResult> : IObservable<TResult>
                 {
                     return (IsSuccess: true, Value: (TNext?)selector(result));
                 }
-                catch
+                catch (Exception)
                 {
                     return (IsSuccess: false, Value: default);
                 }
@@ -74,7 +74,10 @@ public class EventObservable<TResult> : IObservable<TResult>
         // Use Rx's Amb to properly handle cancellation
         var cancellationObservable = Observable.Create<TResult>(observer =>
         {
-            var registration = cancellationToken.Register(() => { observer.OnError(new TaskCanceledException()); });
+            var registration = cancellationToken.Register(() =>
+            {
+                observer.OnError(new TaskCanceledException());
+            });
             return registration;
         });
 
@@ -91,7 +94,6 @@ public class EventObservable(GatewayService gatewayService, string eventName)
         {
             var subscription = gatewayService.SubscribeToEvent(
                 eventName,
-
                 evt =>
                 {
                     try

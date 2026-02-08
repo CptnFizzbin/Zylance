@@ -38,7 +38,7 @@ public class ZyResponse
             data = GetData<TData>();
             return true;
         }
-        catch
+        catch (Exception)
         {
             data = default;
             return false;
@@ -68,7 +68,7 @@ public class ZyResponse<TData> : ZyResponse
             data = GetData();
             return true;
         }
-        catch
+        catch (Exception)
         {
             data = default;
             return false;

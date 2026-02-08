@@ -36,7 +36,9 @@ public class EventObservableTests
         // Act
         _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "invalid" });
         _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "{small}" });
-        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "{" + new string('x', 60) + "}" });
+        _transport.SendToGateway(
+            new EventPayload { EventName = eventName, DataJson = "{" + new string('x', 60) + "}" }
+        );
         _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "{valid-json-data}" });
 
         var result = await task;
@@ -487,8 +489,7 @@ public class EventObservableTests
 
         // Act
         _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "1" });
-        _transport.SendToGateway(
-            new EventPayload { EventName = eventName, DataJson = "not-a-number" }); // This should throw
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "not-a-number" }); // This should throw
 
         // Assert - First event succeeded, second event threw exception
         Assert.Single(receivedValues);
@@ -580,8 +581,7 @@ public class EventObservableTests
 
         // Act
         _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "1" });
-        _transport.SendToGateway(
-            new EventPayload { EventName = eventName, DataJson = "not-a-number" }); // Skipped by TrySelect
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "not-a-number" }); // Skipped by TrySelect
         _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "3" }); // Filtered by Where
         _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "10" }); // Passes
         _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "invalid" }); // Skipped by TrySelect
@@ -629,8 +629,7 @@ public class EventObservableTests
 
         // Act
         _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "x" }); // Filtered by Where
-        _transport.SendToGateway(
-            new EventPayload { EventName = eventName, DataJson = "ab" }); // Passes Where, fails TrySelect
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "ab" }); // Passes Where, fails TrySelect
         _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "42" }); // Passes both
 
         var result = await task;
@@ -729,10 +728,8 @@ public class EventObservableTests
         _ = observable.Subscribe(value => receivedValues.Add(value));
 
         // Act
-        _transport.SendToGateway(
-            new EventPayload { EventName = eventName, DataJson = "ab" }); // Where: called (fails), Selector: not called
-        _transport.SendToGateway(
-            new EventPayload { EventName = eventName, DataJson = "abcd" }); // Where: called (passes), Selector: called
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "ab" }); // Where: called (fails), Selector: not called
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "abcd" }); // Where: called (passes), Selector: called
 
         // Assert
         Assert.Equal(2, whereCallCount);

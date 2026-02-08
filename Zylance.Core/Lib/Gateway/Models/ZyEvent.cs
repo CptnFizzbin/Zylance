@@ -26,7 +26,7 @@ public class ZyEvent
             data = GetData<TData>();
             return true;
         }
-        catch
+        catch (Exception)
         {
             data = default;
             return false;
@@ -58,7 +58,7 @@ public class ZyEvent<TData> : ZyEvent
             data = GetData();
             return true;
         }
-        catch
+        catch (Exception)
         {
             data = default;
             return false;

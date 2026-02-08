@@ -25,7 +25,7 @@ public class ZyRequest
             data = GetData<TData>();
             return true;
         }
-        catch
+        catch (Exception)
         {
             data = default;
             return false;
@@ -51,7 +51,7 @@ public class ZyRequest<TData> : ZyRequest
             data = GetData();
             return true;
         }
-        catch
+        catch (Exception)
         {
             data = default;
             return false;
