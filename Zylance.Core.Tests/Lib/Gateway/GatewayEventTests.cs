@@ -45,11 +45,7 @@ public class GatewayEventTests
         _gatewayService.SubscribeToEvent(eventName, _ => eventCaught = true);
 
         // Act
-        var eventPayload = new EventPayload
-        {
-            EventName = eventName,
-            DataJson = "",
-        };
+        var eventPayload = new EventPayload { EventName = eventName, DataJson = "" };
         var envelope = new GatewayEnvelope { Event = eventPayload };
         _transport.SendToGateway(MessageUtils.ToJson(envelope));
 
@@ -67,11 +63,7 @@ public class GatewayEventTests
         _gatewayService.SubscribeToEvent(eventName, evt => receivedEventName = evt.Name);
 
         // Act
-        var eventPayload = new EventPayload
-        {
-            EventName = eventName,
-            DataJson = "",
-        };
+        var eventPayload = new EventPayload { EventName = eventName, DataJson = "" };
         var envelope = new GatewayEnvelope { Event = eventPayload };
         _transport.SendToGateway(MessageUtils.ToJson(envelope));
 
@@ -266,11 +258,7 @@ public class GatewayEventTests
         var task2 = _gatewayService.ObserveEvent(eventName).FirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var eventPayload = new EventPayload
-        {
-            EventName = eventName,
-            DataJson = "data",
-        };
+        var eventPayload = new EventPayload { EventName = eventName, DataJson = "data" };
         var envelope = new GatewayEnvelope { Event = eventPayload };
         _transport.SendToGateway(MessageUtils.ToJson(envelope));
 
@@ -300,21 +288,13 @@ public class GatewayEventTests
             .FirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var throwingPayload = new EventPayload
-        {
-            EventName = eventName,
-            DataJson = "throw",
-        };
+        var throwingPayload = new EventPayload { EventName = eventName, DataJson = "throw" };
         var throwingEnvelope = new GatewayEnvelope { Event = throwingPayload };
 
         // This should not crash the wait
         _transport.SendToGateway(MessageUtils.ToJson(throwingEnvelope));
 
-        var targetPayload = new EventPayload
-        {
-            EventName = eventName,
-            DataJson = "target",
-        };
+        var targetPayload = new EventPayload { EventName = eventName, DataJson = "target" };
         var targetEnvelope = new GatewayEnvelope { Event = targetPayload };
         _transport.SendToGateway(MessageUtils.ToJson(targetEnvelope));
 
@@ -330,15 +310,11 @@ public class GatewayEventTests
         // Arrange
         var eventName1 = "Test:Event1";
         var eventName2 = "Test:Event2";
-        var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
+        using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
         var task = _gatewayService.ObserveEvent(eventName1).FirstAsync(cts.Token);
 
         // Act - Send event with different name
-        var wrongPayload = new EventPayload
-        {
-            EventName = eventName2,
-            DataJson = "",
-        };
+        var wrongPayload = new EventPayload { EventName = eventName2, DataJson = "" };
         var wrongEnvelope = new GatewayEnvelope { Event = wrongPayload };
         _transport.SendToGateway(MessageUtils.ToJson(wrongEnvelope));
 
@@ -351,7 +327,7 @@ public class GatewayEventTests
     {
         // Arrange
         var eventName = "Test:CancelCleanup";
-        var cts = new CancellationTokenSource();
+        using var cts = new CancellationTokenSource();
         var task = _gatewayService.ObserveEvent(eventName).FirstAsync(cts.Token);
 
         // Act
@@ -367,7 +343,7 @@ public class GatewayEventTests
     {
         // Arrange
         var eventName = "Test:TimeoutCleanup";
-        var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
+        using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
         var task = _gatewayService.ObserveEvent(eventName).FirstAsync(cts.Token);
 
         // Act
@@ -398,9 +374,7 @@ public class GatewayEventTests
             return 0;
 
         var countProperty = list.GetType().GetProperty("Count");
-        return countProperty is null
-            ? 0
-            : (int)countProperty.GetValue(list)!;
+        return countProperty is null ? 0 : (int)countProperty.GetValue(list)!;
     }
 
     private async Task WaitForListenerCountAsync(string eventName, int expectedCount)

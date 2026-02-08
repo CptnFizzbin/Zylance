@@ -56,14 +56,30 @@ public class EventObservable
     {
         try
         {
-            var tcs = new TaskCompletionSource<ZyEvent>();
+            var tcs = new TaskCompletionSource<ZyEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-            var subscription = Subscribe(zyEvent => { tcs.TrySetResult(zyEvent); });
+            var subscription = Subscribe(zyEvent =>
+            {
+                tcs.TrySetResult(zyEvent);
+            });
 
-            tcs.Task.ContinueWith(_ => subscription.Unsubscribe(), TaskScheduler.Default);
+            var cancellationRegistration = cancellationToken.CanBeCanceled
+                ? cancellationToken.Register(() =>
+                {
+                    tcs.TrySetCanceled(cancellationToken);
+                })
+                : default;
 
-            if (cancellationToken.CanBeCanceled)
-                cancellationToken.Register(() => { tcs.TrySetCanceled(cancellationToken); });
+            tcs.Task.ContinueWith(
+                _ =>
+                {
+                    subscription.Unsubscribe();
+                    cancellationRegistration.Dispose();
+                },
+                CancellationToken.None,
+                TaskContinuationOptions.None,
+                TaskScheduler.Default
+            );
 
             return tcs.Task;
         }
@@ -176,14 +192,30 @@ public class EventObservable<TResult>
     {
         try
         {
-            var tcs = new TaskCompletionSource<TResult>();
+            var tcs = new TaskCompletionSource<TResult>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-            var subscription = Subscribe(result => { tcs.TrySetResult(result); });
+            var subscription = Subscribe(result =>
+            {
+                tcs.TrySetResult(result);
+            });
 
-            tcs.Task.ContinueWith(_ => subscription.Unsubscribe(), TaskScheduler.Default);
+            var cancellationRegistration = cancellationToken.CanBeCanceled
+                ? cancellationToken.Register(() =>
+                {
+                    tcs.TrySetCanceled(cancellationToken);
+                })
+                : default;
 
-            if (cancellationToken.CanBeCanceled)
-                cancellationToken.Register(() => { tcs.TrySetCanceled(cancellationToken); });
+            tcs.Task.ContinueWith(
+                _ =>
+                {
+                    subscription.Unsubscribe();
+                    cancellationRegistration.Dispose();
+                },
+                CancellationToken.None,
+                TaskContinuationOptions.None,
+                TaskScheduler.Default
+            );
 
             return tcs.Task;
         }

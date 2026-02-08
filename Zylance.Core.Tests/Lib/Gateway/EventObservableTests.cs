@@ -167,7 +167,8 @@ public class EventObservableTests
             .ObserveEvent(eventName)
             .Select(evt => new
             {
-                evt.Name, Data = evt.Payload.DataJson,
+                evt.Name,
+                Data = evt.Payload.DataJson,
                 evt.Payload.DataJson.Length,
             })
             .FirstAsync(TestContext.Current.CancellationToken);
@@ -373,9 +374,7 @@ public class EventObservableTests
         var eventName = "test:subscribe";
         var receivedEvents = new List<string>();
 
-        var subscription = _gatewayService
-            .ObserveEvent(eventName)
-            .Subscribe(evt => receivedEvents.Add(evt.Payload.DataJson));
+        _ = _gatewayService.ObserveEvent(eventName).Subscribe(evt => receivedEvents.Add(evt.Payload.DataJson));
 
         // Act
         _gatewayService.TriggerEvent(eventName, "event1");
@@ -394,7 +393,7 @@ public class EventObservableTests
         var eventName = "test:filtered-subscribe";
         var receivedEvents = new List<string>();
 
-        var subscription = _gatewayService
+        _ = _gatewayService
             .ObserveEvent(eventName)
             .Where(evt => evt.Payload.DataJson.Contains("match"))
             .Subscribe(evt => receivedEvents.Add(evt.Payload.DataJson));
@@ -438,7 +437,7 @@ public class EventObservableTests
         var eventName = "test:projected-subscribe";
         var receivedValues = new List<int>();
 
-        var subscription = _gatewayService
+        _ = _gatewayService
             .ObserveEvent(eventName)
             .Select(evt => evt.Payload.DataJson.Length)
             .Subscribe(length => receivedValues.Add(length));
@@ -460,7 +459,7 @@ public class EventObservableTests
         var eventName = "test:complex-subscribe";
         var receivedValues = new List<int>();
 
-        var subscription = _gatewayService
+        _ = _gatewayService
             .ObserveEvent(eventName)
             .Select(evt => int.Parse(evt.Payload.DataJson))
             .Where(num => num % 2 == 0)
@@ -486,7 +485,7 @@ public class EventObservableTests
         var eventName = "test:projection-error-subscribe";
         var receivedValues = new List<int>();
 
-        var subscription = _gatewayService
+        _ = _gatewayService
             .ObserveEvent(eventName)
             .Select(evt => int.Parse(evt.Payload.DataJson))
             .Subscribe(num => receivedValues.Add(num));
@@ -511,8 +510,8 @@ public class EventObservableTests
         var received1 = new List<string>();
         var received2 = new List<string>();
 
-        var subscription1 = _gatewayService.ObserveEvent(eventName).Subscribe(_ => received1.Add("sub1"));
-        var subscription2 = _gatewayService.ObserveEvent(eventName).Subscribe(_ => received2.Add("sub2"));
+        _ = _gatewayService.ObserveEvent(eventName).Subscribe(_ => received1.Add("sub1"));
+        _ = _gatewayService.ObserveEvent(eventName).Subscribe(_ => received2.Add("sub2"));
 
         // Act
         _gatewayService.TriggerEvent(eventName, "event");

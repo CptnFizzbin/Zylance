@@ -21,16 +21,16 @@ public static class GatewayTestExtensions
     ///     The test helper uses reflection to inject test events into the gateway's
     ///     message handling pipeline.
     /// </remarks>
-    private static MockTransport GetMockTransport(
-        GatewayService gatewayService
-    )
+    private static MockTransport GetMockTransport(GatewayService gatewayService)
     {
-        var transportField = typeof(GatewayService)
-            .GetField("_transport", BindingFlags.NonPublic | BindingFlags.Instance);
+        var transportField = typeof(GatewayService).GetField(
+            "_transport",
+            BindingFlags.NonPublic | BindingFlags.Instance
+        );
 
         if (transportField is null)
             throw new InvalidOperationException(
-                "Could not find _transport field on Gateway. This method requires access to the transport layer."
+                $"Could not find _transport field on {nameof(GatewayService)}. This method requires access to the transport layer."
             );
 
         var transport = transportField.GetValue(gatewayService);
@@ -38,7 +38,7 @@ public static class GatewayTestExtensions
         if (transport is not MockTransport mockTransport)
             throw new InvalidOperationException(
                 $"Expected MockTransport but found {transport?.GetType().Name ?? "null"}. "
-                + "This extension can only be used with MockTransport in tests."
+                    + "This extension can only be used with MockTransport in tests."
             );
 
         return mockTransport;
@@ -58,14 +58,9 @@ public static class GatewayTestExtensions
         ///     access
         ///     the private _transport field to inject simulated events into the gateway.
         /// </remarks>
-        public void TriggerEvent(
-            string eventName,
-            IMessage? eventData = null
-        )
+        public void TriggerEvent(string eventName, IMessage? eventData = null)
         {
-            var dataJson = eventData is not null
-                ? MessageUtils.ToJson(eventData)
-                : "";
+            var dataJson = eventData is not null ? MessageUtils.ToJson(eventData) : "";
 
             var eventPayload = new EventPayload { EventName = eventName, DataJson = dataJson };
             var envelope = new GatewayEnvelope { Event = eventPayload };
@@ -79,10 +74,7 @@ public static class GatewayTestExtensions
         /// </summary>
         /// <param name="eventName">The name of the event to trigger.</param>
         /// <param name="dataJson">The raw JSON data for the event.</param>
-        public void TriggerEvent(
-            string eventName,
-            string dataJson
-        )
+        public void TriggerEvent(string eventName, string dataJson)
         {
             var eventPayload = new EventPayload { EventName = eventName, DataJson = dataJson };
             var envelope = new GatewayEnvelope { Event = eventPayload };

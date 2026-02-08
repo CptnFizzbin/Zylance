@@ -48,7 +48,7 @@ public class ZyEvent<TData> : ZyEvent
     public TData GetData()
     {
         return MessageUtils.FromJson<TData>(Payload.DataJson)
-            ?? throw new ArgumentException("Failed to deserialize response data");
+            ?? throw new ArgumentException("Failed to deserialize event data");
     }
 
     public bool TryGetData([NotNullWhen(true)] out TData? data)

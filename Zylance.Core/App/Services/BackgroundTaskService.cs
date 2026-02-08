@@ -64,7 +64,8 @@ public class BackgroundTaskService(Zylance zylance)
 
         try
         {
-            var result = await work((progress, progressDescription) =>
+            var result = await work(
+                (progress, progressDescription) =>
                 {
                     NotifyWorkProgress(taskId, progress, progressDescription);
                 }
@@ -95,7 +96,11 @@ public class BackgroundTaskService(Zylance zylance)
 
         try
         {
-            await work((progress, progressDescription) => { NotifyWorkProgress(taskId, progress, progressDescription); }
+            await work(
+                (progress, progressDescription) =>
+                {
+                    NotifyWorkProgress(taskId, progress, progressDescription);
+                }
             );
 
             NotifyWorkFinish(taskId, "Completed successfully");

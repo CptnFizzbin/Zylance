@@ -45,9 +45,7 @@ public class MarkerTableTests : IDisposable
     private string CreateTempFilePath(string? fileName = null, bool includeUuid = true)
     {
         if (fileName is null)
-            fileName = includeUuid
-                ? $"test_{Guid.NewGuid()}.zlv.sqlite"
-                : "test.zlv.sqlite";
+            fileName = includeUuid ? $"test_{Guid.NewGuid()}.zlv.sqlite" : "test.zlv.sqlite";
         else if (includeUuid)
             fileName = $"{Guid.NewGuid()}_{fileName}";
 
@@ -111,7 +109,8 @@ public class MarkerTableTests : IDisposable
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<NonZylanceDatabaseException>(() =>
-            LocalVault.FromFile(filePath, TestContext.Current.CancellationToken));
+            LocalVault.FromFile(filePath, TestContext.Current.CancellationToken)
+        );
 
         Assert.Contains("not a Zylance vault", exception.Message);
         Assert.Contains(filePath, exception.Message);
@@ -132,9 +131,9 @@ public class MarkerTableTests : IDisposable
         }
 
         // Act & Assert - expect exception
-        await Assert.ThrowsAsync<NonZylanceDatabaseException>(() => LocalVault.FromFile(
-            filePath,
-            TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<NonZylanceDatabaseException>(() =>
+            LocalVault.FromFile(filePath, TestContext.Current.CancellationToken)
+        );
 
         // Verify that migrations were not run - check that Zylance tables don't exist
         var accountsTableExists = await TableExistsAsync(filePath, "Accounts");
@@ -159,7 +158,8 @@ public class MarkerTableTests : IDisposable
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<NonZylanceDatabaseException>(() =>
-            LocalVault.FromFile(filePath, TestContext.Current.CancellationToken));
+            LocalVault.FromFile(filePath, TestContext.Current.CancellationToken)
+        );
 
         Assert.Contains("not a Zylance vault", exception.Message);
     }
