@@ -636,4 +636,153 @@ public class EventObservableTests
     }
 
     #endregion
+
+    #region Selector Call Count Tests
+
+    [Fact]
+    public void ObserveEvent_Select_SelectorCalledOncePerEvent()
+    {
+        // Arrange
+        var eventName = "test:selector-call-count";
+        var selectorCallCount = 0;
+
+        var observable = _gatewayService
+            .ObserveEvent(eventName)
+            .Select(evt =>
+            {
+                selectorCallCount++;
+                return evt.Payload.DataJson.Length;
+            });
+
+        var receivedValues = new List<int>();
+        _ = observable.Subscribe(receivedValues.Add);
+
+        // Act
+        _gatewayService.TriggerEvent(eventName, "first");
+        _gatewayService.TriggerEvent(eventName, "second");
+        _gatewayService.TriggerEvent(eventName, "third");
+
+        // Assert - Selector should be called exactly once per event
+        Assert.Equal(3, selectorCallCount);
+        Assert.Equal(3, receivedValues.Count);
+        Assert.Equal([5, 6, 5], receivedValues);
+    }
+
+    [Fact]
+    public void ObserveEvent_ChainedSelectors_EachCalledOncePerEvent()
+    {
+        // Arrange
+        var eventName = "test:chained-selector-count";
+        var firstSelectorCallCount = 0;
+        var secondSelectorCallCount = 0;
+
+        var observable = _gatewayService
+            .ObserveEvent(eventName)
+            .Select(evt =>
+            {
+                firstSelectorCallCount++;
+                return int.Parse(evt.Payload.DataJson);
+            })
+            .Select(num =>
+            {
+                secondSelectorCallCount++;
+                return num * 2;
+            });
+
+        var receivedValues = new List<int>();
+        _ = observable.Subscribe(value => receivedValues.Add(value));
+
+        // Act
+        _gatewayService.TriggerEvent(eventName, "5");
+        _gatewayService.TriggerEvent(eventName, "10");
+        _gatewayService.TriggerEvent(eventName, "15");
+
+        // Assert - Each selector should be called exactly once per event
+        Assert.Equal(3, firstSelectorCallCount);
+        Assert.Equal(3, secondSelectorCallCount);
+        Assert.Equal(3, receivedValues.Count);
+        Assert.Equal([10, 20, 30], receivedValues);
+    }
+
+    [Fact]
+    public void ObserveEvent_WhereBeforeSelect_SelectorNotCalledForFilteredEvents()
+    {
+        // Arrange
+        var eventName = "test:where-select-call-count";
+        var whereCallCount = 0;
+        var selectorCallCount = 0;
+
+        var observable = _gatewayService
+            .ObserveEvent(eventName)
+            .Where(evt =>
+            {
+                whereCallCount++;
+                return evt.Payload.DataJson.Length > 3;
+            })
+            .Select(evt =>
+            {
+                selectorCallCount++;
+                return evt.Payload.DataJson.Length;
+            });
+
+        var receivedValues = new List<int>();
+        _ = observable.Subscribe(value => receivedValues.Add(value));
+
+        // Act
+        _gatewayService.TriggerEvent(eventName, "ab");       // Where: called (fails), Selector: not called
+        _gatewayService.TriggerEvent(eventName, "abcd");     // Where: called (passes), Selector: called
+        _gatewayService.TriggerEvent(eventName, "a");        // Where: called (fails), Selector: not called
+        _gatewayService.TriggerEvent(eventName, "abcde");    // Where: called (passes), Selector: called
+
+        // Assert - Filter should be called for all events (4), but selector only for those that pass (2)
+        Assert.Equal(4, whereCallCount);
+        Assert.Equal(2, selectorCallCount);
+        Assert.Equal(2, receivedValues.Count);
+        Assert.Equal([4, 5], receivedValues);
+    }
+
+
+    [Fact]
+    public void ObserveEvent_SelectWithMultipleSubscribers_SelectorCalledOncePerSubscriber()
+    {
+        // Arrange
+        var eventName = "test:multi-subscriber-selector";
+        var selectorCallCounts = new Dictionary<int, int> { { 1, 0 }, { 2, 0 } };
+
+        // First subscription
+        var observable1 = _gatewayService
+            .ObserveEvent(eventName)
+            .Select(evt =>
+            {
+                selectorCallCounts[1]++;
+                return evt.Payload.DataJson.Length;
+            });
+
+        // Second subscription (independent chain)
+        var observable2 = _gatewayService
+            .ObserveEvent(eventName)
+            .Select(evt =>
+            {
+                selectorCallCounts[2]++;
+                return evt.Payload.DataJson.ToUpper();
+            });
+
+        var receivedValues1 = new List<int>();
+        var receivedValues2 = new List<string>();
+
+        _ = observable1.Subscribe(value => receivedValues1.Add(value));
+        _ = observable2.Subscribe(value => receivedValues2.Add(value));
+
+        // Act
+        _gatewayService.TriggerEvent(eventName, "hello");
+        _gatewayService.TriggerEvent(eventName, "world");
+
+        // Assert - Each independent subscription calls its selector once per event
+        Assert.Equal(2, selectorCallCounts[1]);
+        Assert.Equal(2, selectorCallCounts[2]);
+        Assert.Equal(2, receivedValues1.Count);
+        Assert.Equal(2, receivedValues2.Count);
+    }
+
+    #endregion
 }

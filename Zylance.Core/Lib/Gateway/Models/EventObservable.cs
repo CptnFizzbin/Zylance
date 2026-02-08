@@ -37,37 +37,25 @@ public class EventObservable<TResult>
 
     /// <summary>
     ///     Projects events to a new value, skipping events where the projection throws an exception.
-    ///     Unlike Select, exceptions in the selector will not propagate - the event will simply be filtered out.
+    ///     Unlike Select, exceptions in the selector will not propagate - the event will be filtered out.
     /// </summary>
     public EventObservable<TNext> TrySelect<TNext>(Func<TResult, TNext> selector)
     {
-        // Add a predicate that evaluates the selector and returns false if it throws
-        var safePredicate = new Func<ZyEvent, bool>(evt =>
+        return Select<Result<TNext>>(result => TryExecute(result, selector))
+            .Where(res => res.IsSuccess)
+            .Select(res => res.Value!);
+    }
+
+    private static Result<T> TryExecute<T>(TResult result, Func<TResult, T> selector)
+    {
+        try
         {
-            try
-            {
-                // Evaluate existing predicate first
-                if (_predicate is not null && !_predicate(evt))
-                    return false;
-
-                // Try to evaluate the selector - if it throws, filter out this event
-                var intermediateResult = _selector(evt);
-                selector(intermediateResult);
-                return true;
-            }
-            catch
-            {
-                // Swallow exception and filter out this event
-                return false;
-            }
-        });
-
-        return new EventObservable<TNext>(
-            _gatewayService,
-            _eventName,
-            safePredicate,
-            CombineSelectors(_selector, selector)
-        );
+            return Result<T>.Success(selector(result));
+        }
+        catch
+        {
+            return Result<T>.Failure();
+        }
     }
 
     /// <summary>
@@ -95,7 +83,6 @@ public class EventObservable<TResult>
     {
         var wrappedHandler = new Action<ZyEvent>(evt =>
         {
-            // Exceptions in predicate or selector will propagate to the caller
             if (_predicate is not null && !_predicate(evt))
                 return;
 
@@ -114,44 +101,35 @@ public class EventObservable<TResult>
     {
         var tcs = new TaskCompletionSource<TResult>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        // Wrap the entire subscription to catch exceptions from predicate/selector evaluation
-        Subscription? subscription = null;
-
-        subscription = _gatewayService.SubscribeToEvent(
+        var subscription = _gatewayService.SubscribeToEvent(
             _eventName,
             evt =>
             {
                 try
                 {
-                    // Evaluate predicate - may throw
                     if (_predicate is not null && !_predicate(evt))
                         return;
 
-                    // Evaluate selector - may throw
                     var result = _selector(evt);
 
-                    // Set the result
+
                     tcs.TrySetResult(result);
                 }
                 catch (Exception ex)
                 {
-                    // Capture any exception from predicate or selector
                     tcs.TrySetException(ex);
                 }
             }
         );
 
         var cancellationRegistration = cancellationToken.CanBeCanceled
-            ? cancellationToken.Register(() =>
-            {
-                tcs.TrySetCanceled(cancellationToken);
-            })
+            ? cancellationToken.Register(() => { tcs.TrySetCanceled(cancellationToken); })
             : default;
 
         tcs.Task.ContinueWith(
             _ =>
             {
-                subscription.Unsubscribe();
+                subscription.Dispose();
                 cancellationRegistration.Dispose();
             },
             CancellationToken.None,
@@ -167,7 +145,9 @@ public class EventObservable<TResult>
         Func<ZyEvent, bool> predicateIncoming
     )
     {
-        return predicateBase is null ? predicateIncoming : evt => predicateBase(evt) && predicateIncoming(evt);
+        return predicateBase is null
+            ? predicateIncoming
+            : evt => predicateBase(evt) && predicateIncoming(evt);
     }
 
     private static Func<ZyEvent, TNext> CombineSelectors<TNext>(
@@ -181,3 +161,16 @@ public class EventObservable<TResult>
 
 public class EventObservable(GatewayService gatewayService, string eventName, Func<ZyEvent, bool>? predicate = null)
     : EventObservable<ZyEvent>(gatewayService, eventName, predicate, evt => evt);
+
+internal record Result<T>(bool IsSuccess, T? Value)
+{
+    public static Result<T> Success(T value)
+    {
+        return new Result<T>(true, value);
+    }
+
+    public static Result<T> Failure()
+    {
+        return new Result<T>(false, default);
+    }
+}
