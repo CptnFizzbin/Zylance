@@ -1,3 +1,4 @@
+using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Lib.Gateway.Services;
 using Zylance.Core.Tests.Mocks;
 
@@ -33,10 +34,10 @@ public class EventObservableTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "invalid");
-        _gatewayService.TriggerEvent(eventName, "{small}");
-        _gatewayService.TriggerEvent(eventName, "{" + new string('x', 60) + "}");
-        _gatewayService.TriggerEvent(eventName, "{valid-json-data}");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "invalid" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "{small}" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "{" + new string('x', 60) + "}" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "{valid-json-data}" });
 
         var result = await task;
 
@@ -56,7 +57,7 @@ public class EventObservableTests
         var task = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "first");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "first" });
 
         var result = await task;
 
@@ -96,10 +97,10 @@ public class EventObservableTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act - Send non-matching event
-        _gatewayService.TriggerEvent(eventName, "wrong");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "wrong" });
 
         // Send matching event
-        _gatewayService.TriggerEvent(eventName, "target");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "target" });
 
         var result = await task;
 
@@ -119,9 +120,9 @@ public class EventObservableTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "foo");
-        _gatewayService.TriggerEvent(eventName, "bar");
-        _gatewayService.TriggerEvent(eventName, "foo-bar");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "foo" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "bar" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "foo-bar" });
 
         var result = await task;
 
@@ -144,7 +145,7 @@ public class EventObservableTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "projected-value");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "projected-value" });
 
         var result = await task;
 
@@ -168,7 +169,7 @@ public class EventObservableTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "test");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "test" });
 
         var result = await task;
 
@@ -194,9 +195,9 @@ public class EventObservableTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "hi");
-        _gatewayService.TriggerEvent(eventName, "hello");
-        _gatewayService.TriggerEvent(eventName, "hello world");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "hi" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "hello" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "hello world" });
 
         var result = await task;
 
@@ -218,10 +219,10 @@ public class EventObservableTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "3"); // fails where 1
-        _gatewayService.TriggerEvent(eventName, "22"); // fails where 2
-        _gatewayService.TriggerEvent(eventName, "7"); // fails where 3
-        _gatewayService.TriggerEvent(eventName, "10");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "3" }); // fails where 1
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "22" }); // fails where 2
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "7" }); // fails where 3
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "10" });
 
         var result = await task;
 
@@ -241,8 +242,8 @@ public class EventObservableTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "invalid");
-        _gatewayService.TriggerEvent(eventName, "valid-data");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "invalid" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "valid-data" });
 
         var result = await task;
 
@@ -266,7 +267,7 @@ public class EventObservableTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act - Send invalid data that will throw during parse
-        _gatewayService.TriggerEvent(eventName, "not-a-number");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "not-a-number" });
 
         // Assert - Should propagate the exception
         await Assert.ThrowsAsync<FormatException>(async () => await task);
@@ -290,7 +291,7 @@ public class EventObservableTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act - Send data that will throw in predicate
-        _gatewayService.TriggerEvent(eventName, "throw");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "throw" });
 
         // Assert - Should propagate the exception
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await task);
@@ -310,7 +311,7 @@ public class EventObservableTests
         var task3 = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "broadcast");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "broadcast" });
 
         var results = await Task.WhenAll(task1, task2, task3);
 
@@ -334,8 +335,8 @@ public class EventObservableTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "value-A");
-        _gatewayService.TriggerEvent(eventName, "value-B");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "value-A" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "value-B" });
 
         var result1 = await task1;
         var result2 = await task2;
@@ -359,9 +360,9 @@ public class EventObservableTests
         _ = _gatewayService.ObserveEvent(eventName).Subscribe(evt => receivedEvents.Add(evt.Payload.DataJson));
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "event1");
-        _gatewayService.TriggerEvent(eventName, "event2");
-        _gatewayService.TriggerEvent(eventName, "event3");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "event1" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "event2" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "event3" });
 
         // Assert
         Assert.Equal(3, receivedEvents.Count);
@@ -381,10 +382,10 @@ public class EventObservableTests
             .Subscribe(evt => receivedEvents.Add(evt.Payload.DataJson));
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "skip-1");
-        _gatewayService.TriggerEvent(eventName, "match-1");
-        _gatewayService.TriggerEvent(eventName, "skip-2");
-        _gatewayService.TriggerEvent(eventName, "match-2");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "skip-1" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "match-1" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "skip-2" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "match-2" });
 
         // Assert
         Assert.Equal(2, receivedEvents.Count);
@@ -403,9 +404,9 @@ public class EventObservableTests
             .Subscribe(evt => receivedEvents.Add(evt.Payload.DataJson));
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "before");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "before" });
         subscription.Dispose();
-        _gatewayService.TriggerEvent(eventName, "after");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "after" });
 
         // Assert
         Assert.Single(receivedEvents);
@@ -425,9 +426,9 @@ public class EventObservableTests
             .Subscribe(length => receivedValues.Add(length));
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "ab");
-        _gatewayService.TriggerEvent(eventName, "abcd");
-        _gatewayService.TriggerEvent(eventName, "abcdef");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "ab" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "abcd" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "abcdef" });
 
         // Assert
         Assert.Equal(3, receivedValues.Count);
@@ -448,12 +449,12 @@ public class EventObservableTests
             .Subscribe(num => receivedValues.Add(num));
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "1");
-        _gatewayService.TriggerEvent(eventName, "2");
-        _gatewayService.TriggerEvent(eventName, "3");
-        _gatewayService.TriggerEvent(eventName, "4");
-        _gatewayService.TriggerEvent(eventName, "5");
-        _gatewayService.TriggerEvent(eventName, "6");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "1" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "2" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "3" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "4" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "5" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "6" });
 
         // Assert
         Assert.Equal(3, receivedValues.Count);
@@ -485,8 +486,9 @@ public class EventObservableTests
             .Subscribe(num => receivedValues.Add(num));
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "1");
-        _gatewayService.TriggerEvent(eventName, "not-a-number"); // This should throw
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "1" });
+        _transport.SendToGateway(
+            new EventPayload { EventName = eventName, DataJson = "not-a-number" }); // This should throw
 
         // Assert - First event succeeded, second event threw exception
         Assert.Single(receivedValues);
@@ -507,7 +509,7 @@ public class EventObservableTests
         _ = _gatewayService.ObserveEvent(eventName).Subscribe(_ => received2.Add("sub2"));
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "event");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "event" });
 
         // Assert
         Assert.Single(received1);
@@ -529,9 +531,9 @@ public class EventObservableTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act - Send invalid data first (will be skipped), then valid data
-        _gatewayService.TriggerEvent(eventName, "not-a-number");
-        _gatewayService.TriggerEvent(eventName, "also-invalid");
-        _gatewayService.TriggerEvent(eventName, "42");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "not-a-number" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "also-invalid" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "42" });
 
         var result = await task;
 
@@ -552,11 +554,11 @@ public class EventObservableTests
             .Subscribe(num => receivedValues.Add(num));
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "1");
-        _gatewayService.TriggerEvent(eventName, "not-a-number");
-        _gatewayService.TriggerEvent(eventName, "2");
-        _gatewayService.TriggerEvent(eventName, "invalid");
-        _gatewayService.TriggerEvent(eventName, "3");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "1" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "not-a-number" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "2" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "invalid" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "3" });
 
         // Assert - Only valid numbers should be received
         Assert.Equal(3, receivedValues.Count);
@@ -577,12 +579,13 @@ public class EventObservableTests
             .Subscribe(num => receivedValues.Add(num));
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "1");
-        _gatewayService.TriggerEvent(eventName, "not-a-number"); // Skipped by TrySelect
-        _gatewayService.TriggerEvent(eventName, "3"); // Filtered by Where
-        _gatewayService.TriggerEvent(eventName, "10"); // Passes
-        _gatewayService.TriggerEvent(eventName, "invalid"); // Skipped by TrySelect
-        _gatewayService.TriggerEvent(eventName, "7"); // Passes
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "1" });
+        _transport.SendToGateway(
+            new EventPayload { EventName = eventName, DataJson = "not-a-number" }); // Skipped by TrySelect
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "3" }); // Filtered by Where
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "10" }); // Passes
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "invalid" }); // Skipped by TrySelect
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "7" }); // Passes
 
         // Assert
         Assert.Equal(2, receivedValues.Count);
@@ -604,9 +607,9 @@ public class EventObservableTests
             .Subscribe(str => receivedValues.Add(str));
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "5");
-        _gatewayService.TriggerEvent(eventName, "not-a-number");
-        _gatewayService.TriggerEvent(eventName, "10");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "5" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "not-a-number" });
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "10" });
 
         // Assert
         Assert.Equal(2, receivedValues.Count);
@@ -625,9 +628,10 @@ public class EventObservableTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "x"); // Filtered by Where
-        _gatewayService.TriggerEvent(eventName, "ab"); // Passes Where, fails TrySelect
-        _gatewayService.TriggerEvent(eventName, "42"); // Passes both
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "x" }); // Filtered by Where
+        _transport.SendToGateway(
+            new EventPayload { EventName = eventName, DataJson = "ab" }); // Passes Where, fails TrySelect
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "42" }); // Passes both
 
         var result = await task;
 
@@ -658,7 +662,7 @@ public class EventObservableTests
         observable.Subscribe(receivedValues.Add);
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "first");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "first" });
 
         // Assert - Selector should be called exactly once per event
         Assert.Equal(1, selectorCallCount);
@@ -691,7 +695,7 @@ public class EventObservableTests
         _ = observable.Subscribe(value => receivedValues.Add(value));
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "10");
+        _transport.SendToGateway(new EventPayload { EventName = eventName, DataJson = "10" });
 
         // Assert - Each selector should be called exactly once per event
         Assert.Equal(1, firstSelectorCallCount);
@@ -725,8 +729,10 @@ public class EventObservableTests
         _ = observable.Subscribe(value => receivedValues.Add(value));
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "ab"); // Where: called (fails), Selector: not called
-        _gatewayService.TriggerEvent(eventName, "abcd"); // Where: called (passes), Selector: called
+        _transport.SendToGateway(
+            new EventPayload { EventName = eventName, DataJson = "ab" }); // Where: called (fails), Selector: not called
+        _transport.SendToGateway(
+            new EventPayload { EventName = eventName, DataJson = "abcd" }); // Where: called (passes), Selector: called
 
         // Assert
         Assert.Equal(2, whereCallCount);

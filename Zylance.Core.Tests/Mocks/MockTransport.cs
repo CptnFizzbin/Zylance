@@ -1,4 +1,6 @@
+using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Lib.Gateway;
+using Zylance.Core.Lib.Gateway.Utils;
 
 namespace Zylance.Core.Tests.Mocks;
 
@@ -21,9 +23,23 @@ public class MockTransport : ITransport
         _messageHandler = callback;
     }
 
-    public void SendToGateway(string message)
+    public void SendToGateway(GatewayEnvelope envelope)
     {
-        _messageHandler?.Invoke(message);
+        envelope.MessageId = Guid.CreateVersion7().ToString();
+        var msgJson = MessageUtils.ToJson(envelope);
+        _messageHandler?.Invoke(msgJson);
+    }
+
+    public void SendToGateway(EventPayload payload)
+    {
+        var message = new GatewayEnvelope { Event = payload };
+        SendToGateway(message);
+    }
+
+    public void SendToGateway(RequestPayload payload)
+    {
+        var message = new GatewayEnvelope { Request = payload };
+        SendToGateway(message);
     }
 
     public void ReceiveFromGateway(Action<string> callback)

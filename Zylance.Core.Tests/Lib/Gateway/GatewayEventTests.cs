@@ -2,7 +2,6 @@ using System.Reflection;
 using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Lib.Gateway.Models;
 using Zylance.Core.Lib.Gateway.Services;
-using Zylance.Core.Lib.Gateway.Utils;
 using Zylance.Core.Tests.Mocks;
 
 namespace Zylance.Core.Tests.Lib.Gateway;
@@ -46,8 +45,7 @@ public class GatewayEventTests
 
         // Act
         var eventPayload = new EventPayload { EventName = eventName, DataJson = "" };
-        var envelope = new GatewayEnvelope { Event = eventPayload };
-        _transport.SendToGateway(MessageUtils.ToJson(envelope));
+        _transport.SendToGateway(eventPayload);
 
         // Assert
         Assert.True(eventCaught);
@@ -64,8 +62,7 @@ public class GatewayEventTests
 
         // Act
         var eventPayload = new EventPayload { EventName = eventName, DataJson = "" };
-        var envelope = new GatewayEnvelope { Event = eventPayload };
-        _transport.SendToGateway(MessageUtils.ToJson(envelope));
+        _transport.SendToGateway(eventPayload);
 
         // Assert
         Assert.Equal(eventName, receivedEventName);
@@ -84,8 +81,7 @@ public class GatewayEventTests
 
         // Act
         var eventPayload = new EventPayload { EventName = eventName, DataJson = "" };
-        var envelope = new GatewayEnvelope { Event = eventPayload };
-        _transport.SendToGateway(MessageUtils.ToJson(envelope));
+        _transport.SendToGateway(eventPayload);
 
         // Assert
         Assert.True(handler1Called);
@@ -103,14 +99,13 @@ public class GatewayEventTests
 
         // Act - First event
         var eventPayload = new EventPayload { EventName = eventName, DataJson = "" };
-        var envelope = new GatewayEnvelope { Event = eventPayload };
-        _transport.SendToGateway(MessageUtils.ToJson(envelope));
+        _transport.SendToGateway(eventPayload);
 
         // Unsubscribe
         subscription.Unsubscribe();
 
         // Second event
-        _transport.SendToGateway(MessageUtils.ToJson(envelope));
+        _transport.SendToGateway(eventPayload);
 
         // Assert
         Assert.Equal(1, callCount);
@@ -130,8 +125,7 @@ public class GatewayEventTests
 
         // Act
         var event1Payload = new EventPayload { EventName = event1Name, DataJson = "" };
-        var envelope = new GatewayEnvelope { Event = event1Payload };
-        _transport.SendToGateway(MessageUtils.ToJson(envelope));
+        _transport.SendToGateway(event1Payload);
 
         // Assert
         Assert.True(event1Called);
@@ -150,7 +144,8 @@ public class GatewayEventTests
         var task = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        _gatewayService.TriggerEvent(eventName);
+        var eventPayload = new EventPayload { EventName = eventName, DataJson = "" };
+        _transport.SendToGateway(eventPayload);
 
         var result = await task;
 
@@ -170,10 +165,12 @@ public class GatewayEventTests
             .TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act - Send non-matching event
-        _gatewayService.TriggerEvent(eventName, "other");
+        var otherPayload = new EventPayload { EventName = eventName, DataJson = "other" };
+        _transport.SendToGateway(otherPayload);
 
         // Send matching event
-        _gatewayService.TriggerEvent(eventName, "target");
+        var targetPayload = new EventPayload { EventName = eventName, DataJson = "target" };
+        _transport.SendToGateway(targetPayload);
 
         var result = await task;
 
@@ -190,7 +187,8 @@ public class GatewayEventTests
         var task = _gatewayService.ObserveEvent(eventName).TakeFirstAsync(TestContext.Current.CancellationToken);
 
         // Act
-        _gatewayService.TriggerEvent(eventName, "any data");
+        var eventPayload = new EventPayload { EventName = eventName, DataJson = "any data" };
+        _transport.SendToGateway(eventPayload);
 
         var result = await task;
 
@@ -211,11 +209,12 @@ public class GatewayEventTests
 
         // Act
         // First event completes the wait
-        _gatewayService.TriggerEvent(eventName);
+        var eventPayload = new EventPayload { EventName = eventName, DataJson = "" };
+        _transport.SendToGateway(eventPayload);
         await task;
 
         // Second event should still reach the explicit subscription
-        _gatewayService.TriggerEvent(eventName);
+        _transport.SendToGateway(eventPayload);
 
         // Assert - Handler should be called twice (both events)
         // but the internal ObserveEvent().TakeFirstAsync() subscription should be cleaned up
@@ -259,8 +258,7 @@ public class GatewayEventTests
 
         // Act
         var eventPayload = new EventPayload { EventName = eventName, DataJson = "data" };
-        var envelope = new GatewayEnvelope { Event = eventPayload };
-        _transport.SendToGateway(MessageUtils.ToJson(envelope));
+        _transport.SendToGateway(eventPayload);
 
         var result1 = await task1;
         var result2 = await task2;
@@ -289,10 +287,7 @@ public class GatewayEventTests
 
         // Act
         var throwingPayload = new EventPayload { EventName = eventName, DataJson = "throw" };
-        var throwingEnvelope = new GatewayEnvelope { Event = throwingPayload };
-
-        // This should propagate the exception
-        _transport.SendToGateway(MessageUtils.ToJson(throwingEnvelope));
+        _transport.SendToGateway(throwingPayload);
 
         // Assert - exception should propagate to the awaiter
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await task);
@@ -309,8 +304,7 @@ public class GatewayEventTests
 
         // Act - Send event with different name
         var wrongPayload = new EventPayload { EventName = eventName2, DataJson = "" };
-        var wrongEnvelope = new GatewayEnvelope { Event = wrongPayload };
-        _transport.SendToGateway(MessageUtils.ToJson(wrongEnvelope));
+        _transport.SendToGateway(wrongPayload);
 
         // Assert
         await Assert.ThrowsAsync<TaskCanceledException>(async () => await task);
@@ -368,7 +362,9 @@ public class GatewayEventTests
             return 0;
 
         var countProperty = list.GetType().GetProperty("Count");
-        return countProperty is null ? 0 : (int)countProperty.GetValue(list)!;
+        return countProperty is null
+            ? 0
+            : (int)countProperty.GetValue(list)!;
     }
 
     private async Task WaitForListenerCountAsync(string eventName, int expectedCount)
