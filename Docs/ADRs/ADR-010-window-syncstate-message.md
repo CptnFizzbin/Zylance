@@ -83,12 +83,7 @@ message WindowSyncStateRes {
   // WindowState window_state = 4;
 }
 
-message WindowHeartbeatEvt {
-  option (eventName) = "Window:Heartbeat";
-  
-  // UUIDv7 identifying this window instance
-  string window_id = 1;
-}
+// See "Window:Heartbeat Event" section below for WindowHeartbeatEvt definition
 ```
 
 2. **Controller Implementation**: Create a `WindowController` in Core:

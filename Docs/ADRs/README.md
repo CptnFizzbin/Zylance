@@ -40,6 +40,7 @@ Note: We omit a separate "Status" field from the traditional Michael Nygard form
 
 - [ADR-000: Technology Stack](./ADR-000-technology-stack.md)
 - [ADR-006: Copilot as Productivity Tool, Not Vibe Coding](./ADR-006-copilot-productivity-not-vibe-coding.md)
+
 ## When to Create an ADR
 
 Create an ADR when making a decision that:
