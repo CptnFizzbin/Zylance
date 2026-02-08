@@ -19,6 +19,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Zylance.Contract\Zylance.Contract.csproj" />
-    <ProjectReference Include="..\Zylance.SourceGenerators\Zylance.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference
+      Include="..\Zylance.SourceGenerators\Zylance.SourceGenerators.csproj"
+      OutputItemType="Analyzer"
+      ReferenceOutputAssembly="false"
+    />
   </ItemGroup>
 </Project>
