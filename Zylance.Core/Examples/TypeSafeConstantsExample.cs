@@ -25,7 +25,7 @@ public static class TypeSafeConstantsExample
         Console.WriteLine($"Processing action: {action}");
 
         // Type-safe - the constant value is guaranteed to match the proto definition
-        if (action == "Vault:OpenVault")
+        if (action == ZylanceConstants.Actions.Vault_OpenVault)
         {
             Console.WriteLine("Matched vault open action");
         }

@@ -54,8 +54,12 @@ function parseProtoFile(filePath: string): ActionOrEvent[] {
  * Find all .proto files in the api directory.
  */
 async function findProtoFiles(): Promise<string[]> {
-  const pattern = join(PROTO_DIR, "api", "**", "*.proto");
-  return await glob(pattern);
+  const pattern = "zylance/api/**/*.proto";
+  return await glob(pattern, {
+    cwd: CONTRACT_DIR,
+    absolute: true,
+    windowsPathsNoEscape: true,
+  });
 }
 
 /**
