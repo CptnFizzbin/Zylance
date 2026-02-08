@@ -152,3 +152,7 @@ identifier.sqlite
 
 # Generated TypeScript files from Protocol Buffers
 Zylance.UI/Generated/
+
+# Copilot generated files
+.plans/
+.code-reviews/

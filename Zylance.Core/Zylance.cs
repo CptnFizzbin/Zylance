@@ -16,7 +16,8 @@ namespace Zylance.Core;
 public class Zylance
 {
     /// <summary>
-    ///     Initializes a new instance of Zylance with platform-specific implementations.
+    ///     Initializes a new instance of Zylance with platform-specific
+    ///     implementations.
     ///     The DI container is managed internally.
     /// </summary>
     /// <param name="transport">The transport implementation for communication.</param>
@@ -44,10 +45,10 @@ public class Zylance
         services.AddSingleton<BackgroundTaskService>();
         services.AddZylanceRouter();
 
-        services.TryAddSingleton<Gateway>(sp =>
+        services.TryAddSingleton<GatewayService>(sp =>
         {
             var router = sp.GetRequiredService<RouterService>();
-            return new Gateway(transport, router);
+            return new GatewayService(transport, router);
         });
 
         Console.WriteLine("[Zylance] Building service provider...");
@@ -55,10 +56,10 @@ public class Zylance
 
         // Resolve and cache the vault context
         Console.WriteLine("[Zylance] Initializing Gateway...");
-        Gateway = serviceProvider.GetRequiredService<Gateway>();
+        Gateway = serviceProvider.GetRequiredService<GatewayService>();
 
         Console.WriteLine("[Zylance] Initialization complete!");
     }
 
-    public Gateway Gateway { get; }
+    public GatewayService Gateway { get; }
 }

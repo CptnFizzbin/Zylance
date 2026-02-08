@@ -4,9 +4,9 @@ import { createRouter, RouterProvider } from "@tanstack/react-router"
 import type { FC } from "react"
 import { BackgroundProgressBar } from "@/Components/Background/BackgroundProgressBar"
 import { DesktopMenuBar } from "@/Components/Desktop/FileBar/DesktopMenuBar"
-import { useIsDesktop } from "@/Hooks/UseRuntime"
 import * as TanStackQueryProvider from "@/Integrations/tanstack-query/root-provider"
 import { routeTree } from "@/routeTree.gen"
+import { useIsDesktop } from "@/Components/Runtime/Hooks/UseRuntime"
 
 export const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
 
