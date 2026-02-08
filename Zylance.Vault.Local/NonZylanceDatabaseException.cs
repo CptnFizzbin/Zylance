@@ -19,10 +19,7 @@ public class NonZylanceDatabaseException : Exception
     }
 
     public static NonZylanceDatabaseException InvalidFile(string filePath) =>
-        new(
-            filePath,
-            "Database file could not be opened. The file may be corrupt or is not a valid SQLite database."
-        );
+        new(filePath, "Database file could not be opened. The file may be corrupt or is not a valid SQLite database.");
 
     public static NonZylanceDatabaseException InvalidFile(string filePath, Exception innerException) =>
         new(
@@ -30,7 +27,6 @@ public class NonZylanceDatabaseException : Exception
             "Database file could not be opened. The file may be corrupt or is not a valid SQLite database.",
             innerException
         );
-
 
     public string Reason { get; }
 }
