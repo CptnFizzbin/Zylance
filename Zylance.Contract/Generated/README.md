@@ -77,7 +77,7 @@ To manually regenerate these files:
 
 ```bash
 cd Zylance.Contract
-npx tsx Scripts/generate-constants.ts
+yarn vite-node Scripts/generate-constants.ts
 ```
 
 Or build the entire contract project, which triggers regeneration automatically:

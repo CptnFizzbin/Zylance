@@ -88,7 +88,7 @@ export class ZylanceClient {
     }
   }
 
-  public createEventListener<TEvent extends string, TData extends OptionalData = void> (event: string): EventListener<TEvent, TData> {
+  public createEventListener<TEvent extends string, TData extends OptionalData = void> (event: TEvent): EventListener<TEvent, TData> {
     return (handler: (data: TData) => void | Promise<void>): Unsubscribe => {
       return this.on<TData>(event, handler)
     }

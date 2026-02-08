@@ -12,7 +12,7 @@
  * - C#: Static class with string constants
  */
 
-import { readFileSync, writeFileSync, readdirSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { glob } from "glob";
@@ -35,19 +35,16 @@ function parseProtoFile(filePath: string): ActionOrEvent[] {
   const content = readFileSync(filePath, "utf-8");
   const results: ActionOrEvent[] = [];
   
-  // Match message definitions and their options
-  // This regex looks for:
-  // 1. message MessageName {
-  // 2.   option (action) = "Value"; OR option (eventName) = "Value";
-  const messagePattern = /message\s+(\w+)\s*\{[^}]*option\s*\((action|eventName)\)\s*=\s*['"]([^'"]+)['"];/g;
+  // Match option (action|eventName) = "value" lines
+  const optionPattern = /option\s*\((action|eventName)\)\s*=\s*['"]([^'"]+)['"]/g;
   
   let match: RegExpExecArray | null;
-  while ((match = messagePattern.exec(content)) !== null) {
-    const [, messageName, optionType, value] = match;
+  while ((match = optionPattern.exec(content)) !== null) {
+    const [, optionType, value] = match;
     results.push({
       name: value,
       type: optionType === "action" ? "action" : "event",
-      messageName,
+      messageName: "", // Not needed for constant generation
       file: relative(CONTRACT_DIR, filePath),
     });
   }
@@ -218,7 +215,8 @@ export async function generateConstants(tsOutputDir?: string): Promise<void> {
 }
 
 // Run if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+const isMainModule = fileURLToPath(import.meta.url) === process.argv[1];
+if (isMainModule) {
   generateConstants().catch(error => {
     console.error("Error:", error);
     process.exit(1);
