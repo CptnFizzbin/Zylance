@@ -1,74 +1,24 @@
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using Zylance.Core.Lib.Gateway.Services;
 
 namespace Zylance.Core.Lib.Gateway.Models;
 
 /// <summary>
-///     Typed version of EventObservable that supports projection results.
+///     Typed version of EventObservable that implements IObservable pattern.
 /// </summary>
-public class EventObservable<TResult>
+public class EventObservable<TResult> : IObservable<TResult>
 {
-    private readonly string _eventName;
-    private readonly GatewayService _gatewayService;
-    private readonly Func<ZyEvent, bool>? _predicate;
-    private readonly Func<ZyEvent, TResult> _selector;
+    private readonly IObservable<TResult> _observable;
 
-    internal EventObservable(
-        GatewayService gatewayService,
-        string eventName,
-        Func<ZyEvent, bool>? predicate,
-        Func<ZyEvent, TResult> selector
-    )
+    internal EventObservable(IObservable<TResult> observable)
     {
-        _gatewayService = gatewayService;
-        _eventName = eventName;
-        _predicate = predicate;
-        _selector = selector;
+        _observable = observable;
     }
 
-    public EventObservable<TNext> Select<TNext>(Func<TResult, TNext> selector)
+    public IDisposable Subscribe(IObserver<TResult> observer)
     {
-        return new EventObservable<TNext>(
-            _gatewayService,
-            _eventName,
-            _predicate,
-            CombineSelectors(_selector, selector)
-        );
-    }
-
-    /// <summary>
-    ///     Projects events to a new value, skipping events where the projection throws an exception.
-    ///     Unlike Select, exceptions in the selector will not propagate - the event will be filtered out.
-    /// </summary>
-    public EventObservable<TNext> TrySelect<TNext>(Func<TResult, TNext> selector)
-    {
-        return Select<Result<TNext>>(result => TryExecute(result, selector))
-            .Where(res => res.IsSuccess)
-            .Select(res => res.Value!);
-    }
-
-    private static Result<T> TryExecute<T>(TResult result, Func<TResult, T> selector)
-    {
-        try
-        {
-            return Result<T>.Success(selector(result));
-        }
-        catch
-        {
-            return Result<T>.Failure();
-        }
-    }
-
-    /// <summary>
-    ///     Filters events based on the projected value.
-    /// </summary>
-    public EventObservable<TResult> Where(Func<TResult, bool> predicate)
-    {
-        return new EventObservable<TResult>(
-            _gatewayService,
-            _eventName,
-            CombinePredicates(_predicate, evt => predicate(_selector(evt))),
-            _selector
-        );
+        return _observable.Subscribe(observer);
     }
 
     /// <summary>
@@ -81,96 +31,106 @@ public class EventObservable<TResult>
     /// <returns>A subscription that can be used to unsubscribe.</returns>
     public Subscription Subscribe(Action<TResult> handler)
     {
-        var wrappedHandler = new Action<ZyEvent>(evt =>
-        {
-            if (_predicate is not null && !_predicate(evt))
-                return;
+        var disposable = _observable.Subscribe(handler);
+        return new Subscription { Id = Guid.NewGuid(), Unsubscribe = disposable.Dispose };
+    }
 
-            var result = _selector(evt);
+    /// <summary>
+    ///     Projects events to a new value.
+    /// </summary>
+    public EventObservable<TNext> Select<TNext>(Func<TResult, TNext> selector)
+    {
+        return new EventObservable<TNext>(_observable.Select(selector));
+    }
 
-            handler(result);
-        });
+    /// <summary>
+    ///     Filters events based on the projected value.
+    /// </summary>
+    public EventObservable<TResult> Where(Func<TResult, bool> predicate)
+    {
+        return new EventObservable<TResult>(_observable.Where(predicate));
+    }
 
-        return _gatewayService.SubscribeToEvent(_eventName, wrappedHandler);
+    /// <summary>
+    ///     Projects events to a new value, skipping events where the projection throws an exception.
+    ///     Unlike Select, exceptions in the selector will not propagate - the event will be filtered out.
+    /// </summary>
+    public EventObservable<TNext> TrySelect<TNext>(Func<TResult, TNext> selector)
+    {
+        var observable = _observable
+            .Select(result =>
+            {
+                try
+                {
+                    return new Result<TNext>(true, selector(result));
+                }
+                catch
+                {
+                    return new Result<TNext>(false, default);
+                }
+            })
+            .Where(res => res.IsSuccess)
+            .Select(res => res.Value!);
+
+        return new EventObservable<TNext>(observable);
     }
 
     /// <summary>
     ///     Waits for the first projected value matching the current filters.
     /// </summary>
-    public Task<TResult> TakeFirstAsync(CancellationToken cancellationToken = default)
+    public async Task<TResult> TakeFirstAsync(CancellationToken cancellationToken = default)
     {
-        var tcs = new TaskCompletionSource<TResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        if (!cancellationToken.CanBeCanceled)
+        {
+            return await _observable.FirstAsync().ToTask();
+        }
 
-        var subscription = _gatewayService.SubscribeToEvent(
-            _eventName,
-            evt =>
+        // Use Rx's TakeUntil to properly handle cancellation
+        var cancellationObservable = Observable.Create<TResult>(observer =>
+        {
+            var registration = cancellationToken.Register(() =>
             {
-                try
-                {
-                    if (_predicate is not null && !_predicate(evt))
-                        return;
+                observer.OnError(new TaskCanceledException());
+            });
+            return registration;
+        });
 
-                    var result = _selector(evt);
-
-
-                    tcs.TrySetResult(result);
-                }
-                catch (Exception ex)
-                {
-                    tcs.TrySetException(ex);
-                }
-            }
-        );
-
-        var cancellationRegistration = cancellationToken.CanBeCanceled
-            ? cancellationToken.Register(() => { tcs.TrySetCanceled(cancellationToken); })
-            : default;
-
-        tcs.Task.ContinueWith(
-            _ =>
-            {
-                subscription.Dispose();
-                cancellationRegistration.Dispose();
-            },
-            CancellationToken.None,
-            TaskContinuationOptions.None,
-            TaskScheduler.Default
-        );
-
-        return tcs.Task;
-    }
-
-    private static Func<ZyEvent, bool> CombinePredicates(
-        Func<ZyEvent, bool>? predicateBase,
-        Func<ZyEvent, bool> predicateIncoming
-    )
-    {
-        return predicateBase is null
-            ? predicateIncoming
-            : evt => predicateBase(evt) && predicateIncoming(evt);
-    }
-
-    private static Func<ZyEvent, TNext> CombineSelectors<TNext>(
-        Func<ZyEvent, TResult> selectorBase,
-        Func<TResult, TNext> selectorIncoming
-    )
-    {
-        return evt => selectorIncoming(selectorBase(evt));
+        try
+        {
+            return await _observable.FirstAsync().Amb(cancellationObservable).ToTask();
+        }
+        catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw new TaskCanceledException();
+        }
     }
 }
 
-public class EventObservable(GatewayService gatewayService, string eventName, Func<ZyEvent, bool>? predicate = null)
-    : EventObservable<ZyEvent>(gatewayService, eventName, predicate, evt => evt);
-
-internal record Result<T>(bool IsSuccess, T? Value)
+public class EventObservable(GatewayService gatewayService, string eventName)
+    : EventObservable<ZyEvent>(CreateObservable(gatewayService, eventName))
 {
-    public static Result<T> Success(T value)
+    private static IObservable<ZyEvent> CreateObservable(GatewayService gatewayService, string eventName)
     {
-        return new Result<T>(true, value);
-    }
+        return Observable.Create<ZyEvent>(observer =>
+        {
+            var subscription = gatewayService.SubscribeToEvent(
+                eventName,
+                evt =>
+                {
+                    try
+                    {
+                        observer.OnNext(evt);
+                    }
+                    catch (Exception ex)
+                    {
+                        observer.OnError(ex);
+                    }
+                }
+            );
 
-    public static Result<T> Failure()
-    {
-        return new Result<T>(false, default);
+            return subscription;
+        });
     }
 }
+
+internal record Result<T>(bool IsSuccess, T? Value);
