@@ -10,6 +10,7 @@ import { hideBin } from "yargs/helpers";
 import { XMLParser } from "fast-xml-parser";
 import semver from "semver";
 import getError from "get-error";
+import { generateConstants } from "./generate-constants.js";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const CONTRACT_DIR = resolve(SCRIPT_DIR, "..");
@@ -40,6 +41,10 @@ async function main(): Promise<void> {
   compileProtoFiles(protoFiles, options.outputDir, pluginPath, grpcInclude, protocPath);
   
   console.log("\x1b[32mSuccessfully compiled all proto files!\x1b[0m");
+  
+  // Generate type-safe constants
+  console.log("\nGenerating type-safe action and event constants...");
+  await generateConstants(options.outputDir);
 }
 
 async function parseCommandLineArgs(): Promise<BuildOptions> {
