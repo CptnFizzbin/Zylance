@@ -62,11 +62,11 @@ public class EventObservable<TResult> : IObservable<TResult>
             {
                 try
                 {
-                    return new Result<TNext>(true, selector(result));
+                    return (IsSuccess: true, Value: (TNext?)selector(result));
                 }
                 catch
                 {
-                    return new Result<TNext>(false, default);
+                    return (IsSuccess: false, Value: (TNext?)default);
                 }
             })
             .Where(res => res.IsSuccess)
@@ -85,7 +85,7 @@ public class EventObservable<TResult> : IObservable<TResult>
             return await _observable.FirstAsync().ToTask();
         }
 
-        // Use Rx's TakeUntil to properly handle cancellation
+        // Use Rx's Amb to properly handle cancellation
         var cancellationObservable = Observable.Create<TResult>(observer =>
         {
             var registration = cancellationToken.Register(() =>
@@ -95,14 +95,7 @@ public class EventObservable<TResult> : IObservable<TResult>
             return registration;
         });
 
-        try
-        {
-            return await _observable.FirstAsync().Amb(cancellationObservable).ToTask();
-        }
-        catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            throw new TaskCanceledException();
-        }
+        return await _observable.FirstAsync().Amb(cancellationObservable).ToTask();
     }
 }
 
@@ -132,5 +125,3 @@ public class EventObservable(GatewayService gatewayService, string eventName)
         });
     }
 }
-
-internal record Result<T>(bool IsSuccess, T? Value);
