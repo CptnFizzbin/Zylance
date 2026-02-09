@@ -9,7 +9,7 @@ This directory contains auto-generated type-safe constants for all action and ev
 
 ## Generation
 
-These files are automatically generated during the build process by the `Scripts/generate-constants.ts` script, which:
+These files are automatically generated during the build process by the `Scripts/Lib/generate-constants.ts` script, which:
 
 1. Scans all `.proto` files in the `zylance/api/` directory
 2. Extracts action names from `option (action) = "..."` declarations
@@ -73,14 +73,7 @@ Action and event names use the format `Namespace:Action` in proto files (e.g., `
 
 ## Regeneration
 
-To manually regenerate these files:
-
-```bash
-cd Zylance.Contract
-yarn vite-node Scripts/generate-constants.ts
-```
-
-Or build the entire contract project, which triggers regeneration automatically:
+To manually regenerate these files, build the contract project:
 
 ```bash
 dotnet build Zylance.Contract.csproj
