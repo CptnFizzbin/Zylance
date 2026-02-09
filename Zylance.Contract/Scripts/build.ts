@@ -1,54 +1,59 @@
-#!/usr/bin/env node
+#!/usr/bin/env vite-node
 
-import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import { glob } from "glob";
-import yargs from "yargs";
-import { hideBin } from "yargs/helpers";
-import { XMLParser } from "fast-xml-parser";
-import semver from "semver";
-import getError from "get-error";
+import { execFileSync } from "node:child_process"
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs"
+import { dirname, join, relative, resolve } from "node:path"
+import { fileURLToPath } from "node:url"
+import { glob } from "glob"
+import yargs from "yargs"
+import { hideBin } from "yargs/helpers"
+import { XMLParser } from "fast-xml-parser"
+import semver from "semver"
+import { getError } from "get-error"
+import { generateConstants } from "./Lib/generate-constants"
 
-const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
-const CONTRACT_DIR = resolve(SCRIPT_DIR, "..");
-const HOME_DIR = process.env.HOME || process.env.USERPROFILE || "";
-const GRPC_TOOLS_BASE_DIR = join(HOME_DIR, ".nuget", "packages", "grpc.tools");
+const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
+const CONTRACT_DIR = resolve(SCRIPT_DIR, "..")
+const HOME_DIR = process.env.HOME || process.env.USERPROFILE || ""
+const GRPC_TOOLS_BASE_DIR = join(HOME_DIR, ".nuget", "packages", "grpc.tools")
 
 interface BuildOptions {
   outputDir: string;
 }
 
-async function main(): Promise<void> {
-  const options = await parseCommandLineArgs();
-  
-  console.log(`Contract Directory: ${CONTRACT_DIR}`);
-  console.log(`Output Directory: ${options.outputDir}`);
+async function main (): Promise<void> {
+  const options = await parseCommandLineArgs()
 
-  const protocPath = findProtocPath();
-  console.log(`Using protoc from: ${protocPath}`);
-  
-  const protoFiles = await findProtoFiles();
-  console.log(`Found ${protoFiles.length} proto file(s)`);
-  
-  prepareOutputDirectory(options.outputDir);
-  
-  const pluginPath = getProtocPluginPath();
-  const grpcInclude = findGrpcToolsInclude();
-  
-  compileProtoFiles(protoFiles, options.outputDir, pluginPath, grpcInclude, protocPath);
-  
-  console.log("\x1b[32mSuccessfully compiled all proto files!\x1b[0m");
+  console.log(`Contract Directory: ${CONTRACT_DIR}`)
+  console.log(`Output Directory: ${options.outputDir}`)
+
+  const protocPath = findProtocPath()
+  console.log(`Using protoc from: ${protocPath}`)
+
+  const protoFiles = await findProtoFiles()
+  console.log(`Found ${protoFiles.length} proto file(s)`)
+
+  prepareOutputDirectory(options.outputDir)
+
+  const pluginPath = getProtocPluginPath()
+  const grpcInclude = findGrpcToolsInclude()
+
+  compileProtoFiles(protoFiles, options.outputDir, pluginPath, grpcInclude, protocPath)
+
+  console.log("\x1b[32mSuccessfully compiled all proto files!\x1b[0m")
+
+  // Generate type-safe constants
+  console.log("\nGenerating type-safe action and event constants...")
+  await generateConstants(options.outputDir)
 }
 
-async function parseCommandLineArgs(): Promise<BuildOptions> {
+async function parseCommandLineArgs (): Promise<BuildOptions> {
   const argv = await yargs(hideBin(process.argv))
     .command("$0 [output-dir]", "Compile Protocol Buffer files to TypeScript", (yargs) => {
       yargs.positional("output-dir", {
         describe: "Output directory for generated TypeScript files",
         type: "string",
-      });
+      })
     })
     .option("output-dir", {
       alias: ["o", "output"],
@@ -56,97 +61,97 @@ async function parseCommandLineArgs(): Promise<BuildOptions> {
       description: "Output directory for generated TypeScript files",
     })
     .help()
-    .parse();
+    .parse()
 
-  let outputDir = argv.outputDir || argv._[0];
+  let outputDir = argv.outputDir
 
   // Fall back to reading from .csproj if not provided
   if (!outputDir) {
-    outputDir = getOutputDirFromCsproj();
+    outputDir = getOutputDirFromCsproj()
   }
 
   if (!outputDir) {
     throw new Error(
-      "OutputDir is required. Usage: vite-node Scripts/build.ts <path> or --output-dir <path>"
-    );
+      "OutputDir is required. Usage: vite-node Scripts/build.ts <path> or --output-dir <path>",
+    )
   }
 
   return {
     outputDir: resolve(outputDir),
-  };
+  }
 }
 
-function getOutputDirFromCsproj(): string | null {
-  const csprojPath = join(CONTRACT_DIR, "Zylance.Contract.csproj");
-  
+function getOutputDirFromCsproj (): string | undefined {
+  const csprojPath = join(CONTRACT_DIR, "Zylance.Contract.csproj")
+
   try {
-    const content = readFileSync(csprojPath, "utf-8");
-    const parser = new XMLParser();
-    const parsed = parser.parse(content);
-    
+    const content = readFileSync(csprojPath, "utf-8")
+    const parser = new XMLParser()
+    const parsed = parser.parse(content)
+
     // MSBuild PropertyGroup can be a single object or an array depending on the .csproj structure
-    const propertyGroups = parsed.Project?.PropertyGroup;
+    const propertyGroups = parsed.Project?.PropertyGroup
     if (Array.isArray(propertyGroups)) {
       for (const group of propertyGroups) {
         if (group.TsOutputPath) {
-          return group.TsOutputPath;
+          return group.TsOutputPath
         }
       }
     } else if (propertyGroups?.TsOutputPath) {
-      return propertyGroups.TsOutputPath;
+      return propertyGroups.TsOutputPath
     }
   } catch (error) {
     // If we can't read or parse the .csproj, treat it as "no configured output dir"
     // and let the caller enforce that an explicit output path is provided. We only
     // log unexpected errors; ENOENT (file not found) is silently ignored so the
     // script can run outside of a full .NET build context.
-    const err = error as { code?: string; message?: string };
+    const err = error as { code?: string; message?: string }
     if (err.code !== "ENOENT") {
       console.warn(
         `Warning: Failed to read or parse ${csprojPath}. ` +
-          "Falling back to requiring an explicit --output-dir. " +
-          (err.message ? `Details: ${err.message}` : "")
-      );
+        "Falling back to requiring an explicit --output-dir. " +
+        (err.message ? `Details: ${err.message}` : ""),
+      )
     }
   }
-  
-  return null;
+
+  return undefined
 }
 
-function findProtocPath(): string {
+function findProtocPath (): string {
   // Try to find protoc in PATH first
   try {
-    execFileSync("protoc", ["--version"], { encoding: "utf-8" });
-    return "protoc";
+    execFileSync("protoc", ["--version"], { encoding: "utf-8" })
+    return "protoc"
   } catch {
     // Not in PATH, look in grpc.tools
   }
 
   // Find protoc from grpc.tools NuGet package
   if (!existsSync(GRPC_TOOLS_BASE_DIR)) {
-    console.error("Error: protoc not found in PATH and grpc.tools package not found");
-    console.error("Install protoc: https://grpc.io/docs/protoc-installation/");
-    process.exit(1);
+    console.error("Error: protoc not found in PATH and grpc.tools package not found")
+    console.error("Install protoc: https://grpc.io/docs/protoc-installation/")
+    process.exit(1)
   }
 
   const versions = readdirSync(GRPC_TOOLS_BASE_DIR)
     .filter((v) => semver.valid(v))
-    .sort((a, b) => semver.rcompare(a, b));
+    .sort((a, b) => semver.rcompare(a, b))
 
   if (versions.length === 0) {
-    console.error("Error: No grpc.tools versions found");
-    process.exit(1);
+    console.error("Error: No grpc.tools versions found")
+    process.exit(1)
   }
 
   // grpc.tools packages protoc binaries per OS/architecture
-  let protocSubdir: string;
+  let protocSubdir: string
   if (process.platform === "win32") {
-    protocSubdir = process.arch === "x64" ? "windows_x64" : "windows_x86";
+    protocSubdir = process.arch === "x64" ? "windows_x64" : "windows_x86"
   } else if (process.platform === "darwin") {
-    protocSubdir = process.arch === "arm64" ? "macosx_arm64" : "macosx_x64";
+    protocSubdir = process.arch === "arm64" ? "macosx_arm64" : "macosx_x64"
   } else {
     // Linux
-    protocSubdir = process.arch === "arm64" ? "linux_arm64" : "linux_x64";
+    protocSubdir = process.arch === "arm64" ? "linux_arm64" : "linux_x64"
   }
 
   const protocPath = join(
@@ -154,61 +159,61 @@ function findProtocPath(): string {
     versions[0],
     "tools",
     protocSubdir,
-    process.platform === "win32" ? "protoc.exe" : "protoc"
-  );
+    process.platform === "win32" ? "protoc.exe" : "protoc",
+  )
 
   if (!existsSync(protocPath)) {
-    console.error(`Error: protoc not found at ${protocPath}`);
-    console.error("Make sure grpc.tools NuGet package is restored");
-    process.exit(1);
+    console.error(`Error: protoc not found at ${protocPath}`)
+    console.error("Make sure grpc.tools NuGet package is restored")
+    process.exit(1)
   }
 
-  return protocPath;
+  return protocPath
 }
 
 /**
  * Finds all .proto files in the contract directory while skipping
  * dependency and build artifact directories
  */
-async function findProtoFiles(): Promise<string[]> {
-  const pattern = "**/*.proto";
-  const ignore = ["**/node_modules/**", "**/bin/**", "**/obj/**"];
-  
+async function findProtoFiles (): Promise<string[]> {
+  const pattern = "**/*.proto"
+  const ignore = ["**/node_modules/**", "**/bin/**", "**/obj/**"]
+
   return await glob(pattern, {
     cwd: CONTRACT_DIR,
     absolute: true,
     ignore,
-  });
+  })
 }
 
-function prepareOutputDirectory(outDir: string): void {
+function prepareOutputDirectory (outDir: string): void {
   if (existsSync(outDir)) {
-    rmSync(outDir, { recursive: true, force: true });
+    rmSync(outDir, { recursive: true, force: true })
   }
-  mkdirSync(outDir, { recursive: true });
+  mkdirSync(outDir, { recursive: true })
 }
 
-function getProtocPluginPath(): string {
-  const isWindows = process.platform === "win32";
+function getProtocPluginPath (): string {
+  const isWindows = process.platform === "win32"
   return join(
     CONTRACT_DIR,
     "node_modules",
     ".bin",
-    isWindows ? "protoc-gen-ts_proto.cmd" : "protoc-gen-ts_proto"
-  );
+    isWindows ? "protoc-gen-ts_proto.cmd" : "protoc-gen-ts_proto",
+  )
 }
 
-function findGrpcToolsInclude(): string | null {
+function findGrpcToolsInclude (): string | null {
   if (!existsSync(GRPC_TOOLS_BASE_DIR)) {
-    return null;
+    return null
   }
 
   const versions = readdirSync(GRPC_TOOLS_BASE_DIR)
     .filter((v) => semver.valid(v))
-    .sort((a, b) => semver.rcompare(a, b));
+    .sort((a, b) => semver.rcompare(a, b))
 
   if (versions.length === 0) {
-    return null;
+    return null
   }
 
   const includePath = join(
@@ -216,72 +221,72 @@ function findGrpcToolsInclude(): string | null {
     versions[0],
     "build",
     "native",
-    "include"
-  );
-  
-  return existsSync(includePath) ? includePath : null;
+    "include",
+  )
+
+  return existsSync(includePath) ? includePath : null
 }
 
-function compileProtoFiles(
+function compileProtoFiles (
   protoFiles: string[],
   outDir: string,
   pluginPath: string,
   grpcInclude: string | null,
-  protocPath: string
+  protocPath: string,
 ): void {
-  const protoPath = process.env.PROTO_PATH;
+  const protoPath = process.env.PROTO_PATH
 
   for (const protoFile of protoFiles) {
-    const relativePath = relative(CONTRACT_DIR, protoFile);
-    console.log(`Compiling ${relativePath}...`);
+    const relativePath = relative(CONTRACT_DIR, protoFile)
+    console.log(`Compiling ${relativePath}...`)
 
     const args = buildProtocArgs(
       protoFile,
       outDir,
       pluginPath,
       protoPath,
-      grpcInclude
-    );
+      grpcInclude,
+    )
 
     try {
       execFileSync(protocPath, args, {
         cwd: CONTRACT_DIR,
         stdio: "inherit",
         encoding: "utf-8",
-      });
+      })
     } catch (error) {
-      console.error(`Failed to compile ${relativePath}`);
-      const errorMessage = getError(error);
+      console.error(`Failed to compile ${relativePath}`)
+      const errorMessage = getError(error)
       if (errorMessage) {
-        console.error(errorMessage);
+        console.error(errorMessage)
       }
-      process.exit(1);
+      process.exit(1)
     }
   }
 }
 
-function buildProtocArgs(
+function buildProtocArgs (
   protoFile: string,
   outDir: string,
   pluginPath: string,
   protoPath: string | undefined,
-  grpcInclude: string | null
+  grpcInclude: string | null,
 ): string[] {
   const args = [
     // Proto path options - order matters for resolution
     `--proto_path=${CONTRACT_DIR}`,
-  ];
+  ]
 
   if (protoPath) {
-    args.push(`--proto_path=${protoPath}`);
+    args.push(`--proto_path=${protoPath}`)
   }
 
   if (grpcInclude) {
-    args.push(`--proto_path=${grpcInclude}`);
+    args.push(`--proto_path=${grpcInclude}`)
   } else {
     console.warn(
-      "Warning: grpc.tools include directory not found, google/protobuf imports may fail"
-    );
+      "Warning: grpc.tools include directory not found, google/protobuf imports may fail",
+    )
   }
 
   // Use ts-proto in browser mode with JSON serialization, omitting client/server stubs
@@ -295,13 +300,13 @@ function buildProtocArgs(
     `--ts_proto_opt=outputClientImpl=false`,
     `--ts_proto_opt=nestJs=false`,
     `--ts_proto_out=${outDir}`,
-    protoFile
-  );
+    protoFile,
+  )
 
-  return args;
+  return args
 }
 
 await main().catch((error) => {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exit(1);
-});
+  console.error(error instanceof Error ? error.message : String(error))
+  process.exit(1)
+})

@@ -16,8 +16,6 @@
     <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
     <option name="AUTO_ATTACH_CHILDREN" value="0" />
     <option name="MIXED_MODE_DEBUG" value="0" />
-    <method v="2">
-      <option name="Build" />
-    </method>
+    <method v="2" />
   </configuration>
 </component>
