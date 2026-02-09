@@ -1,5 +1,5 @@
 using JetBrains.Annotations;
-using Zylance.Core.Lib.Gateway.Delegates;
+using Zylance.Core.Lib.Gateway.Handlers;
 using Zylance.Core.Lib.Gateway.Models;
 
 namespace Zylance.Core.Lib.Gateway.Services;

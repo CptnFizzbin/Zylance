@@ -1,21 +1,31 @@
+using System.Collections.Concurrent;
 using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Lib.Gateway.Handlers;
 using Zylance.Core.Lib.Gateway.Models;
-using Zylance.Core.Lib.Gateway.Services;
 using Zylance.Core.Lib.Gateway.Utils;
 
-namespace Zylance.Core.Lib.Gateway;
+namespace Zylance.Core.Lib.Gateway.Services;
 
-public class Gateway
+public class GatewayService
 {
+    private readonly ConcurrentDictionary<string, List<ZyEventSubscription>> _eventListeners = new();
     private readonly RouterService _routerService;
     private readonly ITransport _transport;
 
-    public Gateway(ITransport transport, RouterService routerService)
+    public GatewayService(ITransport transport, RouterService routerService)
     {
         _transport = transport;
         _routerService = routerService;
         _transport.Receive(message => _ = HandleMessage(message));
+
+        SubscribeToEvent(
+            "Vault:VaultClosed",
+            _ =>
+            {
+                Console.WriteLine("Vault closed. Clearing event listeners.");
+                _eventListeners.Clear();
+            }
+        );
     }
 
     public void Send(ResponsePayload response)
@@ -42,6 +52,54 @@ public class Gateway
 
         var envelope = new GatewayEnvelope { Error = errorPayload };
         Send(envelope);
+    }
+
+    public EventObservable ObserveEvent(string eventName)
+    {
+        return new EventObservable(this, eventName);
+    }
+
+    public Subscription SubscribeToEvent(string eventName, Action<ZyEvent> handler)
+    {
+        var listenerId = Guid.NewGuid();
+
+        var listener = new ZyEventSubscription
+        {
+            Id = listenerId,
+            EventName = eventName,
+            Handler = handler,
+            Unsubscribe = () => RemoveEventListener(eventName, listenerId),
+        };
+
+        AddEventListener(eventName, listener);
+
+        return listener;
+    }
+
+    private void AddEventListener(string eventName, ZyEventSubscription listener)
+    {
+        _eventListeners.AddOrUpdate(
+            eventName,
+            _ => [listener],
+            (_, list) =>
+            {
+                list.Add(listener);
+                return list;
+            }
+        );
+    }
+
+    private void RemoveEventListener(string eventName, Guid listenerId)
+    {
+        _eventListeners.AddOrUpdate(
+            eventName,
+            _ => [],
+            (_, list) =>
+            {
+                list.RemoveAll(l => l.Id == listenerId);
+                return list;
+            }
+        );
     }
 
     private async Task HandleMessage(string json)
@@ -92,6 +150,12 @@ public class Gateway
         Console.WriteLine($"==> Evt: {payload.EventName} - {payload.DataJson}");
 
         var evt = new ZyEvent { Payload = payload };
+
+        if (_eventListeners.TryGetValue(payload.EventName, out var listeners))
+            // Iterate over a copy to avoid collection modified exception
+            // when handlers unsubscribe during invocation (e.g., ObserveEvent().TakeTakeFirstAsync())
+            foreach (var listener in listeners.ToList())
+                listener.Handler(evt);
 
         await _routerService.HandleEvent(evt);
     }
