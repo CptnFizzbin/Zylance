@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Zylance.Core.Lib.Vault.Managers;
 using Zylance.Vault.Local.Context;
 using Zylance.Vault.Local.Entities;
@@ -21,13 +20,9 @@ public class LocalMetadataManager(LocalVaultDbContext dbContext) : IMetadataMana
         var entity = await dbContext.ZylanceMetadata.FindAsync([key], cancellationToken);
 
         if (entity is not null)
-        {
             entity.Value = value;
-        }
         else
-        {
             dbContext.ZylanceMetadata.Add(new ZylanceMetadataEntity { Key = key, Value = value });
-        }
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }

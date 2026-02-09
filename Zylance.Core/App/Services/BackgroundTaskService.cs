@@ -49,7 +49,8 @@ public class BackgroundTaskService(Zylance zylance)
     }
 
     /// <summary>
-    ///     Wraps an async operation with automatic background task lifecycle management.
+    ///     Wraps an async operation with automatic background task lifecycle
+    ///     management.
     ///     Handles starting, error, and finish events automatically.
     /// </summary>
     /// <param name="description">Initial description of the task</param>
@@ -81,8 +82,10 @@ public class BackgroundTaskService(Zylance zylance)
     }
 
     /// <summary>
-    ///     Wraps an async operation with automatic background task lifecycle management.
-    ///     Handles starting, error, and finish events automatically. For operations with no return value.
+    ///     Wraps an async operation with automatic background task lifecycle
+    ///     management.
+    ///     Handles starting, error, and finish events automatically. For operations
+    ///     with no return value.
     /// </summary>
     /// <param name="description">Initial description of the task</param>
     /// <param name="work">The work to perform, receives a SetProgress callback</param>
