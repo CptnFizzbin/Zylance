@@ -5,3 +5,5 @@ dataSources/
 dataSources.xml
 db-forest-config.xml
 dataSources.local.xml
+
+shelf/
