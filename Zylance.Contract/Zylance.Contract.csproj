@@ -50,9 +50,8 @@
     />
     <ItemGroup>
       <!-- Include generated C# files in compilation -->
-      <GeneratedCSharpFiles Include="Generated/cs/**/*.cs" />
-      <Compile Include="@(GeneratedCSharpFiles)" />
-      <FileWrites Include="@(GeneratedCSharpFiles)" />
+      <GeneratedCSharpFiles Include="Generated/cs/**/*.cs"/>
+      <FileWrites Include="@(GeneratedCSharpFiles)"/>
     </ItemGroup>
   </Target>
 </Project>
