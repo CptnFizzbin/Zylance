@@ -20,11 +20,10 @@ public class MarkerTableTests : IDisposable
     public void Dispose()
     {
         if (Directory.Exists(_tempDirectory))
-        {
             try
             {
                 SqliteConnection.ClearAllPools();
-                Directory.Delete(_tempDirectory, recursive: true);
+                Directory.Delete(_tempDirectory, true);
             }
             catch (IOException)
             {
@@ -32,14 +31,13 @@ public class MarkerTableTests : IDisposable
                 Thread.Sleep(100);
                 try
                 {
-                    Directory.Delete(_tempDirectory, recursive: true);
+                    Directory.Delete(_tempDirectory, true);
                 }
                 catch
                 {
                     // Ignore if still locked - OS will clean up eventually
                 }
             }
-        }
 
         GC.SuppressFinalize(this);
     }
@@ -47,25 +45,27 @@ public class MarkerTableTests : IDisposable
     private string CreateTempFilePath(string? fileName = null, bool includeUuid = true)
     {
         if (fileName is null)
-        {
-            fileName = includeUuid ? $"test_{Guid.NewGuid()}.zlv.sqlite" : "test.zlv.sqlite";
-        }
+            fileName = includeUuid
+                ? $"test_{Guid.NewGuid()}.zlv.sqlite"
+                : "test.zlv.sqlite";
         else if (includeUuid)
-        {
             fileName = $"{Guid.NewGuid()}_{fileName}";
-        }
 
         return Path.Combine(_tempDirectory, fileName);
     }
 
-    private async Task<bool> TableExistsAsync(string filePath, string tableName)
+    private async Task<bool> TableExistsAsync(
+        string filePath,
+        string tableName,
+        CancellationToken cancellationToken = default
+    )
     {
         using var connection = new SqliteConnection($"Data Source={filePath}");
-        await connection.OpenAsync();
+        await connection.OpenAsync(cancellationToken);
         using var command = connection.CreateCommand();
         command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=@tableName";
         command.Parameters.AddWithValue("@tableName", tableName);
-        var result = await command.ExecuteScalarAsync();
+        var result = await command.ExecuteScalarAsync(cancellationToken);
         return result is not null && Convert.ToInt32(result) > 0;
     }
 
@@ -74,14 +74,15 @@ public class MarkerTableTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFilePath();
+        var cancellationToken = TestContext.Current.CancellationToken;
 
         // Act
-        var vault = await LocalVault.FromFile(filePath);
+        var vault = await LocalVault.FromFile(filePath, cancellationToken);
 
         // Assert
         Assert.NotNull(vault);
 
-        var tableExists = await TableExistsAsync(filePath, "_zylance_");
+        var tableExists = await TableExistsAsync(filePath, "_zylance_", cancellationToken);
         Assert.True(tableExists);
     }
 
@@ -90,10 +91,11 @@ public class MarkerTableTests : IDisposable
     {
         // Arrange - create a Zylance database
         var filePath = CreateTempFilePath();
-        await LocalVault.FromFile(filePath);
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await LocalVault.FromFile(filePath, cancellationToken);
 
         // Act - open the existing database
-        var vault = await LocalVault.FromFile(filePath);
+        var vault = await LocalVault.FromFile(filePath, cancellationToken);
 
         // Assert
         Assert.NotNull(vault);
@@ -104,17 +106,20 @@ public class MarkerTableTests : IDisposable
     {
         // Arrange - create a SQLite database without the marker table
         var filePath = CreateTempFilePath();
+        var cancellationToken = TestContext.Current.CancellationToken;
 
         using (var connection = new SqliteConnection($"Data Source={filePath}"))
         {
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
             using var command = connection.CreateCommand();
             command.CommandText = "CREATE TABLE SomeOtherTable (Id INTEGER PRIMARY KEY, Name TEXT)";
-            await command.ExecuteNonQueryAsync();
+            await command.ExecuteNonQueryAsync(cancellationToken);
         }
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<NonZylanceDatabaseException>(() => LocalVault.FromFile(filePath));
+        var exception =
+            await Assert.ThrowsAsync<NonZylanceDatabaseException>(() => LocalVault.FromFile(filePath, cancellationToken)
+            );
 
         Assert.Contains("not a Zylance vault", exception.Message);
         Assert.Contains(filePath, exception.Message);
@@ -125,22 +130,23 @@ public class MarkerTableTests : IDisposable
     {
         // Arrange - create a SQLite database without the marker table
         var filePath = CreateTempFilePath();
+        var cancellationToken = TestContext.Current.CancellationToken;
 
         using (var connection = new SqliteConnection($"Data Source={filePath}"))
         {
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
             using var command = connection.CreateCommand();
             command.CommandText = "CREATE TABLE SomeOtherTable (Id INTEGER PRIMARY KEY, Name TEXT)";
-            await command.ExecuteNonQueryAsync();
+            await command.ExecuteNonQueryAsync(cancellationToken);
         }
 
         // Act & Assert - expect exception
-        await Assert.ThrowsAsync<NonZylanceDatabaseException>(() => LocalVault.FromFile(filePath));
+        await Assert.ThrowsAsync<NonZylanceDatabaseException>(() => LocalVault.FromFile(filePath, cancellationToken));
 
         // Verify that migrations were not run - check that Zylance tables don't exist
-        var accountsTableExists = await TableExistsAsync(filePath, "Accounts");
-        var ledgerEntriesTableExists = await TableExistsAsync(filePath, "LedgerEntries");
-        var markerTableExists = await TableExistsAsync(filePath, "_zylance_");
+        var accountsTableExists = await TableExistsAsync(filePath, "Accounts", cancellationToken);
+        var ledgerEntriesTableExists = await TableExistsAsync(filePath, "LedgerEntries", cancellationToken);
+        var markerTableExists = await TableExistsAsync(filePath, "_zylance_", cancellationToken);
 
         Assert.False(accountsTableExists, "Accounts table should not exist");
         Assert.False(ledgerEntriesTableExists, "LedgerEntries table should not exist");
@@ -152,14 +158,17 @@ public class MarkerTableTests : IDisposable
     {
         // Arrange - create an empty SQLite database by opening and closing a connection
         var filePath = CreateTempFilePath();
+        var cancellationToken = TestContext.Current.CancellationToken;
 
         using (var connection = new SqliteConnection($"Data Source={filePath}"))
         {
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
         }
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<NonZylanceDatabaseException>(() => LocalVault.FromFile(filePath));
+        var exception =
+            await Assert.ThrowsAsync<NonZylanceDatabaseException>(() => LocalVault.FromFile(filePath, cancellationToken)
+            );
 
         Assert.Contains("not a Zylance vault", exception.Message);
     }
@@ -169,11 +178,12 @@ public class MarkerTableTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFilePath();
-        var vault = await LocalVault.FromFile(filePath);
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var vault = await LocalVault.FromFile(filePath, cancellationToken);
 
         // Act - set and get metadata using the Metadata API
-        await vault.Metadata.SetAsync("version", "1.0.0");
-        var value = await vault.Metadata.GetAsync("version");
+        await vault.Metadata.SetAsync("version", "1.0.0", cancellationToken);
+        var value = await vault.Metadata.GetAsync("version", cancellationToken);
 
         // Assert
         Assert.NotNull(value);
@@ -185,10 +195,11 @@ public class MarkerTableTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFilePath();
-        var vault = await LocalVault.FromFile(filePath);
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var vault = await LocalVault.FromFile(filePath, cancellationToken);
 
         // Act
-        var value = await vault.Metadata.GetAsync("nonexistent");
+        var value = await vault.Metadata.GetAsync("nonexistent", cancellationToken);
 
         // Assert
         Assert.Null(value);
@@ -199,12 +210,13 @@ public class MarkerTableTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFilePath();
-        var vault = await LocalVault.FromFile(filePath);
-        await vault.Metadata.SetAsync("version", "1.0.0");
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var vault = await LocalVault.FromFile(filePath, cancellationToken);
+        await vault.Metadata.SetAsync("version", "1.0.0", cancellationToken);
 
         // Act - update the value
-        await vault.Metadata.SetAsync("version", "2.0.0");
-        var value = await vault.Metadata.GetAsync("version");
+        await vault.Metadata.SetAsync("version", "2.0.0", cancellationToken);
+        var value = await vault.Metadata.GetAsync("version", cancellationToken);
 
         // Assert
         Assert.Equal("2.0.0", value);
@@ -215,18 +227,18 @@ public class MarkerTableTests : IDisposable
     {
         // Arrange
         var filePath = CreateTempFilePath();
-        await LocalVault.FromFile(filePath);
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await LocalVault.FromFile(filePath, cancellationToken);
 
         // Act - query table schema
         using var connection = new SqliteConnection($"Data Source={filePath}");
-        await connection.OpenAsync();
+        await connection.OpenAsync(cancellationToken);
         using var command = connection.CreateCommand();
         command.CommandText = "PRAGMA table_info(_zylance_)";
 
         var columns = new List<(string Name, string Type, bool NotNull)>();
-        using var reader = await command.ExecuteReaderAsync();
-        while (await reader.ReadAsync())
-        {
+        using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
             columns.Add(
                 (
                     reader.GetString(1), // name
@@ -234,7 +246,6 @@ public class MarkerTableTests : IDisposable
                     reader.GetInt32(3) == 1 // notnull
                 )
             );
-        }
 
         // Assert
         Assert.Equal(2, columns.Count);

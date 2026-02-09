@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env vite-node
 
 import { execFileSync } from "node:child_process"
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs"
@@ -10,7 +10,7 @@ import { hideBin } from "yargs/helpers"
 import { XMLParser } from "fast-xml-parser"
 import semver from "semver"
 import { getError } from "get-error"
-import { generateConstants } from "./generate-constants.js"
+import { generateConstants } from "./Lib/generate-constants"
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
 const CONTRACT_DIR = resolve(SCRIPT_DIR, "..")
