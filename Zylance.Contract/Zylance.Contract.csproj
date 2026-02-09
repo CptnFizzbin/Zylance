@@ -31,8 +31,8 @@
   </Target>
 
   <Target
-    Name="YarnInstall"
-    BeforeTargets="Build"
+    Name="InstallYarnPackages"
+    BeforeTargets="BeforeBuild;BeforeRebuild"
     Inputs="package.json;yarn.lock"
     Outputs="$(IntermediateOutputPath)yarn.install.marker"
   >
@@ -42,14 +42,22 @@
 
   <Target
     Name="GenerateTS"
-    AfterTargets="Build"
+    BeforeTargets="BeforeBuild;BeforeRebuild"
     Inputs="@(Protobuf);$(MSBuildProjectFile)"
-    Outputs="$(TsOutputPath).generated.marker"
+    Outputs="$(TsOutputPath).generated.marker;"
   >
+    <RemoveDir Directories="Generated"/>
     <Exec
-      Command="$(YarnExe) build:msbuild &quot;$(TsOutputPath)&quot;"
+      Command="$(YarnExe) build:code"
       EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"
-    />
+      Outputs="Generated/cs/*"
+    >
+      <Output ItemName="Generated" TaskParameter="Outputs"/>
+    </Exec>
+    <ItemGroup>
+      <Compile Include="@(Generated)"/>
+      <FileWrites Include="@(Generated)"/>
+    </ItemGroup>
     <Touch Files="$(TsOutputPath).generated.marker" AlwaysCreate="true"/>
   </Target>
 </Project>

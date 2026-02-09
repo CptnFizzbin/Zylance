@@ -2,8 +2,8 @@
   "name": "@cptnfizzbin/zylance-contract",
   "packageManager": "yarn@4.12.0",
   "scripts": {
-    "build": "dotnet build ./Zylance.Contract.csproj -c Release",
-    "build:msbuild": "vite-node ./Scripts/build.ts"
+    "build": "dotnet build ./Zylance.Contract.csproj",
+    "build:code": "vite-node Scripts/build-code.ts"
   },
   "devDependencies": {
     "@types/node": "^25.2.0",
