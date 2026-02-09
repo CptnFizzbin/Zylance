@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.33.5" />
+    <PackageReference Include="Google.Protobuf" Version="3.33.5"/>
     <PackageReference Include="Grpc.Tools" Version="2.76.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,8 +23,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="./zylance/**/*.proto" GrpcServices="None" />
+    <Protobuf Include="./zylance/**/*.proto" GrpcServices="None"/>
   </ItemGroup>
+
+  <Target Name="CleanGeneratedFiles" BeforeTargets="Clean">
+    <RemoveDir Directories="Generated"/>
+  </Target>
 
   <Target
     Name="YarnInstall"
@@ -32,8 +36,8 @@
     Inputs="package.json;yarn.lock"
     Outputs="$(IntermediateOutputPath)yarn.install.marker"
   >
-    <Exec Command="$(YarnExe) install" />
-    <Touch Files="$(IntermediateOutputPath)yarn.install.marker" AlwaysCreate="true" />
+    <Exec Command="$(YarnExe) install"/>
+    <Touch Files="$(IntermediateOutputPath)yarn.install.marker" AlwaysCreate="true"/>
   </Target>
 
   <Target
@@ -46,6 +50,6 @@
       Command="$(YarnExe) build:msbuild &quot;$(TsOutputPath)&quot;"
       EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"
     />
-    <Touch Files="$(TsOutputPath).generated.marker" AlwaysCreate="true" />
+    <Touch Files="$(TsOutputPath).generated.marker" AlwaysCreate="true"/>
   </Target>
 </Project>
