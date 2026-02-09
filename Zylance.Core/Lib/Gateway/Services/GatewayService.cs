@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Zylance.Contract;
 using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Lib.Gateway.Handlers;
 using Zylance.Core.Lib.Gateway.Models;
@@ -19,7 +20,7 @@ public class GatewayService
         _transport.Receive(message => _ = HandleMessage(message));
 
         SubscribeToEvent(
-            "Vault:VaultClosed",
+            ZylanceConstants.Events.Vault_VaultClosed,
             _ =>
             {
                 Console.WriteLine("Vault closed. Clearing event listeners.");
@@ -125,7 +126,9 @@ public class GatewayService
         catch (Exception ex)
         {
             var requestId =
-                message.PayloadCase == GatewayEnvelope.PayloadOneofCase.Request ? message.Request.RequestId : null;
+                message.PayloadCase == GatewayEnvelope.PayloadOneofCase.Request
+                    ? message.Request.RequestId
+                    : null;
 
             var error = ExceptionHandler.WrapException(ex, requestId);
             Send(error);

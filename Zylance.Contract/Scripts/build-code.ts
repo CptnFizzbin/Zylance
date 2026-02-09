@@ -1,8 +1,9 @@
 #!/usr/bin/env vite-node
 
 import { execFileSync } from "node:child_process"
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs"
-import { dirname, join, relative, resolve } from "node:path"
+import * as fs from "node:fs"
+import { existsSync, readFileSync, readdirSync } from "node:fs"
+import path, { dirname, join, relative, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 import { glob } from "glob"
 import yargs from "yargs"
@@ -14,74 +15,67 @@ import { generateConstants } from "./Lib/generate-constants"
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
 const CONTRACT_DIR = resolve(SCRIPT_DIR, "..")
+const DEST_DIR = resolve(CONTRACT_DIR, "Generated")
 const HOME_DIR = process.env.HOME || process.env.USERPROFILE || ""
 const GRPC_TOOLS_BASE_DIR = join(HOME_DIR, ".nuget", "packages", "grpc.tools")
 
 interface BuildOptions {
-  outputDir: string;
+  tsOutputDir: string;
 }
 
 async function main (): Promise<void> {
   const options = await parseCommandLineArgs()
 
   console.log(`Contract Directory: ${CONTRACT_DIR}`)
-  console.log(`Output Directory: ${options.outputDir}`)
+  if (options.tsOutputDir) {
+    console.log(`Output Directory: ${options.tsOutputDir}`)
+  }
 
-  const protocPath = findProtocPath()
-  console.log(`Using protoc from: ${protocPath}`)
+  await compileProtoFiles(DEST_DIR)
+  await generateConstants(DEST_DIR)
 
-  const protoFiles = await findProtoFiles()
-  console.log(`Found ${protoFiles.length} proto file(s)`)
-
-  prepareOutputDirectory(options.outputDir)
-
-  const pluginPath = getProtocPluginPath()
-  const grpcInclude = findGrpcToolsInclude()
-
-  compileProtoFiles(protoFiles, options.outputDir, pluginPath, grpcInclude, protocPath)
-
-  console.log("\x1b[32mSuccessfully compiled all proto files!\x1b[0m")
-
-  // Generate type-safe constants
-  console.log("\nGenerating type-safe action and event constants...")
-  await generateConstants(options.outputDir)
+  if (options.tsOutputDir) {
+    console.log("Copying generated TypeScript files to output directory...")
+    fs.rmSync(options.tsOutputDir, { recursive: true, force: true })
+    fs.cpSync(path.resolve(DEST_DIR, "ts"), options.tsOutputDir, { recursive: true })
+  }
 }
 
 async function parseCommandLineArgs (): Promise<BuildOptions> {
   const argv = await yargs(hideBin(process.argv))
-    .command("$0 [output-dir]", "Compile Protocol Buffer files to TypeScript", (yargs) => {
-      yargs.positional("output-dir", {
+    .command("$0 [ts-output-path]", "Compile Protocol Buffer files to TypeScript", (yargs) => {
+      yargs.positional("ts-output-path", {
         describe: "Output directory for generated TypeScript files",
         type: "string",
       })
     })
-    .option("output-dir", {
-      alias: ["o", "output"],
+    .option("ts-output-path", {
+      alias: ["o", "ts-output"],
       type: "string",
       description: "Output directory for generated TypeScript files",
     })
     .help()
     .parse()
 
-  let outputDir = argv.outputDir
+  let tsOutputPath = argv.tsOutputPath
 
   // Fall back to reading from .csproj if not provided
-  if (!outputDir) {
-    outputDir = getOutputDirFromCsproj()
+  if (!tsOutputPath) {
+    tsOutputPath = getTsOutputDirFromCsproj()
   }
 
-  if (!outputDir) {
+  if (!tsOutputPath) {
     throw new Error(
-      "OutputDir is required. Usage: vite-node Scripts/build.ts <path> or --output-dir <path>",
+      "TsOutputPath is required. Usage: vite-node Scripts/build.ts <path> or --ts-output-dir <path>",
     )
   }
 
   return {
-    outputDir: resolve(outputDir),
+    tsOutputDir: resolve(tsOutputPath),
   }
 }
 
-function getOutputDirFromCsproj (): string | undefined {
+function getTsOutputDirFromCsproj (): string | undefined {
   const csprojPath = join(CONTRACT_DIR, "Zylance.Contract.csproj")
 
   try {
@@ -109,13 +103,54 @@ function getOutputDirFromCsproj (): string | undefined {
     if (err.code !== "ENOENT") {
       console.warn(
         `Warning: Failed to read or parse ${csprojPath}. ` +
-        "Falling back to requiring an explicit --output-dir. " +
+        "Falling back to requiring an explicit --ts-output-dir. " +
         (err.message ? `Details: ${err.message}` : ""),
       )
     }
   }
 
   return undefined
+}
+
+async function compileProtoFiles (outputDir: string) {
+  fs.mkdirSync(path.resolve(outputDir, "ts"), { recursive: true })
+
+  const protocPath = findProtocPath()
+  console.log(`Using protoc from: ${protocPath}`)
+
+  const protoFiles = await findProtoFiles()
+  console.log(`Found ${protoFiles.length} proto file(s)`)
+
+  const pluginPath = getProtocPluginPath()
+  const grpcInclude = findGrpcToolsInclude()
+
+  for (const protoFile of protoFiles) {
+    const relativePath = relative(CONTRACT_DIR, protoFile)
+    console.log(`Compiling ${relativePath}...`)
+
+    const args = buildProtocArgs(
+      protoFile,
+      pluginPath,
+      grpcInclude,
+    )
+
+    try {
+      execFileSync(protocPath, args, {
+        cwd: CONTRACT_DIR,
+        stdio: "inherit",
+        encoding: "utf-8",
+      })
+    } catch (error) {
+      console.error(`Failed to compile ${relativePath}`)
+      const errorMessage = getError(error)
+      if (errorMessage) {
+        console.error(errorMessage)
+      }
+      process.exit(1)
+    }
+  }
+
+  console.log("\x1b[32mSuccessfully compiled all proto files!\x1b[0m")
 }
 
 function findProtocPath (): string {
@@ -186,13 +221,6 @@ async function findProtoFiles (): Promise<string[]> {
   })
 }
 
-function prepareOutputDirectory (outDir: string): void {
-  if (existsSync(outDir)) {
-    rmSync(outDir, { recursive: true, force: true })
-  }
-  mkdirSync(outDir, { recursive: true })
-}
-
 function getProtocPluginPath (): string {
   const isWindows = process.platform === "win32"
   return join(
@@ -203,9 +231,9 @@ function getProtocPluginPath (): string {
   )
 }
 
-function findGrpcToolsInclude (): string | null {
+function findGrpcToolsInclude (): string | undefined {
   if (!existsSync(GRPC_TOOLS_BASE_DIR)) {
-    return null
+    return undefined
   }
 
   const versions = readdirSync(GRPC_TOOLS_BASE_DIR)
@@ -213,7 +241,7 @@ function findGrpcToolsInclude (): string | null {
     .sort((a, b) => semver.rcompare(a, b))
 
   if (versions.length === 0) {
-    return null
+    return undefined
   }
 
   const includePath = join(
@@ -224,59 +252,20 @@ function findGrpcToolsInclude (): string | null {
     "include",
   )
 
-  return existsSync(includePath) ? includePath : null
-}
-
-function compileProtoFiles (
-  protoFiles: string[],
-  outDir: string,
-  pluginPath: string,
-  grpcInclude: string | null,
-  protocPath: string,
-): void {
-  const protoPath = process.env.PROTO_PATH
-
-  for (const protoFile of protoFiles) {
-    const relativePath = relative(CONTRACT_DIR, protoFile)
-    console.log(`Compiling ${relativePath}...`)
-
-    const args = buildProtocArgs(
-      protoFile,
-      outDir,
-      pluginPath,
-      protoPath,
-      grpcInclude,
-    )
-
-    try {
-      execFileSync(protocPath, args, {
-        cwd: CONTRACT_DIR,
-        stdio: "inherit",
-        encoding: "utf-8",
-      })
-    } catch (error) {
-      console.error(`Failed to compile ${relativePath}`)
-      const errorMessage = getError(error)
-      if (errorMessage) {
-        console.error(errorMessage)
-      }
-      process.exit(1)
-    }
-  }
+  return existsSync(includePath) ? includePath : undefined
 }
 
 function buildProtocArgs (
   protoFile: string,
-  outDir: string,
   pluginPath: string,
-  protoPath: string | undefined,
-  grpcInclude: string | null,
+  grpcInclude?: string,
 ): string[] {
   const args = [
     // Proto path options - order matters for resolution
     `--proto_path=${CONTRACT_DIR}`,
   ]
 
+  const protoPath = process.env.PROTO_PATH
   if (protoPath) {
     args.push(`--proto_path=${protoPath}`)
   }
@@ -299,7 +288,7 @@ function buildProtocArgs (
     `--ts_proto_opt=outputJsonMethods=true`,
     `--ts_proto_opt=outputClientImpl=false`,
     `--ts_proto_opt=nestJs=false`,
-    `--ts_proto_out=${outDir}`,
+    `--ts_proto_out=${path.resolve(DEST_DIR, "ts")}`,
     protoFile,
   )
 

@@ -10,6 +10,7 @@
  * - C#: Static class with string constants
  */
 
+import * as fs from "node:fs"
 import { readFileSync, writeFileSync } from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
@@ -27,7 +28,9 @@ interface ActionOrEvent {
 /**
  * Main function to generate type-safe constants.
  */
-export async function generateConstants (tsOutputDir?: string): Promise<void> {
+export async function generateConstants (outputDir: string): Promise<void> {
+  console.log("\nGenerating type-safe action and event constants...")
+
   console.log("Scanning proto files...")
   const protoFiles = await findProtoFiles()
   console.log(`Found ${protoFiles.length} proto file(s)`)
@@ -46,23 +49,17 @@ export async function generateConstants (tsOutputDir?: string): Promise<void> {
 
   console.log(`\nExtracted ${actions.length} actions and ${events.length} events`)
 
-  const tsContent = generateTypeScript(actions, events)
-  const csContent = generateCSharp(actions, events)
-
   // Generate TypeScript in Contract/Generated for reference
-  const tsContractPath = path.resolve(CONTRACT_DIR, "Generated", "ZylanceConstants.ts")
-  writeFileSync(tsContractPath, tsContent, "utf-8")
-  console.log(`\nGenerated TypeScript: ${path.relative(CONTRACT_DIR, tsContractPath)}`)
-
-  // Also generate in the UI project if output directory is specified
-  if (tsOutputDir) {
-    const tsOutputPath = path.resolve(tsOutputDir, "ZylanceConstants.ts")
-    writeFileSync(tsOutputPath, tsContent, "utf-8")
-    console.log(`Generated TypeScript: ${path.relative(CONTRACT_DIR, tsOutputPath)}`)
-  }
+  const tsContent = generateTypeScript(actions, events)
+  const tsOutputPath = path.resolve(outputDir, "ts", "ZylanceConstants.ts")
+  fs.mkdirSync(path.dirname(tsOutputPath), { recursive: true })
+  writeFileSync(tsOutputPath, tsContent, "utf-8")
+  console.log(`\nGenerated TypeScript: ${path.relative(CONTRACT_DIR, tsOutputPath)}`)
 
   // Generate C#
-  const csOutputPath = path.resolve(CONTRACT_DIR, "Generated", "ZylanceConstants.cs")
+  const csContent = generateCSharp(actions, events)
+  const csOutputPath = path.resolve(outputDir, "cs", "ZylanceConstants.cs")
+  fs.mkdirSync(path.dirname(csOutputPath), { recursive: true })
   writeFileSync(csOutputPath, csContent, "utf-8")
   console.log(`Generated C#: ${path.relative(CONTRACT_DIR, csOutputPath)}`)
 
