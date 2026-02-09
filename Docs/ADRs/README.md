@@ -35,6 +35,7 @@ Note: We omit a separate "Status" field from the traditional Michael Nygard form
 
 - [ADR-002: Zero-Knowledge Remote Vault Architecture](./ADR-002-zero-knowledge-remote-vault.md)
 - [ADR-010: WindowSyncStateReq Message for UI-Core State Synchronization](./ADR-010-window-syncstate-message.md)
+- [ADR-011: Headless End-to-End Testing for UI](./ADR-011-headless-e2e-testing.md)
 
 ### Reference / Guidelines
 
