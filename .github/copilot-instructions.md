@@ -581,3 +581,48 @@ dotnet test --filter-class "*DateTimeOffsetParserTests"
 - Defined in `Properties/AssemblyInfo.cs`
 - Enables testing of internal implementation details
 
+## React component export style (frontend)
+
+- Preferred patterns for React components in `Zylance.UI`:
+  - For components without props:
+
+```tsx
+import type { FC } from 'react';
+
+export const ComponentName: FC = () => {
+  // ...component implementation
+};
+```
+
+- For components with props:
+
+```tsx
+import type { FC } from 'react';
+
+export interface ComponentProps {
+  // ...props
+}
+
+export const ComponentName: FC<ComponentProps> = (props) => {
+  // ...component implementation
+};
+```
+
+- Use type-only imports for React types when project compiler options require
+  it (for example, `import type { FC } from 'react'`) to satisfy
+  `verbatimModuleSyntax` and avoid type-import runtime side-effects.
+- Prefer `export const` with `FC` over `export default function Component` or
+  anonymous default exports for consistency and easier refactoring.
+- Rationale:
+  - Explicit `FC` typing makes component signatures clear and consistent across
+    the codebase.
+  - Named exports encourage predictable imports and avoid the
+    unused-default-export linter warning when a component isn't imported yet.
+  - Type-only imports avoid runtime artefacts and align with the project's
+    TypeScript configuration.
+
+- Linter notes:
+  - The project's Biome/TS settings may warn if `FC` is imported as a value
+    instead of a type; use `import type { FC } from 'react'` when needed.
+  - If you add a new component file, follow this pattern to reduce churn during
+    reviews and keep CI/linting green.

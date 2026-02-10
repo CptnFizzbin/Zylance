@@ -6,6 +6,7 @@ import { Divider, ListItemIcon, ListItemText, MenuItem, Typography } from "@mui/
 import type { FC } from "react"
 import { FileBarMenu, type MenuBarMenuProps } from "@/Components/Desktop/FileBar/Menus/MenuBase"
 import { useZylance } from "@/Hooks/UseZylance"
+import InputIcon from "@mui/icons-material/Input"
 
 export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
   onClose,
@@ -42,6 +43,16 @@ export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
           <CloseIcon fontSize="small" />
         </ListItemIcon>
         <ListItemText>Close Vault</ListItemText>
+      </MenuItem>
+      <Divider />
+      <MenuItem
+        disabled={!currentVault}
+        onClick={onMenuClick(() => ())}
+      >
+        <ListItemIcon>
+          <InputIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>Import Transactions</ListItemText>
       </MenuItem>
       <Divider />
       <MenuItem onClick={onMenuClick(() => zylanceApi.desktop.emitExit())}>
