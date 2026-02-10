@@ -1,11 +1,19 @@
 import type { VaultRef } from "@Contract/models/Vault"
 import { createZylanceApi, type ZylanceApi } from "@Lib/ZylanceApi"
 import { useQuery } from "@tanstack/react-query"
-import { createContext, type FC, type PropsWithChildren, useContext, useEffect, useMemo, useState } from "react"
+import {
+  createContext,
+  type FC,
+  type PropsWithChildren,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 
 export interface ZylanceState {
   currentVault: VaultRef | null
-  zylanceApi: ZylanceApi,
+  zylanceApi: ZylanceApi
 }
 
 const zylanceApi = createZylanceApi()
@@ -53,17 +61,18 @@ export const ZylanceProvider: FC<PropsWithChildren> = ({ children }) => {
       zylanceApi.vault.onVaultClosed(() => setCurrentVault(null)),
     ]
 
-    return () => subscriptions.forEach(unsub => unsub())
-  }, [zylanceApi])
+    return () => subscriptions.forEach((unsub) => void unsub())
+  }, [])
 
-  const state = useMemo(() => ({
-    currentVault,
-    zylanceApi,
-  }), [currentVault, zylanceApi])
+  const state = useMemo(
+    () => ({
+      currentVault,
+      zylanceApi,
+    }),
+    [currentVault],
+  )
 
   return (
-    <ZylanceContext.Provider value={state}>
-      {children}
-    </ZylanceContext.Provider>
+    <ZylanceContext.Provider value={state}>{children}</ZylanceContext.Provider>
   )
 }

@@ -6,95 +6,125 @@ import {
   type ResponsePayload,
 } from "@Contract/lib/Envelope"
 import { getTransport, type ITransport } from "@Lib/ITransport"
+import * as RxJs from "rxjs"
 import { v7 as uuidv7 } from "uuid"
 
-type PendingRequest = {
-  resolve: (data: any) => void,
-  reject: (reason?: any) => void
-};
-
-export type EventHandler = (data: any) => void;
-export type Unsubscribe = () => void;
-export type OptionalData = object | void;
-
-export interface RequestEndpoint<_TAction extends string, TReqData extends OptionalData = void, TResData extends OptionalData = void, TReturn extends OptionalData = TResData> {
-  (data: TReqData): Promise<TReturn>
+type PendingRequest<TResolve, TError> = {
+  resolve: (data: TResolve) => void
+  reject: (reason?: TError) => void
 }
 
-export interface EventEmitter<_TEvent extends string, TEvtData extends OptionalData = void> {
-  (data: TEvtData): Promise<void>
-}
+export type EventHandler<TData> = (data: TData) => void | Promise<void>
+export type Unsubscribe = () => void
 
-export interface EventListener<_TEvent extends string, TEvtData extends OptionalData = void> {
-  (handler: (data: TEvtData) => void | Promise<void>): Unsubscribe
-}
+// biome-ignore lint/suspicious/noConfusingVoidType: used to represent absence of data in a request or event
+export type ObjectOrVoid = object | void
+
+export type RequestEndpoint<
+  _TAction extends string,
+  TReqData extends ObjectOrVoid = void,
+  TResData extends ObjectOrVoid = void,
+  TReturn extends ObjectOrVoid = TResData,
+> = (data: TReqData) => Promise<TReturn>
+
+export type EventEmitter<
+  _TEvent extends string,
+  TEvtData extends ObjectOrVoid = void,
+> = (data: TEvtData) => Promise<void>
+
+export type EventListener<
+  _TEvent extends string,
+  TEvtData extends ObjectOrVoid = void,
+> = (handler: (data: TEvtData) => void | Promise<void>) => Unsubscribe
 
 export class MessageError extends Error {
-  constructor (public readonly details: string) {
+  constructor(public readonly details: string) {
     super(details)
     this.name = "MessageError"
   }
 
-  static throw (details: string): any {
+  static throw(details: string): never {
     throw new MessageError(details)
   }
 }
 
 export class ZylanceClient {
   private readonly transport: ITransport
-  private readonly pendingRequests: Map<string, PendingRequest> = new Map()
-  private readonly eventHandlers: Map<string, Set<EventHandler>> = new Map()
 
-  constructor () {
+  // biome-ignore lint/suspicious/noExplicitAny: Allow any type for event handlers to support various data shapes
+  private readonly pendingRequests: Map<string, PendingRequest<any, any>> =
+    new Map()
+
+  // biome-ignore lint/suspicious/noExplicitAny: Allow any type for event handlers to support various data shapes
+  private readonly eventHandlers: Map<string, Set<EventHandler<any>>> =
+    new Map()
+
+  constructor() {
     this.transport = getTransport()
     this.transport.receive(this.onMessageReceived.bind(this))
   }
 
+  public observeEvent<TData>(eventName: string) {
+    return RxJs.fromEventPattern<TData>(
+      (handler) => this.addEventListener<TData>(eventName, handler),
+      (handler) => this.removeEventListener<TData>(eventName, handler),
+    )
+  }
+
   public createRequestEndpoint<
     TAction extends string,
-    TReqData extends OptionalData = void,
-    TResData extends OptionalData = void
-  > (
-    action: TAction,
-  ): RequestEndpoint<TAction, TReqData, TResData>
+    TReqData extends ObjectOrVoid = void,
+    TResData extends ObjectOrVoid = void,
+  >(action: TAction): RequestEndpoint<TAction, TReqData, TResData>
   public createRequestEndpoint<
     TAction extends string,
-    TReqData extends OptionalData = void,
-    TResData extends OptionalData = void,
-    TReturn extends OptionalData = void
-  > (
+    TReqData extends ObjectOrVoid = void,
+    TResData extends ObjectOrVoid = void,
+    TReturn extends ObjectOrVoid = void,
+  >(
     action: TAction,
     handler: (res: TResData) => Promise<TReturn>,
   ): RequestEndpoint<TAction, TReqData, TResData, TReturn>
   public createRequestEndpoint<
     TAction extends string,
-    TReqData extends OptionalData = void,
-    TResData extends OptionalData = void,
-    TReturn extends OptionalData = void
-  > (
+    TReqData extends ObjectOrVoid = void,
+    TResData extends ObjectOrVoid = void,
+    TReturn extends ObjectOrVoid = void,
+  >(
     action: TAction,
     handler?: (res: TResData) => Promise<TReturn>,
   ): RequestEndpoint<TAction, TReqData, TResData, TReturn> {
     return async (data: TReqData) => {
       return handler
-        ? this.makeRequest<TReqData, TResData>(action, data).then(res => handler(res))
+        ? this.makeRequest<TReqData, TResData>(action, data).then((res) =>
+            handler(res),
+          )
         : this.makeRequest<TReqData, TReturn>(action, data)
     }
   }
 
-  public createEventEmitter<TEvent extends string, TEvtData extends OptionalData = void> (event: TEvent): EventEmitter<TEvent, TEvtData> {
+  public createEventEmitter<
+    TEvent extends string,
+    TEvtData extends ObjectOrVoid = void,
+  >(event: TEvent): EventEmitter<TEvent, TEvtData> {
     return async (data: TEvtData) => {
       this.sendEvent<TEvtData>(event, data)
     }
   }
 
-  public createEventListener<TEvent extends string, TData extends OptionalData = void> (event: TEvent): EventListener<TEvent, TData> {
+  public createEventListener<
+    TEvent extends string,
+    TData extends ObjectOrVoid = void,
+  >(event: TEvent): EventListener<TEvent, TData> {
     return (handler: (data: TData) => void | Promise<void>): Unsubscribe => {
-      return this.on<TData>(event, handler)
+      return this.addEventListener<TData>(event, handler)
     }
   }
 
-  public on<TData> (event: string, handler: (data: TData) => void): Unsubscribe {
+  public addEventListener<TData>(
+    event: string,
+    handler: EventHandler<TData>,
+  ): Unsubscribe {
     let handlers = this.eventHandlers.get(event)
     if (!handlers) {
       handlers = new Set()
@@ -103,24 +133,32 @@ export class ZylanceClient {
 
     handlers.add(handler)
 
-    return () => {
-      const handlers = this.eventHandlers.get(event)
-      handlers?.delete(handler)
-    }
+    return () => this.removeEventListener(event, handler)
   }
 
-  public sendEvent<TData = void> (eventName: string, data?: TData) {
+  public removeEventListener<TData>(
+    event: string,
+    handler: EventHandler<TData>,
+  ): void {
+    this.eventHandlers.get(event)?.delete(handler)
+  }
+
+  public sendEvent<TData = void>(eventName: string, data?: TData) {
     const eventPayload: EventPayload = { eventName }
-    if (data) { eventPayload.dataJson = JSON.stringify(data) }
+    if (data) {
+      eventPayload.dataJson = JSON.stringify(data)
+    }
     this.sendMessage({ event: eventPayload })
   }
 
-  private sendMessage (payload: { request: RequestPayload } | { event: EventPayload }) {
+  private sendMessage(
+    payload: { request: RequestPayload } | { event: EventPayload },
+  ) {
     const message = GatewayEnvelope.toJSON({ messageId: uuidv7(), ...payload })
     this.transport.send(JSON.stringify(message))
   }
 
-  private onMessageReceived (message: string) {
+  private onMessageReceived(message: string) {
     console.log(`Received ${message}`)
     const envelope = GatewayEnvelope.fromJSON(JSON.parse(message))
 
@@ -136,7 +174,7 @@ export class ZylanceClient {
     }
   }
 
-  private onResponseReceived ({ requestId, dataJson }: ResponsePayload) {
+  private onResponseReceived({ requestId, dataJson }: ResponsePayload) {
     const pending = this.pendingRequests.get(requestId)
     if (!pending) {
       console.warn(`No pending request found for requestId: ${requestId}`)
@@ -148,40 +186,53 @@ export class ZylanceClient {
     pending.resolve(data)
   }
 
-  private onEventReceived ({ eventName, dataJson }: EventPayload) {
+  private onEventReceived({ eventName, dataJson }: EventPayload) {
     const data = dataJson ? JSON.parse(dataJson) : undefined
 
     const handlers = this.eventHandlers.get(eventName)
     if (!handlers || handlers.size === 0) return
 
-    handlers.forEach(handler => {
-      try {
-        handler(data)
-      } catch (err) {
-        console.error(err)
-      }
-    })
+    for (const handler of handlers) {
+      Promise.resolve()
+        .then(() => handler(data))
+        .catch((err) =>
+          console.error(
+            `Error in event handler for event "${eventName}":`,
+            err,
+          ),
+        )
+    }
   }
 
-  private onErrorReceived ({ requestId, type, details }: ErrorPayload) {
+  private onErrorReceived({ requestId, type, details }: ErrorPayload) {
     if (requestId) {
       const pending = this.pendingRequests.get(requestId)
       if (pending) {
         this.pendingRequests.delete(requestId)
-        pending.reject(new Error(`Error of type ${type} received. Details: ${details}`))
+        pending.reject(
+          new Error(`Error of type ${type} received. Details: ${details}`),
+        )
       }
     } else {
-      this.onEventReceived({ eventName: "error", dataJson: JSON.stringify({ type, details }) })
+      this.onEventReceived({
+        eventName: "error",
+        dataJson: JSON.stringify({ type, details }),
+      })
     }
   }
 
-  private makeRequest<TData = void, TResponse = void> (action: string, data?: TData): Promise<TResponse> {
+  private makeRequest<TData = void, TResponse = void>(
+    action: string,
+    data?: TData,
+  ): Promise<TResponse> {
     return new Promise((resolve, reject) => {
       const requestId = uuidv7()
       this.pendingRequests.set(requestId, { resolve, reject })
 
       const request: RequestPayload = { requestId, action }
-      if (data) { request.dataJson = JSON.stringify(data)}
+      if (data) {
+        request.dataJson = JSON.stringify(data)
+      }
       this.sendMessage({ request })
     })
   }
