@@ -15,12 +15,14 @@ import {
   FileBarMenu,
   type MenuBarMenuProps,
 } from "@/Components/Desktop/FileBar/Menus/MenuBase"
+import { useImportService } from "@/Components/Import/ImportContext"
 
 export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
   onClose,
   ...props
 }) => {
   const zylance = useZylanceApi()
+  const importService = useImportService()
 
   const onMenuClick = (handler: () => void) => {
     return () => {
@@ -48,6 +50,13 @@ export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
           <CloseIcon fontSize="small" />
         </ListItemIcon>
         <ListItemText>Close Vault</ListItemText>
+      </MenuItem>
+      <Divider />
+      <MenuItem onClick={onMenuClick(() => importService.startImport())}>
+        <ListItemIcon>
+          <CloseIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>Import</ListItemText>
       </MenuItem>
       <Divider />
       <MenuItem onClick={onMenuClick(() => zylance.desktop.emitExit())}>
