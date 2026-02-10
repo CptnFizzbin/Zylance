@@ -11,7 +11,7 @@
       "Lib/**/*",
       "Src/**/*",
       "index.html",
-      "vite.config.js",
+      "vite.config.ts",
       "!Src/routeTree.gen.ts"
     ]
   },

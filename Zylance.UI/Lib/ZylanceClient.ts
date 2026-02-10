@@ -38,12 +38,12 @@ export type EventListener<
 > = (handler: (data: TEvtData) => void | Promise<void>) => Unsubscribe
 
 export class MessageError extends Error {
-  constructor (public readonly details: string) {
+  constructor(public readonly details: string) {
     super(details)
     this.name = "MessageError"
   }
 
-  static throw (details: string): never {
+  static throw(details: string): never {
     throw new MessageError(details)
   }
 }
@@ -59,12 +59,12 @@ export class ZylanceClient {
   private readonly eventHandlers: Map<string, Set<EventHandler<any>>> =
     new Map()
 
-  constructor () {
+  constructor() {
     this.transport = getTransport()
     this.transport.receive(this.onMessageReceived.bind(this))
   }
 
-  public observeEvent<TData> (eventName: string) {
+  public observeEvent<TData>(eventName: string) {
     return RxJs.fromEventPattern<TData>(
       (handler) => this.addEventListener<TData>(eventName, handler),
       (handler) => this.removeEventListener<TData>(eventName, handler),
@@ -75,13 +75,13 @@ export class ZylanceClient {
     TAction extends string,
     TReqData extends ObjectOrVoid = void,
     TResData extends ObjectOrVoid = void,
-  > (action: TAction): RequestEndpoint<TAction, TReqData, TResData>
+  >(action: TAction): RequestEndpoint<TAction, TReqData, TResData>
   public createRequestEndpoint<
     TAction extends string,
     TReqData extends ObjectOrVoid = void,
     TResData extends ObjectOrVoid = void,
     TReturn extends ObjectOrVoid = void,
-  > (
+  >(
     action: TAction,
     handler: (res: TResData) => Promise<TReturn>,
   ): RequestEndpoint<TAction, TReqData, TResData, TReturn>
@@ -90,15 +90,15 @@ export class ZylanceClient {
     TReqData extends ObjectOrVoid = void,
     TResData extends ObjectOrVoid = void,
     TReturn extends ObjectOrVoid = void,
-  > (
+  >(
     action: TAction,
     handler?: (res: TResData) => Promise<TReturn>,
   ): RequestEndpoint<TAction, TReqData, TResData, TReturn> {
     return async (data: TReqData) => {
       return handler
         ? this.makeRequest<TReqData, TResData>(action, data).then((res) =>
-          handler(res),
-        )
+            handler(res),
+          )
         : this.makeRequest<TReqData, TReturn>(action, data)
     }
   }
@@ -106,7 +106,7 @@ export class ZylanceClient {
   public createEventEmitter<
     TEvent extends string,
     TEvtData extends ObjectOrVoid = void,
-  > (event: TEvent): EventEmitter<TEvent, TEvtData> {
+  >(event: TEvent): EventEmitter<TEvent, TEvtData> {
     return async (data: TEvtData) => {
       this.sendEvent<TEvtData>(event, data)
     }
@@ -115,13 +115,13 @@ export class ZylanceClient {
   public createEventListener<
     TEvent extends string,
     TData extends ObjectOrVoid = void,
-  > (event: TEvent): EventListener<TEvent, TData> {
+  >(event: TEvent): EventListener<TEvent, TData> {
     return (handler: (data: TData) => void | Promise<void>): Unsubscribe => {
       return this.addEventListener<TData>(event, handler)
     }
   }
 
-  public addEventListener<TData> (
+  public addEventListener<TData>(
     event: string,
     handler: EventHandler<TData>,
   ): Unsubscribe {
@@ -136,14 +136,14 @@ export class ZylanceClient {
     return () => this.removeEventListener(event, handler)
   }
 
-  public removeEventListener<TData> (
+  public removeEventListener<TData>(
     event: string,
     handler: EventHandler<TData>,
   ): void {
     this.eventHandlers.get(event)?.delete(handler)
   }
 
-  public sendEvent<TData = void> (eventName: string, data?: TData) {
+  public sendEvent<TData = void>(eventName: string, data?: TData) {
     const eventPayload: EventPayload = { eventName }
     if (data) {
       eventPayload.dataJson = JSON.stringify(data)
@@ -151,14 +151,14 @@ export class ZylanceClient {
     this.sendMessage({ event: eventPayload })
   }
 
-  private sendMessage (
+  private sendMessage(
     payload: { request: RequestPayload } | { event: EventPayload },
   ) {
     const message = GatewayEnvelope.toJSON({ messageId: uuidv7(), ...payload })
     this.transport.send(JSON.stringify(message))
   }
 
-  private onMessageReceived (message: string) {
+  private onMessageReceived(message: string) {
     console.log(`Received ${message}`)
     const envelope = GatewayEnvelope.fromJSON(JSON.parse(message))
 
@@ -174,7 +174,7 @@ export class ZylanceClient {
     }
   }
 
-  private onResponseReceived ({ requestId, dataJson }: ResponsePayload) {
+  private onResponseReceived({ requestId, dataJson }: ResponsePayload) {
     const pending = this.pendingRequests.get(requestId)
     if (!pending) {
       console.warn(`No pending request found for requestId: ${requestId}`)
@@ -186,7 +186,7 @@ export class ZylanceClient {
     pending.resolve(data)
   }
 
-  private onEventReceived ({ eventName, dataJson }: EventPayload) {
+  private onEventReceived({ eventName, dataJson }: EventPayload) {
     const data = dataJson ? JSON.parse(dataJson) : undefined
 
     const handlers = this.eventHandlers.get(eventName)
@@ -204,7 +204,7 @@ export class ZylanceClient {
     }
   }
 
-  private onErrorReceived ({ requestId, type, details }: ErrorPayload) {
+  private onErrorReceived({ requestId, type, details }: ErrorPayload) {
     if (requestId) {
       const pending = this.pendingRequests.get(requestId)
       if (pending) {
@@ -221,7 +221,7 @@ export class ZylanceClient {
     }
   }
 
-  private makeRequest<TData = void, TResponse = void> (
+  private makeRequest<TData = void, TResponse = void>(
     action: string,
     data?: TData,
   ): Promise<TResponse> {

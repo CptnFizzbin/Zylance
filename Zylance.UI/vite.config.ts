@@ -1,8 +1,7 @@
+import * as path from "node:path"
 import { devtools } from "@tanstack/devtools-vite"
-
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
 import viteReact from "@vitejs/plugin-react"
-import * as path from "node:path"
 import { defineConfig } from "vite"
 
 const ZYLANCE_UI_DIR = import.meta.dirname

@@ -1,14 +1,12 @@
-import {
-  createAccountApi,
-  createBackgroundApi,
-  createDesktopApi,
-  createEchoApi,
-  createFileApi,
-  createLedgerApi,
-  createStatusApi,
-  createVaultApi,
-} from "@Lib/ZylanceApi"
 import { ZylanceClient } from "../ZylanceClient"
+import { createAccountApi } from "./AccountApi"
+import { createBackgroundApi } from "./BackgroundApi"
+import { createDesktopApi } from "./DesktopApi"
+import { createEchoApi } from "./EchoApi"
+import { createFileApi } from "./FileApi"
+import { createLedgerApi } from "./LedgerApi"
+import { createStatusApi } from "./StatusApi"
+import { createVaultApi } from "./VaultApi"
 
 export function createZylanceApi() {
   const client = new ZylanceClient()
