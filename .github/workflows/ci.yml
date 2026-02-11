@@ -124,18 +124,6 @@ jobs:
         if: matrix.runtime != 'browser-wasm'
         run: dotnet build Zylance.Desktop/Zylance.Desktop.csproj -c Release -r ${{ matrix.runtime }} --no-restore
 
-      - name: Publish Desktop for ${{ matrix.name }}
-        if: matrix.runtime != 'browser-wasm'
-        run: dotnet publish Zylance.Desktop/Zylance.Desktop.csproj -c Release -r ${{ matrix.runtime }} --no-restore --self-contained -o publish-${{ matrix.runtime }}
-
-      - name: Upload build artifact
-        if: matrix.runtime != 'browser-wasm'
-        uses: actions/upload-artifact@v4
-        with:
-          name: zylance-${{ matrix.runtime }}
-          path: publish-${{ matrix.runtime }}/*
-          retention-days: 7
-
   build-summary:
     name: Build Summary
     runs-on: ubuntu-latest
