@@ -9,19 +9,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-    <PackageReference Include="Photino.NET" Version="4.0.16"/>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Photino.NET" Version="4.0.16" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Zylance.Core\Zylance.Core.csproj"/>
-    <ProjectReference Include="..\Zylance.UI\Zylance.UI.csproj"/>
-    <ProjectReference Include="..\Zylance.Vault.Local\Zylance.Vault.Local.csproj"/>
+    <ProjectReference Include="..\Zylance.Core\Zylance.Core.csproj" />
+    <ProjectReference Include="..\Zylance.UI\Zylance.UI.csproj" />
+    <ProjectReference Include="..\Zylance.Vault.Local\Zylance.Vault.Local.csproj" />
   </ItemGroup>
 
   <Target Name="CopyUIAssets" AfterTargets="Build">
     <ItemGroup>
-      <UIDistFiles Include="..\Zylance.UI\dist\**\*"/>
+      <UIDistFiles Include="..\Zylance.UI\dist\**\*" />
     </ItemGroup>
     <Copy
       SourceFiles="@(UIDistFiles)"
