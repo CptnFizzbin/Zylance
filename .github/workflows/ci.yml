@@ -45,28 +45,30 @@ jobs:
         continue-on-error: true
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build --solution Zylance.sln -c Release --no-restore
 
-      - name: Run Core tests
-        run: dotnet test --project Zylance.Core.Tests/Zylance.Core.Tests.csproj --no-build --configuration Release --report-xunit --report-xunit-filename core-test-results.xml
+      - name: Test
+        run: dotnet test --solution Zylance.sln -c Release --no-restore --no-build --results-directory coverage --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
 
-      - name: Run Desktop tests
-        run: dotnet test --project Zylance.Desktop.Tests/Zylance.Desktop.Tests.csproj --no-build --configuration Release --report-xunit --report-xunit-filename desktop-test-results.xml
-
-      - name: Run Vault.Local tests
-        run: dotnet test --project Zylance.Vault.Local.Tests/Zylance.Vault.Local.Tests.csproj --no-build --configuration Release --report-xunit --report-xunit-filename vault-local-test-results.xml
-
-      - name: Run Vault.Remote tests
-        run: dotnet test --project Zylance.Vault.Remote.Tests/Zylance.Vault.Remote.Tests.csproj --no-build --configuration Release --report-xunit --report-xunit-filename vault-remote-test-results.xml
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Code Coverage Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          name: test-results
-          path: |
-            **/TestResults/*.trx
-            **/TestResults/*.xml
+          filename: coverage/**/coverage.cobertura.xml
+          badge: true
+          fail_below_min: true
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: true
+          indicators: true
+          output: both
+          thresholds: '60 80'
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          recreate: true
+          path: code-coverage-results.md
 
   build-runtimes:
     name: Build for ${{ matrix.runtime }}
