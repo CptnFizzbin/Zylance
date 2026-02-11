@@ -21,12 +21,14 @@ public static class Program
             .SetDevToolsEnabled(DevToolsEnabled())
             .Load(appUrl);
 
-        // Create platform-specific implementations
         var transport = new PhotinoTransport(window);
-        var fileProvider = new DesktopFileProvider(window);
+        var fileProvider = new DesktopFileProvider(
+            window,
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Zylance"),
+            Path.Combine(Path.GetTempPath(), "Zylance", Guid.NewGuid().ToString())
+        );
         var vaultProvider = new DesktopVaultProvider(fileProvider);
 
-        // Zylance manages DI internally - just pass in your platform implementations
         _ = new Core.Zylance(transport, fileProvider, vaultProvider);
 
         Console.WriteLine($"Starting {WindowTitle} application...");
