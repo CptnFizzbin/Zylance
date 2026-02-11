@@ -36,19 +36,19 @@ jobs:
         run: corepack enable
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: |
+          dotnet restore
+          dotnet tool restore
 
       - name: Check code formatting (CSharpier)
-        run: |
-          dotnet tool restore
-          dotnet csharpier check .
+        run: dotnet csharpier check .
         continue-on-error: true
 
       - name: Build
-        run: dotnet build --solution Zylance.sln -c Release --no-restore
+        run: dotnet build -c Release --no-restore
 
       - name: Test
-        run: dotnet test --solution Zylance.sln -c Release --no-restore --no-build --results-directory coverage --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+        run: dotnet test -c Release --no-restore --no-build --results-directory coverage --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
 
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
