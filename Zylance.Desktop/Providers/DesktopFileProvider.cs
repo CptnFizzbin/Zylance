@@ -2,7 +2,7 @@ using Photino.NET;
 using Zylance.Contract.Models.File;
 using Zylance.Desktop.Lib;
 
-namespace Zylance.Desktop;
+namespace Zylance.Desktop.Providers;
 
 /// <summary>
 ///     Desktop implementation of IFileProvider using Photino's cross-platform file
