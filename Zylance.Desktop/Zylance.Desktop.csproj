@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Fleck" Version="1.2.0" />
     <PackageReference Include="Photino.NET" Version="4.0.16" />
   </ItemGroup>
 
@@ -23,18 +24,10 @@
     <ItemGroup>
       <UIDistFiles Include="..\Zylance.UI\dist\**\*" />
     </ItemGroup>
-    <Copy
-      SourceFiles="@(UIDistFiles)"
-      DestinationFolder="$(OutputPath)wwwroot\%(RecursiveDir)"
-      SkipUnchangedFiles="true"
-    />
+    <Copy SourceFiles="@(UIDistFiles)" DestinationFolder="$(OutputPath)wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" />
   </Target>
 
   <ItemGroup>
-    <Content
-      Include="$(OutputPath)wwwroot\**\*"
-      CopyToPublishDirectory="PreserveNewest"
-      Link="wwwroot\%(RecursiveDir)%(FileName)%(Extension)"
-    />
+    <Content Include="$(OutputPath)wwwroot\**\*" CopyToPublishDirectory="PreserveNewest" Link="wwwroot\%(RecursiveDir)%(FileName)%(Extension)" />
   </ItemGroup>
 </Project>

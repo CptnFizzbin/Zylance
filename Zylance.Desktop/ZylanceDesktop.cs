@@ -28,7 +28,7 @@ public class ZylanceDesktop(ZylanceDesktopConfig config) : IAsyncDisposable
 
         _window = CreateWindow();
 
-        var transport = new PhotinoTransport(_window);
+        var transport = new WebsocketTransport(config.WsPort);
         var fileProvider = new DesktopFileProvider(_window, config.AppDataPath, config.TmpDataPath);
         var vaultProvider = new DesktopVaultProvider(fileProvider);
 
