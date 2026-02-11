@@ -1,4 +1,5 @@
 using Photino.NET;
+using Zylance.Desktop.Config;
 using Zylance.Desktop.Lib;
 
 namespace Zylance.Desktop;
@@ -6,27 +7,25 @@ namespace Zylance.Desktop;
 public static class Program
 {
     private const string WindowTitle = "Zylance";
-    private const string DefaultUiServerUrl = "http://localhost:3000";
 
     [STAThread]
     private static void Main()
     {
-        var appUrl = GetServerUrl();
+        var config = new ZylanceDesktopConfig();
+
+        if (config.UiServerEnabled)
+            StartWebServer(config.UiPort);
 
         var window = new PhotinoWindow()
-            .SetTitle(WindowTitle)
+            .SetTitle(ZylanceDesktopConfig.AppName)
             .SetUseOsDefaultLocation(true)
             .SetUseOsDefaultSize(true)
             .SetResizable(true)
-            .SetDevToolsEnabled(DevToolsEnabled())
-            .Load(appUrl);
+            .SetDevToolsEnabled(config.DevToolsEnabled)
+            .Load(config.UiServerUrl);
 
         var transport = new PhotinoTransport(window);
-        var fileProvider = new DesktopFileProvider(
-            window,
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Zylance"),
-            Path.Combine(Path.GetTempPath(), "Zylance", Guid.NewGuid().ToString())
-        );
+        var fileProvider = new DesktopFileProvider(window, config.AppDataPath, config.TmpDataPath);
         var vaultProvider = new DesktopVaultProvider(fileProvider);
 
         _ = new Core.Zylance(transport, fileProvider, vaultProvider);
@@ -35,35 +34,10 @@ public static class Program
         window.WaitForClose();
     }
 
-    private static bool DevToolsEnabled()
-    {
-        return Environment.GetEnvironmentVariable("ZYLANCE_DEVTOOLS") == "true";
-    }
-
-    private static string GetUiMode()
-    {
-        return Environment.GetEnvironmentVariable("ZYLANCE_UI_MODE") ?? "internal";
-    }
-
-    private static Uri GetServerUrl()
-    {
-        var serverUrl = GetUiMode() == "external" ? GetZylanceUiUrl() : StartWebServer();
-
-        return new Uri(serverUrl);
-    }
-
-    private static string GetZylanceUiUrl()
-    {
-        var debugServer = Environment.GetEnvironmentVariable("ZYLANCE_UI_URL");
-        return string.IsNullOrWhiteSpace(debugServer) ? DefaultUiServerUrl : debugServer;
-    }
-
-    private static string StartWebServer()
+    private static void StartWebServer(int port)
     {
         var wwwrootPath = Path.Combine(AppContext.BaseDirectory, "wwwroot");
-        var server = new StaticFileServer(wwwrootPath);
-        server.Start();
-
-        return server.BaseUrl;
+        var server = new StaticFileServer(wwwrootPath, port);
+        server.StartAsync();
     }
 }
