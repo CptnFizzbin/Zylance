@@ -62,7 +62,7 @@ We need a solution that:
 
 ## Implementation
 
-**Status**: Planned
+**Status**: Implemented (see `Zylance.Desktop.Tests/Headless/`)
 
 ## Decision
 
@@ -223,73 +223,110 @@ const zylanceClient = new ZylanceClient(transport);
 
 This allows the UI to work with either transport seamlessly.
 
-### 6. E2E Test Example
+### 6. E2E Test Harness
 
-With headless mode, E2E tests can launch the application and control it via
-Playwright:
+The E2E test harness is implemented as `ZylanceTestHarness` in
+`Zylance.Desktop.Tests/Headless/`. It provides:
+
+- Automated setup/teardown of a real `ZylanceDesktop` instance in headless mode
+- Playwright integration for browser automation (`Page`, `Browser`,
+  `BrowserContext`)
+- Management of temporary app data and file directories for test isolation
+- A `HeadlessFileProvider` that allows tests to control file selection/creation
+  dialogs via callbacks
+- Automatic waiting for the app to be ready (by listening for a
+  `"Zylance Loaded"` console message)
+
+#### Example: ZylanceTestHarness API
+
+```csharp
+public record ZylanceTestHarness : IAsyncDisposable
+{
+    public required ZylanceDesktop Desktop { get; init; }
+    public required HeadlessFileProvider FileProvider { get; init; }
+    public required IBrowser Browser { get; init; }
+    public required IPage Page { get; init; }
+    public required IPlaywright Playwright { get; init; }
+    public required IBrowserContext BrowserContext { get; init; }
+    public int UiPort => Desktop.Config.UiPort;
+    public string UiUrl => Desktop.Config.UiServerUrl;
+    public int WsPort => Desktop.Config.WsPort;
+    public string WsUrl => Desktop.Config.WebSocketUrl;
+    public string TempDataDir => Desktop.Config.TmpDataPath;
+    public string AppDataDir => Desktop.Config.AppDataPath;
+    public ZylanceCore Zylance => Desktop.ZylanceCore;
+    // ... DisposeAsync, InitializeAsync, WaitForAppReadyAsync ...
+}
+```
+
+#### Example: HeadlessFileProvider
+
+```csharp
+public class HeadlessFileProvider : LocalFileProvider
+{
+    public CreateFileHandler OnCreateFile = ...;
+    public SelectFileHandler OnSelectFile = ...;
+    public override async Task<FileRef> SelectFile(...) { ... }
+    public override async Task<FileRef> CreateFile(...) { ... }
+}
+```
+
+Tests set `OnCreateFile` and `OnSelectFile` to control file dialogs during E2E
+flows.
+
+#### Example: E2E Test Using the Harness
 
 ```csharp
 [Fact]
-public async Task OpenVault_UnlocksAndDisplaysLedger()
+public async Task ZylanceDesktop_CreatesVaultAndShowsLedger()
 {
-    // Start Zylance in headless mode
-    var app = await ZylanceTestApp.StartHeadlessAsync();
-    
-    // Use Playwright to interact with UI
-    await using var playwright = await Playwright.CreateAsync();
-    await using var browser = await playwright.Chromium.ConnectAsync(app.BrowserEndpoint);
-    var page = await browser.NewPageAsync();
-    await page.GotoAsync(app.AppUrl);
-    
-    // Test full user flow
-    await page.ClickAsync("text=Open Vault");
-    await page.FillAsync("input[type=password]", "test-password");
-    await page.ClickAsync("button:has-text('Unlock')");
-    
-    // Verify backend state
-    await page.WaitForSelectorAsync("text=Ledger");
-    Assert.True(app.Zylance.VaultService.IsVaultOpen);
-    
-    await app.StopAsync();
+    var harness = await ZylanceTestHarness.InitializeAsync(
+        cancellationToken: TestContext.Current.CancellationToken
+    );
+    Assert.NotNull(harness.Page);
+
+    var tempVaultPath = Path.Combine(harness.TempDataDir, $"test_{Guid.NewGuid()}.zlv.sqlite");
+    harness.FileProvider.OnCreateFile = (_, _, _) => Task.FromResult(tempVaultPath);
+
+    var createButton = harness.Page.Locator("button:has-text(\"Create New Vault\")");
+    await createButton.ClickAsync();
+
+    await Assertions.Expect(harness.Page.Locator("text=Ledger")).ToBeVisibleAsync();
 }
 ```
 
-This test exercises the full stack: UI interaction → transport → Gateway →
-controller → vault service → database.
+#### Example: App Ready Wait
 
-### 7. Alternative: Test Harness
-
-For more controlled testing, create a `TestHarness` that provides direct access
-to both UI and backend:
+The harness waits for a `"Zylance Loaded"` console message before returning from
+`InitializeAsync`, ensuring the app is ready for interaction:
 
 ```csharp
-public class ZylanceTestHarness
+private async Task WaitForAppReadyAsync(int timeoutMs = 10000, CancellationToken cancellationToken = default)
 {
-    public IPage UIPage { get; }
-    public Core.Zylance BackendCore { get; }
-    public GatewayService Gateway { get; }
-    
-    public async Task<ZylanceTestHarness> CreateAsync()
+    var readyTcs = new TaskCompletionSource<bool>();
+    void ConsoleHandler(object? sender, IConsoleMessage msg)
     {
-        // Start backend with test database
-        var transport = new WebSocketTransport();
-        var core = new Core.Zylance(transport, testFileProvider, testVaultProvider);
-        
-        // Launch headless browser
-        var page = await LaunchHeadlessBrowserAsync();
-        
-        return new ZylanceTestHarness 
-        { 
-            UIPage = page,
-            BackendCore = core,
-            Gateway = core.Gateway
-        };
+        if (msg.Text.Contains("Zylance Loaded"))
+            readyTcs.TrySetResult(true);
     }
+    Page.Console += ConsoleHandler;
+    var completedTask = await Task.WhenAny(readyTcs.Task, Task.Delay(timeoutMs, cancellationToken));
+    Page.Console -= ConsoleHandler;
+    if (completedTask != readyTcs.Task)
+        throw new TimeoutException($"App did not signal ready within {timeoutMs}ms");
+    await readyTcs.Task;
 }
 ```
 
-This gives tests access to both UI (via Playwright) and backend (via direct
-object references), enabling powerful assertions.
+### 7. E2E Test Patterns
+
+- All E2E tests should use `ZylanceTestHarness.InitializeAsync()` for setup and
+  teardown.
+- File dialogs are simulated by setting callbacks on the harness's
+  `HeadlessFileProvider`.
+- Playwright's `Page` API is used for UI automation and assertions.
+- Temp directories are unique per test for isolation.
+- The harness ensures proper cleanup of all resources.
 
 ## Consequences
 
