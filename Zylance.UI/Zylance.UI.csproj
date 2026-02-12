@@ -25,7 +25,7 @@
 
   <Target Name="CollectSourceFiles">
     <ItemGroup>
-      <SourceFiles Include="$Generated/**/*;Lib/**/*;Src/**/*;Public/**/*" />
+      <SourceFiles Include="Generated/**/*;Lib/**/*;Src/**/*;Public/**/*" />
       <ConfigFiles Include="package.json;yarn.lock;tsconfig.json;vite.config.ts" />
     </ItemGroup>
   </Target>
@@ -68,5 +68,16 @@
     <Exec Command="$(YarnExe) check" />
     <Exec Command="$(YarnExe) build:ui" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1" />
     <Touch Files="$(IntermediateOutputPath)build.marker" AlwaysCreate="true" />
+  </Target>
+
+  <Target Name="CopyGeneratedContractTS" BeforeTargets="YarnTscDev">
+    <ItemGroup>
+      <GeneratedTSFiles Include="..\Zylance.Contract\Generated\ts\**\*.*" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(GeneratedTSFiles)"
+      DestinationFiles="@(GeneratedTSFiles->'Generated\%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true"
+    />
   </Target>
 </Project>

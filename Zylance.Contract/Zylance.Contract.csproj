@@ -40,15 +40,21 @@
     <Touch Files="$(IntermediateOutputPath)yarn.install.marker" AlwaysCreate="true" />
   </Target>
 
-  <Target Name="GenerateCode" BeforeTargets="BeforeCompile">
+  <Target
+    Name="GenerateCode"
+    BeforeTargets="BeforeCompile"
+    Inputs="zylance/**/*.proto;Scripts/build-code.ts;package.json;yarn.lock"
+    Outputs="$(IntermediateOutputPath)yarn.build.marker"
+  >
     <Exec Command="$(YarnExe) build:code" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1" />
     <ItemGroup>
       <!-- Include generated C# files in compilation -->
-      <GeneratedCSharpFiles Include="$Generated/cs/**/*.cs" />
+      <GeneratedCSharpFiles Include="Generated/cs/**/*.cs" />
       <!-- Avoid duplicate default Compile items for generated files -->
-      <Compile Remove="$Generated/cs/**/*.cs" />
+      <Compile Remove="Generated/cs/**/*.cs" />
       <!-- Explicitly compile generated C# files -->
       <Compile Include="@(GeneratedCSharpFiles)" />
     </ItemGroup>
+    <Touch Files="$(IntermediateOutputPath)yarn.build.marker" AlwaysCreate="true" />
   </Target>
 </Project>
