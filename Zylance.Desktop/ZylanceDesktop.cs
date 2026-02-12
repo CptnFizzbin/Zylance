@@ -6,10 +6,16 @@ using Zylance.Desktop.Transports;
 
 namespace Zylance.Desktop;
 
-public class ZylanceDesktop(ZylanceDesktopConfig config) : IAsyncDisposable
+public class ZylanceDesktop : IAsyncDisposable
 {
-    private StaticFileServer? _webServer;
+    private readonly ZylanceDesktopConfig _config;
+    private ZylanceInternalServer? _webServer;
     private PhotinoWindow? _window;
+
+    public ZylanceDesktop(ZylanceDesktopConfig config)
+    {
+        _config = config;
+    }
 
     public async ValueTask DisposeAsync()
     {
@@ -23,13 +29,13 @@ public class ZylanceDesktop(ZylanceDesktopConfig config) : IAsyncDisposable
 
     public ZylanceDesktop Start()
     {
-        if (config.UiServerEnabled)
+        if (_config.UiServerEnabled)
             _webServer = StartWebServer();
 
         _window = CreateWindow();
 
-        var transport = new WebsocketTransport(config.WsPort);
-        var fileProvider = new DesktopFileProvider(_window, config.AppDataPath, config.TmpDataPath);
+        var transport = new WebsocketTransport(_config.WsPort);
+        var fileProvider = new DesktopFileProvider(_window, _config.AppDataPath, _config.TmpDataPath);
         var vaultProvider = new DesktopVaultProvider(fileProvider);
 
         _ = new Core.Zylance(transport, fileProvider, vaultProvider);
@@ -49,15 +55,14 @@ public class ZylanceDesktop(ZylanceDesktopConfig config) : IAsyncDisposable
             .SetUseOsDefaultLocation(true)
             .SetUseOsDefaultSize(true)
             .SetResizable(true)
-            .SetDevToolsEnabled(config.DevToolsEnabled)
-            .Load(config.UiServerUrl);
+            .SetDevToolsEnabled(_config.DevToolsEnabled)
+            .Load(_config.UiServerUrl);
     }
 
-    private StaticFileServer StartWebServer()
+    private ZylanceInternalServer StartWebServer()
     {
-        Console.WriteLine($"Starting web server on port {config.UiPort}...");
-        var wwwrootPath = Path.Combine(AppContext.BaseDirectory, "wwwroot");
-        var server = new StaticFileServer(wwwrootPath, config.UiPort);
+        Console.WriteLine($"Starting web server on port {_config.UiPort}...");
+        var server = new ZylanceInternalServer(_config);
         server.StartAsync();
         return server;
     }

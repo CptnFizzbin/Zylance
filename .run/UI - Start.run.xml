@@ -3,7 +3,9 @@
     <package-json value="$PROJECT_DIR$/Zylance.UI/package.json" />
     <command value="start" />
     <node-interpreter value="project" />
-    <envs />
+    <envs>
+      <env name="ZYLANCE_WS_PORT" value="3001" />
+    </envs>
     <EXTENSION ID="com.intellij.javascript.debugger.execution.StartBrowserRunConfigurationExtension">
       <browser with-js-debugger="true" />
     </EXTENSION>

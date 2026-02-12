@@ -1,6 +1,6 @@
 import type * as StatusTypes from "@Contract/api/Status"
-import type { ZylanceClient } from "@Lib/ZylanceClient"
-import { ZylanceActions } from "../../Generated/ZylanceConstants"
+import { ZylanceActions } from "$Generated/ZylanceConstants"
+import type { ZylanceClient } from "../ZylanceClient"
 
 export function createStatusApi(client: ZylanceClient) {
   return {

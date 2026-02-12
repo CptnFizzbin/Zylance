@@ -1,10 +1,10 @@
-import type { ITransport } from "@Lib/ITransport"
+import type { ITransport } from "@/Apis/Zylance/Transports/ITransport"
 
 export class WebSocketTransport implements ITransport {
   private socket: WebSocket
   private receiveHandler?: (message: string) => void
 
-  private constructor (socket: WebSocket) {
+  private constructor(socket: WebSocket) {
     this.socket = socket
     this.socket.onmessage = (event) => {
       if (this.receiveHandler) {
@@ -13,12 +13,7 @@ export class WebSocketTransport implements ITransport {
     }
   }
 
-  public static async connect (): Promise<WebSocketTransport> {
-    const wsInfo = await fetch("/ws")
-
-    if (!wsInfo.ok) throw new Error("Failed to fetch WebSocket URL")
-
-    const { url } = await wsInfo.json()
+  public static async connect(url: string): Promise<WebSocketTransport> {
     const socket = new WebSocket(url)
 
     await new Promise<void>((resolve, reject) => {
@@ -30,11 +25,11 @@ export class WebSocketTransport implements ITransport {
     return new WebSocketTransport(socket)
   }
 
-  receive (handler: (message: string) => void): void {
+  public receive(handler: (message: string) => void): void {
     this.receiveHandler = handler
   }
 
-  send (message: string): void {
+  public send(message: string): void {
     if (this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(message)
     } else {

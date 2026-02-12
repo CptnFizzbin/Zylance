@@ -5,9 +5,9 @@ import {
   type RequestPayload,
   type ResponsePayload,
 } from "@Contract/lib/Envelope"
-import { getTransport, type ITransport } from "@Lib/ITransport"
 import * as RxJs from "rxjs"
 import { v7 as uuidv7 } from "uuid"
+import type { ITransport } from "@/Apis/Zylance/Transports/ITransport"
 
 type PendingRequest<TResolve, TError> = {
   resolve: (data: TResolve) => void
@@ -59,8 +59,8 @@ export class ZylanceClient {
   private readonly eventHandlers: Map<string, Set<EventHandler<any>>> =
     new Map()
 
-  constructor() {
-    this.transport = getTransport()
+  constructor(transport: ITransport) {
+    this.transport = transport
     this.transport.receive(this.onMessageReceived.bind(this))
   }
 

@@ -1,6 +1,6 @@
 import type * as FileTypes from "@Contract/api/File"
-import type { ZylanceClient } from "@Lib/ZylanceClient"
-import { ZylanceActions } from "../../Generated/ZylanceConstants"
+import { ZylanceActions } from "$Generated/ZylanceConstants"
+import type { ZylanceClient } from "../ZylanceClient"
 
 export function createFileApi(client: ZylanceClient) {
   return {
@@ -9,16 +9,19 @@ export function createFileApi(client: ZylanceClient) {
       FileTypes.SelectFileReq,
       FileTypes.SelectFileRes
     >(ZylanceActions.File_SelectFile),
+
     createFile: client.createRequestEndpoint<
       typeof ZylanceActions.File_CreateFile,
       FileTypes.CreateFileReq,
       FileTypes.CreateFileRes
     >(ZylanceActions.File_CreateFile),
+
     saveFile: client.createRequestEndpoint<
       typeof ZylanceActions.File_SaveFile,
       FileTypes.SaveFileReq,
       void
     >(ZylanceActions.File_SaveFile),
+
     getFile: client.createRequestEndpoint<
       typeof ZylanceActions.File_GetFile,
       FileTypes.GetFileReq,

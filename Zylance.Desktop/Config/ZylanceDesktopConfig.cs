@@ -14,15 +14,17 @@ public record ZylanceDesktopConfig
     public string UiServerUrl => $"http://localhost:{UiPort}";
     public string WebSocketUrl => $"ws://localhost:{WsPort}";
 
+    public string UiRootPath { get; init; } = Path.Combine(AppContext.BaseDirectory, "wwwroot");
+
     public string AppDataPath { get; init; } =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppName);
 
     public string TmpDataPath { get; init; } = Path.Combine(Path.GetTempPath(), AppName, Guid.NewGuid().ToString());
 
-    private static string? GetFlagString(string envVarName)
+    private static string? GetFlagValue(string name)
     {
         var args = Environment.GetCommandLineArgs();
-        var flagName = envVarName.ToLowerInvariant().Replace('_', '-');
+        var flagName = name.ToLowerInvariant().Replace('_', '-');
 
         return (
             from arg in args
@@ -33,9 +35,15 @@ public record ZylanceDesktopConfig
         ).FirstOrDefault();
     }
 
+    private static string? GetEnvValue(string name)
+    {
+        var envVarName = $"ZYLANCE_{name.ToUpperInvariant()}";
+        return Environment.GetEnvironmentVariable(envVarName);
+    }
+
     private static string? GetString(string name)
     {
-        return GetFlagString(name) ?? Environment.GetEnvironmentVariable(name);
+        return GetFlagValue(name) ?? GetEnvValue(name);
     }
 
     private static bool? GetBool(string name)

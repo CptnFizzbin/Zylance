@@ -6,8 +6,26 @@ import { defineConfig } from "vite"
 
 const ZYLANCE_UI_DIR = import.meta.dirname
 
+// Custom plugin to replace websocket URL placeholder in index.html
+function injectWebSocketUrl() {
+  return {
+    name: "inject-websocket-url",
+    transformIndexHtml(html: string) {
+      const wsPort = process.env.ZYLANCE_WS_PORT
+      if (!wsPort) return html
+
+      console.log("Injecting WebSocket URL with port:", wsPort)
+      return html.replace(
+        "{{zylance.webSocketUrl}}",
+        `ws://localhost:${wsPort}`,
+      )
+    },
+  }
+}
+
 export default defineConfig({
   plugins: [
+    injectWebSocketUrl(),
     devtools(),
     tanstackRouter({
       target: "react",
@@ -34,7 +52,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.join(ZYLANCE_UI_DIR, "Src"),
-      "@Contract": path.join(ZYLANCE_UI_DIR, "Generated/zylance"),
+      "@Contract": path.join(ZYLANCE_UI_DIR, "Generated", "zylance"),
+      $Generated: path.join(ZYLANCE_UI_DIR, "Generated"),
       "@Lib": path.join(ZYLANCE_UI_DIR, "Lib"),
     },
   },

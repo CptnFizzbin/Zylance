@@ -1,4 +1,3 @@
-import { useZylanceApi } from "@Lib/ZylanceContext"
 import AddIcon from "@mui/icons-material/Add"
 import CloseIcon from "@mui/icons-material/Close"
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
@@ -15,6 +14,7 @@ import {
   FileBarMenu,
   type MenuBarMenuProps,
 } from "@/Components/Desktop/FileBar/Menus/MenuBase"
+import { useZylanceApi } from "@/Hooks/UseZylance"
 
 export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
   onClose,

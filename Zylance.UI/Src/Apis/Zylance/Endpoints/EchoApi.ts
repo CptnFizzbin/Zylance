@@ -1,6 +1,6 @@
 import type * as EchoTypes from "@Contract/api/Echo"
-import type { ZylanceClient } from "@Lib/ZylanceClient"
-import { ZylanceActions } from "../../Generated/ZylanceConstants"
+import { ZylanceActions } from "$Generated/ZylanceConstants"
+import type { ZylanceClient } from "../ZylanceClient"
 
 export function createEchoApi(client: ZylanceClient) {
   return {

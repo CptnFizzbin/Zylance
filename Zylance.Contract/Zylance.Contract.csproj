@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.33.5"/>
+    <PackageReference Include="Google.Protobuf" Version="3.33.5" />
     <PackageReference Include="Grpc.Tools" Version="2.76.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,11 +23,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="./zylance/**/*.proto" GrpcServices="None"/>
+    <Protobuf Include="./zylance/**/*.proto" GrpcServices="None" />
   </ItemGroup>
 
   <Target Name="CleanGeneratedFiles" BeforeTargets="Clean">
-    <RemoveDir Directories="Generated"/>
+    <RemoveDir Directories="Generated" />
   </Target>
 
   <Target
@@ -36,25 +36,19 @@
     Inputs="package.json;yarn.lock"
     Outputs="$(IntermediateOutputPath)yarn.install.marker"
   >
-    <Exec Command="$(YarnExe) install"/>
-    <Touch Files="$(IntermediateOutputPath)yarn.install.marker" AlwaysCreate="true"/>
+    <Exec Command="$(YarnExe) install" />
+    <Touch Files="$(IntermediateOutputPath)yarn.install.marker" AlwaysCreate="true" />
   </Target>
 
-  <Target
-    Name="GenerateCode"
-    BeforeTargets="BeforeCompile"
-  >
-    <Exec
-      Command="$(YarnExe) build:code"
-      EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"
-    />
+  <Target Name="GenerateCode" BeforeTargets="BeforeCompile">
+    <Exec Command="$(YarnExe) build:code" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1" />
     <ItemGroup>
       <!-- Include generated C# files in compilation -->
-      <GeneratedCSharpFiles Include="Generated/cs/**/*.cs"/>
+      <GeneratedCSharpFiles Include="$Generated/cs/**/*.cs" />
       <!-- Avoid duplicate default Compile items for generated files -->
-      <Compile Remove="Generated/cs/**/*.cs"/>
+      <Compile Remove="$Generated/cs/**/*.cs" />
       <!-- Explicitly compile generated C# files -->
-      <Compile Include="@(GeneratedCSharpFiles)"/>
+      <Compile Include="@(GeneratedCSharpFiles)" />
     </ItemGroup>
   </Target>
 </Project>

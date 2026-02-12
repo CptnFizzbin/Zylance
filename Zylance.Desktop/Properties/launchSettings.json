@@ -3,9 +3,10 @@
     "Development": {
       "commandName": "Project",
       "environmentVariables": {
-        "ZYLANCE_DEVTOOLS": "true",
-        "ZYLANCE_UI_MODE": "external",
-        "ZYLANCE_UI_URL": "http://localhost:3000"
+        "ZYLANCE_UI_SERVER_ENABLED": "false",
+        "ZYLANCE_DEVTOOLS_ENABLED": "true",
+        "ZYLANCE_UI_PORT": "3000",
+        "ZYLANCE_WS_PORT": "3001"
       }
     },
     "Production": {

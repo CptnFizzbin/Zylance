@@ -19,16 +19,20 @@
     </ProjectReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="tsconfig.tsbuildinfo" />
+  </ItemGroup>
+
   <Target Name="CollectSourceFiles">
     <ItemGroup>
-      <SourceFiles Include="Generated/**/*;Lib/**/*;Src/**/*;Public/**/*"/>
-      <ConfigFiles Include="package.json;yarn.lock;tsconfig.json;vite.config.ts"/>
+      <SourceFiles Include="$Generated/**/*;Lib/**/*;Src/**/*;Public/**/*" />
+      <ConfigFiles Include="package.json;yarn.lock;tsconfig.json;vite.config.ts" />
     </ItemGroup>
   </Target>
 
   <Target Name="CleanGenerated" AfterTargets="Clean">
-    <RemoveDir Directories="Generated"/>
-    <RemoveDir Directories="dist"/>
+    <RemoveDir Directories="Generated" />
+    <RemoveDir Directories="dist" />
   </Target>
 
   <Target
@@ -37,8 +41,8 @@
     Inputs="package.json;yarn.lock"
     Outputs="$(IntermediateOutputPath)yarn.install.marker"
   >
-    <Exec Command="$(YarnExe) install"/>
-    <Touch Files="$(IntermediateOutputPath)yarn.install.marker" AlwaysCreate="true"/>
+    <Exec Command="$(YarnExe) install" />
+    <Touch Files="$(IntermediateOutputPath)yarn.install.marker" AlwaysCreate="true" />
   </Target>
 
   <Target
@@ -49,8 +53,8 @@
     Inputs="@(SourceFiles);@(ConfigFiles)"
     Outputs="$(IntermediateOutputPath)tsc.marker"
   >
-    <Exec Command="$(YarnExe) tsc" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
-    <Touch Files="$(IntermediateOutputPath)tsc.marker" AlwaysCreate="true"/>
+    <Exec Command="$(YarnExe) tsc" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1" />
+    <Touch Files="$(IntermediateOutputPath)tsc.marker" AlwaysCreate="true" />
   </Target>
 
   <Target
@@ -61,8 +65,8 @@
     Inputs="@(SourceFiles);@(ConfigFiles)"
     Outputs="$(IntermediateOutputPath)build.marker"
   >
-    <Exec Command="$(YarnExe) check"/>
-    <Exec Command="$(YarnExe) build:ui" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
-    <Touch Files="$(IntermediateOutputPath)build.marker" AlwaysCreate="true"/>
+    <Exec Command="$(YarnExe) check" />
+    <Exec Command="$(YarnExe) build:ui" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1" />
+    <Touch Files="$(IntermediateOutputPath)build.marker" AlwaysCreate="true" />
   </Target>
 </Project>

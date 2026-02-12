@@ -1,5 +1,5 @@
-import type { ZylanceClient } from "@Lib/ZylanceClient"
-import { ZylanceEvents } from "../../Generated/ZylanceConstants"
+import { ZylanceEvents } from "$Generated/ZylanceConstants"
+import type { ZylanceClient } from "../ZylanceClient"
 
 export function createDesktopApi(client: ZylanceClient) {
   return {

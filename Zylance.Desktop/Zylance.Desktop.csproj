@@ -24,10 +24,31 @@
     <ItemGroup>
       <UIDistFiles Include="..\Zylance.UI\dist\**\*" />
     </ItemGroup>
-    <Copy SourceFiles="@(UIDistFiles)" DestinationFolder="$(OutputPath)wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" />
+    <Copy
+      SourceFiles="@(UIDistFiles)"
+      DestinationFolder="$(OutputPath)wwwroot\%(RecursiveDir)"
+      SkipUnchangedFiles="true"
+    />
   </Target>
 
   <ItemGroup>
-    <Content Include="$(OutputPath)wwwroot\**\*" CopyToPublishDirectory="PreserveNewest" Link="wwwroot\%(RecursiveDir)%(FileName)%(Extension)" />
+    <Content
+      Include="$(OutputPath)wwwroot\**\*"
+      CopyToPublishDirectory="PreserveNewest"
+      Link="wwwroot\%(RecursiveDir)%(FileName)%(Extension)"
+    />
+    <Content Remove="bin\Debug\net10.0\wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin\Debug\net10.0\wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="bin\Debug\net10.0\wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="bin\Debug\net10.0\wwwroot\**" />
   </ItemGroup>
 </Project>

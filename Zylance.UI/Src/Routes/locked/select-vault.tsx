@@ -1,4 +1,3 @@
-import { useZylance } from "@Lib/ZylanceContext"
 import {
   Alert,
   Box,
@@ -12,6 +11,7 @@ import {
 } from "@mui/material"
 import { useMutation } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
+import { useZylance } from "@/Hooks/UseZylance"
 
 export const Route = createFileRoute("/locked/select-vault")({
   component: RouteComponent,

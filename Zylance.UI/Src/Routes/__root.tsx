@@ -1,4 +1,3 @@
-import { useZylance, type ZylanceState } from "@Lib/ZylanceContext"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import type { QueryClient } from "@tanstack/react-query"
 import {
@@ -8,6 +7,8 @@ import {
   useLocation,
 } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
+import type { ZylanceState } from "@/Contexts/ZylanceContext"
+import { useZylance } from "@/Hooks/UseZylance"
 import TanStackQueryDevtools from "@/Integrations/tanstack-query/devtools"
 
 interface ZylanceRouterContext {

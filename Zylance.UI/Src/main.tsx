@@ -1,4 +1,3 @@
-import { ZylanceProvider } from "@Lib/ZylanceContext"
 import { CssBaseline } from "@mui/material"
 import GlobalStyles from "@mui/material/GlobalStyles"
 import { ThemeProvider } from "@mui/system"
@@ -9,6 +8,7 @@ import { theme } from "./Integrations/mui/Theme"
 import * as TanStackQueryProvider from "./Integrations/tanstack-query/root-provider"
 
 import "./styles.css"
+import { ZylanceProvider } from "@/Contexts/ZylanceContext"
 
 // Render the app
 const rootElement = document.getElementById("app")
