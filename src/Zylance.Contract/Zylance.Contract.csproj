@@ -33,6 +33,14 @@
     <CodeGenInputs Include="yarn.lock"/>
   </ItemGroup>
 
+  <!-- Files that trigger code regeneration when modified -->
+  <ItemGroup>
+    <CodeGenInputs Include="zylance/**/*.proto" />
+    <CodeGenInputs Include="Scripts/**/*.ts" />
+    <CodeGenInputs Include="package.json" />
+    <CodeGenInputs Include="yarn.lock" />
+  </ItemGroup>
+
   <Target Name="CleanGeneratedFiles" BeforeTargets="Clean">
     <RemoveDir Directories="Generated"/>
     <Delete Files="$(YarnInstallMarker);$(YarnBuildMarker)"/>
