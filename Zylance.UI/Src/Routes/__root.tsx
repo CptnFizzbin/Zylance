@@ -1,12 +1,8 @@
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import type { QueryClient } from "@tanstack/react-query"
-import {
-  createRootRouteWithContext,
-  Navigate,
-  Outlet,
-  useLocation,
-} from "@tanstack/react-router"
+import { createRootRouteWithContext, Navigate, Outlet, useLocation } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
+import { useEffect } from "react"
 import type { ZylanceState } from "@/Contexts/ZylanceContext"
 import { useZylance } from "@/Hooks/UseZylance"
 import TanStackQueryDevtools from "@/Integrations/tanstack-query/devtools"
@@ -20,9 +16,15 @@ export const Route = createRootRouteWithContext<ZylanceRouterContext>()({
   component: RootComponent,
 })
 
-function RootComponent() {
+function RootComponent () {
   const { currentVault } = useZylance()
   const location = useLocation()
+
+  useEffect(() => {
+    // Marker to notify tests that React has loaded and the router is ready.
+    // Tests will wait for this log before proceeding.
+    console.log("Zylance Loaded")
+  }, [])
 
   if (currentVault === null) {
     if (location.pathname !== "/locked/select-vault") {

@@ -13,7 +13,7 @@ namespace Zylance.Core;
 ///     Main application class that coordinates the Gateway and controllers.
 ///     Manages dependency injection internally for a clean API surface.
 /// </summary>
-public class Zylance
+public class ZylanceCore
 {
     /// <summary>
     ///     Initializes a new instance of Zylance with platform-specific
@@ -23,7 +23,7 @@ public class Zylance
     /// <param name="transport">The transport implementation for communication.</param>
     /// <param name="fileProvider">The file provider implementation.</param>
     /// <param name="vaultProvider">The vault provider implementation.</param>
-    public Zylance(ITransport transport, IFileProvider fileProvider, IVaultProvider vaultProvider)
+    public ZylanceCore(ITransport transport, IFileProvider fileProvider, IVaultProvider vaultProvider)
     {
         Console.WriteLine("[Zylance] Initializing...");
 

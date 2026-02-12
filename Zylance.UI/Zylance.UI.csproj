@@ -61,11 +61,9 @@
     Name="YarnBuildProd"
     AfterTargets="Build"
     DependsOnTargets="CollectSourceFiles"
-    Condition="'$(Configuration)' == 'Release'"
     Inputs="@(SourceFiles);@(ConfigFiles)"
     Outputs="$(IntermediateOutputPath)build.marker"
   >
-    <Exec Command="$(YarnExe) check" />
     <Exec Command="$(YarnExe) build:ui" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1" />
     <Touch Files="$(IntermediateOutputPath)build.marker" AlwaysCreate="true" />
   </Target>

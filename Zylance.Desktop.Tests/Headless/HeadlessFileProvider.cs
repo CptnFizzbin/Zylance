@@ -3,12 +3,22 @@ using Zylance.Desktop.Lib;
 
 namespace Zylance.Desktop.Tests.Headless;
 
+/// <summary>
+///     A file provider for headless testing that uses callbacks to simulate file
+///     selection.
+/// </summary>
+/// <returns>The absolute path to the file to select</returns>
 public delegate Task<string> SelectFileHandler(
     string? title,
     (string Name, string[] Extensions)[]? filters,
     bool readOnly
 );
 
+/// <summary>
+///     A file provider for headless testing that uses callbacks to simulate file
+///     creation.
+/// </summary>
+/// <returns>The absolute path to the file to create</returns>
 public delegate Task<string> CreateFileHandler(
     string? title,
     string? defaultPath,

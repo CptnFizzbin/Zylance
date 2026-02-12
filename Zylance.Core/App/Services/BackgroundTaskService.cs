@@ -7,7 +7,7 @@ namespace Zylance.Core.App.Services;
 ///     Service for managing and reporting background task progress.
 ///     Emits events to notify the UI about task lifecycle and progress.
 /// </summary>
-public class BackgroundTaskService(Zylance zylance)
+public class BackgroundTaskService(ZylanceCore zylanceCore)
 {
     /// <summary>
     ///     Notifies that a background task has started.
@@ -17,7 +17,7 @@ public class BackgroundTaskService(Zylance zylance)
     public void NotifyWorkStart(string taskId, string? description = null)
     {
         var evt = new BackgroundWorkStartEvt { TaskId = taskId, Description = description };
-        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
+        zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class BackgroundTaskService(Zylance zylance)
             Progress = Math.Clamp(progress, 0.0f, 1.0f),
             Description = description,
         };
-        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
+        zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public class BackgroundTaskService(Zylance zylance)
     public void NotifyWorkFinish(string taskId, string? description = null)
     {
         var evt = new BackgroundWorkFinishEvt { TaskId = taskId, Description = description };
-        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
+        zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     /// <summary>

@@ -6,6 +6,8 @@ public record ZylanceDesktopConfig
 {
     public const string AppName = "Zylance";
 
+    public bool Headless { get; init; }
+
     public bool UiServerEnabled { get; init; } = GetBool("UI_SERVER_ENABLED") ?? true;
     public int UiPort { get; init; } = GetInt("UI_PORT") ?? DiscoverAvailablePort(8000, 8099);
     public int WsPort { get; init; } = GetInt("WS_PORT") ?? DiscoverAvailablePort(8100, 8199);
