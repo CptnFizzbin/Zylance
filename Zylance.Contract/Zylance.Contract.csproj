@@ -20,32 +20,47 @@
     <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)/bin/yarn</YarnExe>
     <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn</YarnExe>
     <TsOutputPath>../Zylance.UI/Generated/</TsOutputPath>
+    <!-- Marker files for incremental build tracking -->
+    <YarnInstallMarker>$(BaseIntermediateOutputPath)yarn.install.marker</YarnInstallMarker>
+    <YarnBuildMarker>$(BaseIntermediateOutputPath)yarn.build.marker</YarnBuildMarker>
   </PropertyGroup>
 
   <ItemGroup>
     <Protobuf Include="./zylance/**/*.proto" GrpcServices="None" />
   </ItemGroup>
 
+  <!-- Files that trigger code regeneration when modified -->
+  <ItemGroup>
+    <CodeGenInputs Include="zylance/**/*.proto" />
+    <CodeGenInputs Include="Scripts/**/*.ts" />
+    <CodeGenInputs Include="package.json" />
+    <CodeGenInputs Include="yarn.lock" />
+  </ItemGroup>
+
   <Target Name="CleanGeneratedFiles" BeforeTargets="Clean">
     <RemoveDir Directories="Generated" />
+    <Delete Files="$(YarnInstallMarker);$(YarnBuildMarker)" />
   </Target>
 
   <Target
     Name="InstallYarnPackages"
     BeforeTargets="GenerateCode"
     Inputs="package.json;yarn.lock"
-    Outputs="$(IntermediateOutputPath)yarn.install.marker"
+    Outputs="$(YarnInstallMarker)"
   >
+    <MakeDir Directories="$(BaseIntermediateOutputPath)" />
     <Exec Command="$(YarnExe) install" />
-    <Touch Files="$(IntermediateOutputPath)yarn.install.marker" AlwaysCreate="true" />
+    <Touch Files="$(YarnInstallMarker)" AlwaysCreate="true" />
   </Target>
 
   <Target
     Name="GenerateCode"
+    DependsOnTargets="InstallYarnPackages"
     BeforeTargets="BeforeCompile"
-    Inputs="zylance/**/*.proto;Scripts/build-code.ts;package.json;yarn.lock"
-    Outputs="$(IntermediateOutputPath)yarn.build.marker"
+    Inputs="@(CodeGenInputs)"
+    Outputs="$(YarnBuildMarker)"
   >
+    <MakeDir Directories="$(BaseIntermediateOutputPath)" />
     <Exec Command="$(YarnExe) build:code" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1" />
     <ItemGroup>
       <!-- Include generated C# files in compilation -->
@@ -55,6 +70,6 @@
       <!-- Explicitly compile generated C# files -->
       <Compile Include="@(GeneratedCSharpFiles)" />
     </ItemGroup>
-    <Touch Files="$(IntermediateOutputPath)yarn.build.marker" AlwaysCreate="true" />
+    <Touch Files="$(YarnBuildMarker)" AlwaysCreate="true" />
   </Target>
 </Project>

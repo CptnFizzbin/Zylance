@@ -20,10 +20,17 @@
     <ProjectReference Include="..\Zylance.Vault.Local\Zylance.Vault.Local.csproj" />
   </ItemGroup>
 
-  <Target Name="CopyUIAssets" AfterTargets="Build">
-    <ItemGroup>
-      <UIDistFiles Include="..\Zylance.UI\dist\**\*" />
-    </ItemGroup>
+  <!-- Collect UI dist files for incremental build tracking -->
+  <ItemGroup>
+    <UIDistFiles Include="..\Zylance.UI\dist\**\*" />
+  </ItemGroup>
+
+  <Target
+    Name="CopyUIAssets"
+    AfterTargets="Build"
+    Inputs="@(UIDistFiles)"
+    Outputs="@(UIDistFiles->'$(OutputPath)wwwroot\%(RecursiveDir)%(Filename)%(Extension)')"
+  >
     <Copy
       SourceFiles="@(UIDistFiles)"
       DestinationFolder="$(OutputPath)wwwroot\%(RecursiveDir)"
