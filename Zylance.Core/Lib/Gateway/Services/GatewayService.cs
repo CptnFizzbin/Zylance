@@ -126,9 +126,7 @@ public class GatewayService
         catch (Exception ex)
         {
             var requestId =
-                message.PayloadCase == GatewayEnvelope.PayloadOneofCase.Request
-                    ? message.Request.RequestId
-                    : null;
+                message.PayloadCase == GatewayEnvelope.PayloadOneofCase.Request ? message.Request.RequestId : null;
 
             var error = ExceptionHandler.WrapException(ex, requestId);
             Send(error);
