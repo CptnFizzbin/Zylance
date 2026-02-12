@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.33.5" />
+    <PackageReference Include="Google.Protobuf" Version="3.33.5"/>
     <PackageReference Include="Grpc.Tools" Version="2.76.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -25,21 +25,17 @@
     <YarnBuildMarker>$(BaseIntermediateOutputPath)yarn.build.marker</YarnBuildMarker>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Protobuf Include="./zylance/**/*.proto" GrpcServices="None" />
-  </ItemGroup>
-
   <!-- Files that trigger code regeneration when modified -->
   <ItemGroup>
-    <CodeGenInputs Include="zylance/**/*.proto" />
-    <CodeGenInputs Include="Scripts/**/*.ts" />
-    <CodeGenInputs Include="package.json" />
-    <CodeGenInputs Include="yarn.lock" />
+    <Protobuf Include="./zylance/**/*.proto" GrpcServices="None"/>
+    <CodeGenInputs Include="Scripts/**/*.ts"/>
+    <CodeGenInputs Include="package.json"/>
+    <CodeGenInputs Include="yarn.lock"/>
   </ItemGroup>
 
   <Target Name="CleanGeneratedFiles" BeforeTargets="Clean">
-    <RemoveDir Directories="Generated" />
-    <Delete Files="$(YarnInstallMarker);$(YarnBuildMarker)" />
+    <RemoveDir Directories="Generated"/>
+    <Delete Files="$(YarnInstallMarker);$(YarnBuildMarker)"/>
   </Target>
 
   <Target
@@ -48,28 +44,28 @@
     Inputs="package.json;yarn.lock"
     Outputs="$(YarnInstallMarker)"
   >
-    <MakeDir Directories="$(BaseIntermediateOutputPath)" />
-    <Exec Command="$(YarnExe) install" />
-    <Touch Files="$(YarnInstallMarker)" AlwaysCreate="true" />
+    <MakeDir Directories="$(BaseIntermediateOutputPath)"/>
+    <Exec Command="$(YarnExe) install"/>
+    <Touch Files="$(YarnInstallMarker)" AlwaysCreate="true"/>
   </Target>
 
   <Target
     Name="GenerateCode"
     DependsOnTargets="InstallYarnPackages"
     BeforeTargets="BeforeCompile"
-    Inputs="@(CodeGenInputs)"
+    Inputs="@(ProtoBuf);@(CodeGenInputs)"
     Outputs="$(YarnBuildMarker)"
   >
-    <MakeDir Directories="$(BaseIntermediateOutputPath)" />
-    <Exec Command="$(YarnExe) build:code" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1" />
+    <MakeDir Directories="$(BaseIntermediateOutputPath)"/>
+    <Exec Command="$(YarnExe) build:code" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1"/>
     <ItemGroup>
       <!-- Include generated C# files in compilation -->
-      <GeneratedCSharpFiles Include="Generated/cs/**/*.cs" />
+      <GeneratedCSharpFiles Include="Generated/cs/**/*.cs"/>
       <!-- Avoid duplicate default Compile items for generated files -->
-      <Compile Remove="Generated/cs/**/*.cs" />
+      <Compile Remove="Generated/cs/**/*.cs"/>
       <!-- Explicitly compile generated C# files -->
-      <Compile Include="@(GeneratedCSharpFiles)" />
+      <Compile Include="@(GeneratedCSharpFiles)"/>
     </ItemGroup>
-    <Touch Files="$(YarnBuildMarker)" AlwaysCreate="true" />
+    <Touch Files="$(YarnBuildMarker)" AlwaysCreate="true"/>
   </Target>
 </Project>

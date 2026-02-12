@@ -2,7 +2,11 @@ using Microsoft.Playwright;
 using Zylance.Core;
 using Zylance.Desktop.Config;
 
+<<<<<<<< HEAD:tests/Zylance.Desktop.Tests/TestUtils/ZylanceTestHarness.cs
 namespace Zylance.Desktop.Tests.TestUtils;
+========
+namespace Zylance.Desktop.Tests.Lib.Headless;
+>>>>>>>> 2480aa8 (wip):Zylance.Desktop.Tests/Lib/Headless/ZylanceTestHarness.cs
 
 public record ZylanceTestHarness : IAsyncDisposable
 {
@@ -34,8 +38,8 @@ public record ZylanceTestHarness : IAsyncDisposable
     }
 
     public static async Task<ZylanceTestHarness> InitializeAsync(
-        int uiPort = 8123,
-        int wsPort = 8124,
+        int? uiPort = null,
+        int? wsPort = null,
         int appReadyTimeoutMs = 10000,
         CancellationToken cancellationToken = default
     )
@@ -53,21 +57,20 @@ public record ZylanceTestHarness : IAsyncDisposable
 
         var fileProvider = new HeadlessFileProvider(appDataDir, tempDataDir);
 
-        var config = new ZylanceDesktopConfig
+        var config = new ZylanceDesktopConfig(uiPort, wsPort)
         {
             Headless = true,
             UiServerEnabled = true,
-            UiPort = uiPort,
-            WsPort = wsPort,
             UiRootPath = uiRootPath,
             AppDataPath = appDataDir,
             TmpDataPath = tempDataDir,
         };
+
         var desktop = new ZylanceDesktop(config, fileProvider: fileProvider);
         desktop.Start();
 
         var playwright = await Microsoft.Playwright.Playwright.CreateAsync();
-        var browser = await playwright.Chromium.LaunchAsync();
+        var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions { Headless = false });
         var browserContext = await browser.NewContextAsync();
         browserContext.SetDefaultTimeout((float)TimeSpan.FromSeconds(10).TotalMilliseconds);
         var page = await browserContext.NewPageAsync();

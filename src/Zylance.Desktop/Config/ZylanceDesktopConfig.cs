@@ -4,13 +4,19 @@ namespace Zylance.Desktop.Config;
 
 public record ZylanceDesktopConfig
 {
+    public ZylanceDesktopConfig(int? uiPort = null, int? wsPort = null)
+    {
+        UiPort = uiPort ?? GetInt("UI_PORT") ?? DiscoverAvailablePort(8000, 8999);
+        WsPort = wsPort ?? GetInt("WS_PORT") ?? DiscoverAvailablePort(9000, 9999);
+    }
+
     public const string AppName = "Zylance";
 
     public bool Headless { get; init; }
 
     public bool UiServerEnabled { get; init; } = GetBool("UI_SERVER_ENABLED") ?? true;
-    public int UiPort { get; init; } = GetInt("UI_PORT") ?? DiscoverAvailablePort(8000, 8099);
-    public int WsPort { get; init; } = GetInt("WS_PORT") ?? DiscoverAvailablePort(8100, 8199);
+    public int UiPort { get; init; }
+    public int WsPort { get; init; }
     public bool DevToolsEnabled { get; init; } = GetBool("DEVTOOLS_ENABLED") ?? false;
 
     public string UiServerUrl => $"http://localhost:{UiPort}";

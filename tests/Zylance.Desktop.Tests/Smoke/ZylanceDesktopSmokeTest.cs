@@ -1,7 +1,7 @@
 using Microsoft.Playwright;
-using Zylance.Desktop.Tests.Headless;
+using Zylance.Desktop.Tests.Lib.Headless;
 
-namespace Zylance.Desktop.Tests;
+namespace Zylance.Desktop.Tests.Smoke;
 
 public class ZylanceDesktopSmokeTest
 {

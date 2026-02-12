@@ -1,70 +1,72 @@
-import { Button, Grow, MenuList, Paper, Popper } from "@mui/material"
+import { Button, Grow, MenuList, Paper, Popper } from '@mui/material';
 import {
   type FC,
   type KeyboardEvent,
   type PropsWithChildren,
   useEffect,
   useRef,
-} from "react"
+} from 'react';
 
 export interface MenuBarMenuProps extends PropsWithChildren {
-  label: string
-  open: boolean
-  onClick: () => void
-  onClose: () => void
+  id: string;
+  label: string;
+  open: boolean;
+  onClick: () => void;
+  onClose: () => void;
 }
 
 export const FileBarMenu: FC<MenuBarMenuProps> = ({
+  id,
   label,
   open,
   onClick,
   onClose,
   children,
 }) => {
-  const anchorRef = useRef<HTMLButtonElement>(null)
+  const anchorRef = useRef<HTMLButtonElement>(null);
 
-  function handleListKeyDown(event: KeyboardEvent) {
-    if (event.key === "Tab") {
-      event.preventDefault()
-    } else if (event.key === "Escape") {
-      onClose()
+  function handleListKeyDown (event: KeyboardEvent) {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+    } else if (event.key === 'Escape') {
+      onClose();
     }
   }
 
   // return focus to the button when we transitioned from !open -> open
-  const prevOpen = useRef(open)
+  const prevOpen = useRef(open);
   useEffect(() => {
     if (prevOpen.current && !open) {
-      anchorRef.current?.focus()
+      anchorRef.current?.focus();
     }
 
-    prevOpen.current = open
-  }, [open])
+    prevOpen.current = open;
+  }, [open]);
 
   return (
     <>
       <Button
         ref={anchorRef}
-        id={`${label}-menu-button`}
+        id={`menuButton-${id}`}
         aria-controls={open ? `${label}-menu` : undefined}
-        aria-expanded={open ? "true" : undefined}
+        aria-expanded={open ? 'true' : undefined}
         aria-haspopup="true"
         onClick={() => onClick()}
         sx={{
-          fontSize: "12px",
-          padding: "2px 4px",
-          color: "text.primary",
+          fontSize: '12px',
+          padding: '2px 4px',
+          color: 'text.primary',
           minWidth: 0,
-          textTransform: "capitalize",
+          textTransform: 'capitalize',
           borderRadius: 1,
-          transition: "all 0.2s ease-in-out",
-          "&:hover": {
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
             backgroundColor: (theme) => `${theme.palette.primary.main}15`,
-            color: "primary.main",
+            color: 'primary.main',
           },
           ...(open && {
             backgroundColor: (theme) => `${theme.palette.primary.main}20`,
-            color: "primary.main",
+            color: 'primary.main',
           }),
         }}
       >
@@ -83,20 +85,20 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
             {...TransitionProps}
             style={{
               transformOrigin:
-                placement === "bottom-start" ? "left top" : "left bottom",
+                placement === 'bottom-start' ? 'left top' : 'left bottom',
             }}
           >
             <Paper
               sx={{
                 width: 320,
-                maxWidth: "100%",
+                maxWidth: '100%',
               }}
             >
               <MenuList
                 dense
                 autoFocusItem={open}
-                id={`${label}-menu`}
-                aria-labelledby={`${label}-menu-button`}
+                id={`menu-${id}`}
+                aria-labelledby={`menuButton-${id}`}
                 onKeyDown={handleListKeyDown}
               >
                 {children}
@@ -106,5 +108,5 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
         )}
       </Popper>
     </>
-  )
-}
+  );
+};
