@@ -15,6 +15,7 @@ import { readFileSync, writeFileSync } from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { glob } from "glob"
+import { DEST_DIR } from "./paths"
 
 const SCRIPT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const CONTRACT_DIR = path.resolve(SCRIPT_DIR, "..")
@@ -28,7 +29,7 @@ interface ActionOrEvent {
 /**
  * Main function to generate type-safe constants.
  */
-export async function generateConstants (outputDir: string): Promise<void> {
+export async function generateConstants (): Promise<void> {
   console.log("\nGenerating type-safe action and event constants...")
 
   console.log("Scanning proto files...")
@@ -51,14 +52,14 @@ export async function generateConstants (outputDir: string): Promise<void> {
 
   // Generate TypeScript in Contract/Generated for reference
   const tsContent = generateTypeScript(actions, events)
-  const tsOutputPath = path.resolve(outputDir, "ts", "ZylanceConstants.ts")
+  const tsOutputPath = path.resolve(DEST_DIR, "ts", "ZylanceConstants.ts")
   fs.mkdirSync(path.dirname(tsOutputPath), { recursive: true })
   writeFileSync(tsOutputPath, tsContent, "utf-8")
   console.log(`\nGenerated TypeScript: ${path.relative(CONTRACT_DIR, tsOutputPath)}`)
 
   // Generate C#
   const csContent = generateCSharp(actions, events)
-  const csOutputPath = path.resolve(outputDir, "cs", "ZylanceConstants.cs")
+  const csOutputPath = path.resolve(DEST_DIR, "cs", "ZylanceConstants.cs")
   fs.mkdirSync(path.dirname(csOutputPath), { recursive: true })
   writeFileSync(csOutputPath, csContent, "utf-8")
   console.log(`Generated C#: ${path.relative(CONTRACT_DIR, csOutputPath)}`)
@@ -234,3 +235,4 @@ function trimLines (str: string): string {
     .map(line => line.replace(leadingIndentRegex, ""))
     .join("\n")
 }
+

@@ -2,7 +2,7 @@ using Zylance.Core.Lib;
 using Zylance.Core.Lib.Vault;
 using Zylance.Vault.Local;
 
-namespace Zylance.Desktop;
+namespace Zylance.Desktop.Providers;
 
 public class DesktopVaultProvider(ILocalFileProvider fileSystem) : IVaultProvider
 {

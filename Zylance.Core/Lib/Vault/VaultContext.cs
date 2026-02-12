@@ -7,7 +7,7 @@ namespace Zylance.Core.Lib.Vault;
 ///     Manages the active vault state and handles vault state transitions.
 ///     Implements a state machine pattern for vault lifecycle events.
 /// </summary>
-public class VaultContext(Zylance zylance)
+public class VaultContext(ZylanceCore zylanceCore)
 {
     /// <summary>
     ///     Gets or sets the currently active vault.
@@ -72,25 +72,25 @@ public class VaultContext(Zylance zylance)
     private void SendVaultOpenedEvent(IVault vault)
     {
         var evt = new VaultOpenedEvt { VaultRef = vault.ToRef() };
-        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
+        zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     private void SendVaultClosedEvent()
     {
         var evt = new VaultClosedEvt();
-        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
+        zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     private void SendVaultLockedEvent(IVault vault)
     {
         var evt = new VaultLockedEvt { VaultRef = vault.ToRef() };
-        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
+        zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     private void SendVaultUnlockedEvent(IVault vault)
     {
         var evt = new VaultUnlockedEvt { VaultRef = vault.ToRef() };
-        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
+        zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     /// <summary>

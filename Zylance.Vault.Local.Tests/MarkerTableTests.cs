@@ -45,9 +45,7 @@ public class MarkerTableTests : IDisposable
     private string CreateTempFilePath(string? fileName = null, bool includeUuid = true)
     {
         if (fileName is null)
-            fileName = includeUuid
-                ? $"test_{Guid.NewGuid()}.zlv.sqlite"
-                : "test.zlv.sqlite";
+            fileName = includeUuid ? $"test_{Guid.NewGuid()}.zlv.sqlite" : "test.zlv.sqlite";
         else if (includeUuid)
             fileName = $"{Guid.NewGuid()}_{fileName}";
 
@@ -117,9 +115,9 @@ public class MarkerTableTests : IDisposable
         }
 
         // Act & Assert
-        var exception =
-            await Assert.ThrowsAsync<NonZylanceDatabaseException>(() => LocalVault.FromFile(filePath, cancellationToken)
-            );
+        var exception = await Assert.ThrowsAsync<NonZylanceDatabaseException>(() =>
+            LocalVault.FromFile(filePath, cancellationToken)
+        );
 
         Assert.Contains("not a Zylance vault", exception.Message);
         Assert.Contains(filePath, exception.Message);
@@ -166,9 +164,9 @@ public class MarkerTableTests : IDisposable
         }
 
         // Act & Assert
-        var exception =
-            await Assert.ThrowsAsync<NonZylanceDatabaseException>(() => LocalVault.FromFile(filePath, cancellationToken)
-            );
+        var exception = await Assert.ThrowsAsync<NonZylanceDatabaseException>(() =>
+            LocalVault.FromFile(filePath, cancellationToken)
+        );
 
         Assert.Contains("not a Zylance vault", exception.Message);
     }

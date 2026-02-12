@@ -9,19 +9,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-    <PackageReference Include="Photino.NET" Version="4.0.16"/>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Fleck" Version="1.2.0" />
+    <PackageReference Include="Photino.NET" Version="4.0.16" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Zylance.Core\Zylance.Core.csproj"/>
-    <ProjectReference Include="..\Zylance.UI\Zylance.UI.csproj"/>
-    <ProjectReference Include="..\Zylance.Vault.Local\Zylance.Vault.Local.csproj"/>
+    <ProjectReference Include="..\Zylance.Core\Zylance.Core.csproj" />
+    <ProjectReference Include="..\Zylance.UI\Zylance.UI.csproj" />
+    <ProjectReference Include="..\Zylance.Vault.Local\Zylance.Vault.Local.csproj" />
   </ItemGroup>
 
   <Target Name="CopyUIAssets" AfterTargets="Build">
     <ItemGroup>
-      <UIDistFiles Include="..\Zylance.UI\dist\**\*"/>
+      <UIDistFiles Include="..\Zylance.UI\dist\**\*" />
     </ItemGroup>
     <Copy
       SourceFiles="@(UIDistFiles)"
@@ -36,5 +37,18 @@
       CopyToPublishDirectory="PreserveNewest"
       Link="wwwroot\%(RecursiveDir)%(FileName)%(Extension)"
     />
+    <Content Remove="bin\Debug\net10.0\wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin\Debug\net10.0\wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="bin\Debug\net10.0\wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="bin\Debug\net10.0\wwwroot\**" />
   </ItemGroup>
 </Project>

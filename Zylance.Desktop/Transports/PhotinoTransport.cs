@@ -3,7 +3,7 @@ using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Lib.Gateway;
 using Zylance.Core.Lib.Gateway.Utils;
 
-namespace Zylance.Desktop;
+namespace Zylance.Desktop.Transports;
 
 /// <summary>
 ///     Desktop implementation of <see cref="ITransport" /> using Photino.NET for native window communication.

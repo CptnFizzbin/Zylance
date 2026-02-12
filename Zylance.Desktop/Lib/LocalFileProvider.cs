@@ -1,22 +1,13 @@
-using System.Reflection;
-using Photino.NET;
 using Zylance.Contract.Models.File;
 using Zylance.Core.Lib;
 
-namespace Zylance.Desktop;
+namespace Zylance.Desktop.Lib;
 
-/// <summary>
-///     Desktop implementation of IFileProvider using Photino's cross-platform file dialogs.
-///     Works on Windows, macOS, and Linux using native file dialogs on each platform.
-/// </summary>
-public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDisposable
+public abstract class LocalFileProvider(string appDataPath, string tempDataPath) : ILocalFileProvider, IDisposable
 {
     // Store file references in memory - maps FileRef IDs to actual file paths
     private readonly Dictionary<string, string> _fileReferences = new();
     private readonly Lock _lock = new();
-
-    // Create a unique session directory for this instance
-    private readonly string _sessionTempDir = Path.Combine(Path.GetTempPath(), "Zylance", Guid.NewGuid().ToString());
 
     private bool _disposed;
 
@@ -31,13 +22,13 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
         try
         {
             // Clean up the session temp directory if it exists
-            if (Directory.Exists(_sessionTempDir))
-                Directory.Delete(_sessionTempDir, true);
+            if (Directory.Exists(tempDataPath))
+                Directory.Delete(tempDataPath, true);
         }
         catch (Exception ex)
         {
             // Log but don't throw - cleanup is best-effort
-            Console.Error.WriteLine($"Warning: Failed to clean up temp directory {_sessionTempDir}: {ex.Message}");
+            Console.Error.WriteLine($"Warning: Failed to clean up temp directory {tempDataPath}: {ex.Message}");
         }
 
         _disposed = true;
@@ -49,42 +40,19 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
         return File.Exists(path);
     }
 
-    public async Task<FileRef> SelectFile(
+    // Abstract as this will require user input to perform.
+    public abstract Task<FileRef> SelectFile(
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
         bool readOnly = true
-    )
-    {
-        var dialogTitle = title ?? (filters is { Length: > 0 } ? $"Select {filters[0].Name}" : "Select File");
+    );
 
-        var fileFilters = filters ?? [(Name: "All Files", Extensions: ["*"])];
-
-        var selectedFiles = await window.ShowOpenFileAsync(dialogTitle, null, false, fileFilters);
-
-        if (selectedFiles == null || selectedFiles.Length == 0 || string.IsNullOrEmpty(selectedFiles[0]))
-            throw new OperationCanceledException("File selection was cancelled by the user.");
-
-        return await CreateFileReference(selectedFiles[0], readOnly);
-    }
-
-    public async Task<FileRef> CreateFile(
+    // Abstract as this will require user input to perform.
+    public abstract Task<FileRef> CreateFile(
         string? title = null,
         string? defaultPath = null,
         (string Name, string[] Extensions)[]? filters = null
-    )
-    {
-        var dialogTitle = title ?? (filters is { Length: > 0 } ? $"Save {filters[0].Name}" : "Save File");
-
-        var fileFilters = filters ?? [(Name: "All Files", Extensions: ["*"])];
-
-        var filePath = await window.ShowSaveFileAsync(dialogTitle, defaultPath, fileFilters);
-
-        return await (
-            string.IsNullOrEmpty(filePath)
-                ? throw new OperationCanceledException("File creation was cancelled by the user.")
-                : CreateFileReference(filePath)
-        );
-    }
+    );
 
     public async Task<Stream> OpenFile(FileRef fileRef)
     {
@@ -151,7 +119,7 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
     public Task<FileRef> GetTempFile(string path)
     {
         // Combine the path with the session-specific temp directory
-        var tempPath = Path.Combine(_sessionTempDir, path);
+        var tempPath = Path.Combine(tempDataPath, path);
 
         // Ensure the directory exists
         var directory = Path.GetDirectoryName(tempPath);
@@ -163,12 +131,7 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
 
     public Task<FileRef> GetAppDataFile(string path)
     {
-        // Get the application data directory (roaming)
-        var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-
-        // Combine with application-specific directory (using assembly name or a constant)
-        var appName = Assembly.GetEntryAssembly()?.GetName().Name ?? "Zylance";
-        var fullPath = Path.Combine(appDataPath, appName, path);
+        var fullPath = Path.Combine(appDataPath, path);
 
         // Ensure the directory exists
         var directory = Path.GetDirectoryName(fullPath);
@@ -179,7 +142,7 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
     }
 
     /// <summary>
-    ///     Retrieves the actual file path from a FileRef.
+    ///     Retrieves the actual file path for a FileRef.
     /// </summary>
     public Task<string> GetFilePath(FileRef fileRef)
     {
@@ -201,7 +164,7 @@ public class DesktopFileProvider(PhotinoWindow window) : ILocalFileProvider, IDi
     /// <summary>
     ///     Creates a FileRef from a file path and stores the mapping.
     /// </summary>
-    private Task<FileRef> CreateFileReference(string filePath, bool readOnly = false)
+    protected Task<FileRef> CreateFileReference(string filePath, bool readOnly = false)
     {
         var fileRef = new FileRef
         {

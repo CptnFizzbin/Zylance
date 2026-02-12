@@ -36,8 +36,8 @@
       "@Contract/*": [
         "./Generated/zylance/*"
       ],
-      "@Lib/*": [
-        "./Lib/*"
+      "$Generated/*": [
+        "./Generated/*"
       ]
     },
     "allowSyntheticDefaultImports": true

@@ -16,6 +16,13 @@
     <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
     <option name="AUTO_ATTACH_CHILDREN" value="0" />
     <option name="MIXED_MODE_DEBUG" value="0" />
-    <method v="2" />
+    <method v="2">
+      <option
+        name="Build"
+        default="false"
+        projectName="Zylance.Desktop"
+        projectPath="$PROJECT_DIR$/Zylance.Desktop/Zylance.Desktop.csproj"
+      />
+    </method>
   </configuration>
 </component>
