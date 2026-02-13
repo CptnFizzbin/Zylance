@@ -1,5 +1,4 @@
 using Zylance.Desktop.Tests.Lib.Headless;
-using Zylance.Desktop.Tests.Lib.PageContexts;
 
 namespace Zylance.Desktop.Tests.Lib;
 
@@ -9,9 +8,7 @@ public class ZylanceDesktopTest : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        Harness = await ZylanceTestHarness.InitializeAsync(
-            cancellationToken: TestContext.Current.CancellationToken
-        );
+        Harness = await ZylanceTestHarness.InitializeAsync(cancellationToken: TestContext.Current.CancellationToken);
     }
 
     public async ValueTask DisposeAsync()
@@ -19,6 +16,4 @@ public class ZylanceDesktopTest : IAsyncLifetime
         await Harness.DisposeAsync();
         GC.SuppressFinalize(this);
     }
-
-    protected MenuBarContext MenuBar => new(Harness.Page);
 }

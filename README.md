@@ -20,31 +20,35 @@ An OpenSource finance and budgeting app
 3. Restore dependencies:
    ```pwsh
    dotnet restore
+   dotnet tool restore
    ```
-4. Install Node.js and Yarn using FNM (or your preferred Node.js version manager):
+4. Install Node.js and Yarn using FNM (or your preferred Node.js version
+   manager):
    ```pwsh
-   fnm install 24.5.0
-   fnm use 24.5.0
+   fnm install 24.13.0
+   fnm use 24.13.0
    corepack enable
    corepack prepare yarn@stable --activate
    ```
-5. Set the `NODE_HOME` environment variable to your Node.js installation directory:
-   > **Note:** The build process uses `NODE_HOME` to locate yarn. Adjust the path based on your Node.js installation
+5. Set the `NODE_HOME` environment variable to your Node.js installation
+   directory:
+   > **Note:** The build process uses `NODE_HOME` to locate yarn. Adjust the
+   path based on your Node.js installation
    method.
 
    **Windows (PowerShell):**
    ```pwsh
    # For FNM users - set in current session:
-   $env:NODE_HOME = "$env:APPDATA\fnm\node-versions\v24.5.0\installation"
+   $env:NODE_HOME = "$env:APPDATA\fnm\node-versions\v24.13.0\installation"
    
    # Or set permanently (requires restart):
-   [System.Environment]::SetEnvironmentVariable('NODE_HOME', "$env:APPDATA\fnm\node-versions\v24.5.0\installation", 'User')
+   [System.Environment]::SetEnvironmentVariable('NODE_HOME', "$env:APPDATA\fnm\node-versions\v24.13.0\installation", 'User')
    ```
 
    **Linux/macOS:**
    ```bash
    # For FNM users - add to your shell profile (~/.bashrc, ~/.zshrc, etc.):
-   export NODE_HOME="$HOME/.local/share/fnm/node-versions/v24.5.0/installation"
+   export NODE_HOME="$HOME/.local/share/fnm/node-versions/v24.13.0/installation"
    ```
 6. build the solution:
    ```pwsh
@@ -53,7 +57,8 @@ An OpenSource finance and budgeting app
 
 ### Code Formatting
 
-This project uses [CSharpier](https://csharpier.com/) for consistent C# code formatting.
+This project uses [CSharpier](https://csharpier.com/) for consistent C# code
+formatting.
 
 **First-time setup:**
 
@@ -75,13 +80,16 @@ dotnet csharpier --check .
 
 **IDE Integration:**
 
-- **Rider**: Install the "CSharpier" plugin from the marketplace and enable "Reformat with CSharpier on Save" in
+- **Rider**: Install the "CSharpier" plugin from the marketplace and enable "
+  Reformat with CSharpier on Save" in
   settings
 - **VS Code**: Install the "CSharpier" extension
 - **Visual Studio**: Install the "CSharpier" extension
 
 ## Documentation
 
-- **[Architecture Decision Records (ADRs)](./Docs/ADRs/)** - Documented architectural decisions and rationale
-- **[Import/Export Formats](./Docs/Formats/)** - Supported file formats for financial data import/export
+- **[Architecture Decision Records (ADRs)](./Docs/ADRs/)** - Documented
+  architectural decisions and rationale
+- **[Import/Export Formats](./Docs/Formats/)** - Supported file formats for
+  financial data import/export
 

@@ -1,4 +1,5 @@
 using Photino.NET;
+using Zylance.Contract;
 using Zylance.Core;
 using Zylance.Core.Platform.Interfaces;
 using Zylance.Core.Vault.Interfaces;
@@ -23,6 +24,8 @@ public class ZylanceDesktop(
     private PhotinoWindow? _window;
     private ZylanceCore? _zylanceCore;
 
+    public bool IsDisposed { get; private set; }
+
     public ZylanceCore ZylanceCore =>
         _zylanceCore
         ?? throw new InvalidOperationException(
@@ -37,6 +40,7 @@ public class ZylanceDesktop(
             await _webServer.DisposeAsync();
 
         _window?.Close();
+        IsDisposed = true;
 
         GC.SuppressFinalize(this);
     }
@@ -63,8 +67,15 @@ public class ZylanceDesktop(
         _vaultProvider ??= new DesktopVaultProvider(_fileProvider);
 
         _zylanceCore = new ZylanceCore(_transport, _fileProvider, _vaultProvider);
+        _zylanceCore.Gateway.ObserveEvent(ZylanceConstants.Events.Desktop_Exit).Subscribe(_ => Exit());
 
         return this;
+    }
+
+    private void Exit()
+    {
+        Console.WriteLine("Exit requested. Closing application...");
+        DisposeAsync().AsTask().Wait();
     }
 
     public void WaitForExit()
