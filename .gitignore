@@ -156,3 +156,4 @@ Zylance.UI/Generated/
 # Copilot generated files
 .plans/
 .code-reviews/
+/.vs
