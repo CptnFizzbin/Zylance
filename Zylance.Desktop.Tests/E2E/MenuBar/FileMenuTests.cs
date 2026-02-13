@@ -91,7 +91,6 @@ public class FileMenuTests : ZylanceDesktopTest
         var menuBar = MenuBarComponent.GetFromPage(Harness.Page);
         var fileMenu = await menuBar.OpenFileMenuAsync();
         await fileMenu.OpenVault.ClickAsync();
-
         await Harness.Page.WaitForTimeoutAsync(500);
 
         // Act
@@ -100,10 +99,8 @@ public class FileMenuTests : ZylanceDesktopTest
 
         // Assert
         var vaultSelectScreen = new VaultSelectScreen(Harness.Page);
-        Assert.True(
-            await vaultSelectScreen.IsActiveAsync(),
-            "Vault Select Screen should be active after closing the vault"
-        );
+        await vaultSelectScreen.WaitForActiveAsync();
+
         fileMenu = await menuBar.OpenFileMenuAsync();
         await Expect(fileMenu.CloseVault).ToBeDisabledAsync();
     }
