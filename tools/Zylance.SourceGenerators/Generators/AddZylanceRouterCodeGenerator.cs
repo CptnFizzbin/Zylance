@@ -39,7 +39,7 @@ internal static class AddZylanceRouterCodeGenerator
 
                  namespace Zylance.Core.Lib.Gateway.Extensions;
 
-                  /// <summary>
+                 /// <summary>
                   /// Registers generated controllers and the RouterService into the dependency injection container.
                   /// </summary>
                   public static class ControllerRegistration

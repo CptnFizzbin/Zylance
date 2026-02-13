@@ -51,7 +51,7 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      "@": path.join(ZYLANCE_UI_DIR, "Src"),
+      "@": path.join(ZYLANCE_UI_DIR, "src"),
       "@Contract": path.join(ZYLANCE_UI_DIR, "Generated", "zylance"),
       $Generated: path.join(ZYLANCE_UI_DIR, "Generated"),
       "@Lib": path.join(ZYLANCE_UI_DIR, "Lib"),

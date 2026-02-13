@@ -43,7 +43,7 @@ internal static class RegisterControllerCodeGenerator
 
                  namespace Zylance.Core.Lib.Gateway.Extensions;
 
-                 /// <summary>
+                  /// <summary>
                   /// Generated router extension methods for registering controllers.
                   /// </summary>
                   public static partial class RouterServiceExtensions

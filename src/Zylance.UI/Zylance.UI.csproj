@@ -11,7 +11,9 @@
     <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn.cmd</YarnExe>
     <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)/bin/yarn</YarnExe>
     <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn</YarnExe>
+  </PropertyGroup>
 
+  <PropertyGroup>
     <!-- Marker files for incremental build tracking -->
     <YarnInstallMarker>$(BaseIntermediateOutputPath)yarn.install.marker</YarnInstallMarker>
     <TscMarker>$(BaseIntermediateOutputPath)tsc.marker</TscMarker>
@@ -36,13 +38,12 @@
 
   <Target Name="CollectSourceFiles">
     <ItemGroup>
-      <SourceFiles Include="Generated/**/*;Lib/**/*;Src/**/*;Public/**/*" />
+      <SourceFiles Include="Generated/**/*;Lib/**/*;src/**/*;Public/**/*" />
       <ConfigFiles Include="package.json;yarn.lock;tsconfig.json;vite.config.ts" />
     </ItemGroup>
   </Target>
 
-  <Target Name="CopyGeneratedContractTS" BeforeTargets="YarnTscDev;YarnBuildProd">
-    <!-- Re-evaluate ContractTSFiles at target execution time to pick up freshly generated files -->
+  <Target Name="CopyGeneratedContractTS">
     <ItemGroup>
       <ContractTSFiles Include="..\Zylance.Contract\Generated\ts\**\*.*" />
     </ItemGroup>
@@ -53,7 +54,7 @@
     />
   </Target>
 
-  <Target Name="YarnInstall" BeforeTargets="Build" Inputs="package.json;yarn.lock" Outputs="$(YarnInstallMarker)">
+  <Target Name="YarnInstall" Inputs="package.json;yarn.lock" Outputs="$(YarnInstallMarker)">
     <MakeDir Directories="$(BaseIntermediateOutputPath)" />
     <Exec Command="$(YarnExe) install" />
     <Touch Files="$(YarnInstallMarker)" AlwaysCreate="true" />
@@ -61,8 +62,8 @@
 
   <Target
     Name="YarnTscDev"
-    AfterTargets="Build"
-    DependsOnTargets="CopyGeneratedContractTS;CollectSourceFiles"
+    BeforeTargets="Build"
+    DependsOnTargets="YarnInstall;CopyGeneratedContractTS;CollectSourceFiles"
     Condition="'$(Configuration)' == 'Debug'"
     Inputs="@(SourceFiles);@(ConfigFiles)"
     Outputs="$(TscMarker)"
@@ -74,8 +75,8 @@
 
   <Target
     Name="YarnBuildProd"
-    AfterTargets="Build"
-    DependsOnTargets="CopyGeneratedContractTS;CollectSourceFiles"
+    BeforeTargets="Build"
+    DependsOnTargets="YarnInstall;CopyGeneratedContractTS;CollectSourceFiles"
     Inputs="@(SourceFiles);@(ConfigFiles)"
     Outputs="$(BuildMarker)"
   >
