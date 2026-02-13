@@ -17,4 +17,9 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.2" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <CSharpier_Check>true</CSharpier_Check>
+    <CSharpier_UnformattedAsWarnings>true</CSharpier_UnformattedAsWarnings>
+  </PropertyGroup>
 </Project>
