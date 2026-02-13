@@ -75,13 +75,13 @@ jobs:
         run: dotnet workload install wasm-tools
 
       - name: Build Core for ${{ matrix.runtime }}
-        run: dotnet build Zylance.Core/Zylance.Core.csproj -c Release -r ${{ matrix.runtime }}
+        run: dotnet build src/Zylance.Core/Zylance.Core.csproj -c Release -r ${{ matrix.runtime }}
 
       - name: Build Contract for ${{ matrix.runtime }}
-        run: dotnet build Zylance.Contract/Zylance.Contract.csproj -c Release -r ${{ matrix.runtime }}
+        run: dotnet build src/Zylance.Contract/Zylance.Contract.csproj -c Release -r ${{ matrix.runtime }}
 
       - name: Build UI for ${{ matrix.runtime }}
-        run: dotnet build Zylance.UI/Zylance.UI.csproj -c Release -r ${{ matrix.runtime }}
+        run: dotnet build src/Zylance.UI/Zylance.UI.csproj -c Release -r ${{ matrix.runtime }}
 
   build-windows:
     name: Build Windows MSI
@@ -106,20 +106,20 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ github.event.inputs.version || github.ref_name }}"
-          dotnet build Zylance.Installer.Windows\Zylance.Installer.Windows.csproj -c Release -p:Version=$($version -replace '^v','') -p:Platform=x64
+          dotnet build installers/Zylance.Installer.Windows/Zylance.Installer.Windows.csproj -c Release -p:Version=$($version -replace '^v','') -p:Platform=x64
 
       - name: Upload MSI artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-msi
-          path: Zylance.Installer.Windows/bin/x64/Release/*.msi
+          path: installers/Zylance.Installer.Windows/bin/x64/Release/*.msi
           if-no-files-found: error
 
       - name: Upload to release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v1
         with:
-          files: Zylance.Installer.Windows/bin/x64/Release/*.msi
+          files: installers/Zylance.Installer.Windows/bin/x64/Release/*.msi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

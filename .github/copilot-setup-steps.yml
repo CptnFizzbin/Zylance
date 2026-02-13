@@ -125,7 +125,7 @@ project_info:
     - path: Zylance.Vault.Remote
       description: Remote vault implementation (future cloud sync)
     
-    - path: Zylance.SourceGenerators
+    - path: tools/Zylance.SourceGenerators
       description: Roslyn source generators for automatic controller registration
     
     - path: Zylance.Core.Tests
@@ -140,7 +140,7 @@ project_info:
     - path: Zylance.Vault.Remote.Tests
       description: Tests for remote vault implementation
     
-    - path: Zylance.Installer.Windows
+    - path: installers/Zylance.Installer.Windows
       description: Windows installer project using WiX Toolset
 
   # Development commands
