@@ -41,7 +41,7 @@ public record ZylanceTestHarness : IAsyncDisposable
     )
     {
         var solutionRoot = FindSolutionRoot();
-        var uiRootPath = Path.Combine(solutionRoot, "Zylance.UI", "dist");
+        var uiRootPath = Path.Combine(solutionRoot, "src", "Zylance.UI", "dist");
         if (!Directory.Exists(uiRootPath))
             throw new DirectoryNotFoundException($"UI root path does not exist: {uiRootPath}");
 
