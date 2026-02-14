@@ -1,4 +1,4 @@
-using Zylance.Desktop.Tests.Lib.Headless;
+using Zylance.Desktop.Tests.TestUtils;
 
 namespace Zylance.Desktop.Tests.Lib;
 

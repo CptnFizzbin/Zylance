@@ -1,7 +1,7 @@
 using Zylance.Contract.Models.File;
 using Zylance.Desktop.Providers;
 
-namespace Zylance.Desktop.Tests.Lib.Headless;
+namespace Zylance.Desktop.Tests.TestUtils;
 
 public delegate Task<string> AsyncPathProvider();
 

@@ -13,6 +13,10 @@ namespace Zylance.Desktop;
 /// <summary>
 /// Hosts the Zylance core and (optionally) a native window and UI server.
 /// </summary>
+/// <param name="config">Configuration for the desktop instance.</param>
+/// <param name="transport">Optional transport implementation (defaults to WebSocket).</param>
+/// <param name="fileProvider">Optional local file provider for headless mode or custom file handling.</param>
+/// <param name="vaultProvider">Optional vault provider for persistent storage.</param>
 public class ZylanceDesktop(
     ZylanceDesktopConfig config,
     ITransport? transport = null,

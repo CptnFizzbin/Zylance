@@ -2,7 +2,7 @@ using Microsoft.Playwright;
 using Zylance.Core;
 using Zylance.Desktop.Config;
 
-namespace Zylance.Desktop.Tests.Lib.Headless;
+namespace Zylance.Desktop.Tests.TestUtils;
 
 public record ZylanceTestHarness : IAsyncDisposable
 {
