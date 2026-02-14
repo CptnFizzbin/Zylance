@@ -31,7 +31,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./src/*"
+        "./Src/*"
       ],
       "@Contract/*": [
         "./Generated/zylance/*"
