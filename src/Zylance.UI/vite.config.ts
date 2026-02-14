@@ -30,8 +30,8 @@ export default defineConfig({
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,
-      routesDirectory: path.join(ZYLANCE_UI_DIR, "src", "Routes"),
-      generatedRouteTree: path.join(ZYLANCE_UI_DIR, "src", "routeTree.gen.ts"),
+      routesDirectory: path.join(ZYLANCE_UI_DIR, "Src", "Routes"),
+      generatedRouteTree: path.join(ZYLANCE_UI_DIR, "Src", "routeTree.gen.ts"),
     }),
     viteReact({
       babel: {

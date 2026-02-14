@@ -10,6 +10,9 @@ using Zylance.Desktop.Transports;
 
 namespace Zylance.Desktop;
 
+/// <summary>
+/// Hosts the Zylance core and (optionally) a native window and UI server.
+/// </summary>
 public class ZylanceDesktop(
     ZylanceDesktopConfig config,
     ITransport? transport = null,
@@ -24,16 +27,20 @@ public class ZylanceDesktop(
     private PhotinoWindow? _window;
     private ZylanceCore? _zylanceCore;
 
+    /// <summary>Whether DisposeAsync has been called.</summary>
     public bool IsDisposed { get; private set; }
 
+    /// <summary>Access to the running ZylanceCore instance. Throws if Start() has not been called.</summary>
     public ZylanceCore ZylanceCore =>
         _zylanceCore
         ?? throw new InvalidOperationException(
             "ZylanceDesktop has not been started. Call Start() before accessing ZylanceCore."
         );
 
+    /// <summary>The configuration used to construct this desktop instance.</summary>
     public ZylanceDesktopConfig Config => config;
 
+    /// <summary>Dispose resources used by the desktop and stop the webserver and window.</summary>
     public async ValueTask DisposeAsync()
     {
         if (_webServer is not null)
@@ -45,6 +52,7 @@ public class ZylanceDesktop(
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>Starts the desktop: web server, window (unless headless), transport and core.</summary>
     public ZylanceDesktop Start()
     {
         if (config.UiServerEnabled)
@@ -78,6 +86,7 @@ public class ZylanceDesktop(
         DisposeAsync().AsTask().Wait();
     }
 
+    /// <summary>Block until the native window is closed (no-op in headless mode).</summary>
     public void WaitForExit()
     {
         _window?.WaitForClose();

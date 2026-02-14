@@ -1,11 +1,7 @@
 using Zylance.Contract.Models.File;
 using Zylance.Desktop.Providers;
 
-<<<<<<<< HEAD:tests/Zylance.Desktop.Tests/TestUtils/HeadlessFileProvider.cs
-namespace Zylance.Desktop.Tests.TestUtils;
-========
 namespace Zylance.Desktop.Tests.Lib.Headless;
->>>>>>>> 2480aa8 (wip):Zylance.Desktop.Tests/Lib/Headless/HeadlessFileProvider.cs
 
 public delegate Task<string> AsyncPathProvider();
 

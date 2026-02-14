@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Zylance.Desktop: Start" type="CompoundRunConfigurationType">
+    <toRun name="Zylance.Desktop: Development" type="LaunchSettings" />
+    <toRun name="Zylance.UI: Start" type="js.build_tools.npm" />
+    <method v="2" />
+  </configuration>
+</component>

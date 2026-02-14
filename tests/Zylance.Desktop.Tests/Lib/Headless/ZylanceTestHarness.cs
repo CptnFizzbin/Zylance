@@ -2,15 +2,12 @@ using Microsoft.Playwright;
 using Zylance.Core;
 using Zylance.Desktop.Config;
 
-<<<<<<<< HEAD:tests/Zylance.Desktop.Tests/TestUtils/ZylanceTestHarness.cs
-namespace Zylance.Desktop.Tests.TestUtils;
-========
 namespace Zylance.Desktop.Tests.Lib.Headless;
->>>>>>>> 2480aa8 (wip):Zylance.Desktop.Tests/Lib/Headless/ZylanceTestHarness.cs
 
 public record ZylanceTestHarness : IAsyncDisposable
 {
-    private string FixturesDir { get; } = Path.Combine(FindSolutionRoot(), "Zylance.Desktop.Tests", "Fixtures");
+    private string FixturesDir { get; } =
+        Path.Combine(FindSolutionRoot(), "tests", "Zylance.Desktop.Tests", "Fixtures");
 
     public required ZylanceDesktop Desktop { get; init; }
     public required HeadlessFileProvider FileProvider { get; init; }
@@ -60,7 +57,7 @@ public record ZylanceTestHarness : IAsyncDisposable
     )
     {
         var solutionRoot = FindSolutionRoot();
-        var uiRootPath = Path.Combine(solutionRoot, "Zylance.UI", "dist");
+        var uiRootPath = Path.Combine(solutionRoot, "src", "Zylance.UI", "dist");
         if (!Directory.Exists(uiRootPath))
             throw new DirectoryNotFoundException($"UI root path does not exist: {uiRootPath}");
 
