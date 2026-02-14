@@ -1,15 +1,14 @@
-import {
-  createContext,
-  type FC,
-  type PropsWithChildren,
-  useCallback,
-  useContext,
-  useState,
-} from "react"
+import { createContext, type FC, type PropsWithChildren, useContext, useState, useMemo } from "react"
 import { ImportDialog } from "@/Components/Import/ImportDialog"
+import type { FileRef } from "@Contract/models/File"
 
 export interface ImportState {
   startImport: () => void
+  reset: () => void
+
+  importFile: FileRef | null
+
+  setImportFile: (fileRef: FileRef) => void
 }
 
 export const ImportContext = createContext<ImportState | null>(null)
@@ -24,14 +23,27 @@ export const useImportService = () => {
 
 export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [importFile, setImportFile] = useState<FileRef | null>(null)
 
-  const startImport = useCallback(() => {
-    setDialogOpen(() => true)
-  }, [])
+  const startImport = () => setDialogOpen(true)
+
+  const reset = () => {
+    setImportFile(null)
+  }
+
+  const state = {
+    startImport,
+    reset,
+
+    importFile,
+    setImportFile,
+  }
+
+  const memoizedChildren = useMemo(() => children, [children])
 
   return (
-    <ImportContext.Provider value={{ startImport }}>
-      {children}
+    <ImportContext.Provider value={state}>
+      {memoizedChildren}
       <ImportDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </ImportContext.Provider>
   )

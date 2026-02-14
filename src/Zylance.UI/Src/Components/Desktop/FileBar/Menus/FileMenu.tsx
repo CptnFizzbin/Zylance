@@ -7,11 +7,13 @@ import type { FC } from "react"
 import { FileBarMenu, type MenuBarMenuProps } from "@/Components/Desktop/FileBar/Menus/MenuBase"
 import { useZylance } from "@/Hooks/UseZylance"
 import InputIcon from "@mui/icons-material/Input"
+import { useImportService } from "@/Contexts/ImportContext"
 
 export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
   onClose,
   ...props
 }) => {
+  const importService = useImportService()
   const { currentVault, zylanceApi } = useZylance()
 
   const onMenuClick = (handler: () => void) => {
@@ -47,7 +49,7 @@ export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
       <Divider />
       <MenuItem
         disabled={!currentVault}
-        onClick={onMenuClick(() => ())}
+        onClick={onMenuClick(() => importService.startImport())}
       >
         <ListItemIcon>
           <InputIcon fontSize="small" />
