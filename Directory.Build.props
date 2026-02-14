@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Deterministic>true</Deterministic>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+    <RepositoryUrl>https://github.com/CptnFizzbin/Zylance</RepositoryUrl>
+
+    <!-- Enable CI-only stricter settings when runner sets CI environment variable -->
+    <ContinuousIntegrationBuild Condition="'$(CI)' != ''">true</ContinuousIntegrationBuild>
+    <TreatWarningsAsErrors Condition="'$(CI)' != ''">true</TreatWarningsAsErrors>
+
+    <!-- Ensure code style/analyzers run as part of build -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+</Project>

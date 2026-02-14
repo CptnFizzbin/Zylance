@@ -3,17 +3,16 @@
 ## Project Overview
 
 Zylance is an open-source finance and budgeting application built with a clean
-architecture approach. The application
-features a desktop interface powered by Photino.NET with a React/TypeScript
-frontend, communicating via Protocol Buffers
+architecture approach. The application features a desktop interface powered by
+Photino.NET with a React/TypeScript frontend, communicating via Protocol Buffers
 over a custom transport layer.
 
 # Notes to Agents
 
 You are encouraged to update this file with any additional instructions or
-guidelines that will help future contributors
-and agents understand the project's architecture, coding standards, and best
-practices. In particular, consider adding:
+guidelines that will help future contributors and agents understand the
+project's architecture, coding standards, and best practices. In particular,
+consider adding:
 
 - solutions to repeated issues (e.g, using the wrong flags for command-line
   tools)
@@ -30,19 +29,30 @@ Before building the project, ensure the following are installed and configured:
 
 ### Core Components
 
-- **Zylance.Core** - Core business logic with controllers, services, and Gateway
-  for message routing
-- **Zylance.Desktop** - Desktop application using Photino.NET for native
-  windowing
-- **Zylance.UI** - React + TypeScript + Vite frontend
-- **Zylance.Contract** - Protocol Buffers message contracts for type-safe
-  communication
-- **Zylance.Vault.Local** - Local vault implementation using Entity Framework
-  Core
-- **Zylance.SourceGenerators** - Source generators for automatic controller
-  registration
-- **Docs** - Project documentation including format specifications and design
-  documents
+- **Docs/** - Project documentation including format specifications and design
+  documents (see `docs/`)
+- src/
+  - **Zylance.Core** - Core business logic with controllers, services, and
+    Gateway for message routing
+  - **Zylance.Desktop** - Desktop application using Photino.NET for native
+    windowing
+  - **Zylance.UI** - React + TypeScript + Vite frontend (see `Zylance.UI/Src`
+    for main code)
+  - **Zylance.Contract** - Protocol Buffers message contracts for type-safe
+    communication; also contains scripts for code generation in
+    `Zylance.Contract/Scripts`
+  - **Zylance.Vault.Local** - Local vault implementation using Entity Framework
+    Core
+  - **Zylance.Vault.Remote** - Remote vault implementation (new, see
+    `Zylance.Vault.Remote/`)
+- tools/
+  - **Zylance.SourceGenerators** - Source generators for automatic controller
+    registration
+- **installers/** - Platform-specific installer projects (e.g.,
+  `Zylance.Installer.Windows/`)
+- **tests/** - All test projects are grouped under `tests/` (e.g.,
+  `Zylance.Core.Tests/`, `Zylance.Vault.Local.Tests/`,
+  `Zylance.Vault.Remote.Tests/`, `Zylance.Desktop.Tests/`)
 
 ### Key Patterns
 
@@ -362,7 +372,7 @@ for (const file of files) {
 }
 
 // Better - use well-named functions to make code self-documenting
-async function processFilesSequentially(files: string[]) {
+async function processFilesSequentially (files: string[]) {
   // Sequential processing prevents file system overload
   for (const file of files) {
     await processFile(file);

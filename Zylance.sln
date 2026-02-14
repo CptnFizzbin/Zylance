@@ -1,25 +1,25 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Desktop", "Zylance.Desktop\Zylance.Desktop.csproj", "{E39B0693-39E5-41F6-8542-87594D671E65}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Desktop", "src\Zylance.Desktop\Zylance.Desktop.csproj", "{E39B0693-39E5-41F6-8542-87594D671E65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Core", "Zylance.Core\Zylance.Core.csproj", "{9C67CCBB-568C-41A4-89C8-6492DB4C1BD2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Core", "src\Zylance.Core\Zylance.Core.csproj", "{9C67CCBB-568C-41A4-89C8-6492DB4C1BD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.UI", "Zylance.UI\Zylance.UI.csproj", "{81D3D7C1-7583-43A6-93D2-654196A533E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.UI", "src\Zylance.UI\Zylance.UI.csproj", "{81D3D7C1-7583-43A6-93D2-654196A533E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Contract", "Zylance.Contract\Zylance.Contract.csproj", "{FA266739-4CFF-4AD7-997A-50D257B68832}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Contract", "src\Zylance.Contract\Zylance.Contract.csproj", "{FA266739-4CFF-4AD7-997A-50D257B68832}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Local", "Zylance.Vault.Local\Zylance.Vault.Local.csproj", "{8C7FD4B8-FB87-4674-BC5E-4FA3AB8F5357}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Local", "src\Zylance.Vault.Local\Zylance.Vault.Local.csproj", "{8C7FD4B8-FB87-4674-BC5E-4FA3AB8F5357}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.SourceGenerators", "Zylance.SourceGenerators\Zylance.SourceGenerators.csproj", "{D16E2F9E-293F-4FAF-9289-5C6FD53348CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.SourceGenerators", "tools\Zylance.SourceGenerators\Zylance.SourceGenerators.csproj", "{D16E2F9E-293F-4FAF-9289-5C6FD53348CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Remote", "Zylance.Vault.Remote\Zylance.Vault.Remote.csproj", "{9ED44B59-D740-4F6A-BED9-79A1F8B9614B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Remote", "src\Zylance.Vault.Remote\Zylance.Vault.Remote.csproj", "{9ED44B59-D740-4F6A-BED9-79A1F8B9614B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Remote.Tests", "Zylance.Vault.Remote.Tests\Zylance.Vault.Remote.Tests.csproj", "{16AB785C-F14B-439D-A4AC-F173FB2DBA51}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Remote.Tests", "tests\Zylance.Vault.Remote.Tests\Zylance.Vault.Remote.Tests.csproj", "{16AB785C-F14B-439D-A4AC-F173FB2DBA51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Core.Tests", "Zylance.Core.Tests\Zylance.Core.Tests.csproj", "{0FFB7C1F-3B18-4213-B76F-9836518DB649}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Core.Tests", "tests\Zylance.Core.Tests\Zylance.Core.Tests.csproj", "{0FFB7C1F-3B18-4213-B76F-9836518DB649}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Local.Tests", "Zylance.Vault.Local.Tests\Zylance.Vault.Local.Tests.csproj", "{6FC908AB-5E7A-4123-9C27-31EF992D4A56}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Vault.Local.Tests", "tests\Zylance.Vault.Local.Tests\Zylance.Vault.Local.Tests.csproj", "{6FC908AB-5E7A-4123-9C27-31EF992D4A56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Desktop.Tests", "Zylance.Desktop.Tests\Zylance.Desktop.Tests.csproj", "{0EA51A53-0F23-4E55-AB72-0AB7DBCEAF3C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zylance.Desktop.Tests", "tests\Zylance.Desktop.Tests\Zylance.Desktop.Tests.csproj", "{0EA51A53-0F23-4E55-AB72-0AB7DBCEAF3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

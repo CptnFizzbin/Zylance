@@ -1,0 +1,87 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- RID-agnostic library - consuming project specifies RID (browser-wasm, win-x64, etc) -->
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)\yarn.cmd</YarnExe>
+    <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn.cmd</YarnExe>
+    <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)/bin/yarn</YarnExe>
+    <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn</YarnExe>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Marker files for incremental build tracking -->
+    <YarnInstallMarker>$(BaseIntermediateOutputPath)yarn.install.marker</YarnInstallMarker>
+    <TscMarker>$(BaseIntermediateOutputPath)tsc.marker</TscMarker>
+    <BuildMarker>$(BaseIntermediateOutputPath)build.marker</BuildMarker>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Zylance.Contract\Zylance.Contract.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="tsconfig.tsbuildinfo" />
+  </ItemGroup>
+
+  <Target Name="CleanGenerated" AfterTargets="Clean">
+    <RemoveDir Directories="Generated" />
+    <RemoveDir Directories="dist" />
+    <Delete Files="$(YarnInstallMarker);$(TscMarker);$(BuildMarker)" />
+  </Target>
+
+  <Target Name="CollectSourceFiles">
+    <ItemGroup>
+      <SourceFiles Include="Generated/**/*;Lib/**/*;src/**/*;Public/**/*" />
+      <ConfigFiles Include="package.json;yarn.lock;tsconfig.json;vite.config.ts" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="CopyGeneratedContractTS">
+    <ItemGroup>
+      <ContractTSFiles Include="..\Zylance.Contract\Generated\ts\**\*.*" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(ContractTSFiles)"
+      DestinationFiles="@(ContractTSFiles->'Generated\%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true"
+    />
+  </Target>
+
+  <Target Name="YarnInstall" Inputs="package.json;yarn.lock" Outputs="$(YarnInstallMarker)">
+    <MakeDir Directories="$(BaseIntermediateOutputPath)" />
+    <Exec Command="$(YarnExe) install" />
+    <Touch Files="$(YarnInstallMarker)" AlwaysCreate="true" />
+  </Target>
+
+  <Target
+    Name="YarnTscDev"
+    BeforeTargets="Build"
+    DependsOnTargets="YarnInstall;CopyGeneratedContractTS;CollectSourceFiles"
+    Condition="'$(Configuration)' == 'Debug'"
+    Inputs="@(SourceFiles);@(ConfigFiles)"
+    Outputs="$(TscMarker)"
+  >
+    <MakeDir Directories="$(BaseIntermediateOutputPath)" />
+    <Exec Command="$(YarnExe) tsc" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1" />
+    <Touch Files="$(TscMarker)" AlwaysCreate="true" />
+  </Target>
+
+  <Target
+    Name="YarnBuildProd"
+    BeforeTargets="Build"
+    DependsOnTargets="YarnInstall;CopyGeneratedContractTS;CollectSourceFiles"
+    Inputs="@(SourceFiles);@(ConfigFiles)"
+    Outputs="$(BuildMarker)"
+  >
+    <MakeDir Directories="$(BaseIntermediateOutputPath)" />
+    <Exec Command="$(YarnExe) build:ui" EnvironmentVariables="NO_COLOR=1; NODE_DISABLE_COLORS=1" />
+    <Touch Files="$(BuildMarker)" AlwaysCreate="true" />
+  </Target>
+</Project>

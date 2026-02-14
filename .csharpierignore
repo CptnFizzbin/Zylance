@@ -10,6 +10,3 @@
 
 # Ignore node_modules
 **/node_modules/**
-
-# Keep generated contract code unformatted
-Zylance.Contract/zylance/**

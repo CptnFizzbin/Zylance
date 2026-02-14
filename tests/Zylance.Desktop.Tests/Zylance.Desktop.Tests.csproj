@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Zylance.Desktop.Tests</RootNamespace>
+    <TargetFramework>net10.0</TargetFramework>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="Microsoft.Playwright.Xunit.v3" Version="1.58.0" />
+    <PackageReference Include="xunit.v3.mtp-v2" Version="3.2.2" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Zylance.Core\Zylance.Core.csproj" />
+    <ProjectReference Include="..\..\src\Zylance.UI\Zylance.UI.csproj" />
+    <ProjectReference Include="..\..\src\Zylance.Vault.Local\Zylance.Vault.Local.csproj" />
+    <ProjectReference Include="..\..\src\Zylance.Desktop\Zylance.Desktop.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>
