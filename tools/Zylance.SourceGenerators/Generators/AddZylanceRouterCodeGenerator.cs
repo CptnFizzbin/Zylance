@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -34,7 +32,7 @@ internal static class AddZylanceRouterCodeGenerator
                  using System;
                  using Microsoft.Extensions.DependencyInjection;
                  using Microsoft.Extensions.DependencyInjection.Extensions;
-                 using Zylance.Core.Lib.Gateway.Services;
+                 using Zylance.Core.Router.Services;
                  {{ForEach(namespaces, ns => $"using {ns.ToDisplayString()};")}}
 
                  namespace Zylance.Core.Lib.Gateway.Extensions;

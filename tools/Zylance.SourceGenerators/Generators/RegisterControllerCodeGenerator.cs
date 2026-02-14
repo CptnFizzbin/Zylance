@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -37,8 +36,8 @@ internal static class RegisterControllerCodeGenerator
 
                  using System;
                  using System.Threading.Tasks;
-                 using Zylance.Core.Lib.Gateway.Utils;
-                 using Zylance.Core.Lib.Gateway.Services;
+                 using Zylance.Core.Gateway.Utils;
+                 using Zylance.Core.Router.Services;
                  {{ForEach(namespaces, ns => $"using {ns.ToDisplayString()};")}}
 
                  namespace Zylance.Core.Lib.Gateway.Extensions;

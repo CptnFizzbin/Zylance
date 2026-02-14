@@ -1,6 +1,5 @@
 using Photino.NET;
 using Zylance.Contract.Models.File;
-using Zylance.Desktop.Lib;
 
 namespace Zylance.Desktop.Providers;
 
@@ -14,7 +13,7 @@ public class DesktopFileProvider(PhotinoWindow window, string appDataPath, strin
     : LocalFileProvider(appDataPath, tempDataPath)
 {
     /// <summary>
-    /// Shows an open-file dialog and returns a FileRef for the selected file.
+    ///     Shows an open-file dialog and returns a FileRef for the selected file.
     /// </summary>
     /// <param name="title">Optional dialog title.</param>
     /// <param name="filters">File filter options.</param>
@@ -38,7 +37,7 @@ public class DesktopFileProvider(PhotinoWindow window, string appDataPath, strin
     }
 
     /// <summary>
-    /// Shows a save-file dialog and returns a FileRef for the chosen path.
+    ///     Shows a save-file dialog and returns a FileRef for the chosen path.
     /// </summary>
     /// <param name="title">Optional dialog title.</param>
     /// <param name="defaultPath">Suggested default path.</param>

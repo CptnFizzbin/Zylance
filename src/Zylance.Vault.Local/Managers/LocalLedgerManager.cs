@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Zylance.Contract.Api.Ledger;
 using Zylance.Contract.Models.Ledger;
-using Zylance.Core.Lib.Vault;
-using Zylance.Core.Lib.Vault.Managers;
+using Zylance.Core.Vault.Managers;
+using Zylance.Core.Vault.Models;
 using Zylance.Vault.Local.Context;
 using Zylance.Vault.Local.Entities;
 
@@ -18,7 +18,10 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
     /// </summary>
     /// <param name="recordId">The ledger entry ID</param>
     /// <returns>The ledger entry data</returns>
-    /// <exception cref="KeyNotFoundException">Thrown when the ledger entry is not found</exception>
+    /// <exception cref="KeyNotFoundException">
+    ///     Thrown when the ledger entry is not
+    ///     found
+    /// </exception>
     public async Task<LedgerEntryData> GetAsync(Guid recordId)
     {
         var entity = await dbContext.LedgerEntries.FindAsync(recordId);
@@ -28,7 +31,8 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
     }
 
     /// <summary>
-    ///     Saves a ledger entry. Creates a new entry if the ID doesn't exist, or updates an existing one.
+    ///     Saves a ledger entry. Creates a new entry if the ID doesn't exist, or
+    ///     updates an existing one.
     /// </summary>
     /// <param name="record">The ledger entry data to save</param>
     /// <returns>The saved ledger entry data</returns>
@@ -71,7 +75,10 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
     /// </summary>
     /// <param name="recordId">The ledger entry ID to delete</param>
     /// <returns>The deleted ledger entry data</returns>
-    /// <exception cref="KeyNotFoundException">Thrown when the ledger entry is not found</exception>
+    /// <exception cref="KeyNotFoundException">
+    ///     Thrown when the ledger entry is not
+    ///     found
+    /// </exception>
     public async Task<LedgerEntryData> DeleteAsync(Guid recordId)
     {
         var entity = await dbContext.LedgerEntries.FindAsync(recordId);
@@ -85,9 +92,12 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
 
     /// <summary>
     ///     Lists ledger entries with optional filtering and pagination.
-    ///     Why use LINQ queries? EF Core translates LINQ expressions into efficient SQL queries,
-    ///     allowing us to work with strongly-typed C# expressions while getting database-level
-    ///     performance benefits like filtering and sorting before loading data into memory.
+    ///     Why use LINQ queries? EF Core translates LINQ expressions into efficient
+    ///     SQL queries,
+    ///     allowing us to work with strongly-typed C# expressions while getting
+    ///     database-level
+    ///     performance benefits like filtering and sorting before loading data into
+    ///     memory.
     /// </summary>
     /// <param name="filter">Optional filter criteria for pagination and filtering</param>
     /// <returns>A cursor-based paginated list of ledger entries</returns>
@@ -166,8 +176,10 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
 
     /// <summary>
     ///     Applies filter criteria to a ledger entries query.
-    ///     Why separate this method? Following DRY (Don't Repeat Yourself) principle - this logic
-    ///     is shared between ListAsync and SearchAsync, so extracting it reduces duplication and
+    ///     Why separate this method? Following DRY (Don't Repeat Yourself) principle -
+    ///     this logic
+    ///     is shared between ListAsync and SearchAsync, so extracting it reduces
+    ///     duplication and
     ///     makes the code easier to maintain and test.
     /// </summary>
     /// <param name="query">The base query to apply filters to</param>

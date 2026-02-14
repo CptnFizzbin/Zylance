@@ -1,5 +1,5 @@
 using Zylance.Contract.Models.File;
-using Zylance.Core.Lib;
+using Zylance.Core.Platform.Interfaces;
 
 namespace Zylance.Core.Tests.Mocks;
 

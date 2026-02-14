@@ -1,11 +1,10 @@
 using Photino.NET;
 using Zylance.Core;
-using Zylance.Core.Lib;
-using Zylance.Core.Lib.Gateway;
-using Zylance.Core.Lib.Vault;
+using Zylance.Core.Platform.Interfaces;
+using Zylance.Core.Vault.Interfaces;
 using Zylance.Desktop.Config;
-using Zylance.Desktop.Lib;
 using Zylance.Desktop.Providers;
+using Zylance.Desktop.Services;
 using Zylance.Desktop.Transports;
 
 namespace Zylance.Desktop;
@@ -20,7 +19,7 @@ public class ZylanceDesktop(
     private ILocalFileProvider? _fileProvider = fileProvider;
     private ITransport? _transport = transport;
     private IVaultProvider? _vaultProvider = vaultProvider;
-    private ZylanceInternalServer? _webServer;
+    private WebServerService? _webServer;
     private PhotinoWindow? _window;
     private ZylanceCore? _zylanceCore;
 
@@ -84,10 +83,10 @@ public class ZylanceDesktop(
             .Load(config.UiServerUrl);
     }
 
-    private ZylanceInternalServer StartWebServer()
+    private WebServerService StartWebServer()
     {
         Console.WriteLine($"Starting web server on port {config.UiPort}...");
-        var server = new ZylanceInternalServer(config);
+        var server = new WebServerService(config);
         server.StartAsync();
         return server;
     }

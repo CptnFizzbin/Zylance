@@ -1,10 +1,11 @@
 using Fleck;
-using Zylance.Core.Lib.Gateway;
+using Zylance.Core.Platform.Interfaces;
 
 namespace Zylance.Desktop.Transports;
 
 /// <summary>
-/// A simple WebSocket-based ITransport implementation for local UI connections.
+///     A simple WebSocket-based ITransport implementation for local UI
+///     connections.
 /// </summary>
 public class WebsocketTransport : ITransport, IDisposable
 {
@@ -13,7 +14,7 @@ public class WebsocketTransport : ITransport, IDisposable
     private Action<string>? _receiveCallback;
 
     /// <summary>
-    /// Initializes a new WebsocketTransport listening on the specified port.
+    ///     Initializes a new WebsocketTransport listening on the specified port.
     /// </summary>
     /// <param name="port">Port to bind the WebSocket server to.</param>
     public WebsocketTransport(int port)
@@ -50,7 +51,7 @@ public class WebsocketTransport : ITransport, IDisposable
     }
 
     /// <summary>
-    /// Disposes the transport and closes any active WebSocket connection.
+    ///     Disposes the transport and closes any active WebSocket connection.
     /// </summary>
     public void Dispose()
     {
@@ -61,7 +62,7 @@ public class WebsocketTransport : ITransport, IDisposable
     }
 
     /// <summary>
-    /// Sends a serialized message to the connected WebSocket client, if any.
+    ///     Sends a serialized message to the connected WebSocket client, if any.
     /// </summary>
     /// <param name="message">The message to send.</param>
     public void Send(string message)
@@ -78,7 +79,7 @@ public class WebsocketTransport : ITransport, IDisposable
     }
 
     /// <summary>
-    /// Registers a callback to receive messages from the WebSocket client.
+    ///     Registers a callback to receive messages from the WebSocket client.
     /// </summary>
     /// <param name="callback">Callback invoked with the received message string.</param>
     public void Receive(Action<string> callback)

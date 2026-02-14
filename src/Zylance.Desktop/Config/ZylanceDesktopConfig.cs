@@ -1,4 +1,4 @@
-using static Zylance.Desktop.Lib.WebUtils;
+using static Zylance.Desktop.Utils.WebUtils;
 
 namespace Zylance.Desktop.Config;
 

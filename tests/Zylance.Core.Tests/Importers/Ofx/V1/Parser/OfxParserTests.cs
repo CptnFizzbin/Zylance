@@ -1,5 +1,5 @@
 using Zylance.Core.Importers.Ofx.V1;
-using Zylance.Core.Lib.Extensions;
+using Zylance.Core.Tests.Extensions;
 using Zylance.Core.Tests.Fixtures;
 
 namespace Zylance.Core.Tests.Importers.Ofx.V1.Parser;

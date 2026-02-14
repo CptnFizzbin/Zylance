@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using Zylance.Core.Lib.Extensions;
+using Zylance.Core.Importers.Ofx.Extensions;
 
 namespace Zylance.Core.Importers.Ofx.V1.Raw;
 

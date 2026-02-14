@@ -1,13 +1,14 @@
 using Microsoft.EntityFrameworkCore;
-using Zylance.Core.Lib.Vault;
-using Zylance.Core.Lib.Vault.Managers;
+using Zylance.Core.Vault.Interfaces;
+using Zylance.Core.Vault.Managers;
 using Zylance.Vault.Local.Context;
 using Zylance.Vault.Local.Managers;
 
 namespace Zylance.Vault.Local;
 
 /// <summary>
-///     Local vault implementation using SQLite database through Entity Framework Core.
+///     Local vault implementation using SQLite database through Entity Framework
+///     Core.
 /// </summary>
 public class LocalVault(LocalVaultDbContext dbContext) : IVault
 {
@@ -27,19 +28,21 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     public IMetadataManager Metadata { get; } = new LocalMetadataManager(dbContext);
 
     /// <summary>
-    /// Unique identifier for this vault instance.
+    ///     Unique identifier for this vault instance.
     /// </summary>
     public Guid VaultId { get; } = Guid.CreateVersion7();
 
     /// <summary>
-    /// Indicates whether the vault is locked for modifications.
+    ///     Indicates whether the vault is locked for modifications.
     /// </summary>
     public bool Locked => false; // TODO: Implement lock state management
 
     /// <summary>
     ///     Creates a new transactional scope for vault operations.
-    ///     Why reuse the connection? Creating new database connections is expensive and can
-    ///     exhaust the connection pool. SQLite handles transaction isolation at the connection
+    ///     Why reuse the connection? Creating new database connections is expensive
+    ///     and can
+    ///     exhaust the connection pool. SQLite handles transaction isolation at the
+    ///     connection
     ///     level, so we can safely reuse the same connection with nested transactions.
     /// </summary>
     public IVaultScope CreateScope()
@@ -52,7 +55,8 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     }
 
     /// <summary>
-    /// Executes the provided action within a transactional vault scope; commits on success and rolls back on failure.
+    ///     Executes the provided action within a transactional vault scope; commits on
+    ///     success and rolls back on failure.
     /// </summary>
     /// <param name="action">Action to execute within the scope.</param>
     public async Task WithScope(Func<IVaultScope, Task> action)
@@ -77,7 +81,8 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>A new LocalVault instance</returns>
     /// <exception cref="NonZylanceDatabaseException">
-    ///     Thrown when the database exists but does not contain the _zylance_ marker table
+    ///     Thrown when the database exists but does not contain the _zylance_ marker
+    ///     table
     /// </exception>
     public static async Task<LocalVault> FromFile(string filePath, CancellationToken cancellationToken = default)
     {
@@ -88,9 +93,7 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
             var fileExists = File.Exists(filePath);
 
             if (fileExists)
-            {
                 await AssertZylanceVault(dbContext, filePath, cancellationToken);
-            }
 
             await dbContext.Database.MigrateAsync(cancellationToken);
 
@@ -111,9 +114,7 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     {
         var canConnect = await dbContext.Database.CanConnectAsync(cancellationToken);
         if (!canConnect)
-        {
             throw NonZylanceDatabaseException.InvalidFile(filePath);
-        }
 
         var connection = dbContext.Database.GetDbConnection();
         try

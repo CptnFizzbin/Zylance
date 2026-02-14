@@ -1,21 +1,35 @@
 using Photino.NET;
 using Zylance.Contract.Lib.Envelope;
-using Zylance.Core.Lib.Gateway;
-using Zylance.Core.Lib.Gateway.Utils;
+using Zylance.Core.Gateway.Utils;
+using Zylance.Core.Platform.Interfaces;
 
 namespace Zylance.Desktop.Transports;
 
 /// <summary>
-///     Desktop implementation of <see cref="ITransport" /> using Photino.NET for native window communication.
-///     Provides bidirectional message passing between the .NET backend and the embedded web UI.
+///     Desktop implementation of <see cref="ITransport" /> using Photino.NET for
+///     native window communication.
+///     Provides bidirectional message passing between the .NET backend and the
+///     embedded web UI.
 /// </summary>
 /// <remarks>
 ///     This transport implementation:
 ///     <list type="bullet">
-///         <item>Uses Photino's web message API to communicate with the embedded browser</item>
-///         <item>Handles special "Desktop:" prefixed events for window management operations</item>
-///         <item>Supports a single registered message handler for received messages</item>
-///         <item>Automatically deserializes messages to validate Gateway envelope format</item>
+///         <item>
+///             Uses Photino's web message API to communicate with the embedded
+///             browser
+///         </item>
+///         <item>
+///             Handles special "Desktop:" prefixed events for window management
+///             operations
+///         </item>
+///         <item>
+///             Supports a single registered message handler for received
+///             messages
+///         </item>
+///         <item>
+///             Automatically deserializes messages to validate Gateway envelope
+///             format
+///         </item>
 ///     </list>
 /// </remarks>
 public class PhotinoTransport : ITransport
@@ -24,11 +38,13 @@ public class PhotinoTransport : ITransport
     private Action<string>? _messageHandler;
 
     /// <summary>
-    ///     Initializes a new instance of <see cref="PhotinoTransport" /> for the specified Photino window.
+    ///     Initializes a new instance of <see cref="PhotinoTransport" /> for the
+    ///     specified Photino window.
     /// </summary>
     /// <param name="window">The Photino window instance to use for message transport.</param>
     /// <remarks>
-    ///     Automatically registers a web message handler with the Photino window to receive messages from the UI.
+    ///     Automatically registers a web message handler with the Photino window to
+    ///     receive messages from the UI.
     /// </remarks>
     public PhotinoTransport(PhotinoWindow window)
     {
@@ -48,10 +64,15 @@ public class PhotinoTransport : ITransport
     /// <summary>
     ///     Registers a callback to receive messages from the UI layer.
     /// </summary>
-    /// <param name="callback">The callback function to invoke when a message is received from the UI.</param>
+    /// <param name="callback">
+    ///     The callback function to invoke when a message is
+    ///     received from the UI.
+    /// </param>
     /// <remarks>
-    ///     Only one callback can be registered at a time. Calling this method will replace any previously registered callback.
-    ///     Messages with "Desktop:" event prefix are handled internally by <see cref="HandleDesktopEvent" /> and will not be
+    ///     Only one callback can be registered at a time. Calling this method will
+    ///     replace any previously registered callback.
+    ///     Messages with "Desktop:" event prefix are handled internally by
+    ///     <see cref="HandleDesktopEvent" /> and will not be
     ///     forwarded to the callback.
     /// </remarks>
     public void Receive(Action<string> callback)
@@ -61,13 +82,19 @@ public class PhotinoTransport : ITransport
 
     /// <summary>
     ///     Internal handler for web messages received from the Photino window.
-    ///     Deserializes the message and routes it appropriately based on whether it's a desktop-specific event.
+    ///     Deserializes the message and routes it appropriately based on whether it's
+    ///     a desktop-specific event.
     /// </summary>
-    /// <param name="sender">The sender of the web message (typically the Photino window).</param>
+    /// <param name="sender">
+    ///     The sender of the web message (typically the Photino
+    ///     window).
+    /// </param>
     /// <param name="message">The raw message string received from the UI.</param>
     /// <remarks>
-    ///     Messages with "Desktop:" event prefix are handled internally for window management.
-    ///     All other messages are forwarded to the registered message handler if one exists.
+    ///     Messages with "Desktop:" event prefix are handled internally for window
+    ///     management.
+    ///     All other messages are forwarded to the registered message handler if one
+    ///     exists.
     /// </remarks>
     private void HandleWebMessageReceived(object? sender, string message)
     {
@@ -84,7 +111,10 @@ public class PhotinoTransport : ITransport
     /// <summary>
     ///     Handles desktop-specific events that control window behavior.
     /// </summary>
-    /// <param name="payload">The event payload containing the desktop event name and optional data.</param>
+    /// <param name="payload">
+    ///     The event payload containing the desktop event name and
+    ///     optional data.
+    /// </param>
     private void HandleDesktopEvent(EventPayload payload)
     {
         Console.WriteLine("Intercepted desktop event: " + payload.EventName);

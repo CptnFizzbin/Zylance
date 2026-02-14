@@ -1,17 +1,18 @@
-using Zylance.Core.Lib;
-using Zylance.Core.Lib.Vault;
+using Zylance.Core.Platform.Interfaces;
+using Zylance.Core.Vault.Interfaces;
 using Zylance.Vault.Local;
 
 namespace Zylance.Desktop.Providers;
 
 /// <summary>
-/// Desktop implementation of <see cref="IVaultProvider"/> that opens and creates local vault files.
+///     Desktop implementation of <see cref="IVaultProvider" /> that opens and
+///     creates local vault files.
 /// </summary>
 /// <param name="fileSystem">Local file provider used to select and manage files.</param>
 public class DesktopVaultProvider(ILocalFileProvider fileSystem) : IVaultProvider
 {
     /// <summary>
-    /// Opens an existing vault selected by the user.
+    ///     Opens an existing vault selected by the user.
     /// </summary>
     public async Task<IVault> OpenVault()
     {
@@ -27,7 +28,7 @@ public class DesktopVaultProvider(ILocalFileProvider fileSystem) : IVaultProvide
     }
 
     /// <summary>
-    /// Creates a new vault file at a user-selected location.
+    ///     Creates a new vault file at a user-selected location.
     /// </summary>
     public async Task<IVault> CreateVault()
     {

@@ -1,4 +1,4 @@
-using Zylance.Core.Lib.Extensions;
+using Zylance.Core.Tests.Extensions;
 using Zylance.Core.Tests.Fixtures;
 using OfxRawElement = Zylance.Core.Importers.Ofx.V1.Raw.OfxRawElement;
 using OfxRawFile = Zylance.Core.Importers.Ofx.V1.Raw.OfxRawFile;

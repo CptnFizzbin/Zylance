@@ -1,11 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Zylance.Core.App.Services;
-using Zylance.Core.Lib;
-using Zylance.Core.Lib.Gateway;
+using Zylance.Core.Gateway.Services;
 using Zylance.Core.Lib.Gateway.Extensions;
-using Zylance.Core.Lib.Gateway.Services;
-using Zylance.Core.Lib.Vault;
+using Zylance.Core.Platform.Interfaces;
+using Zylance.Core.Router.Services;
+using Zylance.Core.System.Services;
+using Zylance.Core.Vault.Context;
+using Zylance.Core.Vault.Interfaces;
+using Zylance.Core.Vault.Services;
 
 namespace Zylance.Core;
 
@@ -62,7 +64,7 @@ public class ZylanceCore
     }
 
     /// <summary>
-    /// Gets the initialized GatewayService instance.
+    ///     Gets the initialized GatewayService instance.
     /// </summary>
     public GatewayService Gateway { get; }
 }

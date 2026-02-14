@@ -1,6 +1,6 @@
 using Zylance.Contract.Models.File;
+using Zylance.Core.Importers.Interfaces;
 using Zylance.Core.Importers.Ofx;
-using Zylance.Core.Lib.Importers;
 
 namespace Zylance.Core.Tests.Importers;
 
@@ -45,7 +45,7 @@ public class OfxImporterTests
         var extensions = _importer.SupportedExtensions;
 
         // Assert
-        Assert.IsType<IReadOnlyList<(string, string[])>>(extensions, exactMatch: false);
+        Assert.IsType<IReadOnlyList<(string, string[])>>(extensions, false);
     }
 
     [Fact]
@@ -116,6 +116,6 @@ public class OfxImporterTests
     public void OfxImporter_ImplementsIImporter()
     {
         // Act & Assert
-        Assert.IsType<IImporter>(_importer, exactMatch: false);
+        Assert.IsType<IImporter>(_importer, false);
     }
 }

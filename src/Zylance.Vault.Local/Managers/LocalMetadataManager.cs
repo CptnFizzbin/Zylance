@@ -1,4 +1,4 @@
-using Zylance.Core.Lib.Vault.Managers;
+using Zylance.Core.Vault.Managers;
 using Zylance.Vault.Local.Context;
 using Zylance.Vault.Local.Entities;
 
@@ -10,7 +10,7 @@ namespace Zylance.Vault.Local.Managers;
 public class LocalMetadataManager(LocalVaultDbContext dbContext) : IMetadataManager
 {
     /// <summary>
-    /// Gets a metadata value by key from the marker table.
+    ///     Gets a metadata value by key from the marker table.
     /// </summary>
     /// <param name="key">Metadata key to retrieve.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
@@ -21,7 +21,7 @@ public class LocalMetadataManager(LocalVaultDbContext dbContext) : IMetadataMana
     }
 
     /// <summary>
-    /// Sets a metadata key/value pair in the marker table.
+    ///     Sets a metadata key/value pair in the marker table.
     /// </summary>
     /// <param name="key">Metadata key to set.</param>
     /// <param name="value">Value to store.</param>

@@ -23,6 +23,7 @@
   <!-- Collect UI dist files for incremental build tracking -->
   <ItemGroup>
     <UIDistFiles Include="..\Zylance.UI\dist\**\*" />
+    <UIDistFiles Remove="..\Zylance.UI\dist\**" />
   </ItemGroup>
 
   <Target

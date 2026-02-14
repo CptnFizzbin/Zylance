@@ -193,6 +193,8 @@ function generateCSharp (actions: ActionOrEvent[], events: ActionOrEvent[]): str
 
     namespace Zylance.Contract;
 
+    #pragma warning disable CS1591 // Disable missing XML comment warnings for auto-generated code
+
     /// <summary>
     /// Type-safe action and event name constants extracted from Protocol Buffer definitions.
     /// </summary>
@@ -214,6 +216,8 @@ function generateCSharp (actions: ActionOrEvent[], events: ActionOrEvent[]): str
             ${eventConstants.join("\n            ")}
         }
     }
+
+    #pragma warning restore CS1591
   `)
 }
 

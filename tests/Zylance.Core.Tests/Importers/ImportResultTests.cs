@@ -1,4 +1,4 @@
-using Zylance.Core.Lib.Importers;
+using Zylance.Core.Importers.Models;
 
 namespace Zylance.Core.Tests.Importers;
 

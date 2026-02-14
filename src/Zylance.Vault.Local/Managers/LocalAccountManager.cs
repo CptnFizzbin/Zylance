@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Zylance.Contract.Models.Account;
-using Zylance.Core.Lib.Vault;
-using Zylance.Core.Lib.Vault.Managers;
+using Zylance.Core.Vault.Managers;
+using Zylance.Core.Vault.Models;
 using Zylance.Vault.Local.Context;
 using Zylance.Vault.Local.Entities;
 
@@ -27,7 +27,8 @@ public class LocalAccountManager(LocalVaultDbContext dbContext) : IAccountManage
     }
 
     /// <summary>
-    ///     Saves an account. Creates a new account if the ID doesn't exist, or updates an existing one.
+    ///     Saves an account. Creates a new account if the ID doesn't exist, or updates
+    ///     an existing one.
     /// </summary>
     /// <param name="record">The account data to save</param>
     /// <returns>The saved account data</returns>
@@ -90,7 +91,8 @@ public class LocalAccountManager(LocalVaultDbContext dbContext) : IAccountManage
 
     /// <summary>
     ///     Converts an AccountEntity to AccountData.
-    ///     Why this pattern? In clean architecture, we separate our domain models (AccountData) from
+    ///     Why this pattern? In clean architecture, we separate our domain models
+    ///     (AccountData) from
     ///     our persistence models (AccountEntity). This allows us to:
     ///     - Keep database concerns out of the core business logic
     ///     - Change database structure without affecting the API contract

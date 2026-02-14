@@ -1,6 +1,6 @@
 using Zylance.Contract.Lib.Envelope;
-using Zylance.Core.Lib.Gateway;
-using Zylance.Core.Lib.Gateway.Utils;
+using Zylance.Core.Gateway.Utils;
+using Zylance.Core.Platform.Interfaces;
 
 namespace Zylance.Core.Tests.Mocks;
 
