@@ -2,25 +2,16 @@ import AddIcon from "@mui/icons-material/Add"
 import CloseIcon from "@mui/icons-material/Close"
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
 import FolderOpenIcon from "@mui/icons-material/FolderOpen"
-import {
-  Divider,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Typography,
-} from "@mui/material"
+import { Divider, ListItemIcon, ListItemText, MenuItem, Typography } from "@mui/material"
 import type { FC } from "react"
-import {
-  FileBarMenu,
-  type MenuBarMenuProps,
-} from "@/Components/Desktop/FileBar/Menus/MenuBase"
-import { useZylanceApi } from "@/Hooks/UseZylance"
+import { FileBarMenu, type MenuBarMenuProps } from "@/Components/Desktop/FileBar/Menus/MenuBase"
+import { useZylance } from "@/Hooks/UseZylance"
 
 export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
   onClose,
   ...props
 }) => {
-  const zylance = useZylanceApi()
+  const { currentVault, zylanceApi } = useZylance()
 
   const onMenuClick = (handler: () => void) => {
     return () => {
@@ -31,26 +22,29 @@ export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
 
   return (
     <FileBarMenu {...props} label={"File"} onClose={onClose}>
-      <MenuItem onClick={onMenuClick(() => zylance.vault.createVault())}>
+      <MenuItem onClick={onMenuClick(() => zylanceApi.vault.createVault())}>
         <ListItemIcon>
           <AddIcon fontSize="small" />
         </ListItemIcon>
         <ListItemText>New Vault</ListItemText>
       </MenuItem>
-      <MenuItem onClick={onMenuClick(() => zylance.vault.openVault())}>
+      <MenuItem onClick={onMenuClick(() => zylanceApi.vault.openVault())}>
         <ListItemIcon>
           <FolderOpenIcon fontSize="small" />
         </ListItemIcon>
         <ListItemText>Open Vault</ListItemText>
       </MenuItem>
-      <MenuItem onClick={onMenuClick(() => zylance.vault.closeVault())}>
+      <MenuItem
+        disabled={!currentVault}
+        onClick={onMenuClick(() => zylanceApi.vault.closeVault())}
+      >
         <ListItemIcon>
           <CloseIcon fontSize="small" />
         </ListItemIcon>
         <ListItemText>Close Vault</ListItemText>
       </MenuItem>
       <Divider />
-      <MenuItem onClick={onMenuClick(() => zylance.desktop.emitExit())}>
+      <MenuItem onClick={onMenuClick(() => zylanceApi.desktop.emitExit())}>
         <ListItemIcon>
           <ExitToAppIcon fontSize="small" />
         </ListItemIcon>

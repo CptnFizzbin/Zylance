@@ -6,6 +6,9 @@ namespace Zylance.Desktop.Tests.TestUtils;
 
 public record ZylanceTestHarness : IAsyncDisposable
 {
+    private string FixturesDir { get; } =
+        Path.Combine(FindSolutionRoot(), "tests", "Zylance.Desktop.Tests", "Fixtures");
+
     public required ZylanceDesktop Desktop { get; init; }
     public required HeadlessFileProvider FileProvider { get; init; }
     public required IBrowser Browser { get; init; }
@@ -17,8 +20,21 @@ public record ZylanceTestHarness : IAsyncDisposable
     public int WsPort => Desktop.Config.WsPort;
 
     public string WsUrl => Desktop.Config.WebSocketUrl;
+
+    /// <summary>
+    ///     The directory where the app stores temporary data during tests.
+    ///     This is a unique temp directory created for each test run, and is
+    ///     automatically cleaned up when the test harness is disposed.
+    /// </summary>
     public string TempDataDir => Desktop.Config.TmpDataPath;
+
+    /// <summary>
+    ///     The directory where the app stores its data during tests. This is a
+    ///     unique temp directory created for each test run, and is automatically
+    ///     cleaned up when the test harness is disposed.
+    /// </summary>
     public string AppDataDir => Desktop.Config.AppDataPath;
+
     public ZylanceCore Zylance => Desktop.ZylanceCore;
 
     public async ValueTask DisposeAsync()
@@ -34,8 +50,8 @@ public record ZylanceTestHarness : IAsyncDisposable
     }
 
     public static async Task<ZylanceTestHarness> InitializeAsync(
-        int uiPort = 8123,
-        int wsPort = 8124,
+        int? uiPort = null,
+        int? wsPort = null,
         int appReadyTimeoutMs = 10000,
         CancellationToken cancellationToken = default
     )
@@ -53,21 +69,20 @@ public record ZylanceTestHarness : IAsyncDisposable
 
         var fileProvider = new HeadlessFileProvider(appDataDir, tempDataDir);
 
-        var config = new ZylanceDesktopConfig
+        var config = new ZylanceDesktopConfig(uiPort, wsPort)
         {
             Headless = true,
             UiServerEnabled = true,
-            UiPort = uiPort,
-            WsPort = wsPort,
             UiRootPath = uiRootPath,
             AppDataPath = appDataDir,
             TmpDataPath = tempDataDir,
         };
+
         var desktop = new ZylanceDesktop(config, fileProvider: fileProvider);
         desktop.Start();
 
         var playwright = await Microsoft.Playwright.Playwright.CreateAsync();
-        var browser = await playwright.Chromium.LaunchAsync();
+        var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions { Headless = true });
         var browserContext = await browser.NewContextAsync();
         browserContext.SetDefaultTimeout((float)TimeSpan.FromSeconds(10).TotalMilliseconds);
         var page = await browserContext.NewPageAsync();
@@ -123,5 +138,53 @@ public record ZylanceTestHarness : IAsyncDisposable
         }
 
         throw new DirectoryNotFoundException("Could not find Zylance.sln in any parent directory.");
+    }
+
+    /// <summary>
+    ///     Copies a fixture file from the Fixtures directory to a target path.
+    /// </summary>
+    /// <param name="relativeFixturePath">
+    ///     Path relative to Fixtures/
+    ///     (e.g. "Vaults/EmptyVault.zlv")
+    /// </param>
+    /// <param name="relativeDestinationPath">
+    ///     Path relative to the AppData/
+    ///     (e.g. "user-documents/vault.zlv")
+    /// </param>
+    public string CopyFixtureToAppData(string relativeFixturePath, string relativeDestinationPath)
+    {
+        var fixturePath = Path.Combine(FixturesDir, relativeFixturePath);
+        var destinationPath = Path.Combine(AppDataDir, relativeDestinationPath);
+
+        if (!File.Exists(fixturePath))
+            throw new FileNotFoundException($"Fixture file not found: {fixturePath}");
+
+        File.Copy(fixturePath, destinationPath, true);
+
+        return destinationPath;
+    }
+
+    /// <summary>
+    ///     Copies a fixture file from the Fixtures directory to a target path.
+    /// </summary>
+    /// <param name="relativeFixturePath">
+    ///     Path relative to Fixtures/
+    ///     (e.g. "Vaults/EmptyVault.zlv")
+    /// </param>
+    /// <param name="relativeDestinationPath">
+    ///     Path relative to the TempData/
+    ///     (e.g. "user-documents/vault.zlv")
+    /// </param>
+    public string CopyFixtureToTempData(string relativeFixturePath, string relativeDestinationPath)
+    {
+        var fixturePath = Path.Combine(FixturesDir, relativeFixturePath);
+        var destinationPath = Path.Combine(TempDataDir, relativeDestinationPath);
+
+        if (!File.Exists(fixturePath))
+            throw new FileNotFoundException($"Fixture file not found: {fixturePath}");
+
+        File.Copy(fixturePath, destinationPath, true);
+
+        return destinationPath;
     }
 }

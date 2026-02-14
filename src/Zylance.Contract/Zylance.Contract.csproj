@@ -25,8 +25,12 @@
     <YarnBuildMarker>$(BaseIntermediateOutputPath)yarn.build.marker</YarnBuildMarker>
   </PropertyGroup>
 
+  <!-- Files that trigger code regeneration when modified -->
   <ItemGroup>
     <Protobuf Include="./zylance/**/*.proto" GrpcServices="None" />
+    <CodeGenInputs Include="Scripts/**/*.ts" />
+    <CodeGenInputs Include="package.json" />
+    <CodeGenInputs Include="yarn.lock" />
   </ItemGroup>
 
   <!-- Files that trigger code regeneration when modified -->
@@ -57,7 +61,7 @@
     Name="GenerateCode"
     DependsOnTargets="InstallYarnPackages"
     BeforeTargets="BeforeCompile"
-    Inputs="@(CodeGenInputs)"
+    Inputs="@(ProtoBuf);@(CodeGenInputs)"
     Outputs="$(YarnBuildMarker)"
   >
     <MakeDir Directories="$(BaseIntermediateOutputPath)" />

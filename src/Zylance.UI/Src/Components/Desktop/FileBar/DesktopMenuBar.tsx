@@ -29,6 +29,8 @@ export const DesktopMenuBar: FC = () => {
       <Stack
         direction="row"
         ref={anchorRef}
+        role={"menubar"}
+        aria-label="Desktop Menu Bar"
         sx={{
           zIndex: 10000,
           padding: 0.5,

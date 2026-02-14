@@ -1,11 +1,5 @@
 import { Button, Grow, MenuList, Paper, Popper } from "@mui/material"
-import {
-  type FC,
-  type KeyboardEvent,
-  type PropsWithChildren,
-  useEffect,
-  useRef,
-} from "react"
+import { type FC, type KeyboardEvent, type PropsWithChildren, useEffect, useRef } from "react"
 
 export interface MenuBarMenuProps extends PropsWithChildren {
   label: string
@@ -23,7 +17,7 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
 }) => {
   const anchorRef = useRef<HTMLButtonElement>(null)
 
-  function handleListKeyDown(event: KeyboardEvent) {
+  function handleListKeyDown (event: KeyboardEvent) {
     if (event.key === "Tab") {
       event.preventDefault()
     } else if (event.key === "Escape") {
@@ -45,8 +39,8 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
     <>
       <Button
         ref={anchorRef}
-        id={`${label}-menu-button`}
-        aria-controls={open ? `${label}-menu` : undefined}
+        id={`menuButton-${label}`}
+        aria-controls={open ? `menu-${label}` : undefined}
         aria-expanded={open ? "true" : undefined}
         aria-haspopup="true"
         onClick={() => onClick()}
@@ -95,8 +89,9 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
               <MenuList
                 dense
                 autoFocusItem={open}
-                id={`${label}-menu`}
-                aria-labelledby={`${label}-menu-button`}
+                role={"menu"}
+                id={`menu-${label}`}
+                aria-labelledby={`menuButton-${label}`}
                 onKeyDown={handleListKeyDown}
               >
                 {children}

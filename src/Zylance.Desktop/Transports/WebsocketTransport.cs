@@ -36,11 +36,11 @@ public class WebsocketTransport : ITransport, IDisposable
             };
             socket.OnClose = () =>
             {
-                if (_client == socket)
-                {
-                    Console.WriteLine("WebSocket client disconnected.");
-                    _client = null;
-                }
+                if (_client != socket)
+                    return;
+
+                Console.WriteLine("WebSocket client disconnected.");
+                _client = null;
             };
             socket.OnMessage = message =>
             {

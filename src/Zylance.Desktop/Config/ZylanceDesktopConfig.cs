@@ -7,6 +7,15 @@ namespace Zylance.Desktop.Config;
 /// </summary>
 public record ZylanceDesktopConfig
 {
+    /// <summary>
+    /// Creates a new configuration, optionally overriding the UI and WebSocket ports.
+    /// </summary>
+    public ZylanceDesktopConfig(int? uiPort = null, int? wsPort = null)
+    {
+        UiPort = uiPort ?? GetInt("UI_PORT") ?? DiscoverAvailablePort(8000, 8999);
+        WsPort = wsPort ?? GetInt("WS_PORT") ?? DiscoverAvailablePort(9000, 9999);
+    }
+
     /// <summary>The application name shown in the window title and data paths.</summary>
     public const string AppName = "Zylance";
 
@@ -17,10 +26,10 @@ public record ZylanceDesktopConfig
     public bool UiServerEnabled { get; init; } = GetBool("UI_SERVER_ENABLED") ?? true;
 
     /// <summary>The port used by the UI server.</summary>
-    public int UiPort { get; init; } = GetInt("UI_PORT") ?? DiscoverAvailablePort(8000, 8099);
+    public int UiPort { get; init; }
 
     /// <summary>The port used by the WebSocket transport.</summary>
-    public int WsPort { get; init; } = GetInt("WS_PORT") ?? DiscoverAvailablePort(8100, 8199);
+    public int WsPort { get; init; }
 
     /// <summary>Enable developer tools in the native window.</summary>
     public bool DevToolsEnabled { get; init; } = GetBool("DEVTOOLS_ENABLED") ?? false;
