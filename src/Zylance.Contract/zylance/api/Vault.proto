@@ -6,7 +6,7 @@ import "zylance/models/Vault.proto";
 
 option csharp_namespace = "Zylance.Contract.Api.Vault";
 
-// === Vault Operation Messages ===
+// === Actions ===
 message VaultOpenReq {
   option (action) = "Vault:OpenVault";
 }
@@ -33,6 +33,7 @@ message VaultCloseRes {
   option (action) = "Vault:CloseVault";
 }
 
+// === Events ===
 message VaultOpenedEvt {
   option (eventName) = "Vault:VaultOpened";
   VaultRef vault_ref = 1;

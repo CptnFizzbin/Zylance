@@ -17,6 +17,7 @@ export async function createZylanceApi() {
     background: Endpoints.createBackgroundApi(client),
     account: Endpoints.createAccountApi(client),
     ledger: Endpoints.createLedgerApi(client),
+    import: Endpoints.createImportApi(client),
   }
 }
 

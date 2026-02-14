@@ -165,10 +165,12 @@ public class GatewayService
         var req = new ZyRequest { Payload = reqPayload };
 
         var resPayload = new ResponsePayload { RequestId = reqPayload.RequestId };
-        var res = new ZyResponse { Payload = resPayload };
+        var res = new ZyResponse { Payload = resPayload, OnSend = res => Send(res.Payload) };
 
         res = await _routerService.HandleRequest(req, res);
-        Send(res.Payload);
+
+        if (!res.ResponseSent)
+            res.Send();
     }
 
     private async Task HandleMessage(EventPayload payload)

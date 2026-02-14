@@ -1,4 +1,14 @@
-import { Alert, Box, Button, Card, CardContent, Container, Divider, Stack, Typography } from "@mui/material"
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  Divider,
+  Stack,
+  Typography,
+} from "@mui/material"
 import { useMutation } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useZylance } from "@/Hooks/UseZylance"
@@ -7,7 +17,7 @@ export const Route = createFileRoute("/locked/select-vault")({
   component: RouteComponent,
 })
 
-function RouteComponent () {
+function RouteComponent() {
   console.log("Rendering /_locked/vault/select route")
 
   const navigate = Route.useNavigate()

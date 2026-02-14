@@ -9,10 +9,10 @@
     "ignoreUnknown": false,
     "includes": [
       "Lib/**/*",
-      "src/**/*",
+      "Src/**/*",
       "index.html",
       "vite.config.ts",
-      "!src/routeTree.gen.ts"
+      "!Src/routeTree.gen.ts"
     ]
   },
   "formatter": {

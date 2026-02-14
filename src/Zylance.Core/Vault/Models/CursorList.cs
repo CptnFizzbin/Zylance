@@ -1,3 +1,5 @@
+using Zylance.Core.Vault.Exceptions;
+
 namespace Zylance.Core.Vault.Models;
 
 /// <summary>
@@ -13,7 +15,7 @@ public record CursorList<T>
     ///     Cursor token for fetching the next page of results. Empty when there is no
     ///     next page.
     /// </summary>
-    public required string NextCursor { get; init; }
+    public required string Cursor { get; init; }
 
     /// <summary>
     ///     Total number of items across all pages.
@@ -21,40 +23,19 @@ public record CursorList<T>
     public required ulong TotalCount { get; init; }
 
     /// <summary>
+    ///     Function that returns the next page of results. Callers should check
+    ///     <see cref="HasNextPage" /> before invoking this to avoid
+    ///     <see cref="CursorException" />.
+    /// </summary>
+    public Func<Task<CursorList<T>>>? NextPage { get; init; }
+
+    /// <summary>
     ///     Indicates whether this page is the last page of results.
     /// </summary>
-    public required bool IsLastPage { get; init; }
+    public bool HasNextPage => NextPage is not null;
 
     /// <summary>
     ///     The items contained in this page.
     /// </summary>
     public required IReadOnlyList<T> Items { get; init; }
-
-    /// <summary>
-    ///     Creates a simple cursor list from a complete list of items (no pagination).
-    /// </summary>
-    public static CursorList<T> FromList(IReadOnlyList<T> items)
-    {
-        return new CursorList<T>
-        {
-            NextCursor = string.Empty,
-            TotalCount = (ulong)items.Count,
-            IsLastPage = true,
-            Items = items,
-        };
-    }
-
-    /// <summary>
-    ///     Creates a paginated cursor list.
-    /// </summary>
-    public static CursorList<T> Create(IReadOnlyList<T> items, string nextCursor, ulong totalCount, bool isLastPage)
-    {
-        return new CursorList<T>
-        {
-            Items = items,
-            NextCursor = nextCursor,
-            TotalCount = totalCount,
-            IsLastPage = isLastPage,
-        };
-    }
 }

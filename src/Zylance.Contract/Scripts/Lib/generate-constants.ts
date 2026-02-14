@@ -118,13 +118,13 @@ function generateTypeScript (actions: ActionOrEvent[], events: ActionOrEvent[]):
   const actionConstants = allActions
     .map(name => {
       const safeName = name.replace(/:/g, "_").replace(/\s+/g, "_")
-      return `${safeName}: "${name}" as const,`
+      return `${safeName}: "${name}" as const`
     })
 
   const eventConstants = allEvents
     .map(name => {
       const safeName = name.replace(/:/g, "_").replace(/\s+/g, "_")
-      return `${safeName}: "${name}" as const,`
+      return `${safeName}: "${name}" as const`
     })
 
   //language=ts
@@ -150,15 +150,15 @@ function generateTypeScript (actions: ActionOrEvent[], events: ActionOrEvent[]):
      * Type-safe action name constants.
      */
     export const ZylanceActions = {
-      ${actionConstants.join("\n      ")}
-    } as const;
+      ${actionConstants.join(",\n      ")},
+    } as const
 
     /**
      * Type-safe event name constants.
      */
     export const ZylanceEvents = {
-      ${eventConstants.join("\n      ")}
-    } as const;
+      ${eventConstants.join(",\n      ")},
+    } as const
   `)
 }
 

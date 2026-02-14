@@ -95,7 +95,9 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
             if (fileExists)
                 await AssertZylanceVault(dbContext, filePath, cancellationToken);
 
-            await dbContext.Database.MigrateAsync(cancellationToken);
+            // Use EnsureCreated in tests and runtime paths to avoid migrations pending checks
+            // and create schema directly from the current model when the database is new.
+            await dbContext.Database.EnsureCreatedAsync(cancellationToken);
 
             return new LocalVault(dbContext);
         }

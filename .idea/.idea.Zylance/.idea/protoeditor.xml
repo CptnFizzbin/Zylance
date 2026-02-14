@@ -4,7 +4,7 @@
     <option name="importPathEntries">
       <list>
         <ImportPathEntry>
-          <option name="location" value="file://$PROJECT_DIR$/Zylance.Contract" />
+          <option name="location" value="file://$PROJECT_DIR$/src/Zylance.Contract" />
         </ImportPathEntry>
       </list>
     </option>

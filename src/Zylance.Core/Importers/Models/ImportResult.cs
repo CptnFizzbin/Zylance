@@ -24,4 +24,9 @@ public record ImportResult
     ///     Gets any warnings generated during import.
     /// </summary>
     public IReadOnlyList<string>? Warnings { get; init; }
+
+    /// <summary>
+    ///     The parsed import statements (one per account) produced by the parser.
+    /// </summary>
+    public required List<ImportStatement> Statements { get; init; }
 }

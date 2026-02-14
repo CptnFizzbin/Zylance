@@ -63,7 +63,7 @@ public class FileService(IFileProvider fileProvider)
     ///     Opens a stream for the specified FileRef.
     /// </summary>
     /// <param name="fileRef">The file reference to open.</param>
-    public async Task<Stream> OpenFile(FileRef fileRef)
+    public async Task<Stream> OpenFileAsync(FileRef fileRef)
     {
         AssertFileRegistered(fileRef);
 

@@ -1,5 +1,11 @@
 import { Button, Grow, MenuList, Paper, Popper } from "@mui/material"
-import { type FC, type KeyboardEvent, type PropsWithChildren, useEffect, useRef } from "react"
+import {
+  type FC,
+  type KeyboardEvent,
+  type PropsWithChildren,
+  useEffect,
+  useRef,
+} from "react"
 
 export interface MenuBarMenuProps extends PropsWithChildren {
   label: string
@@ -17,7 +23,7 @@ export const FileBarMenu: FC<MenuBarMenuProps> = ({
 }) => {
   const anchorRef = useRef<HTMLButtonElement>(null)
 
-  function handleListKeyDown (event: KeyboardEvent) {
+  function handleListKeyDown(event: KeyboardEvent) {
     if (event.key === "Tab") {
       event.preventDefault()
     } else if (event.key === "Escape") {

@@ -4,10 +4,10 @@ package zylance.contract;
 option csharp_namespace = "Zylance.Contract.Models.Ledger";
 
 message LedgerEntryData {
-    string id = 1;
-    string account_id = 2;
-    int64 timestamp = 6;
-    string payee = 3;
-    string memo = 4;
-    double amount = 5;
+  string id = 1;
+  string account_id = 2;
+  int64 timestamp = 6;
+  string payee = 3;
+  string memo = 4;
+  string amount = 5;
 }

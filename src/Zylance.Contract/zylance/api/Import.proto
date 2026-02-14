@@ -1,0 +1,66 @@
+syntax = "proto3";
+package zylance.contract;
+
+import "zylance/extensions/Zylance.proto";
+import "zylance/models/File.proto";
+import "zylance/models/Account.proto";
+
+option csharp_namespace = "Zylance.Contract.Api.File";
+
+// === Actions ===
+message StartImportReq{
+  option (action) = "Import:Start";
+  FileRef file_ref = 1;
+}
+
+message StartImportRes{
+  option (action) = "Import:Start";
+  string import_id = 1;
+}
+
+// === Events ===
+message ImportGetAccountsEvt {
+  option (eventName) = "Import:GetAccounts";
+  string import_id = 1;
+  repeated AccountData accounts = 2;
+}
+
+message ImportSetAccountsEvt {
+  option (eventName) = "Import:SetAccounts";
+  string import_id = 1;
+  repeated AccountData accounts = 2;
+}
+
+message ImportReadingFileEvt {
+  option (eventName) = "Import:ReadingFile";
+  string import_id = 1;
+}
+
+message ImportStartedEvt {
+  option (eventName) = "Import:Started";
+  string import_id = 1;
+}
+
+message ImportCancelledEvt {
+  option (eventName) = "Import:Cancelled";
+  string import_id = 1;
+}
+
+message ImportErrorEvt {
+  option (eventName) = "Import:Error";
+  string import_id = 1;
+  string error_message = 2;
+}
+
+message ImportProgressEvt {
+  option (eventName) = "Import:Progress";
+  string import_id = 1;
+  float progress = 2; // 0.0 to 1.0
+}
+
+message ImportFinishedEvt {
+  option (eventName) = "Import:Finished";
+  string import_id = 1;
+  bool success = 2;
+  optional string error_message = 3;
+}

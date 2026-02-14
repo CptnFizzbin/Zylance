@@ -1,4 +1,4 @@
-using Zylance.Contract.Models.Account;
+using Zylance.Core.Vault.Models;
 using Zylance.Vault.Local.Context;
 using Zylance.Vault.Local.Managers;
 using Zylance.Vault.Local.Tests.Factories;
@@ -27,10 +27,10 @@ public class LocalAccountManagerTests : IDisposable
 
     #region Helper Methods
 
-    private async Task<Guid> SeedAccount(string name, string type, double balance)
+    private async Task<Guid> SeedAccount(string name, string type, decimal balance)
     {
         var accountId = Guid.NewGuid();
-        var account = new AccountData
+        var account = new AccountModel
         {
             Id = accountId.ToString(),
             Name = name,
@@ -50,12 +50,12 @@ public class LocalAccountManagerTests : IDisposable
     {
         // Arrange
         var accountId = Guid.NewGuid();
-        var account = new AccountData
+        var account = new AccountModel
         {
             Id = accountId.ToString(),
             Name = "Test Checking",
             Type = "checking",
-            Balance = 1500.50,
+            Balance = 1500.50M,
         };
         await _manager.SaveAsync(account);
 
@@ -67,7 +67,7 @@ public class LocalAccountManagerTests : IDisposable
         Assert.Equal(accountId.ToString(), result.Id);
         Assert.Equal("Test Checking", result.Name);
         Assert.Equal("checking", result.Type);
-        Assert.Equal(1500.50, result.Balance);
+        Assert.Equal(1500.50M, result.Balance);
     }
 
     [Fact]
@@ -89,12 +89,12 @@ public class LocalAccountManagerTests : IDisposable
     {
         // Arrange
         var accountId = Guid.NewGuid();
-        var account = new AccountData
+        var account = new AccountModel
         {
             Id = accountId.ToString(),
             Name = "New Savings",
             Type = "savings",
-            Balance = 5000.00,
+            Balance = 5000.00M,
         };
 
         // Act
@@ -105,7 +105,7 @@ public class LocalAccountManagerTests : IDisposable
         Assert.Equal(accountId.ToString(), result.Id);
         Assert.Equal("New Savings", result.Name);
         Assert.Equal("savings", result.Type);
-        Assert.Equal(5000.00, result.Balance);
+        Assert.Equal(5000.00M, result.Balance);
 
         // Verify it was persisted
         var retrieved = await _manager.GetAsync(accountId);
@@ -117,28 +117,33 @@ public class LocalAccountManagerTests : IDisposable
     {
         // Arrange
         var accountId = Guid.NewGuid();
-        var account = new AccountData
+        var account = new AccountModel
         {
             Id = accountId.ToString(),
             Name = "Original Name",
             Type = "checking",
-            Balance = 1000.00,
+            Balance = 1000.00M,
         };
         await _manager.SaveAsync(account);
 
         // Act - Update the account
-        account.Name = "Updated Name";
-        account.Balance = 2000.00;
-        var result = await _manager.SaveAsync(account);
+        var updated = new AccountModel
+        {
+            Id = account.Id,
+            Name = "Updated Name",
+            Type = account.Type,
+            Balance = 2000.00M,
+        };
+        var result = await _manager.SaveAsync(updated);
 
         // Assert
         Assert.Equal("Updated Name", result.Name);
-        Assert.Equal(2000.00, result.Balance);
+        Assert.Equal(2000.00M, result.Balance);
 
         // Verify it was updated
         var retrieved = await _manager.GetAsync(accountId);
         Assert.Equal("Updated Name", retrieved.Name);
-        Assert.Equal(2000.00, retrieved.Balance);
+        Assert.Equal(2000.00M, retrieved.Balance);
     }
 
     [Fact]
@@ -150,32 +155,32 @@ public class LocalAccountManagerTests : IDisposable
         var creditId = Guid.NewGuid();
 
         await _manager.SaveAsync(
-            new AccountData
+            new AccountModel
             {
                 Id = checkingId.ToString(),
                 Name = "Checking",
                 Type = "checking",
-                Balance = 500,
+                Balance = 500M,
             }
         );
 
         await _manager.SaveAsync(
-            new AccountData
+            new AccountModel
             {
                 Id = savingsId.ToString(),
                 Name = "Savings",
                 Type = "savings",
-                Balance = 10000,
+                Balance = 10000M,
             }
         );
 
         await _manager.SaveAsync(
-            new AccountData
+            new AccountModel
             {
                 Id = creditId.ToString(),
                 Name = "Credit Card",
                 Type = "credit",
-                Balance = -500,
+                Balance = -500M,
             }
         );
 
@@ -198,12 +203,12 @@ public class LocalAccountManagerTests : IDisposable
     {
         // Arrange
         var accountId = Guid.NewGuid();
-        var account = new AccountData
+        var account = new AccountModel
         {
             Id = accountId.ToString(),
             Name = "To Delete",
             Type = "checking",
-            Balance = 100.00,
+            Balance = 100.00M,
         };
         await _manager.SaveAsync(account);
 
@@ -240,26 +245,22 @@ public class LocalAccountManagerTests : IDisposable
         var result = await _manager.ListAsync();
 
         // Assert
-        Assert.Empty(result.Items);
-        Assert.Equal(0UL, result.TotalCount);
-        Assert.True(result.IsLastPage);
+        Assert.Empty(result);
     }
 
     [Fact]
     public async Task ListAsync_WithMultipleAccounts_ReturnsAllAccounts()
     {
         // Arrange
-        await SeedAccount("Checking Account", "checking", 1000);
-        await SeedAccount("Savings Account", "savings", 5000);
-        await SeedAccount("Credit Card", "credit", -500);
+        await SeedAccount("Checking Account", "checking", 1000M);
+        await SeedAccount("Savings Account", "savings", 5000M);
+        await SeedAccount("Credit Card", "credit", -500M);
 
         // Act
         var result = await _manager.ListAsync();
 
         // Assert
-        Assert.Equal(3, result.Items.Count);
-        Assert.Equal(3UL, result.TotalCount);
-        Assert.True(result.IsLastPage);
+        Assert.Equal(3, result.Count);
     }
 
     [Fact]
@@ -267,12 +268,12 @@ public class LocalAccountManagerTests : IDisposable
     {
         // Arrange
         var checkingId = Guid.NewGuid();
-        var checking = new AccountData
+        var checking = new AccountModel
         {
             Id = checkingId.ToString(),
             Name = "My Checking",
             Type = "checking",
-            Balance = 2500.75,
+            Balance = 2500.75M,
         };
         await _manager.SaveAsync(checking);
 
@@ -280,27 +281,27 @@ public class LocalAccountManagerTests : IDisposable
         var result = await _manager.ListAsync();
 
         // Assert
-        var account = result.Items.Single();
+        var account = result.Single();
         Assert.Equal(checkingId.ToString(), account.Id);
         Assert.Equal("My Checking", account.Name);
         Assert.Equal("checking", account.Type);
-        Assert.Equal(2500.75, account.Balance);
+        Assert.Equal(2500.75M, account.Balance);
     }
 
     [Fact]
     public async Task ListAsync_AfterDelete_DoesNotIncludeDeletedAccount()
     {
         // Arrange
-        var account1Id = await SeedAccount("Account 1", "checking", 1000);
-        var account2Id = await SeedAccount("Account 2", "savings", 2000);
+        var account1Id = await SeedAccount("Account 1", "checking", 1000M);
+        var account2Id = await SeedAccount("Account 2", "savings", 2000M);
 
         // Act - Delete one account
         await _manager.DeleteAsync(account1Id);
         var result = await _manager.ListAsync();
 
         // Assert
-        Assert.Single(result.Items);
-        Assert.Contains(result.Items, a => a.Id == account2Id.ToString());
+        Assert.Single(result);
+        Assert.Contains(result, a => a.Id == account2Id.ToString());
     }
 
     [Fact]
@@ -308,25 +309,30 @@ public class LocalAccountManagerTests : IDisposable
     {
         // Arrange
         var accountId = Guid.NewGuid();
-        var account = new AccountData
+        var account = new AccountModel
         {
             Id = accountId.ToString(),
             Name = "Original",
             Type = "checking",
-            Balance = 100,
+            Balance = 100M,
         };
         await _manager.SaveAsync(account);
 
         // Act - Update and list
-        account.Name = "Updated";
-        account.Balance = 200;
-        await _manager.SaveAsync(account);
+        var updated = new AccountModel
+        {
+            Id = account.Id,
+            Name = "Updated",
+            Type = account.Type,
+            Balance = 200M,
+        };
+        await _manager.SaveAsync(updated);
         var result = await _manager.ListAsync();
 
         // Assert
-        var retrieved = result.Items.Single();
+        var retrieved = result.Single();
         Assert.Equal("Updated", retrieved.Name);
-        Assert.Equal(200, retrieved.Balance);
+        Assert.Equal(200M, retrieved.Balance);
     }
 
     #endregion
@@ -338,12 +344,12 @@ public class LocalAccountManagerTests : IDisposable
     {
         // Arrange
         var accountId = Guid.NewGuid();
-        var account = new AccountData
+        var account = new AccountModel
         {
             Id = accountId.ToString(),
             Name = "Zero Balance",
             Type = "checking",
-            Balance = 0.00,
+            Balance = 0.00M,
         };
 
         // Act
@@ -351,7 +357,7 @@ public class LocalAccountManagerTests : IDisposable
         var result = await _manager.GetAsync(accountId);
 
         // Assert
-        Assert.Equal(0.00, result.Balance);
+        Assert.Equal(0.00M, result.Balance);
     }
 
     [Fact]
@@ -359,12 +365,12 @@ public class LocalAccountManagerTests : IDisposable
     {
         // Arrange
         var accountId = Guid.NewGuid();
-        var account = new AccountData
+        var account = new AccountModel
         {
             Id = accountId.ToString(),
             Name = "Credit Card",
             Type = "credit",
-            Balance = -1500.50,
+            Balance = -1500.50M,
         };
 
         // Act
@@ -372,7 +378,7 @@ public class LocalAccountManagerTests : IDisposable
         var result = await _manager.GetAsync(accountId);
 
         // Assert
-        Assert.Equal(-1500.50, result.Balance);
+        Assert.Equal(-1500.50M, result.Balance);
     }
 
     [Fact]
@@ -380,12 +386,12 @@ public class LocalAccountManagerTests : IDisposable
     {
         // Arrange
         var accountId = Guid.NewGuid();
-        var account = new AccountData
+        var account = new AccountModel
         {
             Id = accountId.ToString(),
             Name = "Investment Account",
             Type = "investment",
-            Balance = 9999999.99,
+            Balance = 9999999.99M,
         };
 
         // Act
@@ -393,7 +399,7 @@ public class LocalAccountManagerTests : IDisposable
         var result = await _manager.GetAsync(accountId);
 
         // Assert
-        Assert.Equal(9999999.99, result.Balance);
+        Assert.Equal(9999999.99M, result.Balance);
     }
 
     #endregion

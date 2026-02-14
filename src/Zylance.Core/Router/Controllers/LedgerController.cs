@@ -3,6 +3,7 @@ using Zylance.Core.Gateway.Models;
 using Zylance.Core.Router.Attributes;
 using Zylance.Core.Vault.Context;
 using Zylance.Core.Vault.Exceptions;
+using Zylance.Core.Vault.Models;
 
 namespace Zylance.Core.Router.Controllers;
 
@@ -26,8 +27,9 @@ public class LedgerController(VaultContext vaultContext)
 
         await vault.WithScope(async scope =>
         {
-            var savedEntry = await scope.Vault.Ledgers.SaveAsync(data.Entry);
-            res.SetData(new CreateLedgerEntryRes { Entry = savedEntry });
+            var model = LedgerEntryModel.FromData(data.Entry);
+            var savedEntry = await scope.Vault.Ledgers.SaveAsync(model);
+            res.SetData(new CreateLedgerEntryRes { Entry = LedgerEntryModel.ToData(savedEntry) });
         });
     }
 
@@ -46,7 +48,7 @@ public class LedgerController(VaultContext vaultContext)
             throw new ArgumentException($"Invalid ledger entry ID format: {data.Id}");
 
         var entry = await vault.Ledgers.GetAsync(entryId);
-        res.SetData(new GetLedgerEntryRes { Entry = entry });
+        res.SetData(new GetLedgerEntryRes { Entry = LedgerEntryModel.ToData(entry) });
     }
 
     /// <summary>
@@ -61,16 +63,15 @@ public class LedgerController(VaultContext vaultContext)
         var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
         var result = await vault.Ledgers.ListAsync(data.Filter);
+        var resData = new ListLedgerEntriesRes
+        {
+            TotalCount = result.TotalCount,
+            Cursor = result.Cursor,
+            LastPage = !result.HasNextPage,
+        };
+        resData.Entries.AddRange([.. result.Items.Select(LedgerEntryModel.ToData)]);
 
-        res.SetData(
-            new ListLedgerEntriesRes
-            {
-                TotalCount = result.TotalCount,
-                Cursor = result.NextCursor,
-                LastPage = result.IsLastPage,
-                Entries = { result.Items },
-            }
-        );
+        res.SetData(resData);
     }
 
     /// <summary>
@@ -93,8 +94,9 @@ public class LedgerController(VaultContext vaultContext)
 
         await vault.WithScope(async scope =>
         {
-            var updatedEntry = await scope.Vault.Ledgers.SaveAsync(data.Entry);
-            res.SetData(new UpdateLedgerEntryRes { Entry = updatedEntry });
+            var model = LedgerEntryModel.FromData(data.Entry);
+            var updatedEntry = await scope.Vault.Ledgers.SaveAsync(model);
+            res.SetData(new UpdateLedgerEntryRes { Entry = LedgerEntryModel.ToData(updatedEntry) });
         });
     }
 
@@ -132,15 +134,14 @@ public class LedgerController(VaultContext vaultContext)
 
         var searchText = data.Query ?? string.Empty;
         var result = await vault.Ledgers.SearchAsync(searchText, data.Filter);
+        var resData = new SearchLedgerEntriesRes
+        {
+            TotalCount = result.TotalCount,
+            Cursor = result.Cursor,
+            LastPage = !result.HasNextPage,
+        };
+        resData.Entries.AddRange([.. result.Items.Select(LedgerEntryModel.ToData)]);
 
-        res.SetData(
-            new SearchLedgerEntriesRes
-            {
-                TotalCount = result.TotalCount,
-                Cursor = result.NextCursor,
-                LastPage = result.IsLastPage,
-                Entries = { result.Items },
-            }
-        );
+        res.SetData(resData);
     }
 }

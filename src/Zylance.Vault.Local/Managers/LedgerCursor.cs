@@ -4,8 +4,10 @@ namespace Zylance.Vault.Local.Managers;
 
 /// <summary>
 ///     Represents a cursor for ledger pagination using timestamp and ID.
-///     Why use a composite cursor? Timestamps alone aren't unique (multiple entries could have
-///     the same timestamp), so we include the ID to ensure stable, deterministic pagination.
+///     Why use a composite cursor? Timestamps alone aren't unique (multiple
+///     entries could have
+///     the same timestamp), so we include the ID to ensure stable, deterministic
+///     pagination.
 /// </summary>
 public record LedgerCursor
 {
@@ -15,27 +17,28 @@ public record LedgerCursor
     public const int DefaultPageSize = 50;
 
     /// <summary>
-    ///     Maximum allowed page size to prevent excessive memory usage and long response times.
+    ///     Maximum allowed page size to prevent excessive memory usage and long
+    ///     response times.
     /// </summary>
     public const int MaxPageSize = 100;
 
     /// <summary>
-    /// Cursor timestamp component (milliseconds since epoch).
+    ///     Cursor timestamp component (milliseconds since epoch).
     /// </summary>
-    public long Timestamp { get; init; }
+    public DateTimeOffset Timestamp { get; init; }
 
     /// <summary>
-    /// Cursor id component to disambiguate identical timestamps.
+    ///     Cursor id component to disambiguate identical timestamps.
     /// </summary>
     public Guid Id { get; init; }
 
     /// <summary>
     ///     Encodes the cursor to a base64 string for transport.
-    ///     Format: timestamp|id
+    ///     Format: ISO8601|id
     /// </summary>
     public string Encode()
     {
-        var raw = $"{Timestamp}|{Id}";
+        var raw = $"{Timestamp:O}|{Id}";
         var bytes = Encoding.UTF8.GetBytes(raw);
         return Convert.ToBase64String(bytes);
     }
@@ -56,19 +59,11 @@ public record LedgerCursor
 
             return parts.Length != 2
                 ? null
-                : new LedgerCursor { Timestamp = long.Parse(parts[0]), Id = Guid.Parse(parts[1]) };
+                : new LedgerCursor { Timestamp = DateTimeOffset.Parse(parts[0]), Id = Guid.Parse(parts[1]) };
         }
         catch
         {
             return null;
         }
-    }
-
-    /// <summary>
-    ///     Creates a cursor from a ledger entry.
-    /// </summary>
-    public static LedgerCursor FromEntry(long timestamp, Guid id)
-    {
-        return new LedgerCursor { Timestamp = timestamp, Id = id };
     }
 }

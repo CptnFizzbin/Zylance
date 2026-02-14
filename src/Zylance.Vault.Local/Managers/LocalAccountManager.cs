@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Zylance.Contract.Models.Account;
 using Zylance.Core.Vault.Managers;
 using Zylance.Core.Vault.Models;
 using Zylance.Vault.Local.Context;
@@ -18,12 +17,41 @@ public class LocalAccountManager(LocalVaultDbContext dbContext) : IAccountManage
     /// <param name="recordId">The account ID</param>
     /// <returns>The account data</returns>
     /// <exception cref="KeyNotFoundException">Thrown when the account is not found</exception>
-    public async Task<AccountData> GetAsync(Guid recordId)
+    public async Task<AccountModel> GetAsync(Guid recordId)
     {
         var entity = await dbContext.Accounts.FindAsync(recordId);
         return entity is null
             ? throw new KeyNotFoundException($"Account with ID {recordId} not found")
-            : EntityToData(entity);
+            : EntityToModel(entity);
+    }
+
+    /// <summary>
+    ///     Deletes an account by its ID.
+    /// </summary>
+    /// <param name="recordId">The account ID to delete</param>
+    /// <returns>The deleted account data</returns>
+    /// <exception cref="KeyNotFoundException">Thrown when the account is not found</exception>
+    public async Task<AccountModel> DeleteAsync(Guid recordId)
+    {
+        var entity =
+            await dbContext.Accounts.FindAsync(recordId)
+            ?? throw new KeyNotFoundException($"Account with ID {recordId} not found");
+
+        dbContext.Accounts.Remove(entity);
+        await dbContext.SaveChangesAsync();
+
+        return EntityToModel(entity);
+    }
+
+    /// <summary>
+    ///     Lists all accounts in the vault.
+    /// </summary>
+    /// <returns>A cursor list of all accounts</returns>
+    public async Task<List<AccountModel>> ListAsync()
+    {
+        var entities = await dbContext.Accounts.ToListAsync();
+        var items = entities.Select(EntityToModel).ToList();
+        return items;
     }
 
     /// <summary>
@@ -32,7 +60,7 @@ public class LocalAccountManager(LocalVaultDbContext dbContext) : IAccountManage
     /// </summary>
     /// <param name="record">The account data to save</param>
     /// <returns>The saved account data</returns>
-    public async Task<AccountData> SaveAsync(AccountData record)
+    public async Task<AccountModel> SaveAsync(AccountModel record)
     {
         var id = Guid.Parse(record.Id);
         var entity = await dbContext.Accounts.FindAsync(id);
@@ -58,35 +86,7 @@ public class LocalAccountManager(LocalVaultDbContext dbContext) : IAccountManage
         }
 
         await dbContext.SaveChangesAsync();
-        return EntityToData(entity);
-    }
-
-    /// <summary>
-    ///     Deletes an account by its ID.
-    /// </summary>
-    /// <param name="recordId">The account ID to delete</param>
-    /// <returns>The deleted account data</returns>
-    /// <exception cref="KeyNotFoundException">Thrown when the account is not found</exception>
-    public async Task<AccountData> DeleteAsync(Guid recordId)
-    {
-        var entity = await dbContext.Accounts.FindAsync(recordId);
-        if (entity is null)
-            throw new KeyNotFoundException($"Account with ID {recordId} not found");
-
-        dbContext.Accounts.Remove(entity);
-        await dbContext.SaveChangesAsync();
-        return EntityToData(entity);
-    }
-
-    /// <summary>
-    ///     Lists all accounts in the vault.
-    /// </summary>
-    /// <returns>A cursor list of all accounts</returns>
-    public async Task<CursorList<AccountData>> ListAsync()
-    {
-        var entities = await dbContext.Accounts.ToListAsync();
-        var items = entities.Select(EntityToData).ToList();
-        return CursorList<AccountData>.FromList(items);
+        return EntityToModel(entity);
     }
 
     /// <summary>
@@ -98,9 +98,9 @@ public class LocalAccountManager(LocalVaultDbContext dbContext) : IAccountManage
     ///     - Change database structure without affecting the API contract
     ///     - Use different data formats (protobuf) for network transport
     /// </summary>
-    private static AccountData EntityToData(AccountEntity entity)
+    private static AccountModel EntityToModel(AccountEntity entity)
     {
-        return new AccountData
+        return new AccountModel
         {
             Id = entity.Id.ToString(),
             Name = entity.Name,
