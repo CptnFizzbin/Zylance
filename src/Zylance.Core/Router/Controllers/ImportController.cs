@@ -1,3 +1,4 @@
+using Serilog;
 using Zylance.Contract;
 using Zylance.Contract.Api.File;
 using Zylance.Core.Gateway.Models;
@@ -40,7 +41,7 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
             .ContinueWith(
                 _ =>
                 {
-                    Console.WriteLine("Import cancelled, triggering cancellation token.");
+                    Log.Information("Import cancelled, triggering cancellation token.");
                     return cancellationSource.CancelAsync();
                 },
                 cancellationSource.Token

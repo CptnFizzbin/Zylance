@@ -1,4 +1,5 @@
 using Photino.NET;
+using Serilog;
 using Zylance.Contract;
 using Zylance.Core;
 using Zylance.Core.Platform.Interfaces;
@@ -101,7 +102,7 @@ public class ZylanceDesktop(
 
     private void Exit()
     {
-        Console.WriteLine("Exit requested. Closing application...");
+        Log.Information("Exit requested. Closing application...");
         DisposeAsync().AsTask().Wait();
     }
 
@@ -124,7 +125,7 @@ public class ZylanceDesktop(
 
     private WebServerService StartWebServer()
     {
-        Console.WriteLine($"Starting web server on port {config.UiPort}...");
+        Log.Information("Starting web server on port {ConfigUiPort}...", config.UiPort);
         var server = new WebServerService(config);
         server.StartAsync();
         return server;

@@ -1,4 +1,5 @@
 using Fleck;
+using Serilog;
 using Zylance.Core.Platform.Interfaces;
 
 namespace Zylance.Desktop.Transports;
@@ -27,19 +28,19 @@ public class WebsocketTransport : ITransport, IDisposable
                 if (_client is not null && _client.IsAvailable)
                 {
                     socket.Close(); // Only allow one client at a time
-                    Console.WriteLine("Second client attempted to connect, rejected.");
+                    Log.Information("Second client attempted to connect, rejected.");
                     return;
                 }
 
                 _client = socket;
-                Console.WriteLine("WebSocket client connected.");
+                Log.Information("WebSocket client connected.");
             };
             socket.OnClose = () =>
             {
                 if (_client != socket)
                     return;
 
-                Console.WriteLine("WebSocket client disconnected.");
+                Log.Information("WebSocket client disconnected.");
                 _client = null;
             };
             socket.OnMessage = message =>
@@ -54,7 +55,7 @@ public class WebsocketTransport : ITransport, IDisposable
     /// </summary>
     public void Dispose()
     {
-        Console.WriteLine("Disposing WebsocketTransport.");
+        Log.Information("Disposing WebsocketTransport.");
         _client?.Close();
         _server.Dispose();
         GC.SuppressFinalize(this);
@@ -69,7 +70,7 @@ public class WebsocketTransport : ITransport, IDisposable
         if (_client is not null && _client.IsAvailable)
             _client.Send(message);
         else
-            Console.WriteLine("Attempted to send message, but no WebSocket client is connected.");
+            Log.Information("Attempted to send message, but no WebSocket client is connected.");
     }
 
     /// <summary>
@@ -78,7 +79,7 @@ public class WebsocketTransport : ITransport, IDisposable
     /// <param name="callback">Callback invoked with the received message string.</param>
     public void Receive(Action<string> callback)
     {
-        Console.WriteLine("WebSocket receive callback registered.");
+        Log.Information("WebSocket receive callback registered.");
         _receiveCallback = callback;
     }
 }

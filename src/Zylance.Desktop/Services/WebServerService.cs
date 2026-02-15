@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
+using Serilog;
 using Zylance.Desktop.Config;
 
 namespace Zylance.Desktop.Services;
@@ -57,8 +58,8 @@ public sealed class WebServerService : IAsyncDisposable
         _app.UseDefaultFiles();
         _app.UseStaticFiles(new StaticFileOptions { FileProvider = fileProvider, RequestPath = "" });
 
-        Console.WriteLine($"Static file server configured at {config.UiServerUrl}");
-        Console.WriteLine($"Serving files from: {config.UiRootPath}");
+        Log.Information("Static file server configured at {ConfigUiServerUrl}", config.UiServerUrl);
+        Log.Information("Serving files from: {ConfigUiRootPath}", config.UiRootPath);
     }
 
     /// <summary>

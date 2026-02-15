@@ -50,6 +50,9 @@ public record ZylanceDesktopConfig
     /// <summary>Temporary data path used by the application.</summary>
     public string TmpDataPath { get; init; } = Path.Combine(Path.GetTempPath(), AppName, Guid.NewGuid().ToString());
 
+    /// <summary>Path where log files should be stored for the current user.</summary>
+    public string LogPath { get; init; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppName, "logs");
+
     private static string? GetFlagValue(string name)
     {
         var args = Environment.GetCommandLineArgs();
