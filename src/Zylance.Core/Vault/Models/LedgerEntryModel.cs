@@ -14,6 +14,12 @@ public record LedgerEntryModel
     public required Guid Id { get; init; }
 
     /// <summary>
+    ///     Optional transaction identifier linking this ledger entry to an
+    ///     external/imported transaction.
+    /// </summary>
+    public string? TrxId { get; init; }
+
+    /// <summary>
     ///     Identifier of the account this entry belongs to.
     /// </summary>
     public required string AccountId { get; init; }
@@ -53,6 +59,7 @@ public record LedgerEntryModel
             Payee = model.Payee,
             Memo = model.Memo,
             Amount = model.Amount.ToString(CultureInfo.InvariantCulture),
+            TrxId = model.TrxId ?? string.Empty,
         };
     }
 
@@ -72,6 +79,7 @@ public record LedgerEntryModel
             Payee = data.Payee,
             Memo = data.Memo,
             Amount = decimal.Parse(data.Amount, CultureInfo.InvariantCulture),
+            TrxId = string.IsNullOrEmpty(data.TrxId) ? null : data.TrxId,
         };
     }
 }

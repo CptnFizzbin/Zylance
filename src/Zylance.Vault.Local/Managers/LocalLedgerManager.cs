@@ -207,6 +207,7 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
                 Timestamp = record.Timestamp,
                 Payee = record.Payee,
                 Memo = record.Memo,
+                TrxId = record.TrxId,
                 Amount = record.Amount,
             };
             dbContext.LedgerEntries.Add(entity);
@@ -218,6 +219,7 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
             entity.Timestamp = record.Timestamp;
             entity.Payee = record.Payee;
             entity.Memo = record.Memo;
+            entity.TrxId = record.TrxId;
             entity.Amount = record.Amount;
         }
 

@@ -64,6 +64,7 @@ public class OfxImportParser : IImportParser
             Timestamp = transaction.DatePosted,
             Payee = transaction.Name ?? string.Empty,
             Memo = transaction.Memo ?? string.Empty,
+            TrxId = transaction.Id,
             Amount = transaction.Amount,
         };
     }

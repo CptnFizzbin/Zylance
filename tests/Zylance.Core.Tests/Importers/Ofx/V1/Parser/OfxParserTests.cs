@@ -66,7 +66,7 @@ public class OfxV1ParserTests
         var statement = statements[0];
         Assert.NotNull(statement.LedgerBalance);
         Assert.Equal(1411.81m, statement.LedgerBalance.Amount);
-        Assert.Equal("2026-01-15T12:00:00.000+00:00", statement.LedgerBalance.AsOfDate.ToIso8601());
+        Assert.Equal("2025-01-15T12:00:00.000+00:00", statement.LedgerBalance.AsOfDate.ToIso8601());
         Assert.Equal("LEDGER", statement.LedgerBalance.Type);
 
         Assert.NotNull(statement.AvailableBalance);

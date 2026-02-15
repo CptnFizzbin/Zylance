@@ -24,6 +24,9 @@ public class OfxImportParserTests
         var statement = result.Statements.First();
         Assert.Equal("1122334455", statement.Account.Id);
         Assert.Equal(2, statement.Transactions.Count);
+        // Ensure transaction FITIDs are mapped to TrxId on imported ledger entries
+        Assert.Equal("2026020201", statement.Transactions[0].TrxId);
+        Assert.Equal("2026020301", statement.Transactions[1].TrxId);
     }
 
     [Fact]
@@ -43,5 +46,9 @@ public class OfxImportParserTests
         var statement = result.Statements.First();
         Assert.Equal("4111111111111111", statement.Account.Id);
         Assert.Equal(3, statement.Transactions.Count);
+        // Ensure transaction FITIDs are mapped to TrxId on imported ledger entries
+        Assert.Equal("CC2026020201", statement.Transactions[0].TrxId);
+        Assert.Equal("CC2026020301", statement.Transactions[1].TrxId);
+        Assert.Equal("CC2026020401", statement.Transactions[2].TrxId);
     }
 }

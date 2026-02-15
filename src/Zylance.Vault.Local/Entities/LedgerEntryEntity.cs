@@ -37,6 +37,12 @@ public class LedgerEntryEntity
     public required string Memo { get; set; }
 
     /// <summary>
+    ///     Optional transaction identifier linking this ledger entry to an external/imported transaction.
+    /// </summary>
+    [MaxLength(255)]
+    public string? TrxId { get; set; }
+
+    /// <summary>
     ///     Monetary amount for the ledger entry (positive or negative).
     /// </summary>
     public required decimal Amount { get; set; }
@@ -54,6 +60,7 @@ public class LedgerEntryEntity
             Payee = entity.Payee,
             Memo = entity.Memo,
             Amount = entity.Amount,
+            TrxId = entity.TrxId,
         };
     }
 }

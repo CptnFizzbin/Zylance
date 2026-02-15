@@ -7,7 +7,8 @@ message LedgerEntryData {
   string id = 1;
   string account_id = 2;
   int64 timestamp = 6;
-  string payee = 3;
-  string memo = 4;
   string amount = 5;
+  optional string payee = 3;
+  optional string memo = 4;
+  optional string trx_id = 7; // Unique transaction identifier
 }
