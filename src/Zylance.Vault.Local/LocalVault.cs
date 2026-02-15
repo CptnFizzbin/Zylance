@@ -10,7 +10,7 @@ namespace Zylance.Vault.Local;
 ///     Local vault implementation using SQLite database through Entity Framework
 ///     Core.
 /// </summary>
-public class LocalVault(LocalVaultDbContext dbContext) : IVault
+public class LocalVault(LocalVaultDbContext dbContext) : IVault, IAsyncDisposable
 {
     /// <summary>
     ///     Gets the account manager for managing account records.
@@ -124,5 +124,13 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
         {
             await connection.CloseAsync();
         }
+    }
+
+    /// <summary>
+    /// Dispose the local vault and its underlying database context.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        await dbContext.DisposeAsync();
     }
 }

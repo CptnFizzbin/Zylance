@@ -19,8 +19,17 @@ public class VaultContext(ZylanceCore zylanceCore)
         get;
         set
         {
-            var transition = DetermineTransition(field, value);
+            var oldVault = field;
+            var transition = DetermineTransition(oldVault, value);
             field = value;
+
+            // Dispose the previous vault when it's closed or switched to a different vault
+            if (transition == VaultTransition.Closed || transition == VaultTransition.Switched)
+            {
+                if (oldVault is IAsyncDisposable asyncDisposable)
+                    asyncDisposable.DisposeAsync().AsTask().Wait();
+            }
+
             HandleTransition(transition, value);
         }
     }
