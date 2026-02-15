@@ -125,12 +125,6 @@ jobs:
       - name: Build Core for ${{ matrix.name }}
         run: dotnet build src/Zylance.Core/Zylance.Core.csproj -c Release -r ${{ matrix.runtime }} --no-restore
 
-      - name: Build Contract for ${{ matrix.name }}
-        run: dotnet build src/Zylance.Contract/Zylance.Contract.csproj -c Release -r ${{ matrix.runtime }} --no-restore
-
-      - name: Build UI for ${{ matrix.name }}
-        run: dotnet build src/Zylance.UI/Zylance.UI.csproj -c Release -r ${{ matrix.runtime }} --no-restore
-
       - name: Build Desktop for ${{ matrix.name }}
         if: matrix.runtime != 'browser-wasm'
         run: dotnet build src/Zylance.Desktop/Zylance.Desktop.csproj -c Release -r ${{ matrix.runtime }} --no-restore
