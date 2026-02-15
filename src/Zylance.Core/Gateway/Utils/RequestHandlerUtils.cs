@@ -1,7 +1,9 @@
 using Google.Protobuf;
 using JetBrains.Annotations;
+using Serilog;
 using Zylance.Core.Gateway.Handlers;
 using Zylance.Core.Gateway.Models;
+using Zylance.Core.Logging;
 
 namespace Zylance.Core.Gateway.Utils;
 
@@ -11,6 +13,8 @@ namespace Zylance.Core.Gateway.Utils;
 /// </summary>
 public static class RequestHandlerUtils
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger(typeof(RequestHandlerUtils));
+
     /// <summary>
     ///     Wraps a strongly-typed async handler (returns Task) into a generic
     ///     AsyncZyRequestHandler.
@@ -23,11 +27,17 @@ public static class RequestHandlerUtils
     {
         return async (req, res) =>
         {
+            Log.Debug(
+                "Invoking wrapped async request handler for RequestType={ReqType} ResponseType={ResType}",
+                typeof(TReq).FullName,
+                typeof(TRes).FullName
+            );
             var typedReq = new ZyRequest<TReq> { Payload = req.Payload };
             var typedRes = new ZyResponse<TRes> { Payload = res.Payload, OnSend = res.OnSend };
 
             await handler(typedReq, typedRes);
 
+            Log.Debug("Async request handler completed for RequestType={ReqType}", typeof(TReq).FullName);
             return typedRes;
         };
     }
@@ -44,11 +54,17 @@ public static class RequestHandlerUtils
     {
         return (req, res) =>
         {
+            Log.Debug(
+                "Invoking wrapped sync request handler for RequestType={ReqType} ResponseType={ResType}",
+                typeof(TReq).FullName,
+                typeof(TRes).FullName
+            );
             var typedReq = new ZyRequest<TReq> { Payload = req.Payload };
             var typedRes = new ZyResponse<TRes> { Payload = res.Payload, OnSend = res.OnSend };
 
             handler(typedReq, typedRes);
 
+            Log.Debug("Sync request handler completed for RequestType={ReqType}", typeof(TReq).FullName);
             return Task.FromResult<ZyResponse>(typedRes);
         };
     }

@@ -1,0 +1,38 @@
+using Serilog;
+
+namespace Zylance.Core.Logging;
+
+/// <summary>
+///     Provides a strongly-typed Serilog logger for use throughout the
+///     Zylance.Core project.
+/// </summary>
+public static class ZyLogger
+{
+    /// <summary>
+    ///     Creates a Serilog <see cref="ILogger" /> instance for the specified class
+    ///     type.
+    /// </summary>
+    /// <typeparam name="TClass">The class type for which to create the logger context.</typeparam>
+    /// <returns>
+    ///     A Serilog <see cref="ILogger" /> configured for the given class
+    ///     context.
+    /// </returns>
+    public static ILogger CreateLogger<TClass>()
+    {
+        return Log.ForContext<TClass>();
+    }
+
+    /// <summary>
+    ///     Creates a Serilog <see cref="ILogger" /> instance for the specified class
+    ///     type.
+    /// </summary>
+    /// <typeparam name="TClass">The class type for which to create the logger context.</typeparam>
+    /// <returns>
+    ///     A Serilog <see cref="ILogger" /> configured for the given class
+    ///     context.
+    /// </returns>
+    public static ILogger CreateLogger(Type source)
+    {
+        return Log.ForContext(source);
+    }
+}

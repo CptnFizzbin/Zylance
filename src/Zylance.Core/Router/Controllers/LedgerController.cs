@@ -1,5 +1,7 @@
+using Serilog;
 using Zylance.Contract.Api.Ledger;
 using Zylance.Core.Gateway.Models;
+using Zylance.Core.Logging;
 using Zylance.Core.Router.Attributes;
 using Zylance.Core.Vault.Context;
 using Zylance.Core.Vault.Exceptions;
@@ -14,6 +16,8 @@ namespace Zylance.Core.Router.Controllers;
 [Controller]
 public class LedgerController(VaultContext vaultContext)
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<LedgerController>();
+
     /// <summary>
     ///     Creates a new ledger entry in the active vault.
     /// </summary>
@@ -23,6 +27,7 @@ public class LedgerController(VaultContext vaultContext)
     public async Task CreateLedgerEntry(ZyRequest<CreateLedgerEntryReq> req, ZyResponse<CreateLedgerEntryRes> res)
     {
         var data = req.GetData();
+        Log.Debug("CreateLedgerEntry called for AccountId={AccountId}", data.Entry.AccountId);
         var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
         await vault.WithScope(async scope =>
@@ -30,6 +35,7 @@ public class LedgerController(VaultContext vaultContext)
             var model = LedgerEntryModel.FromData(data.Entry);
             var savedEntry = await scope.Vault.Ledgers.SaveAsync(model);
             res.SetData(new CreateLedgerEntryRes { Entry = LedgerEntryModel.ToData(savedEntry) });
+            Log.Information("Created ledger entry {EntryId}", savedEntry.Id);
         });
     }
 
@@ -42,6 +48,7 @@ public class LedgerController(VaultContext vaultContext)
     public async Task GetLedgerEntry(ZyRequest<GetLedgerEntryReq> req, ZyResponse<GetLedgerEntryRes> res)
     {
         var data = req.GetData();
+        Log.Debug("GetLedgerEntry called Id={Id}", data.Id);
         var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
         if (!Guid.TryParse(data.Id, out var entryId))
@@ -49,6 +56,7 @@ public class LedgerController(VaultContext vaultContext)
 
         var entry = await vault.Ledgers.GetAsync(entryId);
         res.SetData(new GetLedgerEntryRes { Entry = LedgerEntryModel.ToData(entry) });
+        Log.Debug("GetLedgerEntry returned EntryId={EntryId}", entry.Id);
     }
 
     /// <summary>
@@ -60,6 +68,7 @@ public class LedgerController(VaultContext vaultContext)
     public async Task ListLedgerEntries(ZyRequest<ListLedgerEntriesReq> req, ZyResponse<ListLedgerEntriesRes> res)
     {
         var data = req.GetData();
+        Log.Debug("ListLedgerEntries called with filter: {Filter}", data.Filter);
         var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
         var result = await vault.Ledgers.ListAsync(data.Filter);
@@ -72,6 +81,7 @@ public class LedgerController(VaultContext vaultContext)
         resData.Entries.AddRange([.. result.Items.Select(LedgerEntryModel.ToData)]);
 
         res.SetData(resData);
+        Log.Debug("ListLedgerEntries returned {Count} entries", result.Items.Count);
     }
 
     /// <summary>
@@ -83,6 +93,7 @@ public class LedgerController(VaultContext vaultContext)
     public async Task UpdateLedgerEntry(ZyRequest<UpdateLedgerEntryReq> req, ZyResponse<UpdateLedgerEntryRes> res)
     {
         var data = req.GetData();
+        Log.Debug("UpdateLedgerEntry called Id={Id}", data.Id);
         var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
         if (!Guid.TryParse(data.Id, out _))
@@ -97,6 +108,7 @@ public class LedgerController(VaultContext vaultContext)
             var model = LedgerEntryModel.FromData(data.Entry);
             var updatedEntry = await scope.Vault.Ledgers.SaveAsync(model);
             res.SetData(new UpdateLedgerEntryRes { Entry = LedgerEntryModel.ToData(updatedEntry) });
+            Log.Information("Updated ledger entry {EntryId}", updatedEntry.Id);
         });
     }
 
@@ -109,6 +121,7 @@ public class LedgerController(VaultContext vaultContext)
     public async Task DeleteLedgerEntry(ZyRequest<DeleteLedgerEntryReq> req, ZyResponse<DeleteLedgerEntryRes> res)
     {
         var data = req.GetData();
+        Log.Debug("DeleteLedgerEntry called Id={Id}", data.Id);
         var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
         if (!Guid.TryParse(data.Id, out var entryId))
@@ -118,6 +131,7 @@ public class LedgerController(VaultContext vaultContext)
         {
             await scope.Vault.Ledgers.DeleteAsync(entryId);
             res.SetData(new DeleteLedgerEntryRes { Success = true });
+            Log.Information("Deleted ledger entry {EntryId}", entryId);
         });
     }
 
@@ -130,6 +144,7 @@ public class LedgerController(VaultContext vaultContext)
     public async Task SearchLedgerEntries(ZyRequest<SearchLedgerEntriesReq> req, ZyResponse<SearchLedgerEntriesRes> res)
     {
         var data = req.GetData();
+        Log.Debug("SearchLedgerEntries called Query={Query}", data.Query);
         var vault = vaultContext.ActiveVault ?? throw VaultException.NoActiveVault();
 
         var searchText = data.Query ?? string.Empty;
@@ -143,5 +158,6 @@ public class LedgerController(VaultContext vaultContext)
         resData.Entries.AddRange([.. result.Items.Select(LedgerEntryModel.ToData)]);
 
         res.SetData(resData);
+        Log.Debug("SearchLedgerEntries returned {Count} results", result.Items.Count);
     }
 }

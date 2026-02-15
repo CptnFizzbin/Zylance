@@ -2,9 +2,10 @@ using Photino.NET;
 using Serilog;
 using Zylance.Contract;
 using Zylance.Core;
+using Zylance.Core.Logging;
 using Zylance.Core.Platform.Interfaces;
 using Zylance.Core.Vault.Interfaces;
-using Zylance.Desktop.Config;
+using Zylance.Desktop.Configuration;
 using Zylance.Desktop.Providers;
 using Zylance.Desktop.Services;
 using Zylance.Desktop.Transports;
@@ -25,12 +26,14 @@ namespace Zylance.Desktop;
 /// </param>
 /// <param name="vaultProvider">Optional vault provider for persistent storage.</param>
 public class ZylanceDesktop(
-    ZylanceDesktopConfig config,
+    ZyConfiguration config,
     ITransport? transport = null,
     ILocalFileProvider? fileProvider = null,
     IVaultProvider? vaultProvider = null
 ) : IAsyncDisposable
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<ZylanceDesktop>();
+
     private ILocalFileProvider? _fileProvider = fileProvider;
     private ITransport? _transport = transport;
     private IVaultProvider? _vaultProvider = vaultProvider;
@@ -52,7 +55,7 @@ public class ZylanceDesktop(
         );
 
     /// <summary>The configuration used to construct this desktop instance.</summary>
-    public ZylanceDesktopConfig Config => config;
+    public ZyConfiguration Config => config;
 
     /// <summary>
     ///     Dispose resources used by the desktop and stop the webserver and
@@ -115,7 +118,7 @@ public class ZylanceDesktop(
     private PhotinoWindow CreateWindow()
     {
         return new PhotinoWindow()
-            .SetTitle(ZylanceDesktopConfig.AppName)
+            .SetTitle(ZyConfiguration.AppName)
             .SetUseOsDefaultLocation(true)
             .SetUseOsDefaultSize(true)
             .SetResizable(true)

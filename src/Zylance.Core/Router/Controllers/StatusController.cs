@@ -1,5 +1,7 @@
+using Serilog;
 using Zylance.Contract.Api.Status;
 using Zylance.Core.Gateway.Models;
+using Zylance.Core.Logging;
 using Zylance.Core.Router.Attributes;
 
 namespace Zylance.Core.Router.Controllers;
@@ -10,6 +12,8 @@ namespace Zylance.Core.Router.Controllers;
 [Controller]
 public class StatusController
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<StatusController>();
+
     /// <summary>
     ///     Returns a basic status response for health monitoring.
     /// </summary>
@@ -18,6 +22,8 @@ public class StatusController
     [RequestHandler]
     public void GetStatus(ZyRequest<GetStatusReq> req, ZyResponse<GetStatusRes> res)
     {
+        Log.Debug("GetStatus called");
         res.SetData(new GetStatusRes { Status = "All systems operational" });
+        Log.Debug("GetStatus responded");
     }
 }

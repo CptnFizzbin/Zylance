@@ -1,5 +1,5 @@
 using Serilog;
-using Zylance.Desktop.Config;
+using Zylance.Desktop.Configuration;
 
 namespace Zylance.Desktop;
 
@@ -11,22 +11,11 @@ public static class Program
     [STAThread]
     private static void Main()
     {
-        var config = new ZylanceDesktopConfig();
-        var sessionId = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        var logDir = config.LogPath;
-        Directory.CreateDirectory(logDir);
-        var logPath = Path.Combine(logDir, $"zylance-{sessionId}.log");
-
-        Log.Logger = new LoggerConfiguration()
-            .Enrich.FromLogContext()
-            .WriteTo.Console()
-            .WriteTo.File(logPath, shared: true)
-            .CreateLogger();
-
-        RotateLogs(logPath);
-
         try
         {
+            var config = new ZyConfiguration();
+            Log.Logger = ZyLoggerConfiguration.CreateLogger(config);
+
             Log.Information("Starting Zylance Desktop");
             new ZylanceDesktop(config).Start().WaitForExit();
         }
@@ -38,16 +27,5 @@ public static class Program
         {
             Log.CloseAndFlush();
         }
-    }
-
-    private static void RotateLogs(string logDir)
-    {
-        var filesToDelete = new DirectoryInfo(logDir)
-            .GetFiles("zylance-*.log")
-            .OrderByDescending(f => f.CreationTimeUtc)
-            .Skip(10);
-
-        foreach (var f in filesToDelete)
-            f.Delete();
     }
 }

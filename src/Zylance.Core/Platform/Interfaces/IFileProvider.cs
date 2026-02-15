@@ -76,15 +76,3 @@ public interface IFileProvider
     /// <param name="path">Relative path inside the application data directory.</param>
     public Task<FileRef> GetAppDataFile(string path);
 }
-
-/// <summary>
-///     File provider with local filesystem operations.
-/// </summary>
-public interface ILocalFileProvider : IFileProvider
-{
-    /// <summary>
-    ///     Returns a local filesystem path for the given FileRef.
-    /// </summary>
-    /// <param name="fileRef">The file reference.</param>
-    public Task<string> GetFilePath(FileRef fileRef);
-}

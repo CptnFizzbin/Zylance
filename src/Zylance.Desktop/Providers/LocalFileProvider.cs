@@ -1,4 +1,7 @@
+using Serilog;
 using Zylance.Contract.Models.File;
+using Zylance.Core.Logging;
+using Zylance.Core.Platform;
 using Zylance.Core.Platform.Interfaces;
 
 namespace Zylance.Desktop.Providers;
@@ -9,6 +12,8 @@ namespace Zylance.Desktop.Providers;
 /// </summary>
 public abstract class LocalFileProvider(string appDataPath, string tempDataPath) : ILocalFileProvider, IDisposable
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<LocalFileProvider>();
+
     // Store file references in memory - maps FileRef IDs to actual file paths
     private readonly Dictionary<string, string> _fileReferences = new();
     private readonly Lock _lock = new();
@@ -20,6 +25,7 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     /// </summary>
     public void Dispose()
     {
+        Log.Information("Disposing LocalFileProvider and cleaning up temp directory at {TempDataPath}", tempDataPath);
         if (_disposed)
             return;
 
@@ -51,11 +57,11 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     ///     representing it.
     /// </summary>
     public abstract Task<FileRef> SelectFile(
-        // This method is marked as abstract as this requires specific implimentation
-        // from the HeadlessFileProvider in tests, or by DesktopFileProvider
+        // This method is abstract as this requires specific implementation
+        // by DesktopFileProvider, or HeadlessFileProvider in tests
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
-        bool readOnly = true
+        bool readOnly = FileRefFlags.READ_ONLY
     );
 
     /// <summary>
@@ -63,8 +69,8 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     ///     file.
     /// </summary>
     public abstract Task<FileRef> CreateFile(
-        // This method is marked as abstract as this requires specific implimentation
-        // from the HeadlessFileProvider in tests, or by DesktopFileProvider
+        // This method is abstract as this requires specific implementation
+        // by DesktopFileProvider, or HeadlessFileProvider in tests
         string? title = null,
         string? defaultPath = null,
         (string Name, string[] Extensions)[]? filters = null
@@ -76,16 +82,14 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     /// <param name="fileRef">Reference to the file to open.</param>
     public async Task<Stream> OpenFile(FileRef fileRef)
     {
+        Log.Information("Opening file for FileRef ID: {FileRefId}", fileRef.Id);
         var filePath = await GetFilePath(fileRef);
 
         if (!File.Exists(filePath))
             throw new FileNotFoundException($"File not found: {filePath}", filePath);
 
-        // Check if the file is read-only on the file system
-        var fileInfo = new FileInfo(filePath);
-        var fileAccess = fileInfo.IsReadOnly ? FileAccess.Read : FileAccess.ReadWrite;
-
-        return File.Open(filePath, FileMode.Open, fileAccess, FileShare.Read);
+        Log.Information("Opening file at path: {FilePath}", filePath);
+        return File.Open(filePath, FileMode.Open);
     }
 
     /// <summary>
@@ -94,6 +98,7 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     /// <param name="fileRef">Reference to the file to touch.</param>
     public Task TouchFile(FileRef fileRef)
     {
+        Log.Information("Touching file for FileRef ID: {FileRefId}", fileRef.Id);
         return SaveFile(fileRef, "");
     }
 
@@ -104,6 +109,10 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     /// <param name="content">Content stream to write to disk.</param>
     public async Task SaveFile(FileRef fileRef, Stream content)
     {
+        if (fileRef.ReadOnly)
+            throw new UnauthorizedAccessException($"Cannot save to read-only file reference: {fileRef.Id}");
+
+        Log.Information("Saving content to file for FileRef ID: {FileRefId}", fileRef.Id);
         var filePath = await GetFilePath(fileRef);
 
         // Check if the file exists and is read-only on the file system
@@ -131,6 +140,10 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     /// <param name="fileRef">Reference to the file to delete.</param>
     public async Task DeleteFile(FileRef fileRef)
     {
+        if (fileRef.ReadOnly)
+            throw new UnauthorizedAccessException($"Cannot delete read-only file reference: {fileRef.Id}");
+
+        Log.Information("Deleting file for FileRef ID: {FileRefId}", fileRef.Id);
         var filePath = await GetFilePath(fileRef);
 
         // Check if the file exists and is read-only on the file system
@@ -157,15 +170,14 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     /// <param name="path">Relative path under the temp directory.</param>
     public Task<FileRef> GetTempFile(string path)
     {
-        // Combine the path with the session-specific temp directory
+        Log.Information("Getting temporary fileRef for file: {path}", path);
         var tempPath = Path.Combine(tempDataPath, path);
 
-        // Ensure the directory exists
         var directory = Path.GetDirectoryName(tempPath);
         if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
             Directory.CreateDirectory(directory);
 
-        return CreateFileReference(tempPath);
+        return CreateFileReference(tempPath, FileRefFlags.READ_WRITE);
     }
 
     /// <summary>
@@ -175,14 +187,14 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     /// <param name="path">Relative path under the app data directory.</param>
     public Task<FileRef> GetAppDataFile(string path)
     {
+        Log.Information("Getting app data file for file: {path}", path);
         var fullPath = Path.Combine(appDataPath, path);
 
-        // Ensure the directory exists
         var directory = Path.GetDirectoryName(fullPath);
         if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
             Directory.CreateDirectory(directory);
 
-        return CreateFileReference(fullPath);
+        return CreateFileReference(fullPath, FileRefFlags.READ_WRITE);
     }
 
     /// <summary>
@@ -190,6 +202,7 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     /// </summary>
     public Task<string> GetFilePath(FileRef fileRef)
     {
+        Log.Information("Retrieving file path for FileRef ID: {FileRefId}", fileRef.Id);
         lock (_lock)
         {
             if (_fileReferences.TryGetValue(fileRef.Id, out var filePath))
@@ -201,6 +214,7 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
 
     private Task SaveFile(FileRef fileRef, string content)
     {
+        Log.Information("Saving string content to file for FileRef ID: {FileRefId}", fileRef.Id);
         var writer = new StreamReader(content);
         return SaveFile(fileRef, writer.BaseStream);
     }
@@ -208,8 +222,9 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     /// <summary>
     ///     Creates a FileRef from a file path and stores the mapping.
     /// </summary>
-    protected Task<FileRef> CreateFileReference(string filePath, bool readOnly = false)
+    protected Task<FileRef> CreateFileReference(string filePath, bool readOnly)
     {
+        Log.Information("Creating file reference for path: {filePath}", filePath);
         var fileRef = new FileRef
         {
             Id = Guid.NewGuid().ToString(),

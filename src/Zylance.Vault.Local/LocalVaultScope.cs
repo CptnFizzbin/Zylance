@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore.Storage;
+using Serilog;
+using Zylance.Core.Logging;
 using Zylance.Core.Vault.Interfaces;
 
 namespace Zylance.Vault.Local;
@@ -14,6 +16,7 @@ namespace Zylance.Vault.Local;
 /// </summary>
 public class LocalVaultScope(LocalVault vault, IDbContextTransaction transaction) : IVaultScope
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<LocalVaultScope>();
     private bool _disposed;
 
     /// <summary>

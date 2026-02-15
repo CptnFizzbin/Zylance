@@ -1,5 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
+using Serilog;
+using Zylance.Core.Logging;
 
 namespace Zylance.Desktop.Utils;
 
@@ -8,6 +10,8 @@ namespace Zylance.Desktop.Utils;
 /// </summary>
 public static class WebUtils
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger(typeof(WebUtils));
+
     /// <summary>
     ///     Discovers an available port by attempting to bind to it.
     /// </summary>
@@ -29,12 +33,15 @@ public static class WebUtils
 
             try
             {
+                Log.Debug("Trying port {Port} (attempt {Attempt}/{MaxAttempts})", port, attempt + 1, maxAttempts);
                 using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 socket.Bind(new IPEndPoint(IPAddress.Loopback, port));
+                Log.Debug("Port {Port} is available", port);
                 return port;
             }
-            catch (SocketException)
+            catch (SocketException ex)
             {
+                Log.Debug(ex, "Port {Port} in use", port);
                 if (attempt == maxAttempts - 1)
                     throw new InvalidOperationException(
                         $"Failed to find an available port after {maxAttempts} attempts"

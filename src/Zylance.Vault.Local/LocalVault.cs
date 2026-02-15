@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Zylance.Core.Logging;
 using Zylance.Core.Vault.Interfaces;
 using Zylance.Core.Vault.Managers;
 using Zylance.Vault.Local.Context;
@@ -12,6 +14,16 @@ namespace Zylance.Vault.Local;
 /// </summary>
 public class LocalVault(LocalVaultDbContext dbContext) : IVault, IAsyncDisposable
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<LocalVault>();
+
+    /// <summary>
+    ///     Dispose the local vault and its underlying database context.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        await dbContext.DisposeAsync();
+    }
+
     /// <summary>
     ///     Gets the account manager for managing account records.
     /// </summary>
@@ -124,13 +136,5 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault, IAsyncDisposabl
         {
             await connection.CloseAsync();
         }
-    }
-
-    /// <summary>
-    /// Dispose the local vault and its underlying database context.
-    /// </summary>
-    public async ValueTask DisposeAsync()
-    {
-        await dbContext.DisposeAsync();
     }
 }
