@@ -17,10 +17,10 @@ public class FileService(IFileProvider fileProvider)
     /// <summary>
     ///     Checks whether a file exists at the given path.
     /// </summary>
-    /// <param name="path">File system path to check.</param>
-    public bool Exists(string path)
+    /// <param name="fileRef">File ref to check.</param>
+    public Task<bool> Exists(FileRef fileRef)
     {
-        return fileProvider.Exists(path);
+        return fileProvider.Exists(fileRef);
     }
 
     /// <summary>
@@ -68,6 +68,20 @@ public class FileService(IFileProvider fileProvider)
         AssertFileRegistered(fileRef);
 
         return await fileProvider.OpenFile(fileRef);
+    }
+
+    /// <summary>
+    ///     Opens a stream for the specified FileRef and executes the provided action,
+    ///     ensuring proper disposal.
+    /// </summary>
+    /// <param name="fileRef">The file reference to open.</param>
+    /// <param name="action">A callback to perform with the file stream</param>
+    public async Task<TResult> WithFileAsync<TResult>(FileRef fileRef, Func<Stream, Task<TResult>> action)
+    {
+        AssertFileRegistered(fileRef);
+
+        await using var stream = await fileProvider.OpenFile(fileRef);
+        return await action(stream);
     }
 
     /// <summary>

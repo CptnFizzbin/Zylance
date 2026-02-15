@@ -20,14 +20,17 @@ import {
 } from "react"
 import { catchError, EMPTY, filter } from "rxjs"
 import { ImportDialog } from "@/Components/Import/ImportDialog"
-import { type ImportForm, useImportForm } from "@/Components/Import/UseImportForm"
+import {
+  type ImportForm,
+  useImportForm,
+} from "@/Components/Import/UseImportForm"
 import { useZylanceApi } from "@/Hooks/UseZylance"
 import { ZylanceEvents } from "$Generated/ZylanceConstants"
 
 export type ImportStep =
   | "selectFile"
   | "reading"
-  | "setAccounts"
+  | "accounts"
   | "importing"
   | "finished"
   | "error"
@@ -35,6 +38,7 @@ export type ImportStep =
 
 export interface ImportState {
   openDialog: () => void
+  closeDialog: () => void
   uploadFile: () => void
   cancelImport: () => void
   setAccounts: () => void
@@ -101,6 +105,7 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
     mutationFn: async () => {
       if (!importId) return
       zylanceApi.import.cancelImport({ importId })
+      setImportStep("cancelled")
     },
     onError: onError,
   })
@@ -116,7 +121,7 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     if (!importId) return
 
-    function observeImportEvents<TEvt extends { importId: string }> (
+    function observeImportEvents<TEvt extends { importId: string }>(
       eventName: string,
     ) {
       return zylanceApi
@@ -135,8 +140,8 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
         ZylanceEvents.Import_ReadingFile,
       ).subscribe(() => setImportStep("reading")),
       observeImportEvents<ImportSetAccountsEvt>(
-        ZylanceEvents.Import_SetAccounts,
-      ).subscribe(() => setImportStep("setAccounts")),
+        ZylanceEvents.Import_GetAccounts,
+      ).subscribe(() => setImportStep("accounts")),
       observeImportEvents<ImportStartedEvt>(
         ZylanceEvents.Import_Started,
       ).subscribe(() => setImportStep("importing")),
@@ -161,6 +166,7 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const state: ImportState = {
     openDialog: () => setDialogOpen(true),
+    closeDialog: () => setDialogOpen(false),
     reset: onReset,
 
     form,
@@ -180,11 +186,7 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
   return (
     <ImportContext.Provider value={state}>
       {memoizedChildren}
-      <ImportDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        afterClose={() => onReset()}
-      />
+      <ImportDialog open={dialogOpen} />
     </ImportContext.Provider>
   )
 }

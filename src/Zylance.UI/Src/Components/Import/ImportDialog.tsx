@@ -11,16 +11,10 @@ import { useImportService } from "@/Components/Import/ImportContext"
 
 export interface ImportDialogProps {
   open: boolean
-  onClose?: () => void
-  afterClose?: () => void
 }
 
-export const ImportDialog: FC<ImportDialogProps> = ({
-  open,
-  onClose,
-  afterClose,
-}) => {
-  const { importStep, setImportStep } = useImportService()
+export const ImportDialog: FC<ImportDialogProps> = ({ open }) => {
+  const { importStep, reset } = useImportService()
 
   let dialogContent = null
   switch (importStep) {
@@ -28,57 +22,27 @@ export const ImportDialog: FC<ImportDialogProps> = ({
       dialogContent = <SelectFileDialogContent />
       break
     case "reading":
-      dialogContent = (
-        <ReadingDialogContent
-          onCancel={onClose ?? (() => setImportStep("cancelled"))}
-        />
-      )
+      dialogContent = <ReadingDialogContent />
       break
-    case "setAccounts":
-      dialogContent = (
-        <SetAccountsDialogContent
-          onCancel={onClose ?? (() => setImportStep("cancelled"))}
-          onImport={() => setImportStep("importing")}
-        />
-      )
+    case "accounts":
+      dialogContent = <SetAccountsDialogContent />
       break
     case "importing":
-      dialogContent = (
-        <ImportingDialogContent
-          onCancel={onClose ?? (() => setImportStep("cancelled"))}
-        />
-      )
+      dialogContent = <ImportingDialogContent />
       break
     case "finished":
-      dialogContent = (
-        <FinishedDialogContent
-          onClose={onClose ?? (() => setImportStep("selectFile"))}
-        />
-      )
+      dialogContent = <FinishedDialogContent />
       break
     case "error":
-      dialogContent = (
-        <ErrorDialogContent
-          onTryAgain={() => setImportStep("selectFile")}
-          onClose={onClose ?? (() => setImportStep("selectFile"))}
-        />
-      )
+      dialogContent = <ErrorDialogContent />
       break
     case "cancelled":
-      dialogContent = (
-        <CancelledDialogContent
-          onClose={onClose ?? (() => setImportStep("selectFile"))}
-        />
-      )
+      dialogContent = <CancelledDialogContent />
       break
   }
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      slotProps={{ transition: { onExited: afterClose } }}
-    >
+    <Dialog open={open} slotProps={{ transition: { onExited: () => reset() } }}>
       <DialogTitle>Import Transactions</DialogTitle>
       <form>{dialogContent}</form>
     </Dialog>

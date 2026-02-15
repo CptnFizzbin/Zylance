@@ -9,10 +9,10 @@ namespace Zylance.Core.Platform.Interfaces;
 public interface IFileProvider
 {
     /// <summary>
-    ///     Checks whether the file at the given path exists.
+    ///     Checks whether the backing file for a fileRef exists.
     /// </summary>
-    /// <param name="path">Path to check.</param>
-    public bool Exists(string path);
+    /// <param name="fileRef">ref to check.</param>
+    public Task<bool> Exists(FileRef fileRef);
 
     /// <summary>
     ///     Prompts the user to select a file.

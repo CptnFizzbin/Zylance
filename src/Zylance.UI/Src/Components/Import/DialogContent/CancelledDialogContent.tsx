@@ -1,17 +1,16 @@
 import { Button, DialogActions, DialogContent } from "@mui/material"
 import type { FC } from "react"
+import { useImportService } from "@/Components/Import/ImportContext"
 
-export interface CancelledDialogContentProps {
-  onClose: () => void
+export const CancelledDialogContent: FC = () => {
+  const { closeDialog } = useImportService()
+
+  return (
+    <>
+      <DialogContent>Import cancelled.</DialogContent>
+      <DialogActions>
+        <Button onClick={closeDialog}>Close</Button>
+      </DialogActions>
+    </>
+  )
 }
-
-export const CancelledDialogContent: FC<CancelledDialogContentProps> = ({
-  onClose,
-}) => (
-  <>
-    <DialogContent>Import cancelled.</DialogContent>
-    <DialogActions>
-      <Button onClick={onClose}>Close</Button>
-    </DialogActions>
-  </>
-)

@@ -5,9 +5,9 @@ namespace Zylance.Core.Tests.Mocks;
 
 internal class MockFileProvider : IFileProvider
 {
-    public bool Exists(string path)
+    public Task<bool> Exists(FileRef fileRef)
     {
-        return true;
+        return Task.FromResult(true);
     }
 
     public Task<FileRef> SelectFile(

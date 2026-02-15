@@ -66,7 +66,7 @@ public class OfxV1ParserTests
         var statement = statements[0];
         Assert.NotNull(statement.LedgerBalance);
         Assert.Equal(1411.81m, statement.LedgerBalance.Amount);
-        Assert.Equal(new DateTimeOffset(2025, 1, 15, 12, 0, 0, TimeSpan.Zero), statement.LedgerBalance.AsOfDate);
+        Assert.Equal("2026-01-15T12:00:00.000+00:00", statement.LedgerBalance.AsOfDate.ToIso8601());
         Assert.Equal("LEDGER", statement.LedgerBalance.Type);
 
         Assert.NotNull(statement.AvailableBalance);
@@ -180,12 +180,34 @@ public class OfxV1ParserTests
         var statement = statements[0];
         Assert.NotNull(statement.LedgerBalance);
         Assert.Equal(-971.49m, statement.LedgerBalance.Amount);
-        Assert.Equal(new DateTimeOffset(2026, 2, 4, 12, 0, 0, TimeSpan.Zero), statement.LedgerBalance.AsOfDate);
+        Assert.Equal("2026-02-04T12:00:00.000+00:00", statement.LedgerBalance.AsOfDate.ToIso8601());
         Assert.Equal("LEDGER", statement.LedgerBalance.Type);
 
         Assert.NotNull(statement.AvailableBalance);
         Assert.Equal(4028.51m, statement.AvailableBalance.Amount);
         Assert.Equal("AVAIL", statement.AvailableBalance.Type);
+        return Task.CompletedTask;
+    }
+
+    [Fact]
+    public Task ParseAsync_TransactionWithMissingMemo_ParsesWithNullMemo()
+    {
+        // Arrange
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/ofx-missing-memo.ofx");
+
+        // Act
+        var statements = OfxV1Parser.Parse(reader);
+
+        // Assert
+        var statement = statements[0];
+        Assert.Single(statement.Transactions);
+        var transaction = statement.Transactions[0];
+        Assert.Equal("DEBIT", transaction.Type);
+        Assert.Equal("2026-01-02T12:00:00.000+00:00", transaction.DatePosted.ToIso8601());
+        Assert.Equal(-50.00m, transaction.Amount);
+        Assert.Equal("2026010201", transaction.Id);
+        Assert.Equal("NO MEMO TRANSACTION", transaction.Name);
+        Assert.Null(transaction.Memo); // Memo should be null if missing
         return Task.CompletedTask;
     }
 }

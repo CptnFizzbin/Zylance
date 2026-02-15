@@ -19,7 +19,7 @@ internal abstract record OfxV1Transaction : OfxTransaction
             DatePosted = element.GetToken(OfxTagNames.DatePosted).DateTimeValue,
             Amount = element.GetToken(OfxTagNames.TransactionAmount).DecimalValue,
             Name = element.GetToken(OfxTagNames.Name).Value,
-            Memo = element.GetToken(OfxTagNames.Memo).Value,
+            Memo = element.TryGetToken(OfxTagNames.Memo, out var memoToken) ? memoToken.Value : null,
             CheckNumber = element.TryGetToken(OfxTagNames.CheckNumber, out var checkNum) ? checkNum.Value : null,
             ReferenceNumber = element.TryGetToken(OfxTagNames.ReferenceNumber, out var refNum) ? refNum.Value : null,
             IsTransfer = isTransfer,

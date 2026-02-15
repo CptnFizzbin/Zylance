@@ -196,25 +196,19 @@ function generateCSharp (actions: ActionOrEvent[], events: ActionOrEvent[]): str
     #pragma warning disable CS1591 // Disable missing XML comment warnings for auto-generated code
 
     /// <summary>
-    /// Type-safe action and event name constants extracted from Protocol Buffer definitions.
+    /// All available request action names.
     /// </summary>
-    public static class ZylanceConstants
+    public static class ZylanceActions
     {
-        /// <summary>
-        /// All available request action names.
-        /// </summary>
-        public static class Actions
-        {
-            ${actionConstants.join("\n            ")}
-        }
+        ${actionConstants.join("\n            ")}
+    }
 
-        /// <summary>
-        /// All available event names.
-        /// </summary>
-        public static class Events
-        {
-            ${eventConstants.join("\n            ")}
-        }
+    /// <summary>
+    /// All available event names.
+    /// </summary>
+    public static class ZylanceEvents
+    {
+        ${eventConstants.join("\n            ")}
     }
 
     #pragma warning restore CS1591

@@ -11,11 +11,17 @@ using Zylance.Desktop.Transports;
 namespace Zylance.Desktop;
 
 /// <summary>
-/// Hosts the Zylance core and (optionally) a native window and UI server.
+///     Hosts the Zylance core and (optionally) a native window and UI server.
 /// </summary>
 /// <param name="config">Configuration for the desktop instance.</param>
-/// <param name="transport">Optional transport implementation (defaults to WebSocket).</param>
-/// <param name="fileProvider">Optional local file provider for headless mode or custom file handling.</param>
+/// <param name="transport">
+///     Optional transport implementation (defaults to
+///     WebSocket).
+/// </param>
+/// <param name="fileProvider">
+///     Optional local file provider for headless mode or
+///     custom file handling.
+/// </param>
 /// <param name="vaultProvider">Optional vault provider for persistent storage.</param>
 public class ZylanceDesktop(
     ZylanceDesktopConfig config,
@@ -34,7 +40,10 @@ public class ZylanceDesktop(
     /// <summary>Whether DisposeAsync has been called.</summary>
     public bool IsDisposed { get; private set; }
 
-    /// <summary>Access to the running ZylanceCore instance. Throws if Start() has not been called.</summary>
+    /// <summary>
+    ///     Access to the running ZylanceCore instance. Throws if Start() has not
+    ///     been called.
+    /// </summary>
     public ZylanceCore ZylanceCore =>
         _zylanceCore
         ?? throw new InvalidOperationException(
@@ -44,7 +53,10 @@ public class ZylanceDesktop(
     /// <summary>The configuration used to construct this desktop instance.</summary>
     public ZylanceDesktopConfig Config => config;
 
-    /// <summary>Dispose resources used by the desktop and stop the webserver and window.</summary>
+    /// <summary>
+    ///     Dispose resources used by the desktop and stop the webserver and
+    ///     window.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         if (_webServer is not null)
@@ -56,7 +68,10 @@ public class ZylanceDesktop(
         GC.SuppressFinalize(this);
     }
 
-    /// <summary>Starts the desktop: web server, window (unless headless), transport and core.</summary>
+    /// <summary>
+    ///     Starts the desktop: web server, window (unless headless), transport
+    ///     and core.
+    /// </summary>
     public ZylanceDesktop Start()
     {
         if (config.UiServerEnabled)
@@ -79,7 +94,7 @@ public class ZylanceDesktop(
         _vaultProvider ??= new DesktopVaultProvider(_fileProvider);
 
         _zylanceCore = new ZylanceCore(_transport, _fileProvider, _vaultProvider);
-        _zylanceCore.Gateway.ObserveEvent(ZylanceConstants.Events.Desktop_Exit).Subscribe(_ => Exit());
+        _zylanceCore.Gateway.ObserveEvent(ZylanceEvents.Desktop_Exit).Subscribe(_ => Exit());
 
         return this;
     }

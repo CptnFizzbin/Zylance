@@ -1,4 +1,5 @@
 using System.Globalization;
+using Zylance.Contract;
 using Zylance.Contract.Api.File;
 using Zylance.Contract.Models.Account;
 using Zylance.Core.Gateway.Models;
@@ -23,24 +24,41 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
     [RequestHandler]
     public async Task StartImport(ZyRequest<StartImportReq> req, ZyResponse<StartImportRes> res)
     {
-        var cancellationToken = new CancellationToken(false);
-        var importId = Guid.CreateVersion7().ToString();
-        var vault = vaultContext.ActiveVault;
+        var cancellationSource = new CancellationTokenSource();
 
+        var vault = vaultContext.ActiveVault;
         if (vault?.Locked ?? true)
             throw VaultException.VaultLocked();
 
         var fileRef = req.Data.FileRef;
+        if (!await fileService.Exists(fileRef))
+            throw new FileNotFoundException($"File not found: {fileRef}");
 
-        // TODO: Implement actual import logic and generate a real import_id
+        var importId = Guid.CreateVersion7().ToString();
         res.SetData(new StartImportRes { ImportId = importId });
         res.Send();
+
+        _ = zylance
+            .Gateway.ObserveEvent<ImportCancelledEvt>(ZylanceEvents.Import_Cancelled)
+            .Select(evt => evt.ImportId == importId)
+            .TakeFirstAsync(cancellationSource.Token)
+            .ContinueWith(
+                _ =>
+                {
+                    Console.WriteLine("Import cancelled, triggering cancellation token.");
+                    return cancellationSource.CancelAsync();
+                },
+                cancellationSource.Token
+            );
 
         // TODO: find the right importer based on the file extension and call it to process the file
         var importer = new OfxImportParser();
 
-        var fileStream = await fileService.OpenFileAsync(fileRef);
-        var statements = await importer.ParseAsync(fileStream, cancellationToken);
+        var statements = await fileService.WithFileAsync(
+            fileRef,
+            fileStream => importer.ParseAsync(fileStream, cancellationSource.Token)
+        );
+
         var knownAccounts = (await vault.Accounts.ListAsync()).ToDictionary(a => a.Id, a => a);
 
         var accounts = statements
@@ -66,7 +84,11 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
 
         var evtData = new ImportGetAccountsEvt { ImportId = importId };
         evtData.Accounts.AddRange(accounts);
-
         zylance.Gateway.Send(MessageUtils.ToEventPayload(evtData));
+
+        await zylance
+            .Gateway.ObserveEvent<ImportCancelledEvt>(ZylanceEvents.Import_GetAccounts)
+            .Select(evt => evt.ImportId == importId)
+            .TakeFirstAsync(cancellationSource.Token);
     }
 }

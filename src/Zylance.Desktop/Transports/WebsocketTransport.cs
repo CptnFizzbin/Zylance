@@ -44,7 +44,6 @@ public class WebsocketTransport : ITransport, IDisposable
             };
             socket.OnMessage = message =>
             {
-                Console.WriteLine($"WebSocket message received: {message}");
                 _receiveCallback?.Invoke(message);
             };
         });
@@ -68,14 +67,9 @@ public class WebsocketTransport : ITransport, IDisposable
     public void Send(string message)
     {
         if (_client is not null && _client.IsAvailable)
-        {
-            Console.WriteLine($"Sending WebSocket message: {message}");
             _client.Send(message);
-        }
         else
-        {
             Console.WriteLine("Attempted to send message, but no WebSocket client is connected.");
-        }
     }
 
     /// <summary>

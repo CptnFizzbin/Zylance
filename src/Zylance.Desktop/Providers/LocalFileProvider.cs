@@ -39,12 +39,10 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
         GC.SuppressFinalize(this);
     }
 
-    /// <summary>
-    ///     Determines whether the specified path exists on disk.
-    /// </summary>
-    /// <param name="path">File system path to check.</param>
-    public bool Exists(string path)
+    /// <inheritdoc />
+    public async Task<bool> Exists(FileRef fileRef)
     {
+        var path = await GetFilePath(fileRef);
         return File.Exists(path);
     }
 

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Google.Protobuf;
 using Zylance.Contract;
 using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Gateway.Handlers;
@@ -29,7 +30,7 @@ public class GatewayService
         _transport.Receive(message => _ = HandleMessage(message));
 
         SubscribeToEvent(
-            ZylanceConstants.Events.Vault_VaultClosed,
+            ZylanceEvents.Vault_VaultClosed,
             _ =>
             {
                 Console.WriteLine("Vault closed. Clearing event listeners.");
@@ -79,6 +80,17 @@ public class GatewayService
     public EventObservable ObserveEvent(string eventName)
     {
         return new EventObservable(this, eventName);
+    }
+
+    /// <summary>
+    ///     Creates an observable that listens for events with the specified name.
+    /// </summary>
+    public EventObservable<TData> ObserveEvent<TData>(string eventName)
+        where TData : IMessage, new()
+    {
+        return ObserveEvent(eventName)
+            .Select(evt => new ZyEvent<TData> { Payload = evt.Payload })
+            .Select(evt => evt.Data);
     }
 
     /// <summary>
