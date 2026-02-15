@@ -43,7 +43,28 @@ public interface IVault
     /// <summary>
     ///     Executes an action within a vault scope, ensuring disposal.
     /// </summary>
-    public Task WithScope(Func<IVaultScope, Task> action);
+    public async Task WithScope(Func<IVaultScope, Task> action)
+    {
+        await using var scope = CreateScope();
+        try
+        {
+            await action(scope);
+            await scope.Commit();
+        }
+        catch
+        {
+            await scope.Rollback();
+            throw;
+        }
+    }
+
+    /// <summary>
+    ///     Executes an action within a vault scope, ensuring disposal.
+    /// </summary>
+    public Task WithScope(Func<IVault, Task> action)
+    {
+        return WithScope(scope => action(scope.Vault));
+    }
 
     /// <summary>
     ///     Converts the vault to a serializable reference object.

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Zylance.Core.Vault.Models;
 
 namespace Zylance.Vault.Local.Entities;
 
@@ -11,7 +12,8 @@ public class AccountEntity
     ///     Unique identifier for the account.
     /// </summary>
     [Key]
-    public required Guid Id { get; init; }
+    [MaxLength(255)]
+    public required string Id { get; init; }
 
     /// <summary>
     ///     Human-friendly account name.
@@ -29,4 +31,18 @@ public class AccountEntity
     ///     Current balance of the account.
     /// </summary>
     public required decimal Balance { get; set; }
+
+    /// <summary>
+    ///     Converts a AccountEntity to AccountModel.
+    /// </summary>
+    public static AccountModel ToModel(AccountEntity arg)
+    {
+        return new()
+        {
+            Id = arg.Id,
+            Name = arg.Name,
+            Type = arg.Type,
+            Balance = arg.Balance,
+        };
+    }
 }

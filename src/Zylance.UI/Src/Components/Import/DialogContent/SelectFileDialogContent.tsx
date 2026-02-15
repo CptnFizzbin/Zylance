@@ -32,11 +32,17 @@ export const SelectFileDialogContent: FC = () => {
           )}
         </form.AppField>
       </DialogContent>
-      <form.Subscribe selector={(state) => !!state.values.importFile}>
-        {(fileSelected) => (
+      <form.Subscribe selector={(state) => state.values.importFile}>
+        {(fileRef) => (
           <DialogActions>
             <Button onClick={cancelImport}>Cancel</Button>
-            <Button disabled={!fileSelected} onClick={uploadFile}>
+            <Button
+              disabled={!fileRef}
+              onClick={() => {
+                if (!fileRef) return
+                uploadFile(fileRef)
+              }}
+            >
               Next
             </Button>
           </DialogActions>

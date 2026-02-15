@@ -25,6 +25,11 @@ public class VaultContext(ZylanceCore zylanceCore)
         }
     }
 
+    /// <summary>
+    ///     Gets the currently active vault or throws if none is set.
+    /// </summary>
+    public IVault ActiveVaultOrThrow => ActiveVault ?? throw new InvalidOperationException("No active vault.");
+
     private static VaultTransition DetermineTransition(IVault? oldVault, IVault? newVault)
     {
         return (Old: oldVault, New: newVault) switch
@@ -94,9 +99,6 @@ public class VaultContext(ZylanceCore zylanceCore)
         zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
-    /// <summary>
-    ///     Represents the possible state transitions for a vault.
-    /// </summary>
     private enum VaultTransition
     {
         None,

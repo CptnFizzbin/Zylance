@@ -3,7 +3,7 @@ namespace Zylance.Core.Importers.Models;
 /// <summary>
 ///     Result of an import operation.
 /// </summary>
-public record ImportResult
+public record ParseResult
 {
     /// <summary>
     ///     Gets whether the import was successful.

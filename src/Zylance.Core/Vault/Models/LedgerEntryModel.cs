@@ -6,7 +6,7 @@ namespace Zylance.Core.Vault.Models;
 /// <summary>
 ///     Represents a single ledger entry / transaction stored in the vault.
 /// </summary>
-public class LedgerEntryModel
+public record LedgerEntryModel
 {
     /// <summary>
     ///     Unique identifier for the ledger entry.

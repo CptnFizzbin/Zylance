@@ -42,7 +42,7 @@ public class LedgerEntryEntity
     public required decimal Amount { get; set; }
 
     /// <summary>
-    ///     Converts a LedgerEntryEntity to LedgerEntryData.
+    ///     Converts a LedgerEntryEntity to LedgerEntryModel.
     /// </summary>
     public static LedgerEntryModel ToModel(LedgerEntryEntity entity)
     {

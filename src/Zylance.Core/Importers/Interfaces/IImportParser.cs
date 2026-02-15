@@ -18,5 +18,5 @@ public interface IImportParser
     /// <param name="file">The file to import</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Result of the import operation.</returns>
-    Task<ImportResult> ParseAsync(Stream file, CancellationToken cancellationToken = default);
+    Task<ParseResult> ParseAsync(Stream file, CancellationToken cancellationToken = default);
 }

@@ -20,7 +20,7 @@ public class OfxImportParser : IImportParser
     /// <summary>
     ///     Imports the provided file and returns an ImportResult.
     /// </summary>
-    public Task<ImportResult> ParseAsync(Stream file, CancellationToken cancellationToken = default)
+    public Task<ParseResult> ParseAsync(Stream file, CancellationToken cancellationToken = default)
     {
         var reader = new StreamReader(file);
 
@@ -29,7 +29,7 @@ public class OfxImportParser : IImportParser
         var transactionCount = statements.Sum(s => s.Transactions.Count);
 
         return Task.FromResult(
-            new ImportResult
+            new ParseResult
             {
                 Success = true,
                 TransactionCount = transactionCount,

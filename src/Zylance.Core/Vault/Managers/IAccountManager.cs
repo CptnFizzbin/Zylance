@@ -6,7 +6,7 @@ namespace Zylance.Core.Vault.Managers;
 ///     Manager for account records in a vault.
 ///     Provides CRUD and listing operations for accounts.
 /// </summary>
-public interface IAccountManager : IRecordManager<Guid, AccountModel>
+public interface IAccountManager : IRecordManager<string, AccountModel>
 {
     /// <summary>
     ///     Returns a paged list of accounts.

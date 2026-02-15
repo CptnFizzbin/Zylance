@@ -55,26 +55,6 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     }
 
     /// <summary>
-    ///     Executes the provided action within a transactional vault scope; commits on
-    ///     success and rolls back on failure.
-    /// </summary>
-    /// <param name="action">Action to execute within the scope.</param>
-    public async Task WithScope(Func<IVaultScope, Task> action)
-    {
-        await using var scope = CreateScope();
-        try
-        {
-            await action(scope);
-            await scope.Commit();
-        }
-        catch
-        {
-            await scope.Rollback();
-            throw;
-        }
-    }
-
-    /// <summary>
     ///     Creates a LocalVault instance from a file path.
     /// </summary>
     /// <param name="filePath">Path to the SQLite database file</param>

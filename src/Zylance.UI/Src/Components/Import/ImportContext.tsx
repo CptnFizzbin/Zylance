@@ -6,7 +6,8 @@ import type {
   ImportSetAccountsEvt,
   ImportStartedEvt,
 } from "@Contract/api/Import"
-import { useStore } from "@tanstack/react-form"
+import type { AccountData } from "@Contract/models/Account"
+import type { FileRef } from "@Contract/models/File"
 import { useMutation } from "@tanstack/react-query"
 import {
   createContext,
@@ -20,10 +21,7 @@ import {
 } from "react"
 import { catchError, EMPTY, filter } from "rxjs"
 import { ImportDialog } from "@/Components/Import/ImportDialog"
-import {
-  type ImportForm,
-  useImportForm,
-} from "@/Components/Import/UseImportForm"
+import { type ImportForm, useImportForm } from "@/Components/Import/UseImportForm"
 import { useZylanceApi } from "@/Hooks/UseZylance"
 import { ZylanceEvents } from "$Generated/ZylanceConstants"
 
@@ -39,9 +37,9 @@ export type ImportStep =
 export interface ImportState {
   openDialog: () => void
   closeDialog: () => void
-  uploadFile: () => void
+  uploadFile: (fileRef: FileRef) => void
   cancelImport: () => void
-  setAccounts: () => void
+  setAccounts: (accounts: AccountData[]) => void
 
   reset: () => void
 
@@ -75,14 +73,10 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
   const [importStep, setImportStep] = useState<ImportStep>("selectFile")
   const [importError, setImportError] = useState<Error | null>(null)
 
-  const fileRef = useStore(form.store, (state) => state.values.importFile)
-
   const onError = useCallback((error: unknown) => {
     console.error("Import error:", error)
     setImportStep("error")
-    setImportError(
-      error instanceof Error ? error : new Error("An unknown error occurred"),
-    )
+    setImportError(error instanceof Error ? error : new Error(String(error)))
   }, [])
 
   const onReset = () => {
@@ -92,7 +86,7 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
   }
 
   const uploadFile = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (fileRef: FileRef) => {
       if (!fileRef) return
       const { importId } = await zylanceApi.import.uploadFile({ fileRef })
       setImportId(importId)
@@ -111,9 +105,9 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
   })
 
   const setAccounts = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (accounts: AccountData[]) => {
       if (!importId) return
-      zylanceApi.import.setAccounts({ importId, accounts: [] })
+      zylanceApi.import.setAccounts({ importId, accounts: accounts })
     },
     onError: onError,
   })
@@ -121,7 +115,7 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     if (!importId) return
 
-    function observeImportEvents<TEvt extends { importId: string }>(
+    function observeImportEvents<TEvt extends { importId: string }> (
       eventName: string,
     ) {
       return zylanceApi
@@ -141,7 +135,10 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
       ).subscribe(() => setImportStep("reading")),
       observeImportEvents<ImportSetAccountsEvt>(
         ZylanceEvents.Import_GetAccounts,
-      ).subscribe(() => setImportStep("accounts")),
+      ).subscribe((evt) => {
+        form.setFieldValue("accounts", evt.accounts ?? [])
+        setImportStep("accounts")
+      }),
       observeImportEvents<ImportStartedEvt>(
         ZylanceEvents.Import_Started,
       ).subscribe(() => setImportStep("importing")),
@@ -160,7 +157,7 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
     ]
 
     return () => subscriptions.forEach((sub) => void sub.unsubscribe())
-  }, [zylanceApi, importId, onError])
+  }, [form, zylanceApi, importId, onError])
 
   const memoizedChildren = useMemo(() => children, [children])
 
@@ -178,9 +175,9 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
     error: importError,
     setError: onError,
 
-    uploadFile: () => uploadFile.mutate(),
     cancelImport: () => cancelImport.mutate(),
-    setAccounts: () => setAccounts.mutate(),
+    uploadFile: (fileRef) => uploadFile.mutate(fileRef),
+    setAccounts: (accounts) => setAccounts.mutate(accounts),
   }
 
   return (

@@ -1,14 +1,13 @@
-using System.Globalization;
 using Zylance.Contract;
 using Zylance.Contract.Api.File;
-using Zylance.Contract.Models.Account;
 using Zylance.Core.Gateway.Models;
 using Zylance.Core.Gateway.Utils;
+using Zylance.Core.Importers.Models;
 using Zylance.Core.Importers.Ofx;
 using Zylance.Core.Router.Attributes;
 using Zylance.Core.System.Services;
 using Zylance.Core.Vault.Context;
-using Zylance.Core.Vault.Exceptions;
+using Zylance.Core.Vault.Models;
 
 namespace Zylance.Core.Router.Controllers;
 
@@ -25,10 +24,6 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
     public async Task StartImport(ZyRequest<StartImportReq> req, ZyResponse<StartImportRes> res)
     {
         var cancellationSource = new CancellationTokenSource();
-
-        var vault = vaultContext.ActiveVault;
-        if (vault?.Locked ?? true)
-            throw VaultException.VaultLocked();
 
         var fileRef = req.Data.FileRef;
         if (!await fileService.Exists(fileRef))
@@ -54,15 +49,40 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
         // TODO: find the right importer based on the file extension and call it to process the file
         var importer = new OfxImportParser();
 
-        var statements = await fileService.WithFileAsync(
+        var results = await fileService.WithFileAsync(
             fileRef,
             fileStream => importer.ParseAsync(fileStream, cancellationSource.Token)
         );
 
+        var accounts = await GetAccountData(importId, results.Statements, cancellationSource.Token);
+
+        var transactions = results.Statements.SelectMany(s => s.Transactions).ToList();
+
+        try
+        {
+            await PerformImport(importId, accounts, transactions);
+            var evt = new ImportFinishedEvt { ImportId = importId, Success = true };
+            zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
+        }
+        catch (Exception e)
+        {
+            var evt = new ImportErrorEvt { ImportId = importId, ErrorMessage = e.Message };
+            zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
+            throw;
+        }
+    }
+
+    private async Task<List<AccountModel>> GetAccountData(
+        string importId,
+        List<ImportStatement> statements,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var vault = vaultContext.ActiveVaultOrThrow;
         var knownAccounts = (await vault.Accounts.ListAsync()).ToDictionary(a => a.Id, a => a);
 
         var accounts = statements
-            .Statements.Select(s => s.Account)
+            .Select(s => s.Account)
             .DistinctBy(a => a.Id)
             .Select(a =>
             {
@@ -70,25 +90,60 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
                     ? knownAccount.Name
                     : string.Empty;
 
-                return new AccountData
+                return a with
                 {
-                    Id = a.Id,
                     Name = accountName,
-                    Type = a.Type,
-                    Currency = a.Currency,
-                    Balance = a.Balance.ToString(CultureInfo.InvariantCulture),
-                    AvailableBalance = a.AvailableBalance?.ToString(CultureInfo.InvariantCulture),
                 };
             })
-            .ToArray();
+            .Select(AccountModel.ToData);
 
-        var evtData = new ImportGetAccountsEvt { ImportId = importId };
-        evtData.Accounts.AddRange(accounts);
-        zylance.Gateway.Send(MessageUtils.ToEventPayload(evtData));
+        var accountsValid = false;
+        while (!accountsValid)
+        {
+            var evtData = new ImportGetAccountsEvt { ImportId = importId };
+            evtData.Accounts.AddRange(accounts);
+            zylance.Gateway.Send(MessageUtils.ToEventPayload(evtData));
 
-        await zylance
-            .Gateway.ObserveEvent<ImportCancelledEvt>(ZylanceEvents.Import_GetAccounts)
-            .Select(evt => evt.ImportId == importId)
-            .TakeFirstAsync(cancellationSource.Token);
+            accounts = await zylance
+                .Gateway.ObserveEvent<ImportSetAccountsEvt>(ZylanceEvents.Import_SetAccounts)
+                .Where(evt => evt.ImportId == importId)
+                .Select(evt => evt.Accounts)
+                .TakeFirstAsync(cancellationToken);
+
+            // TODO: validate accounts (e.g., missing required fields, etc.)
+            accountsValid = true;
+        }
+
+        return [.. accounts.Select(AccountModel.FromData)];
+    }
+
+    private void ReportProgress(string importId, int progress, int total)
+    {
+        var percent = (float)progress / total * 100;
+        var evt = new ImportProgressEvt { ImportId = importId, Progress = percent };
+        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
+    }
+
+    private async Task PerformImport(string importId, List<AccountModel> accounts, List<LedgerEntryModel> transactions)
+    {
+        var totalTasks = accounts.Count + transactions.Count;
+        var completedTasks = 0;
+
+        var vault = vaultContext.ActiveVaultOrThrow;
+        await vault.WithScope(async trxVault =>
+        {
+            ReportProgress(importId, completedTasks, totalTasks);
+            foreach (var model in accounts)
+            {
+                await trxVault.Accounts.SaveAsync(model);
+                ReportProgress(importId, ++completedTasks, totalTasks);
+            }
+
+            foreach (var transaction in transactions)
+            {
+                await trxVault.Ledgers.SaveAsync(transaction);
+                ReportProgress(importId, ++completedTasks, totalTasks);
+            }
+        });
     }
 }

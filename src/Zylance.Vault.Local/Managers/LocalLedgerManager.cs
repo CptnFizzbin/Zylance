@@ -82,6 +82,15 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
     }
 
     /// <summary>
+    ///     Returns all ledger entries in the database as models.
+    /// </summary>
+    /// <returns>All ledger entries as models.</returns>
+    public Task<List<LedgerEntryModel>> GetAllAsync()
+    {
+        return Task.FromResult(dbContext.LedgerEntries.Select(LedgerEntryEntity.ToModel).ToList());
+    }
+
+    /// <summary>
     ///     Deletes a ledger entry by its ID.
     /// </summary>
     /// <param name="recordId">The ledger entry ID to delete</param>
@@ -92,13 +101,32 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
     /// </exception>
     public async Task<LedgerEntryModel> DeleteAsync(Guid recordId)
     {
-        var entity = await dbContext.LedgerEntries.FindAsync(recordId);
-        if (entity is null)
-            throw new KeyNotFoundException($"Ledger entry with ID {recordId} not found");
+        var entity =
+            await dbContext.LedgerEntries.FindAsync(recordId)
+            ?? throw new KeyNotFoundException($"Ledger entry with ID {recordId} not found");
 
         dbContext.LedgerEntries.Remove(entity);
         await dbContext.SaveChangesAsync();
         return LedgerEntryEntity.ToModel(entity);
+    }
+
+    /// <summary>
+    ///     Deletes each ledger entry in the provided list by ID and returns the
+    ///     deleted entries.
+    /// </summary>
+    /// <param name="records">The ledger entries to delete.</param>
+    /// <returns>The deleted ledger entries.</returns>
+    public async Task<List<LedgerEntryModel>> DeleteAsync(List<LedgerEntryModel> records)
+    {
+        // Deletes each ledger entry in the provided list by ID and returns the deleted entries.
+        var deletedEntries = new List<LedgerEntryModel>();
+        foreach (var record in records)
+        {
+            var entity = await DeleteAsync(record.Id);
+            deletedEntries.Add(entity);
+        }
+
+        return deletedEntries;
     }
 
     /// <summary>
@@ -195,6 +223,24 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
 
         await dbContext.SaveChangesAsync();
         return LedgerEntryEntity.ToModel(entity);
+    }
+
+    /// <summary>
+    ///     Saves each ledger entry in the provided list and returns the saved entries.
+    /// </summary>
+    /// <param name="records">The ledger entries to save.</param>
+    /// <returns>The saved ledger entries.</returns>
+    public async Task<List<LedgerEntryModel>> SaveAsync(List<LedgerEntryModel> records)
+    {
+        // Saves each ledger entry in the provided list and returns the saved entries.
+        var savedEntries = new List<LedgerEntryModel>();
+        foreach (var record in records)
+        {
+            var savedEntry = await SaveAsync(record);
+            savedEntries.Add(savedEntry);
+        }
+
+        return savedEntries;
     }
 
     /// <summary>
