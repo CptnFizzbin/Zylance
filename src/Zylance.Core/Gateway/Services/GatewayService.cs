@@ -49,6 +49,12 @@ public class GatewayService
         Send(envelope);
     }
 
+    public void SendEvent<TEvt>(TEvt evt)
+        where TEvt : IMessage, new()
+    {
+        Send(MessageUtils.ToEventPayload(evt));
+    }
+
     /// <summary>
     ///     Sends an event payload over the configured transport.
     /// </summary>

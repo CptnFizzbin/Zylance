@@ -60,14 +60,13 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
 
         try
         {
+            zylance.Gateway.SendEvent(new ImportStartedEvt { ImportId = importId });
             await PerformImport(importId, accounts, transactions);
-            var evt = new ImportFinishedEvt { ImportId = importId, Success = true };
-            zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
+            zylance.Gateway.SendEvent(new ImportFinishedEvt { ImportId = importId, Success = true });
         }
         catch (Exception e)
         {
-            var evt = new ImportErrorEvt { ImportId = importId, ErrorMessage = e.Message };
-            zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
+            zylance.Gateway.SendEvent(new ImportErrorEvt { ImportId = importId, ErrorMessage = e.Message });
             throw;
         }
     }
