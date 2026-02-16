@@ -23,6 +23,7 @@ public interface ILedgerManager : IRecordManager<Guid, LedgerEntryModel>
 
     /// <summary>
     ///     Finds ledger entries by a list of external/online transaction IDs.
+    ///     Returns an empty list if no matches are found.
     /// </summary>
     /// <param name="trxIds">The list of trxIds to fetch</param>
     /// <returns>A list of matching ledger entries</returns>

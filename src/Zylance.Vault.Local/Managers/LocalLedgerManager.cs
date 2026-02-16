@@ -12,17 +12,7 @@ namespace Zylance.Vault.Local.Managers;
 /// </summary>
 public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
 {
-    /// <summary>
-    ///     Lists ledger entries with optional filtering and pagination.
-    ///     Why use LINQ queries? EF Core translates LINQ expressions into efficient
-    ///     SQL queries,
-    ///     allowing us to work with strongly-typed C# expressions while getting
-    ///     database-level
-    ///     performance benefits like filtering and sorting before loading data into
-    ///     memory.
-    /// </summary>
-    /// <param name="filter">Optional filter criteria for pagination and filtering</param>
-    /// <returns>A cursor-based paginated list of ledger entries</returns>
+    /// <inheritdoc />
     public async Task<CursorList<LedgerEntryModel>> ListAsync(LedgerFilter? filter)
     {
         var query = ApplyFilter(dbContext.LedgerEntries.AsQueryable(), filter);
@@ -64,15 +54,7 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
         };
     }
 
-    /// <summary>
-    ///     Gets a ledger entry by its ID.
-    /// </summary>
-    /// <param name="recordId">The ledger entry ID</param>
-    /// <returns>The ledger entry data</returns>
-    /// <exception cref="KeyNotFoundException">
-    ///     Thrown when the ledger entry is not
-    ///     found
-    /// </exception>
+    /// <inheritdoc />
     public async Task<LedgerEntryModel> GetAsync(Guid recordId)
     {
         var entity = await dbContext.LedgerEntries.FindAsync(recordId);
@@ -81,24 +63,13 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
             : LedgerEntryEntity.ToModel(entity);
     }
 
-    /// <summary>
-    ///     Returns all ledger entries in the database as models.
-    /// </summary>
-    /// <returns>All ledger entries as models.</returns>
+    /// <inheritdoc />
     public Task<List<LedgerEntryModel>> GetAllAsync()
     {
         return Task.FromResult(dbContext.LedgerEntries.Select(LedgerEntryEntity.ToModel).ToList());
     }
 
-    /// <summary>
-    ///     Deletes a ledger entry by its ID.
-    /// </summary>
-    /// <param name="recordId">The ledger entry ID to delete</param>
-    /// <returns>The deleted ledger entry data</returns>
-    /// <exception cref="KeyNotFoundException">
-    ///     Thrown when the ledger entry is not
-    ///     found
-    /// </exception>
+    /// <inheritdoc />
     public async Task<LedgerEntryModel> DeleteAsync(Guid recordId)
     {
         var entity =
@@ -110,12 +81,7 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
         return LedgerEntryEntity.ToModel(entity);
     }
 
-    /// <summary>
-    ///     Deletes each ledger entry in the provided list by ID and returns the
-    ///     deleted entries.
-    /// </summary>
-    /// <param name="records">The ledger entries to delete.</param>
-    /// <returns>The deleted ledger entries.</returns>
+    /// <inheritdoc />
     public async Task<List<LedgerEntryModel>> DeleteAsync(List<LedgerEntryModel> records)
     {
         // Deletes each ledger entry in the provided list by ID and returns the deleted entries.
@@ -129,12 +95,7 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
         return deletedEntries;
     }
 
-    /// <summary>
-    ///     Searches ledger entries with text search and optional filtering.
-    /// </summary>
-    /// <param name="searchText">The text to search for in payee and memo fields</param>
-    /// <param name="filter">Optional filter criteria for pagination and filtering</param>
-    /// <returns>A cursor-based paginated list of ledger entries matching the search</returns>
+    /// <inheritdoc />
     public async Task<CursorList<LedgerEntryModel>> SearchAsync(string searchText, LedgerFilter? filter)
     {
         var query = ApplyFilter(dbContext.LedgerEntries.AsQueryable(), filter);
@@ -185,12 +146,7 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
         };
     }
 
-    /// <summary>
-    ///     Saves a ledger entry. Creates a new entry if the ID doesn't exist, or
-    ///     updates an existing one.
-    /// </summary>
-    /// <param name="record">The ledger entry data to save</param>
-    /// <returns>The saved ledger entry data</returns>
+    /// <inheritdoc />
     public async Task<LedgerEntryModel> SaveAsync(LedgerEntryModel record)
     {
         var id = record.Id;
@@ -227,11 +183,7 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
         return LedgerEntryEntity.ToModel(entity);
     }
 
-    /// <summary>
-    ///     Saves each ledger entry in the provided list and returns the saved entries.
-    /// </summary>
-    /// <param name="records">The ledger entries to save.</param>
-    /// <returns>The saved ledger entries.</returns>
+    /// <inheritdoc />
     public async Task<List<LedgerEntryModel>> SaveAsync(List<LedgerEntryModel> records)
     {
         // Saves each ledger entry in the provided list and returns the saved entries.
@@ -245,6 +197,7 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
         return savedEntries;
     }
 
+    /// <inheritdoc />
     public Task<List<LedgerEntryModel>> FindByTrxIdsAsync(IEnumerable<string> trxIds)
     {
         var entries = dbContext
