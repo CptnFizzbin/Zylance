@@ -10,7 +10,7 @@ namespace Zylance.Vault.Local.Entities;
 /// </summary>
 public class LedgerEntryEntity
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<LedgerEntryEntity>();
+    private static readonly ILogger Log = ZyLogger.ForContext<LedgerEntryEntity>();
 
     /// <summary>
     ///     Unique identifier for the ledger entry.

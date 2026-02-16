@@ -11,7 +11,7 @@ namespace Zylance.Core.System.Services;
 /// </summary>
 public class BackgroundTaskService(ZylanceCore zylanceCore)
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<BackgroundTaskService>();
+    private static readonly ILogger Log = ZyLogger.ForContext<BackgroundTaskService>();
 
     /// <summary>
     ///     Notifies that a background task has started.

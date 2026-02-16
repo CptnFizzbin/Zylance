@@ -14,7 +14,7 @@ namespace Zylance.Core.Router.Controllers;
 [Controller]
 public class FileController(FileService fileService)
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<FileController>();
+    private static readonly ILogger Log = ZyLogger.ForContext<FileController>();
 
     /// <summary>
     ///     Selects a file using the platform file provider and returns the selected

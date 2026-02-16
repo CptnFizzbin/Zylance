@@ -13,7 +13,7 @@ namespace Zylance.Desktop.Providers;
 /// <param name="fileSystem">Local file provider used to select and manage files.</param>
 public class DesktopVaultProvider(ILocalFileProvider fileSystem) : IVaultProvider
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<DesktopVaultProvider>();
+    private static readonly ILogger Log = ZyLogger.ForContext<DesktopVaultProvider>();
 
     /// <summary>
     ///     Opens an existing vault selected by the user.

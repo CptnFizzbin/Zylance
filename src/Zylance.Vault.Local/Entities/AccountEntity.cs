@@ -10,7 +10,7 @@ namespace Zylance.Vault.Local.Entities;
 /// </summary>
 public class AccountEntity
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<AccountEntity>();
+    private static readonly ILogger Log = ZyLogger.ForContext<AccountEntity>();
 
     /// <summary>
     ///     Unique identifier for the account.

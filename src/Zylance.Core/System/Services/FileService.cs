@@ -13,7 +13,7 @@ namespace Zylance.Core.System.Services;
 /// </summary>
 public class FileService(IFileProvider fileProvider)
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<FileService>();
+    private static readonly ILogger Log = ZyLogger.ForContext<FileService>();
     private readonly Lock _lock = new();
     private readonly Dictionary<string, bool> _readOnlyRegistry = new();
 

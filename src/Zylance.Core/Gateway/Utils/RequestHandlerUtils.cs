@@ -13,7 +13,7 @@ namespace Zylance.Core.Gateway.Utils;
 /// </summary>
 public static class RequestHandlerUtils
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger(typeof(RequestHandlerUtils));
+    private static readonly ILogger Log = ZyLogger.ForContext(typeof(RequestHandlerUtils));
 
     /// <summary>
     ///     Wraps a strongly-typed async handler (returns Task) into a generic

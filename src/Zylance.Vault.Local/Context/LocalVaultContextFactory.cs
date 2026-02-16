@@ -11,7 +11,7 @@ namespace Zylance.Vault.Local.Context;
 /// </summary>
 public class LocalVaultContextFactory : IDesignTimeDbContextFactory<LocalVaultDbContext>
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<LocalVaultContextFactory>();
+    private static readonly ILogger Log = ZyLogger.ForContext<LocalVaultContextFactory>();
 
     /// <summary>
     ///     Creates a new DbContext using the provided command-line args (first arg is

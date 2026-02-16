@@ -12,7 +12,7 @@ namespace Zylance.Core.Gateway.Utils;
 /// </summary>
 public static class EventHandlerUtils
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger(typeof(EventHandlerUtils));
+    private static readonly ILogger Log = ZyLogger.ForContext(typeof(EventHandlerUtils));
 
     /// <summary>
     ///     Wraps a strongly-typed event handler into a generic AsyncZyEventHandler.

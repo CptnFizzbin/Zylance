@@ -1,10 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog;
 using Zylance.Core.Gateway.Services;
 using Zylance.Core.Lib.Gateway.Extensions;
+using Zylance.Core.Logging;
 using Zylance.Core.Platform.Interfaces;
-using Zylance.Core.Router.Services;
 using Zylance.Core.System.Services;
 using Zylance.Core.Vault.Context;
 using Zylance.Core.Vault.Interfaces;
@@ -18,6 +17,8 @@ namespace Zylance.Core;
 /// </summary>
 public class ZylanceCore
 {
+    private static readonly ILogger Log = ZyLogger.ForContext<ZylanceCore>();
+
     /// <summary>
     ///     Initializes a new instance of Zylance with platform-specific
     ///     implementations.
@@ -28,40 +29,31 @@ public class ZylanceCore
     /// <param name="vaultProvider">The vault provider implementation.</param>
     public ZylanceCore(ITransport transport, IFileProvider fileProvider, IVaultProvider vaultProvider)
     {
-        Log.Information("[Zylance] Initializing...");
+        Log.Information("Initializing...");
 
-        // Build the internal DI container
         var services = new ServiceCollection();
 
         services.AddSingleton(this);
 
-        // Register platform-specific implementations
         services.AddSingleton(transport);
         services.AddSingleton(fileProvider);
         services.AddSingleton(vaultProvider);
 
-        // Register all core Zylance services
-        Log.Information("[Zylance] Calling AddZylance()...");
         services.AddSingleton<FileService>();
         services.AddSingleton<VaultService>();
         services.AddSingleton<VaultContext>();
         services.AddSingleton<BackgroundTaskService>();
         services.AddZylanceRouter();
+        services.AddSingleton<GatewayService>();
 
-        services.TryAddSingleton<GatewayService>(sp =>
-        {
-            var router = sp.GetRequiredService<RouterService>();
-            return new GatewayService(transport, router);
-        });
-
-        Log.Information("[Zylance] Building service provider...");
+        Log.Information("Building service provider...");
         IServiceProvider serviceProvider = services.BuildServiceProvider();
 
         // Resolve and cache the vault context
-        Log.Information("[Zylance] Initializing Gateway...");
+        Log.Information("Initializing Gateway...");
         Gateway = serviceProvider.GetRequiredService<GatewayService>();
 
-        Log.Information("[Zylance] Initialization complete!");
+        Log.Information("Initialization complete!");
     }
 
     /// <summary>

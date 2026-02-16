@@ -13,7 +13,7 @@ namespace Zylance.Core.Router.Controllers;
 [Controller]
 public class VaultController(VaultService vaultService)
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<VaultController>();
+    private static readonly ILogger Log = ZyLogger.ForContext<VaultController>();
 
     /// <summary>
     ///     Opens the active vault and returns its reference.

@@ -12,7 +12,7 @@ namespace Zylance.Vault.Local.Context;
 /// </summary>
 public class LocalVaultDbContext(DbContextOptions<LocalVaultDbContext> options) : DbContext(options)
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<LocalVaultDbContext>();
+    private static readonly ILogger Log = ZyLogger.ForContext<LocalVaultDbContext>();
 
     /// <summary>
     ///     Accounts table mapping.

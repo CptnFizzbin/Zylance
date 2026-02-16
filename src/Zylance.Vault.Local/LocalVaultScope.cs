@@ -16,7 +16,7 @@ namespace Zylance.Vault.Local;
 /// </summary>
 public class LocalVaultScope(LocalVault vault, IDbContextTransaction transaction) : IVaultScope
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<LocalVaultScope>();
+    private static readonly ILogger Log = ZyLogger.ForContext<LocalVaultScope>();
     private bool _disposed;
 
     /// <summary>

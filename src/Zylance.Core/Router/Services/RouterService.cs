@@ -14,7 +14,7 @@ namespace Zylance.Core.Router.Services;
 /// </summary>
 public class RouterService
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<RouterService>();
+    private static readonly ILogger Log = ZyLogger.ForContext<RouterService>();
     private readonly Dictionary<string, AsyncZyEventHandler> _eventHandlers = [];
     private readonly Dictionary<string, AsyncZyRequestHandler> _requestHandlers = [];
 

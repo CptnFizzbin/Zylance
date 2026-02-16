@@ -10,7 +10,7 @@ namespace Zylance.Desktop.Utils;
 /// </summary>
 public static class WebUtils
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger(typeof(WebUtils));
+    private static readonly ILogger Log = ZyLogger.ForContext(typeof(WebUtils));
 
     /// <summary>
     ///     Discovers an available port by attempting to bind to it.

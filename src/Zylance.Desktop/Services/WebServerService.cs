@@ -14,7 +14,7 @@ namespace Zylance.Desktop.Services;
 /// </summary>
 public sealed class WebServerService : IAsyncDisposable
 {
-    private static readonly ILogger Log = CreateLogger<WebServerService>();
+    private static readonly ILogger Log = ForContext<WebServerService>();
     private readonly WebApplication _app;
 
     /// <summary>

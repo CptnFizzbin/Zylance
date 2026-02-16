@@ -14,7 +14,7 @@ namespace Zylance.Vault.Local.Entities;
 [Table("_zylance_")]
 public class ZylanceMetadataEntity
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<ZylanceMetadataEntity>();
+    private static readonly ILogger Log = ZyLogger.ForContext<ZylanceMetadataEntity>();
 
     /// <summary>
     ///     Metadata key name.
