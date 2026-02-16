@@ -35,9 +35,14 @@ public static class ZyLogger
         return Log.ForContext(source);
     }
 
+    /// <summary>
+    ///     Sanitizes a log message by replacing line endings with spaces to prevent
+    ///     log injection attacks and maintain log integrity.
+    /// </summary>
+    /// <param name="message">The message to sanitize</param>
+    /// <returns>The sanitized message</returns>
     public static string Sanitize(string message)
     {
-        message.ReplaceLineEndings(" ");
-        return message;
+        return message.ReplaceLineEndings(" ");
     }
 }
