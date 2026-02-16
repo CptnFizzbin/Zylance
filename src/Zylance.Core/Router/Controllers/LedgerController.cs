@@ -80,8 +80,8 @@ public class LedgerController(VaultContext vaultContext)
         };
         resData.Entries.AddRange([.. result.Items.Select(LedgerEntryModel.ToData)]);
 
-        res.SetData(resData);
         Log.Debug("ListLedgerEntries returned {Count} entries", result.Items.Count);
+        res.SetData(resData);
     }
 
     /// <summary>
@@ -157,7 +157,7 @@ public class LedgerController(VaultContext vaultContext)
         };
         resData.Entries.AddRange([.. result.Items.Select(LedgerEntryModel.ToData)]);
 
-        res.SetData(resData);
         Log.Debug("SearchLedgerEntries returned {Count} results", result.Items.Count);
+        res.SetData(resData);
     }
 }

@@ -137,4 +137,12 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault, IAsyncDisposabl
             await connection.CloseAsync();
         }
     }
+
+    /// <summary>
+    /// Dispose the local vault and its underlying database context.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        await dbContext.DisposeAsync();
+    }
 }
