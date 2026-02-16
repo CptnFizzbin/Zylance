@@ -13,7 +13,7 @@ namespace Zylance.Vault.Local.Managers;
 /// </summary>
 public class LocalAccountManager(LocalVaultDbContext dbContext) : IAccountManager
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<LocalAccountManager>();
+    private static readonly ILogger Log = ZyLogger.ForContext<LocalAccountManager>();
 
     /// <summary>
     ///     Gets an account by its string ID.

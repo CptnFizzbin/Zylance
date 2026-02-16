@@ -17,7 +17,7 @@ public static class ZyLogger
     ///     A Serilog <see cref="ILogger" /> configured for the given class
     ///     context.
     /// </returns>
-    public static ILogger CreateLogger<TClass>()
+    public static ILogger ForContext<TClass>()
     {
         return Log.ForContext<TClass>();
     }
@@ -30,7 +30,7 @@ public static class ZyLogger
     ///     A Serilog <see cref="ILogger" /> configured for the given class
     ///     context.
     /// </returns>
-    public static ILogger CreateLogger(Type source)
+    public static ILogger ForContext(Type source)
     {
         return Log.ForContext(source);
     }

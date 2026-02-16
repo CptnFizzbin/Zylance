@@ -11,7 +11,7 @@ namespace Zylance.Desktop.Transports;
 /// </summary>
 public class WebsocketTransport : ITransport, IDisposable
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<WebsocketTransport>();
+    private static readonly ILogger Log = ZyLogger.ForContext<WebsocketTransport>();
     private readonly WebSocketServer _server;
     private IWebSocketConnection? _client;
     private Action<string>? _receiveCallback;

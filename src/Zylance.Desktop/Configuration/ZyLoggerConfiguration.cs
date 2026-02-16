@@ -1,5 +1,6 @@
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting.Compact;
 
 namespace Zylance.Desktop.Configuration;
 
@@ -25,9 +26,9 @@ public static class ZyLoggerConfiguration
 
         var logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
-            .WriteTo.Console()
-            .WriteTo.File(logPath, LogEventLevel.Information, shared: true)
-            .WriteTo.File(errorLogPath, LogEventLevel.Error, shared: true)
+            .WriteTo.Console(new CompactJsonFormatter())
+            .WriteTo.File(new CompactJsonFormatter(), logPath, LogEventLevel.Information, shared: true)
+            .WriteTo.File(new CompactJsonFormatter(), errorLogPath, LogEventLevel.Error, shared: true)
             .CreateLogger();
 
         RotateLogs(config.LogPath);

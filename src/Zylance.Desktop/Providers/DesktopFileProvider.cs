@@ -15,7 +15,7 @@ namespace Zylance.Desktop.Providers;
 public class DesktopFileProvider(PhotinoWindow window, string appDataPath, string tempDataPath)
     : LocalFileProvider(appDataPath, tempDataPath)
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<DesktopFileProvider>();
+    private static readonly ILogger Log = ZyLogger.ForContext<DesktopFileProvider>();
 
     /// <summary>
     ///     Shows an open-file dialog and returns a FileRef for the selected file.

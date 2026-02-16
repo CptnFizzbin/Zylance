@@ -11,7 +11,7 @@ namespace Zylance.Vault.Local;
 /// </summary>
 public class NonZylanceDatabaseException : Exception
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<NonZylanceDatabaseException>();
+    private static readonly ILogger Log = ZyLogger.ForContext<NonZylanceDatabaseException>();
 
     /// <summary>
     ///     Creates an exception for non-Zylance database errors.

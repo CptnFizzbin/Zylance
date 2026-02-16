@@ -35,6 +35,7 @@ internal static class RegisterControllerCodeGenerator
                  using Serilog;
                  using System;
                  using System.Threading.Tasks;
+                 using Zylance.Core.Logging;
                  using Zylance.Core.Gateway.Utils;
                  using Zylance.Core.Router.Services;
                  {{ForEach(namespaces, ns => $"using {ns.ToDisplayString()};")}}
@@ -54,6 +55,7 @@ internal static class RegisterControllerCodeGenerator
                     /// <returns>The same RouterService instance passed in.</returns>
                     public static RouterService Register{{controllerClassName}}(this RouterService router, {{controllerClassName}} controller)
                      {
+
                          {{ForEach(validRequestHandlers, handler =>
                              //language=csharp
                              $$"""
@@ -79,7 +81,7 @@ internal static class RegisterControllerCodeGenerator
                                            $"Request type has action '{reqAction}' but Response type has action '{resAction}'.");
 
                                    var action = reqAction;
-                                   Log.Information($"[RouterService] Registering request handler '{action}': {{controller.ClassType.Name}}.{{handler.Method.Name}}");
+                                   Log.Information($"Registering request handler '{action}': {{controller.ClassType.Name}}.{{handler.Method.Name}}");
 
                                    {{(
                                        handler.IsAsync

@@ -32,7 +32,7 @@ public class ZylanceDesktop(
     IVaultProvider? vaultProvider = null
 ) : IAsyncDisposable
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<ZylanceDesktop>();
+    private static readonly ILogger Log = ZyLogger.ForContext<ZylanceDesktop>();
 
     private ILocalFileProvider? _fileProvider = fileProvider;
     private ITransport? _transport = transport;

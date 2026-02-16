@@ -12,7 +12,7 @@ namespace Zylance.Core.Vault.Context;
 /// </summary>
 public class VaultContext(ZylanceCore zylanceCore)
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<VaultContext>();
+    private static readonly ILogger Log = ZyLogger.ForContext<VaultContext>();
 
     /// <summary>
     ///     Gets or sets the currently active vault.

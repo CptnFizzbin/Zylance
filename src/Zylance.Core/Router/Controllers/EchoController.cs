@@ -12,7 +12,7 @@ namespace Zylance.Core.Router.Controllers;
 [Controller]
 public class EchoController
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<EchoController>();
+    private static readonly ILogger Log = ZyLogger.ForContext<EchoController>();
 
     /// <summary>
     ///     Echoes the provided message back in the response.

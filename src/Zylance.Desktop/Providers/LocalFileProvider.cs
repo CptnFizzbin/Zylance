@@ -12,7 +12,7 @@ namespace Zylance.Desktop.Providers;
 /// </summary>
 public abstract class LocalFileProvider(string appDataPath, string tempDataPath) : ILocalFileProvider, IDisposable
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<LocalFileProvider>();
+    private static readonly ILogger Log = ZyLogger.ForContext<LocalFileProvider>();
 
     // Store file references in memory - maps FileRef IDs to actual file paths
     private readonly Dictionary<string, string> _fileReferences = new();

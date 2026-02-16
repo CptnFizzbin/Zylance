@@ -16,7 +16,7 @@ namespace Zylance.Core.Router.Controllers;
 [Controller]
 public class LedgerController(VaultContext vaultContext)
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<LedgerController>();
+    private static readonly ILogger Log = ZyLogger.ForContext<LedgerController>();
 
     /// <summary>
     ///     Creates a new ledger entry in the active vault.

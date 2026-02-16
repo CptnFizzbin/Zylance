@@ -14,7 +14,7 @@ namespace Zylance.Vault.Local.Managers;
 /// </summary>
 public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<LocalLedgerManager>();
+    private static readonly ILogger Log = ZyLogger.ForContext<LocalLedgerManager>();
 
     /// <inheritdoc />
     public async Task<CursorList<LedgerEntryModel>> ListAsync(LedgerFilter? filter)

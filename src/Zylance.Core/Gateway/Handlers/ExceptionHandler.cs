@@ -9,7 +9,7 @@ namespace Zylance.Core.Gateway.Handlers;
 /// </summary>
 public static class ExceptionHandler
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger(typeof(ExceptionHandler));
+    private static readonly ILogger Log = ZyLogger.ForContext(typeof(ExceptionHandler));
 
     /// <summary>
     ///     Wraps an exception into an ErrorPayload.

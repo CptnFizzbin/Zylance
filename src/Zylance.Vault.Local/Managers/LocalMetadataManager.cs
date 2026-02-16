@@ -11,7 +11,7 @@ namespace Zylance.Vault.Local.Managers;
 /// </summary>
 public class LocalMetadataManager(LocalVaultDbContext dbContext) : IMetadataManager
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<LocalMetadataManager>();
+    private static readonly ILogger Log = ZyLogger.ForContext<LocalMetadataManager>();
 
     /// <summary>
     ///     Gets a metadata value by key from the marker table.

@@ -18,7 +18,7 @@ public class VaultService(
     BackgroundTaskService backgroundTaskService
 )
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<VaultService>();
+    private static readonly ILogger Log = ZyLogger.ForContext<VaultService>();
 
     /// <summary>
     ///     Opens the active vault and returns its reference.

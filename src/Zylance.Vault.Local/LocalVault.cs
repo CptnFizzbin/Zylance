@@ -14,7 +14,7 @@ namespace Zylance.Vault.Local;
 /// </summary>
 public class LocalVault(LocalVaultDbContext dbContext) : IVault, IAsyncDisposable
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<LocalVault>();
+    private static readonly ILogger Log = ZyLogger.ForContext<LocalVault>();
 
     /// <summary>
     ///     Dispose the local vault and its underlying database context.

@@ -12,7 +12,7 @@ namespace Zylance.Core.Router.Controllers;
 [Controller]
 public class StatusController
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<StatusController>();
+    private static readonly ILogger Log = ZyLogger.ForContext<StatusController>();
 
     /// <summary>
     ///     Returns a basic status response for health monitoring.
