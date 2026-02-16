@@ -1,3 +1,4 @@
+using System.Globalization;
 using Zylance.Contract.Models.Account;
 
 namespace Zylance.Core.Vault.Services;
@@ -13,14 +14,14 @@ public class AccountService
     /// <param name="name">Account display name.</param>
     /// <param name="type">Account type identifier.</param>
     /// <param name="balance">Initial balance.</param>
-    public AccountData CreateAccount(string name, string type, double balance = 0.0)
+    public AccountData CreateAccount(string name, string type, decimal balance = decimal.Zero)
     {
         return new AccountData
         {
             Id = Guid.NewGuid().ToString(),
             Name = name,
             Type = type,
-            Balance = balance,
+            Balance = balance.ToString(CultureInfo.InvariantCulture),
         };
     }
 

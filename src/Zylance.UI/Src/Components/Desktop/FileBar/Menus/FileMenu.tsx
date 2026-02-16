@@ -2,15 +2,27 @@ import AddIcon from "@mui/icons-material/Add"
 import CloseIcon from "@mui/icons-material/Close"
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
 import FolderOpenIcon from "@mui/icons-material/FolderOpen"
-import { Divider, ListItemIcon, ListItemText, MenuItem, Typography } from "@mui/material"
+import InputIcon from "@mui/icons-material/Input"
+import {
+  Divider,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Typography,
+} from "@mui/material"
 import type { FC } from "react"
-import { FileBarMenu, type MenuBarMenuProps } from "@/Components/Desktop/FileBar/Menus/MenuBase"
+import {
+  FileBarMenu,
+  type MenuBarMenuProps,
+} from "@/Components/Desktop/FileBar/Menus/MenuBase"
+import { useImportService } from "@/Components/Import/ImportContext"
 import { useZylance } from "@/Hooks/UseZylance"
 
 export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
   onClose,
   ...props
 }) => {
+  const importService = useImportService()
   const { currentVault, zylanceApi } = useZylance()
 
   const onMenuClick = (handler: () => void) => {
@@ -42,6 +54,16 @@ export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
           <CloseIcon fontSize="small" />
         </ListItemIcon>
         <ListItemText>Close Vault</ListItemText>
+      </MenuItem>
+      <Divider />
+      <MenuItem
+        disabled={!currentVault}
+        onClick={onMenuClick(() => importService.openDialog())}
+      >
+        <ListItemIcon>
+          <InputIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>Import Transactions</ListItemText>
       </MenuItem>
       <Divider />
       <MenuItem onClick={onMenuClick(() => zylanceApi.desktop.emitExit())}>

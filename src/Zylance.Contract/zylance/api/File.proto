@@ -6,7 +6,7 @@ import "zylance/models/File.proto";
 
 option csharp_namespace = "Zylance.Contract.Api.File";
 
-// === Operations ===
+// === Actions ===
 message SelectFileReq {
   option (action) = "File:SelectFile";
   optional string title = 1;

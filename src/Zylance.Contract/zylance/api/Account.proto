@@ -6,6 +6,7 @@ import "zylance/extensions/Zylance.proto";
 
 option csharp_namespace = "Zylance.Contract.Api.Account";
 
+// === Actions ===
 message ListAccountsReq {
   option (action) = "Account:ListAccounts";
 }

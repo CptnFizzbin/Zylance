@@ -5,7 +5,7 @@ import "zylance/extensions/Zylance.proto";
 
 option csharp_namespace = "Zylance.Contract.Api.Background";
 
-// === Background Task Events ===
+// === Events ===
 message BackgroundWorkStartEvt {
   option (eventName) = "Background:WorkStart";
   string task_id = 1;

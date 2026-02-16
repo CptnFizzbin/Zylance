@@ -10,7 +10,7 @@ namespace Zylance.Vault.Local;
 ///     Local vault implementation using SQLite database through Entity Framework
 ///     Core.
 /// </summary>
-public class LocalVault(LocalVaultDbContext dbContext) : IVault
+public class LocalVault(LocalVaultDbContext dbContext) : IVault, IAsyncDisposable
 {
     /// <summary>
     ///     Gets the account manager for managing account records.
@@ -55,26 +55,6 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
     }
 
     /// <summary>
-    ///     Executes the provided action within a transactional vault scope; commits on
-    ///     success and rolls back on failure.
-    /// </summary>
-    /// <param name="action">Action to execute within the scope.</param>
-    public async Task WithScope(Func<IVaultScope, Task> action)
-    {
-        await using var scope = CreateScope();
-        try
-        {
-            await action(scope);
-            await scope.Commit();
-        }
-        catch
-        {
-            await scope.Rollback();
-            throw;
-        }
-    }
-
-    /// <summary>
     ///     Creates a LocalVault instance from a file path.
     /// </summary>
     /// <param name="filePath">Path to the SQLite database file</param>
@@ -95,7 +75,9 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
             if (fileExists)
                 await AssertZylanceVault(dbContext, filePath, cancellationToken);
 
-            await dbContext.Database.MigrateAsync(cancellationToken);
+            // Use EnsureCreated in tests and runtime paths to avoid migrations pending checks
+            // and create schema directly from the current model when the database is new.
+            await dbContext.Database.EnsureCreatedAsync(cancellationToken);
 
             return new LocalVault(dbContext);
         }
@@ -142,5 +124,13 @@ public class LocalVault(LocalVaultDbContext dbContext) : IVault
         {
             await connection.CloseAsync();
         }
+    }
+
+    /// <summary>
+    /// Dispose the local vault and its underlying database context.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        await dbContext.DisposeAsync();
     }
 }

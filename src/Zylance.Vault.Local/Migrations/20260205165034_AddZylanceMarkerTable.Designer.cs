@@ -17,7 +17,6 @@ namespace Zylance.Vault.Local.Entities
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
-#pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
 
             modelBuilder.Entity("Zylance.Vault.Local.Entities.AccountEntity", b =>
@@ -89,7 +88,6 @@ namespace Zylance.Vault.Local.Entities
 
                     b.ToTable("_zylance_", (string)null);
                 });
-#pragma warning restore 612, 618
         }
     }
 }

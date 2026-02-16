@@ -72,7 +72,7 @@ public class EventObservable<TResult> : IObservable<TResult>
     public async Task<TResult> TakeFirstAsync(CancellationToken cancellationToken = default)
     {
         if (!cancellationToken.CanBeCanceled)
-            return await _observable.FirstAsync().ToTask();
+            return await _observable.FirstAsync().ToTask(cancellationToken);
 
         // Use Rx's Amb to properly handle cancellation
         var cancellationObservable = Observable.Create<TResult>(observer =>
@@ -84,7 +84,7 @@ public class EventObservable<TResult> : IObservable<TResult>
             return registration;
         });
 
-        return await _observable.FirstAsync().Amb(cancellationObservable).ToTask();
+        return await _observable.FirstAsync().Amb(cancellationObservable).ToTask(cancellationToken);
     }
 }
 

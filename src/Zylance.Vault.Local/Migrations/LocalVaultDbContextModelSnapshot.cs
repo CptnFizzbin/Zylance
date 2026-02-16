@@ -58,6 +58,10 @@ namespace Zylance.Vault.Local.Entities
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("TrxId")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Payee")
                         .IsRequired()
                         .HasMaxLength(255)

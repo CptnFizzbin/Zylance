@@ -5,6 +5,7 @@ import "zylance/extensions/Zylance.proto";
 
 option csharp_namespace = "Zylance.Contract.Api.Echo";
 
+// === Actions ===
 message EchoReq {
   option (action) = "Echo:EchoMessage";
   string message = 1;

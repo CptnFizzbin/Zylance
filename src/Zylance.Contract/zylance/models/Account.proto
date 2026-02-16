@@ -4,8 +4,10 @@ package zylance.contract;
 option csharp_namespace = "Zylance.Contract.Models.Account";
 
 message AccountData {
-    string id = 1;
-    string name = 2;
-    string type = 3;
-    double balance = 4;
+  string id = 1;
+  string name = 2;
+  string type = 3;
+  string currency = 4;
+  string balance = 5;
+  string available_balance = 6;
 }

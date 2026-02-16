@@ -5,6 +5,7 @@ import "zylance/extensions/Zylance.proto";
 
 option csharp_namespace = "Zylance.Contract.Api.Desktop";
 
+// === Events ===
 message DesktopExitEvt {
   option (eventName) = 'Desktop:Exit';
   int32 code = 1;

@@ -1,5 +1,4 @@
 using Zylance.Contract.Api.Ledger;
-using Zylance.Contract.Models.Ledger;
 using Zylance.Core.Vault.Models;
 
 namespace Zylance.Core.Vault.Managers;
@@ -8,17 +7,25 @@ namespace Zylance.Core.Vault.Managers;
 ///     Manager for ledger entries in a vault.
 ///     Supports listing and searching ledger entries.
 /// </summary>
-public interface ILedgerManager : IRecordManager<Guid, LedgerEntryData>
+public interface ILedgerManager : IRecordManager<Guid, LedgerEntryModel>
 {
     /// <summary>
     ///     Lists ledger entries optionally filtered by <paramref name="filter" />.
     /// </summary>
-    public Task<CursorList<LedgerEntryData>> ListAsync(LedgerFilter? filter);
+    public Task<CursorList<LedgerEntryModel>> ListAsync(LedgerFilter? filter);
 
     /// <summary>
     ///     Searches ledger entries using a text query and optional filter.
     /// </summary>
     /// <param name="searchText">The text to search for.</param>
     /// <param name="filter">Optional filter to narrow results.</param>
-    public Task<CursorList<LedgerEntryData>> SearchAsync(string searchText, LedgerFilter? filter);
+    public Task<CursorList<LedgerEntryModel>> SearchAsync(string searchText, LedgerFilter? filter);
+
+    /// <summary>
+    ///     Finds ledger entries by a list of external/online transaction IDs.
+    ///     Returns an empty list if no matches are found.
+    /// </summary>
+    /// <param name="trxIds">The list of trxIds to fetch</param>
+    /// <returns>A list of matching ledger entries</returns>
+    public Task<List<LedgerEntryModel>> FindByTrxIdsAsync(IEnumerable<string> trxIds);
 }

@@ -118,13 +118,13 @@ function generateTypeScript (actions: ActionOrEvent[], events: ActionOrEvent[]):
   const actionConstants = allActions
     .map(name => {
       const safeName = name.replace(/:/g, "_").replace(/\s+/g, "_")
-      return `${safeName}: "${name}" as const,`
+      return `${safeName}: "${name}" as const`
     })
 
   const eventConstants = allEvents
     .map(name => {
       const safeName = name.replace(/:/g, "_").replace(/\s+/g, "_")
-      return `${safeName}: "${name}" as const,`
+      return `${safeName}: "${name}" as const`
     })
 
   //language=ts
@@ -150,15 +150,15 @@ function generateTypeScript (actions: ActionOrEvent[], events: ActionOrEvent[]):
      * Type-safe action name constants.
      */
     export const ZylanceActions = {
-      ${actionConstants.join("\n      ")}
-    } as const;
+      ${actionConstants.join(",\n      ")},
+    } as const
 
     /**
      * Type-safe event name constants.
      */
     export const ZylanceEvents = {
-      ${eventConstants.join("\n      ")}
-    } as const;
+      ${eventConstants.join(",\n      ")},
+    } as const
   `)
 }
 
@@ -196,25 +196,19 @@ function generateCSharp (actions: ActionOrEvent[], events: ActionOrEvent[]): str
     #pragma warning disable CS1591 // Disable missing XML comment warnings for auto-generated code
 
     /// <summary>
-    /// Type-safe action and event name constants extracted from Protocol Buffer definitions.
+    /// All available request action names.
     /// </summary>
-    public static class ZylanceConstants
+    public static class ZylanceActions
     {
-        /// <summary>
-        /// All available request action names.
-        /// </summary>
-        public static class Actions
-        {
-            ${actionConstants.join("\n            ")}
-        }
+        ${actionConstants.join("\n            ")}
+    }
 
-        /// <summary>
-        /// All available event names.
-        /// </summary>
-        public static class Events
-        {
-            ${eventConstants.join("\n            ")}
-        }
+    /// <summary>
+    /// All available event names.
+    /// </summary>
+    public static class ZylanceEvents
+    {
+        ${eventConstants.join("\n            ")}
     }
 
     #pragma warning restore CS1591

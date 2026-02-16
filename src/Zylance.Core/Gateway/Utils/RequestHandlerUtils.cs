@@ -24,11 +24,11 @@ public static class RequestHandlerUtils
         return async (req, res) =>
         {
             var typedReq = new ZyRequest<TReq> { Payload = req.Payload };
-            var typedRes = new ZyResponse<TRes> { Payload = res.Payload };
+            var typedRes = new ZyResponse<TRes> { Payload = res.Payload, OnSend = res.OnSend };
 
             await handler(typedReq, typedRes);
 
-            return new ZyResponse { Payload = typedRes.Payload };
+            return typedRes;
         };
     }
 
@@ -45,11 +45,11 @@ public static class RequestHandlerUtils
         return (req, res) =>
         {
             var typedReq = new ZyRequest<TReq> { Payload = req.Payload };
-            var typedRes = new ZyResponse<TRes> { Payload = res.Payload };
+            var typedRes = new ZyResponse<TRes> { Payload = res.Payload, OnSend = res.OnSend };
 
             handler(typedReq, typedRes);
 
-            return Task.FromResult(new ZyResponse { Payload = typedRes.Payload });
+            return Task.FromResult<ZyResponse>(typedRes);
         };
     }
 }

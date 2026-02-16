@@ -1,27 +1,23 @@
 namespace Zylance.Core.Importers.Models;
 
 /// <summary>
-///     Result of an import operation.
+///     Represents the result of an import operation, including counts of imported
+///     and skipped entities.
 /// </summary>
 public record ImportResult
 {
     /// <summary>
-    ///     Gets whether the import was successful.
+    ///     Gets the number of accounts successfully imported.
     /// </summary>
-    public required bool Success { get; init; }
+    public required int NumAccountsImported { get; init; }
 
     /// <summary>
-    ///     Gets the error message if the import failed.
+    ///     Gets the number of transactions successfully imported.
     /// </summary>
-    public string? ErrorMessage { get; init; }
+    public required int NumTransactionsImported { get; init; }
 
     /// <summary>
-    ///     Gets the number of transactions imported.
+    ///     Gets the number of transactions that were skipped during import.
     /// </summary>
-    public int TransactionCount { get; init; }
-
-    /// <summary>
-    ///     Gets any warnings generated during import.
-    /// </summary>
-    public IReadOnlyList<string>? Warnings { get; init; }
+    public required int NumTransactionsSkipped { get; init; }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Google.Protobuf;
 using Zylance.Contract;
 using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Gateway.Handlers;
@@ -29,7 +30,7 @@ public class GatewayService
         _transport.Receive(message => _ = HandleMessage(message));
 
         SubscribeToEvent(
-            ZylanceConstants.Events.Vault_VaultClosed,
+            ZylanceEvents.Vault_VaultClosed,
             _ =>
             {
                 Console.WriteLine("Vault closed. Clearing event listeners.");
@@ -46,6 +47,15 @@ public class GatewayService
         Console.WriteLine($"<== Res[{response.RequestId}]: {response.DataJson}");
         var envelope = new GatewayEnvelope { Response = response };
         Send(envelope);
+    }
+
+    /// <summary>
+    ///     Sends an event over the configured transport.
+    /// </summary>
+    public void SendEvent<TEvt>(TEvt evt)
+        where TEvt : IMessage, new()
+    {
+        Send(MessageUtils.ToEventPayload(evt));
     }
 
     /// <summary>
@@ -79,6 +89,17 @@ public class GatewayService
     public EventObservable ObserveEvent(string eventName)
     {
         return new EventObservable(this, eventName);
+    }
+
+    /// <summary>
+    ///     Creates an observable that listens for events with the specified name.
+    /// </summary>
+    public EventObservable<TData> ObserveEvent<TData>(string eventName)
+        where TData : IMessage, new()
+    {
+        return ObserveEvent(eventName)
+            .Select(evt => new ZyEvent<TData> { Payload = evt.Payload })
+            .Select(evt => evt.Data);
     }
 
     /// <summary>
@@ -165,10 +186,12 @@ public class GatewayService
         var req = new ZyRequest { Payload = reqPayload };
 
         var resPayload = new ResponsePayload { RequestId = reqPayload.RequestId };
-        var res = new ZyResponse { Payload = resPayload };
+        var res = new ZyResponse { Payload = resPayload, OnSend = res => Send(res.Payload) };
 
         res = await _routerService.HandleRequest(req, res);
-        Send(res.Payload);
+
+        if (!res.ResponseSent)
+            res.Send();
     }
 
     private async Task HandleMessage(EventPayload payload)

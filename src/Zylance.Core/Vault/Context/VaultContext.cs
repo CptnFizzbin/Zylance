@@ -19,11 +19,25 @@ public class VaultContext(ZylanceCore zylanceCore)
         get;
         set
         {
-            var transition = DetermineTransition(field, value);
+            var oldVault = field;
+            var transition = DetermineTransition(oldVault, value);
             field = value;
+
+            // Dispose the previous vault when it's closed or switched to a different vault
+            if (transition == VaultTransition.Closed || transition == VaultTransition.Switched)
+            {
+                if (oldVault is IAsyncDisposable asyncDisposable)
+                    asyncDisposable.DisposeAsync().AsTask().Wait();
+            }
+
             HandleTransition(transition, value);
         }
     }
+
+    /// <summary>
+    ///     Gets the currently active vault or throws if none is set.
+    /// </summary>
+    public IVault ActiveVaultOrThrow => ActiveVault ?? throw new InvalidOperationException("No active vault.");
 
     private static VaultTransition DetermineTransition(IVault? oldVault, IVault? newVault)
     {
@@ -94,9 +108,6 @@ public class VaultContext(ZylanceCore zylanceCore)
         zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
-    /// <summary>
-    ///     Represents the possible state transitions for a vault.
-    /// </summary>
     private enum VaultTransition
     {
         None,

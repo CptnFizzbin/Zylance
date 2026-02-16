@@ -15,6 +15,7 @@ message LedgerFilter {
   optional uint32 page_size = 6;
 }
 
+// === Actions ===
 // Create a new ledger entry
 message CreateLedgerEntryReq {
   option (action) = "Ledger:CreateLedgerEntry";

@@ -12,14 +12,27 @@ namespace Zylance.Core.Gateway.Models;
 public class ZyResponse
 {
     /// <summary>
+    ///     Callback invoked when the response is sent. Implementations must set
+    ///     this before calling <see cref="Send" /> to perform the actual send
+    ///     operation (for example, serializing and writing to the transport).
+    /// </summary>
+    public required Action<ZyResponse> OnSend { get; init; }
+
+    /// <summary>
     ///     Raw response payload that will be sent over the gateway.
     /// </summary>
     public required ResponsePayload Payload { get; init; }
 
     /// <summary>
-    ///     Short-hand for the response status string.
+    ///     Shorthand for the response status string.
     /// </summary>
     public string Status => Payload.Status;
+
+    /// <summary>
+    ///     True once <see cref="Send" /> has been called for this response. Used to
+    ///     ensure the response is only sent once.
+    /// </summary>
+    public bool ResponseSent { get; private set; }
 
     /// <summary>
     ///     Sets the response status string.
@@ -31,43 +44,17 @@ public class ZyResponse
     }
 
     /// <summary>
-    ///     Sets the response payload data from a protobuf message.
+    ///     Marks the response as sent and invokes the configured <see cref="OnSend" />
+    ///     callback.
+    ///     Subsequent calls are ignored.
     /// </summary>
-    public ZyResponse SetData<TData>(TData data)
-        where TData : IMessage
+    public void Send()
     {
-        Payload.DataJson = MessageUtils.ToJson(data);
-        return this;
-    }
+        if (ResponseSent)
+            return;
 
-    /// <summary>
-    ///     Deserializes the response payload data into a protobuf message of type
-    ///     <typeparamref name="TData" />.
-    /// </summary>
-    public TData GetData<TData>()
-        where TData : IMessage, new()
-    {
-        return MessageUtils.FromJson<TData>(Payload.DataJson)
-            ?? throw new ArgumentException("Failed to deserialize response data");
-    }
-
-    /// <summary>
-    ///     Attempts to deserialize the response payload into
-    ///     <typeparamref name="TData" />, returning true on success.
-    /// </summary>
-    public bool TryGetData<TData>([NotNullWhen(true)] out TData? data)
-        where TData : IMessage, new()
-    {
-        try
-        {
-            data = GetData<TData>();
-            return true;
-        }
-        catch (Exception)
-        {
-            data = default;
-            return false;
-        }
+        ResponseSent = true;
+        OnSend(this);
     }
 }
 

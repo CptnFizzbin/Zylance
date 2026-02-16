@@ -30,6 +30,10 @@
     <None Remove="tsconfig.tsbuildinfo" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Src\Components\Common\" />
+  </ItemGroup>
+
   <Target Name="CleanGenerated" AfterTargets="Clean">
     <RemoveDir Directories="Generated" />
     <RemoveDir Directories="dist" />

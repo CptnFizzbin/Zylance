@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Zylance.Contract.Models.Account;
 using Zylance.Core.Vault.Managers;
 using Zylance.Core.Vault.Models;
 using Zylance.Vault.Local.Context;
@@ -13,17 +12,87 @@ namespace Zylance.Vault.Local.Managers;
 public class LocalAccountManager(LocalVaultDbContext dbContext) : IAccountManager
 {
     /// <summary>
-    ///     Gets an account by its ID.
+    ///     Gets an account by its string ID.
     /// </summary>
-    /// <param name="recordId">The account ID</param>
-    /// <returns>The account data</returns>
+    /// <param name="recordId">The account ID as a string.</param>
+    /// <returns>The account data.</returns>
     /// <exception cref="KeyNotFoundException">Thrown when the account is not found</exception>
-    public async Task<AccountData> GetAsync(Guid recordId)
+    public async Task<AccountModel> GetAsync(string recordId)
     {
         var entity = await dbContext.Accounts.FindAsync(recordId);
         return entity is null
             ? throw new KeyNotFoundException($"Account with ID {recordId} not found")
-            : EntityToData(entity);
+            : AccountEntity.ToModel(entity);
+    }
+
+    /// <summary>
+    ///     Gets all accounts in the vault as a list.
+    /// </summary>
+    /// <returns>All account models in the vault.</returns>
+    public Task<List<AccountModel>> GetAllAsync()
+    {
+        return Task.FromResult(dbContext.Accounts.Select(AccountEntity.ToModel).ToList());
+    }
+
+    /// <summary>
+    ///     Saves a list of accounts. Each account is created or updated as needed.
+    /// </summary>
+    /// <param name="records">The accounts to save.</param>
+    /// <returns>The saved account models.</returns>
+    public async Task<List<AccountModel>> SaveAsync(List<AccountModel> records)
+    {
+        var savedEntries = new List<AccountModel>();
+        foreach (var record in records)
+        {
+            var savedEntry = await SaveAsync(record);
+            savedEntries.Add(savedEntry);
+        }
+
+        return savedEntries;
+    }
+
+    /// <summary>
+    ///     Deletes an account by its string ID.
+    /// </summary>
+    /// <param name="recordId">The account ID as a string.</param>
+    /// <returns>The deleted account data.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown when the account is not found</exception>
+    public async Task<AccountModel> DeleteAsync(string recordId)
+    {
+        var entity =
+            await dbContext.Accounts.FindAsync(recordId)
+            ?? throw new KeyNotFoundException($"Account with ID {recordId} not found");
+        dbContext.Accounts.Remove(entity);
+        await dbContext.SaveChangesAsync();
+        return AccountEntity.ToModel(entity);
+    }
+
+    /// <summary>
+    ///     Deletes a list of accounts by their string IDs.
+    /// </summary>
+    /// <param name="records">The accounts to delete.</param>
+    /// <returns>The deleted account models.</returns>
+    public async Task<List<AccountModel>> DeleteAsync(List<AccountModel> records)
+    {
+        var deletedEntries = new List<AccountModel>();
+        foreach (var record in records)
+        {
+            var entity = await DeleteAsync(record.Id);
+            deletedEntries.Add(entity);
+        }
+
+        return deletedEntries;
+    }
+
+    /// <summary>
+    ///     Lists all accounts in the vault.
+    /// </summary>
+    /// <returns>A cursor list of all accounts</returns>
+    public async Task<List<AccountModel>> ListAsync()
+    {
+        var entities = await dbContext.Accounts.ToListAsync();
+        var items = entities.Select(AccountEntity.ToModel).ToList();
+        return items;
     }
 
     /// <summary>
@@ -32,17 +101,16 @@ public class LocalAccountManager(LocalVaultDbContext dbContext) : IAccountManage
     /// </summary>
     /// <param name="record">The account data to save</param>
     /// <returns>The saved account data</returns>
-    public async Task<AccountData> SaveAsync(AccountData record)
+    public async Task<AccountModel> SaveAsync(AccountModel record)
     {
-        var id = Guid.Parse(record.Id);
-        var entity = await dbContext.Accounts.FindAsync(id);
+        var entity = await dbContext.Accounts.FindAsync(record.Id);
 
         if (entity is null)
         {
             // Create new account
             entity = new AccountEntity
             {
-                Id = id,
+                Id = record.Id,
                 Name = record.Name,
                 Type = record.Type,
                 Balance = record.Balance,
@@ -58,54 +126,38 @@ public class LocalAccountManager(LocalVaultDbContext dbContext) : IAccountManage
         }
 
         await dbContext.SaveChangesAsync();
-        return EntityToData(entity);
+        return AccountEntity.ToModel(entity);
     }
 
     /// <summary>
-    ///     Deletes an account by its ID.
+    ///     Gets an account by its Guid ID.
     /// </summary>
-    /// <param name="recordId">The account ID to delete</param>
-    /// <returns>The deleted account data</returns>
+    /// <param name="recordId">The account ID as a Guid.</param>
+    /// <returns>The account data.</returns>
     /// <exception cref="KeyNotFoundException">Thrown when the account is not found</exception>
-    public async Task<AccountData> DeleteAsync(Guid recordId)
+    public async Task<AccountModel> GetAsync(Guid recordId)
     {
-        var entity = await dbContext.Accounts.FindAsync(recordId);
-        if (entity is null)
-            throw new KeyNotFoundException($"Account with ID {recordId} not found");
+        // Convert Guid to string for lookup
+        var entity = await dbContext.Accounts.FindAsync(recordId.ToString());
+        return entity is null
+            ? throw new KeyNotFoundException($"Account with ID {recordId} not found")
+            : AccountEntity.ToModel(entity);
+    }
 
+    /// <summary>
+    ///     Deletes an account by its Guid ID.
+    /// </summary>
+    /// <param name="recordId">The account ID as a Guid.</param>
+    /// <returns>The deleted account data.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown when the account is not found</exception>
+    public async Task<AccountModel> DeleteAsync(Guid recordId)
+    {
+        // Convert Guid to string for lookup
+        var entity =
+            await dbContext.Accounts.FindAsync(recordId.ToString())
+            ?? throw new KeyNotFoundException($"Account with ID {recordId} not found");
         dbContext.Accounts.Remove(entity);
         await dbContext.SaveChangesAsync();
-        return EntityToData(entity);
-    }
-
-    /// <summary>
-    ///     Lists all accounts in the vault.
-    /// </summary>
-    /// <returns>A cursor list of all accounts</returns>
-    public async Task<CursorList<AccountData>> ListAsync()
-    {
-        var entities = await dbContext.Accounts.ToListAsync();
-        var items = entities.Select(EntityToData).ToList();
-        return CursorList<AccountData>.FromList(items);
-    }
-
-    /// <summary>
-    ///     Converts an AccountEntity to AccountData.
-    ///     Why this pattern? In clean architecture, we separate our domain models
-    ///     (AccountData) from
-    ///     our persistence models (AccountEntity). This allows us to:
-    ///     - Keep database concerns out of the core business logic
-    ///     - Change database structure without affecting the API contract
-    ///     - Use different data formats (protobuf) for network transport
-    /// </summary>
-    private static AccountData EntityToData(AccountEntity entity)
-    {
-        return new AccountData
-        {
-            Id = entity.Id.ToString(),
-            Name = entity.Name,
-            Type = entity.Type,
-            Balance = entity.Balance,
-        };
+        return AccountEntity.ToModel(entity);
     }
 }
