@@ -61,8 +61,16 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
         try
         {
             zylance.Gateway.SendEvent(new ImportStartedEvt { ImportId = importId });
-            await PerformImport(importId, accounts, transactions);
-            zylance.Gateway.SendEvent(new ImportFinishedEvt { ImportId = importId, Success = true });
+            var result = await PerformImport(importId, accounts, transactions);
+            zylance.Gateway.SendEvent(
+                new ImportFinishedEvt
+                {
+                    ImportId = importId,
+                    NumAccountsImported = result.NumAccountsImported,
+                    NumTransactionsSkipped = result.NumTransactionsSkipped,
+                    NumTransactionsImported = result.NumTransactionsImported,
+                }
+            );
         }
         catch (Exception e)
         {
@@ -123,10 +131,16 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
         zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
-    private async Task PerformImport(string importId, List<AccountModel> accounts, List<LedgerEntryModel> transactions)
+    private async Task<ImportResult> PerformImport(
+        string importId,
+        List<AccountModel> accounts,
+        List<LedgerEntryModel> transactions
+    )
     {
         var totalTasks = accounts.Count + transactions.Count;
         var completedTasks = 0;
+        var transactionsImported = 0;
+        var transactionsSkipped = 0;
 
         var vault = vaultContext.ActiveVaultOrThrow;
         await vault.WithScope(async trxVault =>
@@ -138,11 +152,31 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
                 ReportProgress(importId, ++completedTasks, totalTasks);
             }
 
+            var trxIds = transactions.Where(t => t.TrxId is not null).Select(t => t.TrxId!).Distinct().ToList();
+            var existingTransactions = await trxVault.Ledgers.FindByTrxIdsAsync(trxIds);
+            var existingTrxIds = existingTransactions.Select(t => t.TrxId).ToHashSet();
+
             foreach (var transaction in transactions)
             {
-                await trxVault.Ledgers.SaveAsync(transaction);
+                if (existingTrxIds.Contains(transaction.TrxId))
+                {
+                    transactionsSkipped++;
+                }
+                else
+                {
+                    transactionsImported++;
+                    await trxVault.Ledgers.SaveAsync(transaction);
+                }
+
                 ReportProgress(importId, ++completedTasks, totalTasks);
             }
         });
+
+        return new()
+        {
+            NumAccountsImported = accounts.Count,
+            NumTransactionsImported = transactionsImported,
+            NumTransactionsSkipped = transactionsSkipped,
+        };
     }
 }

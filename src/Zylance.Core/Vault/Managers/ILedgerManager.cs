@@ -20,4 +20,11 @@ public interface ILedgerManager : IRecordManager<Guid, LedgerEntryModel>
     /// <param name="searchText">The text to search for.</param>
     /// <param name="filter">Optional filter to narrow results.</param>
     public Task<CursorList<LedgerEntryModel>> SearchAsync(string searchText, LedgerFilter? filter);
+
+    /// <summary>
+    ///     Finds ledger entries by a list of external/online transaction IDs.
+    /// </summary>
+    /// <param name="trxIds">The list of trxIds to fetch</param>
+    /// <returns>A list of matching ledger entries</returns>
+    public Task<List<LedgerEntryModel>> FindByTrxIdsAsync(IEnumerable<string> trxIds);
 }

@@ -182,6 +182,13 @@ public class MockVault : IVault, IAsyncDisposable
 
             return Task.FromResult(cursor);
         }
+
+        public async Task<List<LedgerEntryModel>> FindByTrxIdsAsync(IEnumerable<string> trxIds)
+        {
+            var trxIdSet = new HashSet<string>(trxIds);
+            var matches = _items.Where(i => i.TrxId is not null && trxIdSet.Contains(i.TrxId)).ToList();
+            return await Task.FromResult(matches);
+        }
     }
 
     private class MockVaultScope : IVaultScope

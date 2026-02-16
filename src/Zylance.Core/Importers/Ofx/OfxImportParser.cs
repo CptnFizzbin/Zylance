@@ -59,7 +59,7 @@ public class OfxImportParser : IImportParser
     {
         return new LedgerEntryModel
         {
-            Id = Guid.CreateVersion7(),
+            Id = Guid.CreateVersion7(transaction.DatePosted),
             AccountId = account.Id,
             Timestamp = transaction.DatePosted,
             Payee = transaction.Name ?? string.Empty,

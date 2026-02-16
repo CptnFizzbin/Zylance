@@ -49,6 +49,9 @@ public class GatewayService
         Send(envelope);
     }
 
+    /// <summary>
+    ///     Sends an event over the configured transport.
+    /// </summary>
     public void SendEvent<TEvt>(TEvt evt)
         where TEvt : IMessage, new()
     {

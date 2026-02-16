@@ -245,6 +245,16 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
         return savedEntries;
     }
 
+    public Task<List<LedgerEntryModel>> FindByTrxIdsAsync(IEnumerable<string> trxIds)
+    {
+        var entries = dbContext
+            .LedgerEntries.Where(e => trxIds.Contains(e.TrxId))
+            .ToList()
+            .Select(LedgerEntryEntity.ToModel)
+            .ToList();
+        return Task.FromResult(entries);
+    }
+
     /// <summary>
     ///     Applies filter criteria to a ledger entries query.
     ///     Why separate this method? Following DRY (Don't Repeat Yourself) principle -

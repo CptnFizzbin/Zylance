@@ -61,6 +61,7 @@ message ImportProgressEvt {
 message ImportFinishedEvt {
   option (eventName) = "Import:Finished";
   string import_id = 1;
-  bool success = 2;
-  optional string error_message = 3;
+  int64 num_accounts_imported = 2;
+  int64 num_transactions_skipped = 3;
+  int64 num_transactions_imported = 4;
 }
