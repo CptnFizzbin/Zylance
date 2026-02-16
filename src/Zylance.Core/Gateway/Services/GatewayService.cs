@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Google.Protobuf;
+using Serilog;
 using Zylance.Contract;
 using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Gateway.Handlers;
@@ -33,7 +34,7 @@ public class GatewayService
             ZylanceEvents.Vault_VaultClosed,
             _ =>
             {
-                Console.WriteLine("Vault closed. Clearing event listeners.");
+                Log.Information("Vault closed. Clearing event listeners.");
                 _eventListeners.Clear();
             }
         );
@@ -44,7 +45,7 @@ public class GatewayService
     /// </summary>
     public void Send(ResponsePayload response)
     {
-        Console.WriteLine($"<== Res[{response.RequestId}]: {response.DataJson}");
+        Log.Information((string)"<== Res[{RequestId}]: {DataJson}", response.RequestId, response.DataJson);
         var envelope = new GatewayEnvelope { Response = response };
         Send(envelope);
     }
@@ -63,7 +64,7 @@ public class GatewayService
     /// </summary>
     public void Send(EventPayload eventPayload)
     {
-        Console.WriteLine($"<== Evt: {eventPayload.EventName} - {eventPayload.DataJson}");
+        Log.Information((string)"<== Evt: {EventName} - {DataJson}", eventPayload.EventName, eventPayload.DataJson);
         var envelope = new GatewayEnvelope { Event = eventPayload };
         Send(envelope);
     }
@@ -73,11 +74,15 @@ public class GatewayService
     /// </summary>
     public void Send(ErrorPayload errorPayload)
     {
-        Console.WriteLine(
-            errorPayload.HasRequestId
-                ? $"<== ERR[{errorPayload.RequestId}]: {errorPayload.Type} - {errorPayload.Details}"
-                : $"<== ERR: {errorPayload.Type} - {errorPayload.Details}"
-        );
+        if (errorPayload.HasRequestId)
+            Log.Information(
+                "<== ERR[{RequestId}]: {Type} - {Details}",
+                errorPayload.RequestId,
+                errorPayload.Type,
+                errorPayload.Details
+            );
+        else
+            Log.Information((string)"<== ERR: {Type} - {Details}", errorPayload.Type, errorPayload.Details);
 
         var envelope = new GatewayEnvelope { Error = errorPayload };
         Send(envelope);
@@ -181,7 +186,7 @@ public class GatewayService
 
     private async Task HandleMessage(RequestPayload reqPayload)
     {
-        Console.WriteLine($"==> Req[{reqPayload.RequestId}]: {reqPayload.Action} - {reqPayload.DataJson}");
+        Log.Information($"==> Req[{reqPayload.RequestId}]: {reqPayload.Action} - {reqPayload.DataJson}");
 
         var req = new ZyRequest { Payload = reqPayload };
 
@@ -196,7 +201,7 @@ public class GatewayService
 
     private async Task HandleMessage(EventPayload payload)
     {
-        Console.WriteLine($"==> Evt: {payload.EventName} - {payload.DataJson}");
+        Log.Information($"==> Evt: {payload.EventName} - {payload.DataJson}");
 
         var evt = new ZyEvent { Payload = payload };
 

@@ -1,6 +1,8 @@
 using JetBrains.Annotations;
+using Serilog;
 using Zylance.Core.Gateway.Handlers;
 using Zylance.Core.Gateway.Models;
+using Zylance.Core.Logging;
 
 namespace Zylance.Core.Router.Services;
 
@@ -12,6 +14,7 @@ namespace Zylance.Core.Router.Services;
 /// </summary>
 public class RouterService
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<RouterService>();
     private readonly Dictionary<string, AsyncZyEventHandler> _eventHandlers = [];
     private readonly Dictionary<string, AsyncZyRequestHandler> _requestHandlers = [];
 

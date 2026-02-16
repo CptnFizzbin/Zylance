@@ -1,23 +1,24 @@
 using static Zylance.Desktop.Utils.WebUtils;
 
-namespace Zylance.Desktop.Config;
+namespace Zylance.Desktop.Configuration;
 
 /// <summary>
-/// Configuration for the Zylance desktop application.
+///     Configuration for the Zylance desktop application.
 /// </summary>
-public record ZylanceDesktopConfig
+public record ZyConfiguration
 {
+    /// <summary>The application name shown in the window title and data paths.</summary>
+    public const string AppName = "Zylance";
+
     /// <summary>
-    /// Creates a new configuration, optionally overriding the UI and WebSocket ports.
+    ///     Creates a new configuration, optionally overriding the UI and WebSocket
+    ///     ports.
     /// </summary>
-    public ZylanceDesktopConfig(int? uiPort = null, int? wsPort = null)
+    public ZyConfiguration(int? uiPort = null, int? wsPort = null)
     {
         UiPort = uiPort ?? GetInt("UI_PORT") ?? DiscoverAvailablePort(8000, 8999);
         WsPort = wsPort ?? GetInt("WS_PORT") ?? DiscoverAvailablePort(9000, 9999);
     }
-
-    /// <summary>The application name shown in the window title and data paths.</summary>
-    public const string AppName = "Zylance";
 
     /// <summary>When true, run without a native window (headless mode).</summary>
     public bool Headless { get; init; }
@@ -49,6 +50,10 @@ public record ZylanceDesktopConfig
 
     /// <summary>Temporary data path used by the application.</summary>
     public string TmpDataPath { get; init; } = Path.Combine(Path.GetTempPath(), AppName, Guid.NewGuid().ToString());
+
+    /// <summary>Path where log files should be stored for the current user.</summary>
+    public string LogPath { get; init; } =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppName, "logs");
 
     private static string? GetFlagValue(string name)
     {

@@ -1,5 +1,7 @@
+using Serilog;
 using Zylance.Contract.Api.Background;
 using Zylance.Core.Gateway.Utils;
+using Zylance.Core.Logging;
 
 namespace Zylance.Core.System.Services;
 
@@ -9,6 +11,8 @@ namespace Zylance.Core.System.Services;
 /// </summary>
 public class BackgroundTaskService(ZylanceCore zylanceCore)
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<BackgroundTaskService>();
+
     /// <summary>
     ///     Notifies that a background task has started.
     /// </summary>
@@ -16,6 +20,8 @@ public class BackgroundTaskService(ZylanceCore zylanceCore)
     /// <param name="description">Optional human-readable description of the task</param>
     public void NotifyWorkStart(string taskId, string? description = null)
     {
+        var log = Log.ForContext("taskId", taskId);
+        log.Information("Background task started: {description}", description ?? "<No description>");
         var evt = new BackgroundWorkStartEvt { TaskId = taskId, Description = description };
         zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
@@ -28,6 +34,12 @@ public class BackgroundTaskService(ZylanceCore zylanceCore)
     /// <param name="description">Optional updated description of the task</param>
     public void NotifyWorkProgress(string taskId, float progress, string? description = null)
     {
+        var log = Log.ForContext("taskId", taskId);
+        log.Information(
+            "Background task progress: {description} - {progress}",
+            description ?? "<No description>",
+            progress
+        );
         var evt = new BackgroundWorkProgressEvt
         {
             TaskId = taskId,
@@ -44,6 +56,8 @@ public class BackgroundTaskService(ZylanceCore zylanceCore)
     /// <param name="description">Optional final description or completion message</param>
     public void NotifyWorkFinish(string taskId, string? description = null)
     {
+        var log = Log.ForContext("taskId", taskId);
+        log.Information("Background task complete: {description}", description ?? "<No description>");
         var evt = new BackgroundWorkFinishEvt { TaskId = taskId, Description = description };
         zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
@@ -60,10 +74,11 @@ public class BackgroundTaskService(ZylanceCore zylanceCore)
     public async Task<T> WithProgress<T>(string description, Func<Action<float, string?>, Task<T>> work)
     {
         var taskId = Guid.NewGuid().ToString();
-        NotifyWorkStart(taskId, description);
 
         try
         {
+            NotifyWorkStart(taskId, description);
+
             var result = await work(
                 (progress, progressDescription) =>
                 {
@@ -73,37 +88,6 @@ public class BackgroundTaskService(ZylanceCore zylanceCore)
 
             NotifyWorkFinish(taskId, "Completed successfully");
             return result;
-        }
-        catch (Exception ex)
-        {
-            NotifyWorkFinish(taskId, $"Failed: {ex.Message}");
-            throw;
-        }
-    }
-
-    /// <summary>
-    ///     Wraps an async operation with automatic background task lifecycle
-    ///     management.
-    ///     Handles starting, error, and finish events automatically. For operations
-    ///     with no return value.
-    /// </summary>
-    /// <param name="description">Initial description of the task</param>
-    /// <param name="work">The work to perform, receives a SetProgress callback</param>
-    public async Task WithProgress(string description, Func<Action<float, string?>, Task> work)
-    {
-        var taskId = Guid.NewGuid().ToString();
-        NotifyWorkStart(taskId, description);
-
-        try
-        {
-            await work(
-                (progress, progressDescription) =>
-                {
-                    NotifyWorkProgress(taskId, progress, progressDescription);
-                }
-            );
-
-            NotifyWorkFinish(taskId, "Completed successfully");
         }
         catch (Exception ex)
         {

@@ -1,5 +1,7 @@
+using Serilog;
 using Zylance.Contract.Api.Vault;
 using Zylance.Core.Gateway.Models;
+using Zylance.Core.Logging;
 using Zylance.Core.Router.Attributes;
 using Zylance.Core.Vault.Services;
 
@@ -11,6 +13,8 @@ namespace Zylance.Core.Router.Controllers;
 [Controller]
 public class VaultController(VaultService vaultService)
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<VaultController>();
+
     /// <summary>
     ///     Opens the active vault and returns its reference.
     /// </summary>
@@ -19,8 +23,10 @@ public class VaultController(VaultService vaultService)
     [RequestHandler]
     public async Task OpenVault(ZyRequest<VaultOpenReq> req, ZyResponse<VaultOpenRes> res)
     {
+        Log.Debug("OpenVault called");
         var vaultRef = await vaultService.OpenVault();
         res.SetData(new VaultOpenRes { VaultRef = vaultRef });
+        Log.Information("Opened vault {VaultRef}", vaultRef);
     }
 
     /// <summary>
@@ -31,8 +37,10 @@ public class VaultController(VaultService vaultService)
     [RequestHandler]
     public async Task CreateVault(ZyRequest<VaultCreateReq> req, ZyResponse<VaultCreateRes> res)
     {
+        Log.Debug("CreateVault called");
         var vaultRef = await vaultService.CreateVault();
         res.SetData(new VaultCreateRes { VaultRef = vaultRef });
+        Log.Information("Created vault {VaultRef}", vaultRef);
     }
 
     /// <summary>
@@ -43,8 +51,10 @@ public class VaultController(VaultService vaultService)
     [RequestHandler]
     public void CloseVault(ZyRequest<VaultCloseReq> req, ZyResponse<VaultCloseRes> res)
     {
+        Log.Debug("CloseVault called");
         vaultService.CloseVault();
         res.SetData(new VaultCloseRes());
+        Log.Information("Closed active vault");
     }
 
     /// <summary>
@@ -55,6 +65,8 @@ public class VaultController(VaultService vaultService)
     [RequestHandler]
     public void GetStatus(ZyRequest<VaultGetStatusReq> req, ZyResponse<VaultGetStatusRes> res)
     {
+        Log.Debug("Vault GetStatus called");
         res.SetData(new VaultGetStatusRes { VaultRef = vaultService.GetActiveVaultRef() });
+        Log.Debug("Vault GetStatus responded");
     }
 }

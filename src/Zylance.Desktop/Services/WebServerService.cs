@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
-using Zylance.Desktop.Config;
+using Serilog;
+using Zylance.Desktop.Configuration;
+using static Zylance.Core.Logging.ZyLogger;
 
 namespace Zylance.Desktop.Services;
 
@@ -12,6 +14,7 @@ namespace Zylance.Desktop.Services;
 /// </summary>
 public sealed class WebServerService : IAsyncDisposable
 {
+    private static readonly ILogger Log = CreateLogger<WebServerService>();
     private readonly WebApplication _app;
 
     /// <summary>
@@ -22,8 +25,10 @@ public sealed class WebServerService : IAsyncDisposable
     ///     Desktop configuration containing UI server and webroot
     ///     settings.
     /// </param>
-    public WebServerService(ZylanceDesktopConfig config)
+    public WebServerService(ZyConfiguration config)
     {
+        Log.Debug("Initializing WebServerService with UiServerUrl={Url}", config.UiServerUrl);
+
         if (!Directory.Exists(config.UiRootPath))
             throw new DirectoryNotFoundException($"Root path does not exist: {config.UiRootPath}");
 
@@ -37,6 +42,11 @@ public sealed class WebServerService : IAsyncDisposable
         _app.Use(
             async (context, next) =>
             {
+                Log.Debug(
+                    "Incoming request {Method} {Path}",
+                    Sanitize(context.Request.Method),
+                    Sanitize(context.Request.Path.ToString())
+                );
                 if (context.Request.Path == "/" || context.Request.Path == "/index.html")
                 {
                     var htmlPath = Path.Combine(config.UiRootPath, "index.html");
@@ -57,8 +67,8 @@ public sealed class WebServerService : IAsyncDisposable
         _app.UseDefaultFiles();
         _app.UseStaticFiles(new StaticFileOptions { FileProvider = fileProvider, RequestPath = "" });
 
-        Console.WriteLine($"Static file server configured at {config.UiServerUrl}");
-        Console.WriteLine($"Serving files from: {config.UiRootPath}");
+        Log.Information("Static file server configured at {ConfigUiServerUrl}", config.UiServerUrl);
+        Log.Information("Serving files from: {ConfigUiRootPath}", config.UiRootPath);
     }
 
     /// <summary>
@@ -66,6 +76,7 @@ public sealed class WebServerService : IAsyncDisposable
     /// </summary>
     public async ValueTask DisposeAsync()
     {
+        Log.Debug("Disposing WebServerService");
         await _app.DisposeAsync();
     }
 
@@ -75,6 +86,7 @@ public sealed class WebServerService : IAsyncDisposable
     /// </summary>
     public Task StartAsync()
     {
+        Log.Information("Starting WebServerService");
         return _app.RunAsync();
     }
 }

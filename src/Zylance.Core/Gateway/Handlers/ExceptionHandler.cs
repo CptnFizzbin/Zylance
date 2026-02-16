@@ -1,4 +1,6 @@
+using Serilog;
 using Zylance.Contract.Lib.Envelope;
+using Zylance.Core.Logging;
 
 namespace Zylance.Core.Gateway.Handlers;
 
@@ -7,6 +9,8 @@ namespace Zylance.Core.Gateway.Handlers;
 /// </summary>
 public static class ExceptionHandler
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger(typeof(ExceptionHandler));
+
     /// <summary>
     ///     Wraps an exception into an ErrorPayload.
     ///     Unwraps inner exceptions for wrapper exceptions.
@@ -18,7 +22,7 @@ public static class ExceptionHandler
         if (requestId is not null)
             payload.RequestId = requestId;
 
-        Console.Error.WriteLine(ex);
+        Log.Error(ex, "Wrapped exception for RequestId={RequestId}", requestId);
 
         return payload;
     }

@@ -1,5 +1,7 @@
+using Serilog;
 using Zylance.Contract.Api.Vault;
 using Zylance.Core.Gateway.Utils;
+using Zylance.Core.Logging;
 using Zylance.Core.Vault.Interfaces;
 
 namespace Zylance.Core.Vault.Context;
@@ -10,6 +12,8 @@ namespace Zylance.Core.Vault.Context;
 /// </summary>
 public class VaultContext(ZylanceCore zylanceCore)
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<VaultContext>();
+
     /// <summary>
     ///     Gets or sets the currently active vault.
     ///     Setting this property triggers appropriate vault lifecycle events.
@@ -23,12 +27,12 @@ public class VaultContext(ZylanceCore zylanceCore)
             var transition = DetermineTransition(oldVault, value);
             field = value;
 
-            // Dispose the previous vault when it's closed or switched to a different vault
-            if (transition == VaultTransition.Closed || transition == VaultTransition.Switched)
-            {
+            if (transition is VaultTransition.Closed or VaultTransition.Switched)
                 if (oldVault is IAsyncDisposable asyncDisposable)
+                {
+                    Log.Information("Disposing previous vault with ID {VaultId}", oldVault.VaultId);
                     asyncDisposable.DisposeAsync().AsTask().Wait();
-            }
+                }
 
             HandleTransition(transition, value);
         }
@@ -92,18 +96,21 @@ public class VaultContext(ZylanceCore zylanceCore)
 
     private void SendVaultClosedEvent()
     {
+        Log.Information("Transitioning vault to closed state");
         var evt = new VaultClosedEvt();
         zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     private void SendVaultLockedEvent(IVault vault)
     {
+        Log.Information("Transitioning vault to locked state");
         var evt = new VaultLockedEvt { VaultRef = vault.ToRef() };
         zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     private void SendVaultUnlockedEvent(IVault vault)
     {
+        Log.Information("Transitioning vault to unlocked state");
         var evt = new VaultUnlockedEvt { VaultRef = vault.ToRef() };
         zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }

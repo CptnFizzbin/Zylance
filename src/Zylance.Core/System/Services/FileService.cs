@@ -1,4 +1,6 @@
+using Serilog;
 using Zylance.Contract.Models.File;
+using Zylance.Core.Logging;
 using Zylance.Core.Platform.Interfaces;
 
 namespace Zylance.Core.System.Services;
@@ -11,6 +13,7 @@ namespace Zylance.Core.System.Services;
 /// </summary>
 public class FileService(IFileProvider fileProvider)
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<FileService>();
     private readonly Lock _lock = new();
     private readonly Dictionary<string, bool> _readOnlyRegistry = new();
 
@@ -20,6 +23,7 @@ public class FileService(IFileProvider fileProvider)
     /// <param name="fileRef">File ref to check.</param>
     public Task<bool> Exists(FileRef fileRef)
     {
+        Log.Information("Checking if file exists: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         return fileProvider.Exists(fileRef);
     }
 
@@ -35,6 +39,14 @@ public class FileService(IFileProvider fileProvider)
         bool readOnly = true
     )
     {
+        Log.Information(
+            "Prompting user to select file with title: {title}, filters: {filters}, readOnly: {readOnly}",
+            title,
+            filters != null
+                ? string.Join(", ", filters.Select(f => $"{f.Name} ({string.Join(", ", f.Extensions)})"))
+                : "None",
+            readOnly
+        );
         var fileRef = await fileProvider.SelectFile(title, filters, readOnly);
         RegisterFileRef(fileRef);
 
@@ -53,6 +65,14 @@ public class FileService(IFileProvider fileProvider)
         (string Name, string[] Extensions)[]? filters = null
     )
     {
+        Log.Information(
+            "Prompting user to create file with title: {title}, filename: {filename}, filters: {filters}",
+            title,
+            filename,
+            filters != null
+                ? string.Join(", ", filters.Select(f => $"{f.Name} ({string.Join(", ", f.Extensions)})"))
+                : "None"
+        );
         var fileRef = await fileProvider.CreateFile(title, filename, filters);
         RegisterFileRef(fileRef);
 
@@ -65,6 +85,7 @@ public class FileService(IFileProvider fileProvider)
     /// <param name="fileRef">The file reference to open.</param>
     public async Task<Stream> OpenFileAsync(FileRef fileRef)
     {
+        Log.Information("Opening file: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         AssertFileRegistered(fileRef);
 
         return await fileProvider.OpenFile(fileRef);
@@ -78,6 +99,7 @@ public class FileService(IFileProvider fileProvider)
     /// <param name="action">A callback to perform with the file stream</param>
     public async Task<TResult> WithFileAsync<TResult>(FileRef fileRef, Func<Stream, Task<TResult>> action)
     {
+        Log.Information("Opening file with action: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         AssertFileRegistered(fileRef);
 
         await using var stream = await fileProvider.OpenFile(fileRef);
@@ -91,6 +113,7 @@ public class FileService(IFileProvider fileProvider)
     /// <param name="content">Stream content to write.</param>
     public async Task SaveFile(FileRef fileRef, Stream content)
     {
+        Log.Information("Saving file: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         AssertFileRegistered(fileRef);
         AssertFileWritable(fileRef);
 
@@ -103,6 +126,7 @@ public class FileService(IFileProvider fileProvider)
     /// <param name="fileRef">The file reference to delete.</param>
     public async Task DeleteFile(FileRef fileRef)
     {
+        Log.Information("Deleting file: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         AssertFileRegistered(fileRef);
         AssertFileWritable(fileRef);
 
@@ -120,6 +144,7 @@ public class FileService(IFileProvider fileProvider)
     /// <param name="path">Relative path for the temporary file.</param>
     public async Task<FileRef> GetTempFile(string path)
     {
+        Log.Information("Getting temporary file: {path}", path);
         var fileRef = await fileProvider.GetTempFile(path);
         RegisterFileRef(fileRef);
         return fileRef;
@@ -131,6 +156,7 @@ public class FileService(IFileProvider fileProvider)
     /// <param name="path">Relative path within the application data folder.</param>
     public async Task<FileRef> GetAppDataFile(string path)
     {
+        Log.Information("Getting app data file: {path}", path);
         var fileRef = await fileProvider.GetAppDataFile(path);
         RegisterFileRef(fileRef);
         return fileRef;
@@ -141,6 +167,12 @@ public class FileService(IFileProvider fileProvider)
     /// </summary>
     private void RegisterFileRef(FileRef fileRef)
     {
+        Log.Information(
+            "Registering file reference: {filename} (ID: {id}, ReadOnly: {readOnly})",
+            fileRef.Filename,
+            fileRef.Id,
+            fileRef.ReadOnly
+        );
         lock (_lock)
         {
             _readOnlyRegistry[fileRef.Id] = fileRef.ReadOnly;
@@ -154,6 +186,7 @@ public class FileService(IFileProvider fileProvider)
     /// </summary>
     private void AssertFileRegistered(FileRef fileRef)
     {
+        Log.Information("Asserting file is registered: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         lock (_lock)
         {
             if (!_readOnlyRegistry.ContainsKey(fileRef.Id))
@@ -172,6 +205,7 @@ public class FileService(IFileProvider fileProvider)
     {
         bool isReadOnlyInRegistry;
 
+        Log.Information("Asserting file is writable: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         lock (_lock)
         {
             isReadOnlyInRegistry = _readOnlyRegistry.TryGetValue(fileRef.Id, out var registryValue) && registryValue;

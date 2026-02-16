@@ -1,3 +1,5 @@
+using Serilog;
+using Zylance.Core.Logging;
 using Zylance.Core.Platform.Interfaces;
 using Zylance.Core.Vault.Interfaces;
 using Zylance.Vault.Local;
@@ -11,11 +13,14 @@ namespace Zylance.Desktop.Providers;
 /// <param name="fileSystem">Local file provider used to select and manage files.</param>
 public class DesktopVaultProvider(ILocalFileProvider fileSystem) : IVaultProvider
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<DesktopVaultProvider>();
+
     /// <summary>
     ///     Opens an existing vault selected by the user.
     /// </summary>
     public async Task<IVault> OpenVault()
     {
+        Log.Information("Prompting user to select a vault file to open.");
         var filters = new List<(string Name, string[] Extensions)> { ("Zylance Vault", [".zlv"]) };
 
         var fileRef = await fileSystem.SelectFile("Open Vault", filters.ToArray(), false);
@@ -24,6 +29,7 @@ public class DesktopVaultProvider(ILocalFileProvider fileSystem) : IVaultProvide
         if (!path.EndsWith(".zlv", StringComparison.OrdinalIgnoreCase))
             throw new InvalidDataException("Selected file is not a valid Zylance Vault (.zlv) file.");
 
+        Log.Information("User selected vault file: {Path}", path);
         return await LocalVault.FromFile(path);
     }
 
@@ -32,6 +38,7 @@ public class DesktopVaultProvider(ILocalFileProvider fileSystem) : IVaultProvide
     /// </summary>
     public async Task<IVault> CreateVault()
     {
+        Log.Information("Prompting user to select a location to create a new vault file.");
         var filters = new List<(string Name, string[] Extensions)> { ("Zylance Vault", [".zlv"]) };
 
         var fileRef = await fileSystem.CreateFile(
@@ -44,6 +51,7 @@ public class DesktopVaultProvider(ILocalFileProvider fileSystem) : IVaultProvide
         if (!path.EndsWith(".zlv", StringComparison.OrdinalIgnoreCase))
             path += ".zlv";
 
+        Log.Information("User selected vault file: {Path}", path);
         return await LocalVault.FromFile(path);
     }
 }

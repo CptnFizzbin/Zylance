@@ -1,16 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Serilog;
+using Zylance.Core.Logging;
 
 namespace Zylance.Vault.Local.Context;
 
 /// <summary>
-/// Factory used to create LocalVaultDbContext instances for design-time and runtime scenarios.
+///     Factory used to create LocalVaultDbContext instances for design-time and
+///     runtime scenarios.
 /// </summary>
 public class LocalVaultContextFactory : IDesignTimeDbContextFactory<LocalVaultDbContext>
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<LocalVaultContextFactory>();
+
     /// <summary>
-    /// Creates a new DbContext using the provided command-line args (first arg is file path).
-    /// Used by EntityFramework generator utilities
+    ///     Creates a new DbContext using the provided command-line args (first arg is
+    ///     file path).
+    ///     Used by EntityFramework generator utilities
     /// </summary>
     /// <param name="args">Command-line arguments</param>
     public LocalVaultDbContext CreateDbContext(string[] args)
@@ -20,7 +26,7 @@ public class LocalVaultContextFactory : IDesignTimeDbContextFactory<LocalVaultDb
     }
 
     /// <summary>
-    /// Creates a DbContext configured to use the given SQLite file.
+    ///     Creates a DbContext configured to use the given SQLite file.
     /// </summary>
     /// <param name="filePath">Path to the SQLite database file.</param>
     public static LocalVaultDbContext CreateDbContextFromFile(string filePath = "localvault.zlv.sqlite")
@@ -30,7 +36,7 @@ public class LocalVaultContextFactory : IDesignTimeDbContextFactory<LocalVaultDb
     }
 
     /// <summary>
-    /// Internal helper to create a DbContext from a connection string.
+    ///     Internal helper to create a DbContext from a connection string.
     /// </summary>
     private static LocalVaultDbContext CreateDbContext(string connectionString)
     {

@@ -1,9 +1,11 @@
+using Serilog;
 using Zylance.Contract;
 using Zylance.Contract.Api.File;
 using Zylance.Core.Gateway.Models;
 using Zylance.Core.Gateway.Utils;
 using Zylance.Core.Importers.Models;
 using Zylance.Core.Importers.Ofx;
+using Zylance.Core.Logging;
 using Zylance.Core.Router.Attributes;
 using Zylance.Core.System.Services;
 using Zylance.Core.Vault.Context;
@@ -17,6 +19,8 @@ namespace Zylance.Core.Router.Controllers;
 [Controller]
 public class ImportController(FileService fileService, ZylanceCore zylance, VaultContext vaultContext)
 {
+    private static readonly ILogger Log = ZyLogger.CreateLogger<ImportController>();
+
     /// <summary>
     ///     Handles the Import:Start action, starting a new import process.
     /// </summary>
@@ -26,6 +30,7 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
         var cancellationSource = new CancellationTokenSource();
 
         var fileRef = req.Data.FileRef;
+        Log.Information("StartImport called for FileRef={FileRef}", fileRef);
         if (!await fileService.Exists(fileRef))
             throw new FileNotFoundException($"File not found: {fileRef}");
 
@@ -40,7 +45,7 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
             .ContinueWith(
                 _ =>
                 {
-                    Console.WriteLine("Import cancelled, triggering cancellation token.");
+                    Log.Information("Import cancelled, triggering cancellation token.");
                     return cancellationSource.CancelAsync();
                 },
                 cancellationSource.Token
@@ -71,9 +76,11 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
                     NumTransactionsImported = result.NumTransactionsImported,
                 }
             );
+            Log.Information("Import {ImportId} finished successfully", importId);
         }
         catch (Exception e)
         {
+            Log.Error(e, "Import {ImportId} failed", importId);
             zylance.Gateway.SendEvent(new ImportErrorEvt { ImportId = importId, ErrorMessage = e.Message });
             throw;
         }
@@ -109,6 +116,11 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
         {
             var evtData = new ImportGetAccountsEvt { ImportId = importId };
             evtData.Accounts.AddRange(accounts);
+            Log.Debug(
+                "Requesting account selection for ImportId={ImportId} with {Count} candidate accounts",
+                importId,
+                accounts.Count()
+            );
             zylance.Gateway.Send(MessageUtils.ToEventPayload(evtData));
 
             accounts = await zylance
@@ -128,6 +140,7 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
     {
         var percent = (float)progress / total * 100;
         var evt = new ImportProgressEvt { ImportId = importId, Progress = percent };
+        Log.Debug("Import {ImportId} progress {Progress}/{Total} ({Percent}%)", importId, progress, total, percent);
         zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
@@ -142,6 +155,12 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
         var transactionsImported = 0;
         var transactionsSkipped = 0;
 
+        Log.Information(
+            "Performing import {ImportId} with {Accounts} accounts and {Transactions} transactions",
+            importId,
+            accounts.Count,
+            transactions.Count
+        );
         var vault = vaultContext.ActiveVaultOrThrow;
         await vault.WithScope(async trxVault =>
         {
@@ -150,6 +169,7 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
             {
                 await trxVault.Accounts.SaveAsync(model);
                 ReportProgress(importId, ++completedTasks, totalTasks);
+                Log.Debug("Saved account for Import {ImportId}: {AccountId}", importId, model.Id);
             }
 
             var trxIds = transactions.Where(t => t.TrxId is not null).Select(t => t.TrxId!).Distinct().ToList();
@@ -169,6 +189,7 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
                 }
 
                 ReportProgress(importId, ++completedTasks, totalTasks);
+                Log.Debug("Saved transaction for Import {ImportId}: {TransactionId}", importId, transaction.Id);
             }
         });
 

@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 using Zylance.Core;
-using Zylance.Desktop.Config;
+using Zylance.Desktop.Configuration;
 
 namespace Zylance.Desktop.Tests.TestUtils;
 
@@ -69,7 +69,7 @@ public record ZylanceTestHarness : IAsyncDisposable
 
         var fileProvider = new HeadlessFileProvider(appDataDir, tempDataDir);
 
-        var config = new ZylanceDesktopConfig(uiPort, wsPort)
+        var config = new ZyConfiguration(uiPort, wsPort)
         {
             Headless = true,
             UiServerEnabled = true,

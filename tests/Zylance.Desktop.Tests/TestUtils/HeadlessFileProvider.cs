@@ -1,4 +1,5 @@
 using Zylance.Contract.Models.File;
+using Zylance.Core.Platform;
 using Zylance.Desktop.Providers;
 
 namespace Zylance.Desktop.Tests.TestUtils;
@@ -97,7 +98,7 @@ public class HeadlessFileProvider(string appDataPath, string tempDataPath)
     public override async Task<FileRef> SelectFile(
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
-        bool readOnly = true
+        bool readOnly = FileRefFlags.READ_ONLY
     )
     {
         var selectedPath = await _onSelectFile(title, filters, readOnly);
@@ -117,6 +118,6 @@ public class HeadlessFileProvider(string appDataPath, string tempDataPath)
         if (string.IsNullOrEmpty(selectedPath))
             throw new OperationCanceledException("File selection was cancelled by the user.");
 
-        return await CreateFileReference(selectedPath);
+        return await CreateFileReference(selectedPath, FileRefFlags.READ_WRITE);
     }
 }
