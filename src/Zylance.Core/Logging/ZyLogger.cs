@@ -26,7 +26,6 @@ public static class ZyLogger
     ///     Creates a Serilog <see cref="ILogger" /> instance for the specified class
     ///     type.
     /// </summary>
-    /// <typeparam name="TClass">The class type for which to create the logger context.</typeparam>
     /// <returns>
     ///     A Serilog <see cref="ILogger" /> configured for the given class
     ///     context.
@@ -34,5 +33,11 @@ public static class ZyLogger
     public static ILogger CreateLogger(Type source)
     {
         return Log.ForContext(source);
+    }
+
+    public static string Sanitize(string message)
+    {
+        message.ReplaceLineEndings(" ");
+        return message;
     }
 }

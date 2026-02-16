@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
-using Zylance.Core.Logging;
 using Zylance.Desktop.Configuration;
+using static Zylance.Core.Logging.ZyLogger;
 
 namespace Zylance.Desktop.Services;
 
@@ -14,7 +14,7 @@ namespace Zylance.Desktop.Services;
 /// </summary>
 public sealed class WebServerService : IAsyncDisposable
 {
-    private static readonly ILogger Log = ZyLogger.CreateLogger<WebServerService>();
+    private static readonly ILogger Log = CreateLogger<WebServerService>();
     private readonly WebApplication _app;
 
     /// <summary>
@@ -42,7 +42,11 @@ public sealed class WebServerService : IAsyncDisposable
         _app.Use(
             async (context, next) =>
             {
-                Log.Debug("Incoming request {Method} {Path}", context.Request.Method, context.Request.Path);
+                Log.Debug(
+                    "Incoming request {Method} {Path}",
+                    Sanitize(context.Request.Method),
+                    Sanitize(context.Request.Path.ToString())
+                );
                 if (context.Request.Path == "/" || context.Request.Path == "/index.html")
                 {
                     var htmlPath = Path.Combine(config.UiRootPath, "index.html");
