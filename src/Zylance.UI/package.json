@@ -34,6 +34,7 @@
     "@tanstack/react-router": "^1.158.0",
     "@tanstack/react-router-devtools": "^1.158.0",
     "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-virtual": "^3.13.18",
     "@tanstack/router-core": "^1.158.0",
     "@tanstack/router-plugin": "^1.158.0",
     "date-fns": "^4.1.0",
