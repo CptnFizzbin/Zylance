@@ -1,5 +1,5 @@
 {
-  "name": "@zylance/ui",
+  "name": "zylance",
   "private": true,
   "type": "module",
   "engines": {
@@ -37,7 +37,7 @@
     "@tanstack/router-core": "^1.158.0",
     "@tanstack/router-plugin": "^1.158.0",
     "date-fns": "^4.1.0",
-    "lucide-react": "^0.563.0",
+    "fast-sort": "^3.4.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "rxjs": "^7.8.2",

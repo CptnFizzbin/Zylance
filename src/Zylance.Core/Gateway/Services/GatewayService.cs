@@ -55,7 +55,7 @@ public class GatewayService : IDisposable
     /// </summary>
     public void Send(ResponsePayload response)
     {
-        Log.Information((string)"<== Res[{RequestId}]: {DataJson}", response.RequestId, response.DataJson);
+        Log.Information("<== Res[{RequestId}]: {DataJson}", response.RequestId, response.DataJson);
         var envelope = new GatewayEnvelope { Response = response };
         Send(envelope);
     }

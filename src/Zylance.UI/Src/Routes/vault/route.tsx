@@ -1,4 +1,4 @@
-import { Box } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import { createFileRoute, Outlet } from "@tanstack/react-router"
 import { AccountsPanel } from "@/Components/AccountsPanel/AccountsPanel"
 import { MenuRibbon } from "@/Components/MenuRibbon/MenuRibbon"
@@ -7,7 +7,7 @@ export const Route = createFileRoute("/vault")({
   component: RouteComponent,
 })
 
-function RouteComponent() {
+function RouteComponent () {
   console.log("Rendering /vault route")
 
   return (
@@ -34,7 +34,7 @@ function RouteComponent() {
         <AccountsPanel />
 
         {/* Main content area (Outlet) */}
-        <Box
+        <Stack
           component="main"
           sx={{
             flexGrow: 1,
@@ -43,7 +43,7 @@ function RouteComponent() {
           }}
         >
           <Outlet />
-        </Box>
+        </Stack>
       </Box>
     </Box>
   )

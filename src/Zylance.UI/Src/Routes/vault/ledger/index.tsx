@@ -1,11 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router"
+import { LedgerGrid } from "@/Components/Ledger/LedgerGrid"
 
 export const Route = createFileRoute("/vault/ledger/")({
   component: RouteComponent,
 })
 
-function RouteComponent() {
-  console.log("Rendering /_unlocked/ledger route")
-
-  return <div>Hello "/Ledger/Index"!</div>
+function RouteComponent () {
+  return <LedgerGrid />
 }
