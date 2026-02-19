@@ -58,7 +58,7 @@ public record LedgerEntryModel
             Timestamp = model.Timestamp.ToString("O"),
             Payee = model.Payee,
             Memo = model.Memo,
-            Amount = model.Amount.ToString(CultureInfo.InvariantCulture),
+            Amount = model.Amount.ToString("F2", CultureInfo.InvariantCulture),
             TrxId = model.TrxId ?? string.Empty,
         };
     }
