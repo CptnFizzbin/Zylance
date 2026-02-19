@@ -1,10 +1,12 @@
 import type { Column } from "@tanstack/react-table"
 import type { RowData } from "@tanstack/table-core"
+import type { CSSProperties } from "react"
 import type { LedgerEntryRowData } from "@/Components/Ledger/UseLedgerRowForm"
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
-    alignment: string
+    alignment?: "left" | "center" | "right"
+    flexGrow?: number
   }
 }
 
@@ -23,25 +25,17 @@ export function formatAsCurrency (value: string | number): string {
   return currencyFormatter.format(value)
 }
 
-export function getAlignment ({
-  columnDef,
-}: Column<LedgerEntryRowData>): string {
-  return columnDef.meta?.alignment || "left"
-}
+export function getColumnStyle (
+  column: Column<LedgerEntryRowData>,
+): CSSProperties {
+  const { columnDef } = column
 
-export function getJustifyContent ({
-  columnDef,
-}: Column<LedgerEntryRowData>): string {
-  const alignment = columnDef.meta?.alignment
-
-  switch (alignment) {
-    case "left":
-      return "flex-start"
-    case "center":
-      return "center"
-    case "right":
-      return "flex-end"
-    default:
-      return "flex-start"
+  return {
+    width: columnDef.size,
+    minWidth: columnDef.minSize,
+    maxWidth: columnDef.maxSize,
+    flexGrow: columnDef.meta?.flexGrow,
+    flexShrink: 0,
+    textAlign: columnDef.meta?.alignment,
   }
 }

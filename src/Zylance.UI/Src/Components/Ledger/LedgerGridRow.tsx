@@ -1,26 +1,22 @@
 import { Box } from "@mui/material"
+import type { SxProps } from "@mui/system"
 import type { Row } from "@tanstack/react-table"
-import { type FC, memo } from "react"
+import { type CSSProperties, type FC, memo } from "react"
 import { LedgerGridCell } from "@/Components/Ledger/LedgerGridCell"
-import { type LedgerEntryRowData, useLedgerRowForm } from "@/Components/Ledger/UseLedgerRowForm"
-import { getJustifyContent } from "./LedgerGridUtils"
+import type { LedgerEntryRowData } from "@/Components/Ledger/UseLedgerRowForm"
+import { mergeSxProps } from "@/Integrations/mui/SxPropUtils"
+import { getColumnStyle } from "./LedgerGridUtils"
 
 export const LedgerGridRow: FC<{
   row: Row<LedgerEntryRowData>
-}> = memo(({ row }) => {
-  const form = useLedgerRowForm({ ledgerEntry: row.original })
-  const onSave = () => form.handleSubmit()
-  const onReset = () => form.reset()
-  const numColumns = row.getVisibleCells().length
-
+  sx?: SxProps
+  style?: CSSProperties
+  onEdit: () => void
+}> = memo(({ row, sx, style, onEdit }) => {
   return (
     <Box
-      component={"form"}
-      sx={{
-        display: "grid",
-        gridTemplateColumns: "subgrid",
-        gridColumn: `1 / ${numColumns + 1}`,
-      }}
+      sx={mergeSxProps({ display: "flex", flexDirection: "row" }, sx)}
+      style={style}
     >
       {row.getVisibleCells().map((cell) => (
         <Box
@@ -29,17 +25,14 @@ export const LedgerGridRow: FC<{
             padding: 0.5,
             borderBottom: "1px solid",
             borderColor: "divider",
-            display: "flex",
             alignItems: "center",
-            justifyContent: getJustifyContent(cell.column),
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
           }}
+          style={getColumnStyle(cell.column)}
         >
-          <LedgerGridCell
-            cell={cell}
-            form={form}
-            onSave={onSave}
-            onReset={onReset}
-          />
+          <LedgerGridCell cell={cell} onEdit={onEdit} />
         </Box>
       ))}
     </Box>

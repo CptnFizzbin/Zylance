@@ -1,15 +1,21 @@
 import { Box } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
-import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { type ColumnDef, flexRender, getCoreRowModel, type Row, useReactTable } from "@tanstack/react-table"
+import { useVirtualizer } from "@tanstack/react-virtual"
 import { sort } from "fast-sort"
-import { type FC, useMemo } from "react"
+import { type FC, useMemo, useRef } from "react"
 import type { LedgerEntryData } from "@/../Generated/zylance/models/Ledger"
 import { LedgerGridRow } from "@/Components/Ledger/LedgerGridRow"
-import { formatAsCurrency, getJustifyContent } from "@/Components/Ledger/LedgerGridUtils"
+import { formatAsCurrency, getColumnStyle } from "@/Components/Ledger/LedgerGridUtils"
 import type { LedgerEntryRowData } from "@/Components/Ledger/UseLedgerRowForm"
 import { useZylance, useZylanceApi } from "@/Hooks/UseZylance"
 
 const columns: ColumnDef<LedgerEntryData>[] = [
+  {
+    accessorKey: "actions",
+    header: "",
+    size: 30,
+  },
   {
     accessorKey: "timestamp",
     accessorFn: (entry) => {
@@ -22,12 +28,14 @@ const columns: ColumnDef<LedgerEntryData>[] = [
   {
     accessorKey: "payee",
     header: "Payee",
-    minSize: 150,
+    minSize: 250,
+    meta: { flexGrow: 1 },
   },
   {
     accessorKey: "memo",
     header: "Memo",
-    minSize: 150,
+    minSize: 250,
+    meta: { flexGrow: 1 },
   },
   {
     accessorKey: "debit",
@@ -56,23 +64,7 @@ const columns: ColumnDef<LedgerEntryData>[] = [
     size: 100,
     meta: { alignment: "right" },
   },
-  {
-    accessorKey: "actions",
-    header: "Actions",
-    size: 80,
-  },
 ]
-
-function getGridTemplateColumns (columns: ColumnDef<LedgerEntryData>[]) {
-  // Use size or minSize for each column, fallback to 1fr
-  return columns
-    .map((col) => {
-      if (col.size) return `${col.size}px`
-      if (col.minSize) return `minmax(${col.minSize}px, 1fr)`
-      return "1fr"
-    })
-    .join(" ")
-}
 
 function toLedgerEntryRowData (entry: LedgerEntryData): LedgerEntryRowData {
   const amount = Number(entry.amount)
@@ -84,6 +76,8 @@ function toLedgerEntryRowData (entry: LedgerEntryData): LedgerEntryRowData {
 }
 
 export const LedgerGrid: FC = () => {
+  const wrapperRef = useRef(null)
+
   const api = useZylanceApi()
   const { currentVault } = useZylance()
 
@@ -103,6 +97,15 @@ export const LedgerGrid: FC = () => {
     },
   })
 
+  const rowHeight = 35
+
+  const rowVirtualizer = useVirtualizer({
+    count: entries.length,
+    getScrollElement: () => wrapperRef.current,
+    estimateSize: () => rowHeight,
+    overscan: 20,
+  })
+
   const sortedEntries = useMemo(() => {
     return sort(entries).by({ desc: (entry) => entry.timestamp })
   }, [entries])
@@ -116,42 +119,72 @@ export const LedgerGrid: FC = () => {
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>Error loading ledger entries</div>
 
-  const headers = table.getHeaderGroups()[0].headers
+  const { headers } = table.getHeaderGroups()[0]
+  const { rows } = table.getRowModel()
+
+  const onEditRow = (row: Row<LedgerEntryRowData>) => {
+    console.log("Edit row", row.original)
+  }
 
   return (
     <Box
+      ref={wrapperRef}
       sx={{
-        width: "100%",
         overflowX: "auto",
         overflowY: "scroll",
-        position: "relative",
-        display: "grid",
-        gridTemplateColumns: getGridTemplateColumns(columns),
       }}
     >
-      {headers.map((header) => (
+      <Box
+        sx={{
+          height: `calc(${rowVirtualizer.getTotalSize()}px + 50px)`,
+          position: "relative",
+        }}
+      >
         <Box
-          key={header.id}
           sx={{
-            padding: 1,
-            fontWeight: 600,
             position: "sticky",
             top: 0,
             backgroundColor: "background.paper",
             zIndex: 1,
             display: "flex",
-            alignItems: "center",
-            justifyContent: getJustifyContent(header.column),
+            flexDirection: "row",
           }}
         >
-          {header.isPlaceholder
-            ? null
-            : flexRender(header.column.columnDef.header, header.getContext())}
+          {headers.map((header) => (
+            <Box
+              key={header.id}
+              sx={{
+                padding: 1,
+                fontWeight: 600,
+                display: "flex",
+                alignItems: "center",
+              }}
+              style={getColumnStyle(header.column)}
+            >
+              {header.isPlaceholder
+                ? null
+                : flexRender(
+                  header.column.columnDef.header,
+                  header.getContext(),
+                )}
+            </Box>
+          ))}
         </Box>
-      ))}
-      {table.getRowModel().rows.map((row) => {
-        return <LedgerGridRow key={row.id} row={row} />
-      })}
+        {rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
+          const row = rows[virtualRow.index]
+          return (
+            <LedgerGridRow
+              key={row.id}
+              row={row}
+              style={{
+                height: `${virtualRow.size}px`,
+                transform: `translateY(${virtualRow.start - index * virtualRow.size}px)`,
+              }}
+              onEdit={() => onEditRow(row)}
+            />
+          )
+        })}
+      </Box>
     </Box>
   )
 }
