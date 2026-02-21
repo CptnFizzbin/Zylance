@@ -8,7 +8,9 @@
   ],
   "scripts": {
     "test": "npm-run-all -ls 'test:*'",
-    "test:ui": "yarn workspace @zylance/ui test"
+    "test:ui": "yarn workspace @zylance/ui test",
+    "build": "npm-run-all -ls 'build:*'",
+    "build:ui": "yarn workspace @zylance/ui build"
   },
   "dependencies": {
     "npm-run-all": "^4.1.5"

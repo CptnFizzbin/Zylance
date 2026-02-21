@@ -1,6 +1,6 @@
-import { getTransport } from "@/Apis/Zylance/Transports/ITransport"
-import { ZylanceClient } from "@/Apis/Zylance/ZylanceClient"
 import * as Endpoints from "./Endpoints"
+import { getTransport } from "./Transports/ITransport"
+import { ZylanceClient } from "./ZylanceClient"
 
 export async function createZylanceApi () {
   const transport = await getTransport()

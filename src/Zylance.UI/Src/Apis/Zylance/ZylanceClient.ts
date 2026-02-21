@@ -1,3 +1,5 @@
+import * as RxJs from "rxjs"
+import { v7 as uuidv7 } from "uuid"
 import {
   type ErrorPayload,
   type EventPayload,
@@ -5,9 +7,7 @@ import {
   type RequestPayload,
   type ResponsePayload,
 } from "$Contract/lib/Envelope"
-import * as RxJs from "rxjs"
-import { v7 as uuidv7 } from "uuid"
-import type { ITransport } from "@/Apis/Zylance/Transports/ITransport"
+import type { ITransport } from "./Transports/ITransport"
 
 type PendingRequest<TResolve, TError> = {
   resolve: (data: TResolve) => void

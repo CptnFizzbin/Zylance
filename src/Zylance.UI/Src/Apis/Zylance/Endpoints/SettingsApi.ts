@@ -1,5 +1,5 @@
-import type * as SettingsTypes from "@Contract/api/Settings"
 import type { ZylanceClient } from "@/Apis/Zylance/ZylanceClient"
+import type * as SettingsTypes from "$Contract/api/Settings"
 import { ZylanceActions } from "$Generated/ZylanceConstants"
 
 export const createSettingsApi = (client: ZylanceClient) => {

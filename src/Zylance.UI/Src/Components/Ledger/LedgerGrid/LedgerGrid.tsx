@@ -1,68 +1,17 @@
 import { Box } from "@mui/material"
-import { useQuery } from "@tanstack/react-query"
-import { flexRender, getCoreRowModel, type Row, useReactTable } from "@tanstack/react-table"
-import { useVirtualizer } from "@tanstack/react-virtual"
-import { sort } from "fast-sort"
-import { type FC, useMemo, useRef } from "react"
+import { flexRender, type Row } from "@tanstack/react-table"
+import type { FC } from "react"
+import { useLedgerGrid } from "@/Components/Ledger/LedgerGrid/UseLedgerGrid"
 import type { LedgerEntryRowData } from "@/Components/Ledger/UseLedgerRowForm"
-import { useZylance, useZylanceApi } from "@/Hooks/UseZylance"
-import type { LedgerEntryData } from "$Generated/zylance/models/Ledger"
-import { ledgerGridColumns } from "./LedgerGridColumns"
 import { LedgerGridRow } from "./LedgerGridRow"
 import { getColumnStyle } from "./LedgerGridUtils"
 
-function toLedgerEntryRowData (entry: LedgerEntryData): LedgerEntryRowData {
-  const amount = Number(entry.amount)
-  return {
-    ...entry,
-    credit: amount < 0 ? entry.amount : "",
-    debit: amount > 0 ? entry.amount : "",
-  }
-}
-
 export const LedgerGrid: FC = () => {
-  const wrapperRef = useRef(null)
+  const { ledgerEntriesQuery, wrapperRef, rowVirtualizer, table } =
+    useLedgerGrid()
 
-  const api = useZylanceApi()
-  const { currentVault } = useZylance()
-
-  const {
-    data: entries = [],
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["ledger", "entries", currentVault?.id],
-    enabled: !!currentVault,
-    queryFn: async () => {
-      if (!currentVault) return []
-      const res = await api.ledger.listLedgerEntries({
-        vaultRef: { id: currentVault.id, locked: false },
-      })
-      return res.entries
-    },
-  })
-
-  const rowHeight = 35
-
-  const rowVirtualizer = useVirtualizer({
-    count: entries.length,
-    getScrollElement: () => wrapperRef.current,
-    estimateSize: () => rowHeight,
-    overscan: 20,
-  })
-
-  const sortedEntries = useMemo(() => {
-    return sort(entries).by({ desc: (entry) => entry.timestamp })
-  }, [entries])
-
-  const table = useReactTable({
-    data: sortedEntries.map(toLedgerEntryRowData),
-    columns: ledgerGridColumns,
-    getCoreRowModel: getCoreRowModel(),
-  })
-
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error loading ledger entries</div>
+  if (ledgerEntriesQuery.isLoading) return <div>Loading...</div>
+  if (ledgerEntriesQuery.error) return <div>Error loading ledger entries</div>
 
   const { headers } = table.getHeaderGroups()[0]
   const { rows } = table.getRowModel()

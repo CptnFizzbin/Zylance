@@ -1,5 +1,5 @@
 {
-  "name": "zylance",
+  "name": "@zylance/ui",
   "private": true,
   "type": "module",
   "engines": {

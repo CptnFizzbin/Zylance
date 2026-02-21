@@ -1,8 +1,8 @@
-import type { VaultRef } from "@Contract/models/Vault"
 import { useQuery } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 import { useZylanceApi } from "@/Apis/UseZylanceApi"
 import { useZylanceQueries } from "@/Apis/Zylance/ZylanceQueryKeys"
+import type { VaultRef } from "$Contract/models/Vault"
 
 export const useCurrentVault = () => {
   const zylanceApi = useZylanceApi()
