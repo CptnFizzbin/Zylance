@@ -1,25 +1,9 @@
-import type { LedgerEntryData } from "@Contract/models/Ledger"
+import type { LedgerEntryData } from "$Contract/models/Ledger"
 import { useAppForm } from "@/Integrations/tanstack-form/UseAppForm"
 
 export interface LedgerEntryRowData extends LedgerEntryData {
   credit: string
   debit: string
-}
-
-export function isLedgerEntryRowDataKey (
-  key: string,
-): key is keyof LedgerEntryRowData {
-  return [
-    "id",
-    "accountId",
-    "timestamp",
-    "amount",
-    "payee",
-    "memo",
-    "trxId",
-    "credit",
-    "debit",
-  ].includes(key)
 }
 
 export interface UseLedgerRowFormProps {

@@ -2,9 +2,9 @@ import { Box } from "@mui/material"
 import type { SxProps } from "@mui/system"
 import type { Row } from "@tanstack/react-table"
 import { type CSSProperties, type FC, memo } from "react"
-import { LedgerGridCell } from "@/Components/Ledger/LedgerGridCell"
-import type { LedgerEntryRowData } from "@/Components/Ledger/UseLedgerRowForm"
 import { mergeSxProps } from "@/Integrations/mui/SxPropUtils"
+import type { LedgerEntryRowData } from "../UseLedgerRowForm"
+import { LedgerGridCell } from "./LedgerGridCell"
 import { getColumnStyle } from "./LedgerGridUtils"
 
 export const LedgerGridRow: FC<{

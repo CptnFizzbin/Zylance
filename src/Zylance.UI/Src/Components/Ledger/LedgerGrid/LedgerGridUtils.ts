@@ -1,7 +1,7 @@
 import type { Column } from "@tanstack/react-table"
 import type { RowData } from "@tanstack/table-core"
 import type { CSSProperties } from "react"
-import type { LedgerEntryRowData } from "@/Components/Ledger/UseLedgerRowForm"
+import type { LedgerEntryRowData } from "../UseLedgerRowForm"
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -12,7 +12,7 @@ declare module "@tanstack/react-table" {
 
 const currencyFormatter = new Intl.NumberFormat("en-NA", {
   style: "currency",
-  currency: "USD",
+  currency: "CAD",
   currencyDisplay: "narrowSymbol",
 })
 

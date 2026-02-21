@@ -1,70 +1,15 @@
 import { Box } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
-import { type ColumnDef, flexRender, getCoreRowModel, type Row, useReactTable } from "@tanstack/react-table"
+import { flexRender, getCoreRowModel, type Row, useReactTable } from "@tanstack/react-table"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import { sort } from "fast-sort"
 import { type FC, useMemo, useRef } from "react"
-import type { LedgerEntryData } from "@/../Generated/zylance/models/Ledger"
-import { LedgerGridRow } from "@/Components/Ledger/LedgerGridRow"
-import { formatAsCurrency, getColumnStyle } from "@/Components/Ledger/LedgerGridUtils"
 import type { LedgerEntryRowData } from "@/Components/Ledger/UseLedgerRowForm"
 import { useZylance, useZylanceApi } from "@/Hooks/UseZylance"
-
-const columns: ColumnDef<LedgerEntryData>[] = [
-  {
-    accessorKey: "actions",
-    header: "",
-    size: 30,
-  },
-  {
-    accessorKey: "timestamp",
-    accessorFn: (entry) => {
-      const timestamp = Number(entry.timestamp)
-      return Number.isNaN(timestamp) ? "" : new Date(timestamp).toLocaleString()
-    },
-    header: "Date",
-    size: 165,
-  },
-  {
-    accessorKey: "payee",
-    header: "Payee",
-    minSize: 250,
-    meta: { flexGrow: 1 },
-  },
-  {
-    accessorKey: "memo",
-    header: "Memo",
-    minSize: 250,
-    meta: { flexGrow: 1 },
-  },
-  {
-    accessorKey: "debit",
-    accessorFn: (entry) => {
-      const value = Number(entry.amount)
-      return value > 0 ? formatAsCurrency(entry.amount) : ""
-    },
-    header: "Debit",
-    size: 80,
-    meta: { alignment: "right" },
-  },
-  {
-    accessorKey: "credit",
-    accessorFn: (entry) => {
-      const value = Number(entry.amount)
-      return value < 0 ? formatAsCurrency(entry.amount) : ""
-    },
-    header: "Credit",
-    size: 80,
-    meta: { alignment: "right" },
-  },
-  {
-    accessorKey: "amount",
-    accessorFn: (entry) => formatAsCurrency(entry.amount),
-    header: "Amount",
-    size: 100,
-    meta: { alignment: "right" },
-  },
-]
+import type { LedgerEntryData } from "$Generated/zylance/models/Ledger"
+import { ledgerGridColumns } from "./LedgerGridColumns"
+import { LedgerGridRow } from "./LedgerGridRow"
+import { getColumnStyle } from "./LedgerGridUtils"
 
 function toLedgerEntryRowData (entry: LedgerEntryData): LedgerEntryRowData {
   const amount = Number(entry.amount)
@@ -112,7 +57,7 @@ export const LedgerGrid: FC = () => {
 
   const table = useReactTable({
     data: sortedEntries.map(toLedgerEntryRowData),
-    columns: columns as ColumnDef<LedgerEntryRowData>[],
+    columns: ledgerGridColumns,
     getCoreRowModel: getCoreRowModel(),
   })
 
