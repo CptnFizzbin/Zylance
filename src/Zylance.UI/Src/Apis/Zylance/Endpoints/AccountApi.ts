@@ -1,8 +1,8 @@
-import type * as AccountTypes from "@Contract/api/Account"
+import type * as AccountTypes from "$Contract/api/Account"
 import { ZylanceActions } from "$Generated/ZylanceConstants"
 import type { ZylanceClient } from "../ZylanceClient"
 
-export function createAccountApi(client: ZylanceClient) {
+export function createAccountApi (client: ZylanceClient) {
   return {
     listAccounts: client.createRequestEndpoint<
       typeof ZylanceActions.Account_ListAccounts,

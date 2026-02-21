@@ -4,7 +4,7 @@ import {
   GatewayEnvelope,
   type RequestPayload,
   type ResponsePayload,
-} from "@Contract/lib/Envelope"
+} from "$Contract/lib/Envelope"
 import * as RxJs from "rxjs"
 import { v7 as uuidv7 } from "uuid"
 import type { ITransport } from "@/Apis/Zylance/Transports/ITransport"

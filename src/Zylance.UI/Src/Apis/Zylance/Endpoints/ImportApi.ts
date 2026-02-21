@@ -1,4 +1,4 @@
-import type * as ImportTypes from "@Contract/api/Import"
+import type * as ImportTypes from "$Contract/api/Import"
 import { ZylanceActions, ZylanceEvents } from "$Generated/ZylanceConstants"
 import type { ZylanceClient } from "../ZylanceClient"
 

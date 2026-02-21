@@ -1,4 +1,4 @@
-import type { FileFilter } from "@Contract/models/File"
+import type { FileFilter } from "$Contract/models/File"
 import { Button, DialogActions, DialogContent } from "@mui/material"
 import type { FC } from "react"
 import { useImportService } from "@/Components/Import/ImportContext"

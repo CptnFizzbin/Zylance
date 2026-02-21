@@ -1,8 +1,8 @@
-import type * as FileTypes from "@Contract/api/File"
+import type * as FileTypes from "$Contract/api/File"
 import { ZylanceActions } from "$Generated/ZylanceConstants"
 import type { ZylanceClient } from "../ZylanceClient"
 
-export function createFileApi(client: ZylanceClient) {
+export function createFileApi (client: ZylanceClient) {
   return {
     selectFile: client.createRequestEndpoint<
       typeof ZylanceActions.File_SelectFile,

@@ -1,8 +1,8 @@
-import type * as BackgroundTypes from "@Contract/api/Background"
+import type * as BackgroundTypes from "$Contract/api/Background"
 import { ZylanceEvents } from "$Generated/ZylanceConstants"
 import type { ZylanceClient } from "../ZylanceClient"
 
-export function createBackgroundApi(client: ZylanceClient) {
+export function createBackgroundApi (client: ZylanceClient) {
   return {
     onWorkStart: client.createEventListener<
       typeof ZylanceEvents.Background_WorkStart,

@@ -1,8 +1,8 @@
-import type * as VaultTypes from "@Contract/api/Vault"
+import type * as VaultTypes from "$Contract/api/Vault"
 import { ZylanceActions, ZylanceEvents } from "$Generated/ZylanceConstants"
 import type { ZylanceClient } from "../ZylanceClient"
 
-export function createVaultApi(client: ZylanceClient) {
+export function createVaultApi (client: ZylanceClient) {
   return {
     // ===== Requests =====
     getStatus: client.createRequestEndpoint<

@@ -1,8 +1,8 @@
-import type * as LedgerTypes from "@Contract/api/Ledger"
+import type * as LedgerTypes from "$Contract/api/Ledger"
 import { ZylanceActions } from "$Generated/ZylanceConstants"
 import type { ZylanceClient } from "../ZylanceClient"
 
-export function createLedgerApi(client: ZylanceClient) {
+export function createLedgerApi (client: ZylanceClient) {
   return {
     createLedgerEntry: client.createRequestEndpoint<
       typeof ZylanceActions.Ledger_CreateLedgerEntry,

@@ -1,5 +1,5 @@
-import type { AccountData } from "@Contract/models/Account"
-import type { FileRef } from "@Contract/models/File"
+import type { AccountData } from "$Contract/models/Account"
+import type { FileRef } from "$Contract/models/File"
 import { useAppForm } from "@/Integrations/tanstack-form/UseAppForm"
 
 interface FormState {

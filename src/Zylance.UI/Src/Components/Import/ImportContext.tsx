@@ -5,9 +5,9 @@ import type {
   ImportReadingFileEvt,
   ImportSetAccountsEvt,
   ImportStartedEvt,
-} from "@Contract/api/Import"
-import type { AccountData } from "@Contract/models/Account"
-import type { FileRef } from "@Contract/models/File"
+} from "$Contract/api/Import"
+import type { AccountData } from "$Contract/models/Account"
+import type { FileRef } from "$Contract/models/File"
 import { useMutation } from "@tanstack/react-query"
 import {
   createContext,

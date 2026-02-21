@@ -33,7 +33,7 @@
       "@/*": [
         "./Src/*"
       ],
-      "@Contract/*": [
+      "$Contract/*": [
         "./Generated/zylance/*"
       ],
       "$Generated/*": [
