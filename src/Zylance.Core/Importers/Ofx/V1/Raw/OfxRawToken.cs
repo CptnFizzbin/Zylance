@@ -31,10 +31,20 @@ internal partial record OfxRawToken
         return new OfxRawToken
         {
             Name = match.Groups["Name"].Value.Trim().ToUpper(),
-            Value = match.Groups["Value"].Value.Trim(),
+            Value = DecodeHtmlEntities(match.Groups["Value"].Value).Trim(),
         };
     }
 
     [GeneratedRegex(@"^\<(?'Name'[\w\d\.]+)\>(?'Value'.+)$")]
     private static partial Regex TokenLineRegex();
+
+    private static string DecodeHtmlEntities(string input)
+    {
+        return input
+            .Replace("&lt;", "<")
+            .Replace("&gt;", ">")
+            .Replace("&amp;", "&")
+            .Replace("&quot;", "\"")
+            .Replace("&apos;", "'");
+    }
 }
