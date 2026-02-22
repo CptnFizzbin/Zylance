@@ -1,14 +1,12 @@
 import type { ColumnDef } from "@tanstack/react-table"
+import { parseISO } from "date-fns"
 import type { LedgerEntryRowData } from "../UseLedgerRowForm"
 import { formatAsCurrency } from "./LedgerGridUtils"
 
 export const ledgerGridColumns: ColumnDef<LedgerEntryRowData>[] = [
   {
     accessorKey: "timestamp",
-    accessorFn: (entry) => {
-      const timestamp = Number(entry.timestamp)
-      return Number.isNaN(timestamp) ? "" : new Date(timestamp).toLocaleString()
-    },
+    accessorFn: (entry) => parseISO(entry.timestamp).toLocaleString(),
     header: "Date",
     size: 165,
   },

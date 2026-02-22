@@ -18,7 +18,7 @@ function RouteComponent () {
 
   const sortedEntries = useMemo(() => {
     console.log("Entries updated, sorting entries")
-    return sort(entries).by({ desc: (entry) => entry.timestamp })
+    return sort(entries).by({ asc: (entry) => entry.timestamp })
   }, [entries])
 
   if (ledgerEntriesQuery.isPending) return <div>Loading...</div>
