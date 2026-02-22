@@ -1,6 +1,6 @@
 import { Box, Stack } from "@mui/material"
 import { createFileRoute, Outlet } from "@tanstack/react-router"
-import { AccountsPanel } from "@/Components/AccountsPanel/AccountsPanel"
+import { AccountsPanel } from "@/Components/Accounts/AccountsPanel"
 import { MenuRibbon } from "@/Components/MenuRibbon/MenuRibbon"
 
 export const Route = createFileRoute("/vault")({

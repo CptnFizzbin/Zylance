@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { sort } from "fast-sort"
 import { useMemo } from "react"
-import { useZylance } from "@/Apis/Zylance/UseZylance"
 import { useLedgerEntries } from "@/Components/Ledger/LedgerEntryQueries"
 import { LedgerGrid } from "@/Components/Ledger/LedgerGrid/LedgerGrid"
 
@@ -10,8 +9,7 @@ export const Route = createFileRoute("/vault/ledger/")({
 })
 
 function RouteComponent () {
-  const { currentVault } = useZylance()
-  const ledgerEntriesQuery = useLedgerEntries(currentVault)
+  const ledgerEntriesQuery = useLedgerEntries()
   const entries = ledgerEntriesQuery.data || []
 
   const sortedEntries = useMemo(() => {

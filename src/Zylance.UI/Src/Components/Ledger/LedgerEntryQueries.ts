@@ -7,35 +7,21 @@ import type {
   DeleteLedgerEntryReq,
   UpdateLedgerEntryReq,
 } from "$Contract/api/Ledger"
-import type { VaultRef } from "$Contract/models/Vault"
 
 // Query Key Factory for ledger queries
 export const ledgerQueryKeys = createQueryKeys("ledger-entries", {
-  inVault: (vaultRef: VaultRef | null) => ({
-    queryKey: [`vault/${vaultRef?.id}`],
-    contextQueries: {
-      list: (filter?: LedgerTypes.LedgerFilter) => [filter],
-      entry: (id: string) => [id],
-      search: (query: string, filter?: LedgerTypes.LedgerFilter) => [
-        query,
-        filter,
-      ],
-    },
-  }),
+  list: (filter?: LedgerTypes.LedgerFilter) => [filter],
+  entry: (id: string) => [id],
+  search: (query: string, filter?: LedgerTypes.LedgerFilter) => [query, filter],
 })
 
 // Fetch all ledger entries (with optional filter/pagination)
-export function useLedgerEntries(
-  vaultRef: VaultRef | null,
-  filter?: LedgerTypes.LedgerFilter,
-) {
+export function useLedgerEntries(filter?: LedgerTypes.LedgerFilter) {
   const zylanceApi = useZylanceApi()
 
   return useQuery({
-    ...ledgerQueryKeys.inVault(vaultRef)._ctx.list(filter),
-    enabled: !!vaultRef,
+    ...ledgerQueryKeys.list(filter),
     queryFn: async () => {
-      if (!vaultRef) return []
       const res = await zylanceApi.ledger.listLedgerEntries({})
       return res.entries
     },
@@ -43,7 +29,7 @@ export function useLedgerEntries(
 }
 
 // Fetch a single ledger entry by ID
-export function useLedgerEntry(vaultRef: VaultRef, id: string) {
+export function useLedgerEntry(id: string) {
   const zylanceApi = useZylanceApi()
 
   return useQuery({
@@ -55,16 +41,14 @@ export function useLedgerEntry(vaultRef: VaultRef, id: string) {
 
 // Search ledger entries (vaultRef not required)
 export function useSearchLedgerEntries(
-  vaultRef: VaultRef | null,
   query: string,
   filter?: LedgerTypes.LedgerFilter,
 ) {
   const zylanceApi = useZylanceApi()
 
   return useQuery({
-    ...ledgerQueryKeys.inVault(vaultRef)._ctx.search(query, filter),
+    ...ledgerQueryKeys.search(query, filter),
     queryFn: () => zylanceApi.ledger.searchLedgerEntries({ query, filter }),
-    enabled: !!query,
   })
 }
 
