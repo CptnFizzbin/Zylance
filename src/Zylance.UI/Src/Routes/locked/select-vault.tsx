@@ -8,8 +8,6 @@ export const Route = createFileRoute("/locked/select-vault")({
 })
 
 function RouteComponent () {
-  console.log("Rendering /_locked/vault/select route")
-
   const navigate = Route.useNavigate()
   const zylanceApi = useZylanceApi()
 
@@ -17,7 +15,6 @@ function RouteComponent () {
     mutationFn: async () => zylanceApi.vault.openVault(),
     onSuccess: (data) => {
       if (data.vaultRef) {
-        console.log("Vault opened successfully:", data.vaultRef)
         navigate({ to: "/locked/unlock-vault" })
       } else {
         openVaultMutation.reset()
@@ -34,7 +31,6 @@ function RouteComponent () {
     mutationFn: async () => zylanceApi.vault.createVault(),
     onSuccess: (data) => {
       if (data.vaultRef) {
-        console.log("Vault created successfully:", data.vaultRef)
         navigate({ to: "/locked/unlock-vault" })
       } else {
         createVaultMutation.reset()

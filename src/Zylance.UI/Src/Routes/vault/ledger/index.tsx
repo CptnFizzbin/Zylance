@@ -10,14 +10,11 @@ export const Route = createFileRoute("/vault/ledger/")({
 })
 
 function RouteComponent () {
-  console.log("Parent render")
-
   const { currentVault } = useZylance()
   const ledgerEntriesQuery = useLedgerEntries(currentVault)
   const entries = ledgerEntriesQuery.data || []
 
   const sortedEntries = useMemo(() => {
-    console.log("Entries updated, sorting entries")
     return sort(entries).by({ asc: (entry) => entry.timestamp })
   }, [entries])
 

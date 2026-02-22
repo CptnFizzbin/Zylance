@@ -5,9 +5,7 @@ export const Route = createFileRoute("/locked/")({
   component: RouteComponent,
 })
 
-function RouteComponent() {
-  console.log("Rendering /_locked route")
-
+function RouteComponent () {
   return (
     <Box flexGrow={1} overflow="auto">
       <Outlet />

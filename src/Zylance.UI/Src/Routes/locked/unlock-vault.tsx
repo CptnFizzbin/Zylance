@@ -4,8 +4,6 @@ export const Route = createFileRoute("/locked/unlock-vault")({
   component: RouteComponent,
 })
 
-function RouteComponent() {
-  console.log("Rendering /_locked/vault/unlock route")
-
+function RouteComponent () {
   return <div>Hello "/Vault/Unlock"!</div>
 }
