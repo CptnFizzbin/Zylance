@@ -1,7 +1,7 @@
 import type { Column } from "@tanstack/react-table"
 import type { RowData } from "@tanstack/table-core"
 import type { CSSProperties } from "react"
-import type { LedgerEntryRowData } from "../UseLedgerRowForm"
+import type { LedgerEntryData } from "$Contract/models/Ledger"
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -25,9 +25,7 @@ export function formatAsCurrency (value: string | number): string {
   return currencyFormatter.format(value)
 }
 
-export function getColumnStyle (
-  column: Column<LedgerEntryRowData>,
-): CSSProperties {
+export function getColumnStyle (column: Column<LedgerEntryData>): CSSProperties {
   const { columnDef } = column
 
   return {

@@ -1,13 +1,8 @@
 import { useAppForm } from "@/Integrations/tanstack-form/UseAppForm"
 import type { LedgerEntryData } from "$Contract/models/Ledger"
 
-export interface LedgerEntryRowData extends LedgerEntryData {
-  credit: string
-  debit: string
-}
-
 export interface UseLedgerRowFormProps {
-  ledgerEntry: LedgerEntryRowData
+  ledgerEntry: LedgerEntryData
 }
 
 export const useLedgerRowForm = ({ ledgerEntry }: UseLedgerRowFormProps) => {

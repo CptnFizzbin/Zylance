@@ -1,17 +1,16 @@
 import { Box } from "@mui/material"
 import type { SxProps } from "@mui/system"
-import type { Row } from "@tanstack/react-table"
-import type { FC } from "react"
-import { LedgerGridCell } from "@/Components/Ledger/LedgerGrid/LedgerGridCell"
+import { flexRender, type Row } from "@tanstack/react-table"
+import type { CSSProperties, FC } from "react"
 import { mergeSxProps } from "@/Integrations/mui/SxPropUtils"
-import type { LedgerEntryRowData } from "../UseLedgerRowForm"
+import type { LedgerEntryData } from "$Contract/models/Ledger"
 import { getColumnStyle } from "./LedgerGridUtils"
 
 export interface LedgerGridRowProps {
-  row: Row<LedgerEntryRowData>
+  row: Row<LedgerEntryData>
   sx?: SxProps
-  style?: React.CSSProperties
-  onEdit: (rowData: LedgerEntryRowData) => void
+  style?: CSSProperties
+  onEdit: (rowData: LedgerEntryData) => void
 }
 
 export const LedgerGridRow: FC<LedgerGridRowProps> = ({
@@ -40,7 +39,7 @@ export const LedgerGridRow: FC<LedgerGridRowProps> = ({
           }}
           style={getColumnStyle(cell.column)}
         >
-          <LedgerGridCell cell={cell} />
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </Box>
       ))}
     </Box>

@@ -1,30 +1,19 @@
 import { Box } from "@mui/material"
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useVirtualizer } from "@tanstack/react-virtual"
-import { type FC, useEffect, useMemo, useRef } from "react"
+import { type FC, useEffect, useRef } from "react"
 import { ledgerGridColumns } from "@/Components/Ledger/LedgerGrid/LedgerGridColumns"
-import type { LedgerEntryRowData } from "@/Components/Ledger/UseLedgerRowForm"
 import type { LedgerEntryData } from "$Contract/models/Ledger"
 import { LedgerGridRow } from "./LedgerGridRow"
 import { getColumnStyle } from "./LedgerGridUtils"
 
 const LEDGER_ROW_HEIGHT = 35
 
-function toLedgerEntryRowData (entry: LedgerEntryData): LedgerEntryRowData {
-  const amount = Number(entry.amount)
-  return {
-    ...entry,
-    credit: amount < 0 ? entry.amount : "",
-    debit: amount > 0 ? entry.amount : "",
-  }
-}
-
 export interface LedgerGridProps {
   entries: LedgerEntryData[]
 }
 
 export const LedgerGrid: FC<LedgerGridProps> = ({ entries }) => {
-  console.log("LedgerGrid render")
   const wrapperRef = useRef(null)
 
   const rowVirtualizer = useVirtualizer({
@@ -35,15 +24,13 @@ export const LedgerGrid: FC<LedgerGridProps> = ({ entries }) => {
     overscan: 20,
   })
 
-  const rowsData = useMemo(() => entries.map(toLedgerEntryRowData), [entries])
   const table = useReactTable({
-    data: rowsData,
+    data: entries,
     columns: ledgerGridColumns,
     getCoreRowModel: getCoreRowModel(),
   })
 
   useEffect(() => {
-    console.log("Entries updated, scrolling to bottom")
     if (entries.length > 0) {
       rowVirtualizer.scrollToIndex(entries.length - 1)
     }
@@ -52,7 +39,7 @@ export const LedgerGrid: FC<LedgerGridProps> = ({ entries }) => {
   const { headers } = table.getHeaderGroups()[0]
   const { rows } = table.getRowModel()
 
-  const onEdit = (rowData: LedgerEntryRowData) => {
+  const onEdit = (rowData: LedgerEntryData) => {
     console.log("Editing row:", rowData)
   }
 
