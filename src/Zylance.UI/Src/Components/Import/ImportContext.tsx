@@ -1,14 +1,5 @@
 import { useMutation } from "@tanstack/react-query"
-import {
-  createContext,
-  type FC,
-  type PropsWithChildren,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react"
+import { createContext, type FC, type PropsWithChildren, useCallback, useContext, useEffect, useState } from "react"
 import { catchError, EMPTY, filter } from "rxjs"
 import { useZylanceApi } from "@/Apis/UseZylanceApi"
 import { ImportDialog } from "@/Components/Import/ImportDialog"
@@ -159,8 +150,6 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
     return () => subscriptions.forEach((sub) => void sub.unsubscribe())
   }, [form, zylanceApi, importId, onError])
 
-  const memoizedChildren = useMemo(() => children, [children])
-
   const state: ImportState = {
     openDialog: () => setDialogOpen(true),
     closeDialog: () => setDialogOpen(false),
@@ -182,7 +171,7 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <ImportContext.Provider value={state}>
-      {memoizedChildren}
+      {children}
       <ImportDialog open={dialogOpen} />
     </ImportContext.Provider>
   )

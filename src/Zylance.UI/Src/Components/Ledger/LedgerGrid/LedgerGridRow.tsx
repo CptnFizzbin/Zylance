@@ -1,23 +1,30 @@
 import { Box } from "@mui/material"
 import type { SxProps } from "@mui/system"
 import type { Row } from "@tanstack/react-table"
-import type { CSSProperties, FC } from "react"
+import type { FC } from "react"
 import { LedgerGridCell } from "@/Components/Ledger/LedgerGrid/LedgerGridCell"
 import { mergeSxProps } from "@/Integrations/mui/SxPropUtils"
 import type { LedgerEntryRowData } from "../UseLedgerRowForm"
 import { getColumnStyle } from "./LedgerGridUtils"
 
-export const LedgerGridRow: FC<{
+export interface LedgerGridRowProps {
   row: Row<LedgerEntryRowData>
   sx?: SxProps
-  style?: CSSProperties
-  onEdit: () => void
-}> = ({ row, sx, style, onEdit }) => {
+  style?: React.CSSProperties
+  onEdit: (rowData: LedgerEntryRowData) => void
+}
+
+export const LedgerGridRow: FC<LedgerGridRowProps> = ({
+  row,
+  sx,
+  style,
+  onEdit,
+}) => {
   return (
     <Box
       sx={mergeSxProps({ display: "flex", flexDirection: "row" }, sx)}
       style={style}
-      onDoubleClick={onEdit}
+      onDoubleClick={() => onEdit(row.original)}
     >
       {row.getVisibleCells().map((cell) => (
         <Box

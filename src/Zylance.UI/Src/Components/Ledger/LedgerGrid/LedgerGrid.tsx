@@ -1,14 +1,7 @@
 import { Box } from "@mui/material"
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
+import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useVirtualizer } from "@tanstack/react-virtual"
-import { sort } from "fast-sort"
 import { type FC, useEffect, useMemo, useRef } from "react"
-import { useZylance } from "@/Apis/Zylance/UseZylance"
-import { useLedgerEntries } from "@/Components/Ledger/LedgerEntryQueries"
 import { ledgerGridColumns } from "@/Components/Ledger/LedgerGrid/LedgerGridColumns"
 import type { LedgerEntryRowData } from "@/Components/Ledger/UseLedgerRowForm"
 import type { LedgerEntryData } from "$Contract/models/Ledger"
@@ -17,7 +10,7 @@ import { getColumnStyle } from "./LedgerGridUtils"
 
 const LEDGER_ROW_HEIGHT = 35
 
-function toLedgerEntryRowData(entry: LedgerEntryData): LedgerEntryRowData {
+function toLedgerEntryRowData (entry: LedgerEntryData): LedgerEntryRowData {
   const amount = Number(entry.amount)
   return {
     ...entry,
@@ -26,38 +19,35 @@ function toLedgerEntryRowData(entry: LedgerEntryData): LedgerEntryRowData {
   }
 }
 
-export const LedgerGrid: FC = () => {
-  const wrapperRef = useRef(null)
+export interface LedgerGridProps {
+  entries: LedgerEntryData[]
+}
 
-  const { currentVault } = useZylance()
-  const ledgerEntriesQuery = useLedgerEntries(currentVault)
-  const entries = ledgerEntriesQuery.data || []
+export const LedgerGrid: FC<LedgerGridProps> = ({ entries }) => {
+  console.log("LedgerGrid render")
+  const wrapperRef = useRef(null)
 
   const rowVirtualizer = useVirtualizer({
     count: entries.length,
     getScrollElement: () => wrapperRef.current,
     estimateSize: () => LEDGER_ROW_HEIGHT,
+    getItemKey: (index) => entries[index].id,
     overscan: 20,
   })
 
-  const sortedEntries = useMemo(() => {
-    return sort(entries).by({ desc: (entry) => entry.timestamp })
-  }, [entries])
-
+  const rowsData = useMemo(() => entries.map(toLedgerEntryRowData), [entries])
   const table = useReactTable({
-    data: sortedEntries.map(toLedgerEntryRowData),
+    data: rowsData,
     columns: ledgerGridColumns,
     getCoreRowModel: getCoreRowModel(),
   })
 
   useEffect(() => {
+    console.log("Entries updated, scrolling to bottom")
     if (entries.length > 0) {
       rowVirtualizer.scrollToIndex(entries.length - 1)
     }
-  }, [entries, rowVirtualizer])
-
-  if (ledgerEntriesQuery.isLoading) return <div>Loading...</div>
-  if (ledgerEntriesQuery.error) return <div>Error loading ledger entries</div>
+  }, [entries.length, rowVirtualizer])
 
   const { headers } = table.getHeaderGroups()[0]
   const { rows } = table.getRowModel()
@@ -104,9 +94,9 @@ export const LedgerGrid: FC = () => {
               {header.isPlaceholder
                 ? null
                 : flexRender(
-                    header.column.columnDef.header,
-                    header.getContext(),
-                  )}
+                  header.column.columnDef.header,
+                  header.getContext(),
+                )}
             </Box>
           ))}
         </Box>
@@ -120,7 +110,7 @@ export const LedgerGrid: FC = () => {
                 height: `${virtualRow.size}px`,
                 transform: `translateY(${virtualRow.start - index * virtualRow.size}px)`,
               }}
-              onEdit={() => onEdit(row.original)}
+              onEdit={onEdit}
             />
           )
         })}
