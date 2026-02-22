@@ -39,6 +39,7 @@ export function useLedgerEntries(
       const res = await zylanceApi.ledger.listLedgerEntries({})
       return res.entries
     },
+    staleTime: "static",
   })
 }
 

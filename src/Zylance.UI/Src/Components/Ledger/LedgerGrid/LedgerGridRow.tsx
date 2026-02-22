@@ -1,10 +1,10 @@
 import { Box } from "@mui/material"
 import type { SxProps } from "@mui/system"
 import type { Row } from "@tanstack/react-table"
-import { type CSSProperties, type FC, memo } from "react"
+import type { CSSProperties, FC } from "react"
+import { LedgerGridCell } from "@/Components/Ledger/LedgerGrid/LedgerGridCell"
 import { mergeSxProps } from "@/Integrations/mui/SxPropUtils"
 import type { LedgerEntryRowData } from "../UseLedgerRowForm"
-import { LedgerGridCell } from "./LedgerGridCell"
 import { getColumnStyle } from "./LedgerGridUtils"
 
 export const LedgerGridRow: FC<{
@@ -12,11 +12,12 @@ export const LedgerGridRow: FC<{
   sx?: SxProps
   style?: CSSProperties
   onEdit: () => void
-}> = memo(({ row, sx, style, onEdit }) => {
+}> = ({ row, sx, style, onEdit }) => {
   return (
     <Box
       sx={mergeSxProps({ display: "flex", flexDirection: "row" }, sx)}
       style={style}
+      onDoubleClick={onEdit}
     >
       {row.getVisibleCells().map((cell) => (
         <Box
@@ -32,9 +33,9 @@ export const LedgerGridRow: FC<{
           }}
           style={getColumnStyle(cell.column)}
         >
-          <LedgerGridCell cell={cell} onEdit={onEdit} />
+          <LedgerGridCell cell={cell} />
         </Box>
       ))}
     </Box>
   )
-})
+}

@@ -1,5 +1,5 @@
-import type { LedgerEntryData } from "$Contract/models/Ledger"
 import { useAppForm } from "@/Integrations/tanstack-form/UseAppForm"
+import type { LedgerEntryData } from "$Contract/models/Ledger"
 
 export interface LedgerEntryRowData extends LedgerEntryData {
   credit: string

@@ -159,7 +159,6 @@ export class ZylanceClient {
   }
 
   private onMessageReceived (message: string) {
-    console.log(`Received ${message}`)
     const envelope = GatewayEnvelope.fromJSON(JSON.parse(message))
 
     switch (true) {

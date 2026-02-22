@@ -4,11 +4,6 @@ import { formatAsCurrency } from "./LedgerGridUtils"
 
 export const ledgerGridColumns: ColumnDef<LedgerEntryRowData>[] = [
   {
-    accessorKey: "actions",
-    header: "",
-    size: 30,
-  },
-  {
     accessorKey: "timestamp",
     accessorFn: (entry) => {
       const timestamp = Number(entry.timestamp)

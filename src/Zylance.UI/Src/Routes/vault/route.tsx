@@ -8,8 +8,6 @@ export const Route = createFileRoute("/vault")({
 })
 
 function RouteComponent () {
-  console.log("Rendering /vault route")
-
   return (
     <Box
       sx={{

@@ -1,14 +1,60 @@
 import { Box } from "@mui/material"
-import { flexRender, type Row } from "@tanstack/react-table"
-import type { FC } from "react"
-import { useLedgerGrid } from "@/Components/Ledger/LedgerGrid/UseLedgerGrid"
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
+import { useVirtualizer } from "@tanstack/react-virtual"
+import { sort } from "fast-sort"
+import { type FC, useEffect, useMemo, useRef } from "react"
+import { useZylance } from "@/Apis/Zylance/UseZylance"
+import { useLedgerEntries } from "@/Components/Ledger/LedgerEntryQueries"
+import { ledgerGridColumns } from "@/Components/Ledger/LedgerGrid/LedgerGridColumns"
 import type { LedgerEntryRowData } from "@/Components/Ledger/UseLedgerRowForm"
+import type { LedgerEntryData } from "$Contract/models/Ledger"
 import { LedgerGridRow } from "./LedgerGridRow"
 import { getColumnStyle } from "./LedgerGridUtils"
 
+const LEDGER_ROW_HEIGHT = 35
+
+function toLedgerEntryRowData(entry: LedgerEntryData): LedgerEntryRowData {
+  const amount = Number(entry.amount)
+  return {
+    ...entry,
+    credit: amount < 0 ? entry.amount : "",
+    debit: amount > 0 ? entry.amount : "",
+  }
+}
+
 export const LedgerGrid: FC = () => {
-  const { ledgerEntriesQuery, wrapperRef, rowVirtualizer, table } =
-    useLedgerGrid()
+  const wrapperRef = useRef(null)
+
+  const { currentVault } = useZylance()
+  const ledgerEntriesQuery = useLedgerEntries(currentVault)
+  const entries = ledgerEntriesQuery.data || []
+
+  const rowVirtualizer = useVirtualizer({
+    count: entries.length,
+    getScrollElement: () => wrapperRef.current,
+    estimateSize: () => LEDGER_ROW_HEIGHT,
+    overscan: 20,
+  })
+
+  const sortedEntries = useMemo(() => {
+    return sort(entries).by({ desc: (entry) => entry.timestamp })
+  }, [entries])
+
+  const table = useReactTable({
+    data: sortedEntries.map(toLedgerEntryRowData),
+    columns: ledgerGridColumns,
+    getCoreRowModel: getCoreRowModel(),
+  })
+
+  useEffect(() => {
+    if (entries.length > 0) {
+      rowVirtualizer.scrollToIndex(entries.length - 1)
+    }
+  }, [entries, rowVirtualizer])
 
   if (ledgerEntriesQuery.isLoading) return <div>Loading...</div>
   if (ledgerEntriesQuery.error) return <div>Error loading ledger entries</div>
@@ -16,8 +62,8 @@ export const LedgerGrid: FC = () => {
   const { headers } = table.getHeaderGroups()[0]
   const { rows } = table.getRowModel()
 
-  const onEditRow = (row: Row<LedgerEntryRowData>) => {
-    console.log("Edit row", row.original)
+  const onEdit = (rowData: LedgerEntryRowData) => {
+    console.log("Editing row:", rowData)
   }
 
   return (
@@ -58,9 +104,9 @@ export const LedgerGrid: FC = () => {
               {header.isPlaceholder
                 ? null
                 : flexRender(
-                  header.column.columnDef.header,
-                  header.getContext(),
-                )}
+                    header.column.columnDef.header,
+                    header.getContext(),
+                  )}
             </Box>
           ))}
         </Box>
@@ -74,7 +120,7 @@ export const LedgerGrid: FC = () => {
                 height: `${virtualRow.size}px`,
                 transform: `translateY(${virtualRow.start - index * virtualRow.size}px)`,
               }}
-              onEdit={() => onEditRow(row)}
+              onEdit={() => onEdit(row.original)}
             />
           )
         })}
