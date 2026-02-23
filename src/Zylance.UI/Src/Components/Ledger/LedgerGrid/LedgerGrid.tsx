@@ -2,7 +2,8 @@ import { Box } from "@mui/material"
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import { type FC, useEffect, useRef } from "react"
-import { ledgerGridColumns } from "@/Components/Ledger/LedgerGrid/LedgerGridColumns"
+import { useLedgerGridColumns } from "@/Components/Ledger/LedgerGrid/LedgerGridColumns"
+import type { AccountData } from "$Contract/models/Account"
 import type { LedgerEntryData } from "$Contract/models/Ledger"
 import { LedgerGridRow } from "./LedgerGridRow"
 import { getColumnStyle } from "./LedgerGridUtils"
@@ -11,9 +12,11 @@ const LEDGER_ROW_HEIGHT = 35
 
 export interface LedgerGridProps {
   entries: LedgerEntryData[]
+  accounts: AccountData[]
 }
 
-export const LedgerGrid: FC<LedgerGridProps> = ({ entries }) => {
+export const LedgerGrid: FC<LedgerGridProps> = ({ entries, accounts }) => {
+  const ledgerGridColumns = useLedgerGridColumns(accounts)
   const wrapperRef = useRef(null)
 
   const rowVirtualizer = useVirtualizer({

@@ -54,7 +54,7 @@ public record AccountModel
             Currency = account.Currency,
             AvailableBalance = decimal.TryParse(account.AvailableBalance, out var availableBalance)
                 ? availableBalance
-                : null,
+                : 0,
         };
     }
 
