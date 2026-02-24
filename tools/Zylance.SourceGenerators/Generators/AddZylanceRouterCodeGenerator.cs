@@ -30,25 +30,32 @@ internal static class AddZylanceRouterCodeGenerator
                  #nullable enable
 
                  using System;
+                 using Serilog;
                  using Microsoft.Extensions.DependencyInjection;
                  using Microsoft.Extensions.DependencyInjection.Extensions;
+                 using Zylance.Core.Logging;
                  using Zylance.Core.Router.Services;
+                 using Zylance.Core.Gateway.Services;
                  {{ForEach(namespaces, ns => $"using {ns.ToDisplayString()};")}}
 
                  namespace Zylance.Core.Lib.Gateway.Extensions;
 
-                  /// <summary>
-                  /// Registers generated controllers and the RouterService into the dependency injection container.
-                  /// </summary>
-                  public static class ControllerRegistration
+                 /// <summary>
+                 /// Registers generated controllers and the RouterService into the dependency injection container.
+                 /// </summary>
+                 public static class ControllerRegistration
                  {
+                     private static readonly ILogger Log = ZyLogger.ForContext(typeof(ControllerRegistration));
+
                      internal static IServiceCollection AddZylanceRouter(this IServiceCollection services)
                      {
                          {{ForEach(controllers, c => $"services.TryAddSingleton<{c.ClassType.Name}>();")}}
 
                          services.TryAddSingleton<RouterService>(sp =>
                          {
-                             var router = new RouterService();
+                             Log.Information("Registering controllers with RouterService...");
+                             var gateway = sp.GetRequiredService<GatewayService>();
+                             var router = new RouterService(gateway);
 
                              {{ForEach(
                                  controllers,

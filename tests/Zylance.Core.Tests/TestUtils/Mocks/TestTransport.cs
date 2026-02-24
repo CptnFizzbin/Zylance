@@ -2,13 +2,13 @@ using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Gateway.Utils;
 using Zylance.Core.Platform.Interfaces;
 
-namespace Zylance.Core.Tests.Mocks;
+namespace Zylance.Core.Tests.TestUtils.Mocks;
 
 /// <summary>
 ///     Mock implementation of ITransport for testing Gateway event handling.
 ///     Allows tests to simulate messages being received from the UI layer.
 /// </summary>
-public class MockTransport : ITransport
+internal class TestTransport : ITransport
 {
     private Action<string>? _messageHandler;
     private Action<string>? _messageReceiver;
@@ -45,5 +45,19 @@ public class MockTransport : ITransport
     public void ReceiveFromGateway(Action<string> callback)
     {
         _messageReceiver = callback;
+    }
+
+    public Task<GatewayEnvelope> WaitForMessage(Action callback)
+    {
+        var tcs = new TaskCompletionSource<GatewayEnvelope>();
+        ReceiveFromGateway(json =>
+        {
+            var message = GatewayEnvelope.Parser.ParseJson(json);
+            tcs.SetResult(message);
+        });
+
+        callback();
+
+        return Task.FromResult(tcs.Task.Result);
     }
 }

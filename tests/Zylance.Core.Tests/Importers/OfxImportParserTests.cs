@@ -1,5 +1,5 @@
 using Zylance.Core.Importers.Ofx;
-using Zylance.Core.Tests.Fixtures;
+using Zylance.Core.Tests.TestUtils.Fixtures;
 
 namespace Zylance.Core.Tests.Importers;
 

@@ -7,7 +7,7 @@ namespace Zylance.Core.Vault.Interfaces;
 ///     Represents a vault exposing managers for accounts, ledgers, and metadata,
 ///     and helpers for creating and executing work within a transactional scope.
 /// </summary>
-public interface IVault
+public interface IVault : IAsyncDisposable
 {
     /// <summary>
     ///     Unique identifier for the vault instance.
@@ -56,14 +56,6 @@ public interface IVault
             await scope.Rollback();
             throw;
         }
-    }
-
-    /// <summary>
-    ///     Executes an action within a vault scope, ensuring disposal.
-    /// </summary>
-    public Task WithScope(Func<IVault, Task> action)
-    {
-        return WithScope(scope => action(scope.Vault));
     }
 
     /// <summary>

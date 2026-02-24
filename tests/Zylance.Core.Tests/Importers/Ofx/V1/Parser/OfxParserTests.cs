@@ -1,6 +1,5 @@
 using Zylance.Core.Importers.Ofx.V1;
-using Zylance.Core.Tests.Extensions;
-using Zylance.Core.Tests.Fixtures;
+using Zylance.Core.Tests.TestUtils.Fixtures;
 
 namespace Zylance.Core.Tests.Importers.Ofx.V1.Parser;
 
@@ -41,7 +40,7 @@ public class OfxV1ParserTests
 
         var firstTransaction = statement.Transactions[0];
         Assert.Equal("DEBIT", firstTransaction.Type);
-        Assert.Equal("2025-01-02T12:00:00.000+00:00", firstTransaction.DatePosted.ToIso8601());
+        Assert.Equal("2025-01-02T12:00:00.0000000+00:00", firstTransaction.DatePosted.ToString("O"));
         Assert.Equal(-87.50m, firstTransaction.Amount);
         Assert.Equal("2025010201", firstTransaction.Id);
         Assert.Equal("WHOLE FOODS MARKET #123", firstTransaction.Name);
@@ -66,7 +65,7 @@ public class OfxV1ParserTests
         var statement = statements[0];
         Assert.NotNull(statement.LedgerBalance);
         Assert.Equal(1411.81m, statement.LedgerBalance.Amount);
-        Assert.Equal("2025-01-15T12:00:00.000+00:00", statement.LedgerBalance.AsOfDate.ToIso8601());
+        Assert.Equal("2025-01-15T12:00:00.0000000+00:00", statement.LedgerBalance.AsOfDate.ToString("O"));
         Assert.Equal("LEDGER", statement.LedgerBalance.Type);
 
         Assert.NotNull(statement.AvailableBalance);
@@ -155,7 +154,7 @@ public class OfxV1ParserTests
 
         var firstDebit = statement.Transactions[0];
         Assert.Equal("DEBIT", firstDebit.Type);
-        Assert.Equal("2026-02-02T12:00:00.000+00:00", firstDebit.DatePosted.ToIso8601());
+        Assert.Equal("2026-02-02T12:00:00.0000000+00:00", firstDebit.DatePosted.ToString("O"));
         Assert.Equal(-125.50m, firstDebit.Amount);
         Assert.Equal("CC2026020201", firstDebit.Id);
         Assert.Equal("ONLINE RETAILER", firstDebit.Name);
@@ -180,7 +179,7 @@ public class OfxV1ParserTests
         var statement = statements[0];
         Assert.NotNull(statement.LedgerBalance);
         Assert.Equal(-971.49m, statement.LedgerBalance.Amount);
-        Assert.Equal("2026-02-04T12:00:00.000+00:00", statement.LedgerBalance.AsOfDate.ToIso8601());
+        Assert.Equal("2026-02-04T12:00:00.0000000+00:00", statement.LedgerBalance.AsOfDate.ToString("O"));
         Assert.Equal("LEDGER", statement.LedgerBalance.Type);
 
         Assert.NotNull(statement.AvailableBalance);
@@ -203,7 +202,7 @@ public class OfxV1ParserTests
         Assert.Single(statement.Transactions);
         var transaction = statement.Transactions[0];
         Assert.Equal("DEBIT", transaction.Type);
-        Assert.Equal("2026-01-02T12:00:00.000+00:00", transaction.DatePosted.ToIso8601());
+        Assert.Equal("2026-01-02T12:00:00.0000000+00:00", transaction.DatePosted.ToString("O"));
         Assert.Equal(-50.00m, transaction.Amount);
         Assert.Equal("2026010201", transaction.Id);
         Assert.Equal("NO MEMO TRANSACTION", transaction.Name);

@@ -29,4 +29,8 @@
     <ProjectReference Include="..\..\src\Zylance.Contract\Zylance.Contract.csproj" />
     <ProjectReference Include="..\..\src\Zylance.Vault.Local\Zylance.Vault.Local.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="TestUtils\" />
+  </ItemGroup>
 </Project>

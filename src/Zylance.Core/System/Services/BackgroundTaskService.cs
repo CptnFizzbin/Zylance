@@ -1,5 +1,6 @@
 using Serilog;
 using Zylance.Contract.Api.Background;
+using Zylance.Core.Gateway.Services;
 using Zylance.Core.Gateway.Utils;
 using Zylance.Core.Logging;
 
@@ -9,7 +10,7 @@ namespace Zylance.Core.System.Services;
 ///     Service for managing and reporting background task progress.
 ///     Emits events to notify the UI about task lifecycle and progress.
 /// </summary>
-public class BackgroundTaskService(ZylanceCore zylanceCore)
+public class BackgroundTaskService(GatewayService gateway)
 {
     private static readonly ILogger Log = ZyLogger.ForContext<BackgroundTaskService>();
 
@@ -23,7 +24,7 @@ public class BackgroundTaskService(ZylanceCore zylanceCore)
         var log = Log.ForContext("taskId", taskId);
         log.Information("Background task started: {description}", description ?? "<No description>");
         var evt = new BackgroundWorkStartEvt { TaskId = taskId, Description = description };
-        zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
+        gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     /// <summary>
@@ -46,7 +47,7 @@ public class BackgroundTaskService(ZylanceCore zylanceCore)
             Progress = Math.Clamp(progress, 0.0f, 1.0f),
             Description = description,
         };
-        zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
+        gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     /// <summary>
@@ -59,7 +60,7 @@ public class BackgroundTaskService(ZylanceCore zylanceCore)
         var log = Log.ForContext("taskId", taskId);
         log.Information("Background task complete: {description}", description ?? "<No description>");
         var evt = new BackgroundWorkFinishEvt { TaskId = taskId, Description = description };
-        zylanceCore.Gateway.Send(MessageUtils.ToEventPayload(evt));
+        gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     /// <summary>

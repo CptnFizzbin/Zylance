@@ -1,9 +1,8 @@
 using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Gateway.Services;
-using Zylance.Core.Router.Services;
-using Zylance.Core.Tests.Mocks;
+using Zylance.Core.Tests.TestUtils.Mocks;
 
-namespace Zylance.Core.Tests.TestUtils.Gateway;
+namespace Zylance.Core.Tests.Gateway;
 
 /// <summary>
 ///     Tests for the fluent EventObservable API (ObserveEvent).
@@ -11,12 +10,11 @@ namespace Zylance.Core.Tests.TestUtils.Gateway;
 public class EventObservableTests
 {
     private readonly GatewayService _gatewayService;
-    private readonly RouterService _routerService = new();
-    private readonly MockTransport _transport = new();
+    private readonly TestTransport _transport = new();
 
     public EventObservableTests()
     {
-        _gatewayService = new GatewayService(_transport, _routerService);
+        _gatewayService = new GatewayService(_transport);
     }
 
     #region Integration Tests

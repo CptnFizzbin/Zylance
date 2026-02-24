@@ -32,7 +32,7 @@ public class VaultService(
                 var vault = await vaultProvider.OpenVault();
                 var vaultId = Guid.NewGuid().ToString();
 
-                vaultContext.ActiveVault = vault;
+                vaultContext.OpenVault(vault);
 
                 return new VaultRef { Id = vaultId };
             }
@@ -51,7 +51,7 @@ public class VaultService(
                 var vault = await vaultProvider.CreateVault();
 
                 var vaultId = Guid.NewGuid().ToString();
-                vaultContext.ActiveVault = vault;
+                vaultContext.OpenVault(vault);
 
                 return new VaultRef { Id = vaultId };
             }
@@ -63,7 +63,7 @@ public class VaultService(
     /// </summary>
     public void CloseVault()
     {
-        vaultContext.ActiveVault = null;
+        vaultContext.CloseVault();
     }
 
     /// <summary>

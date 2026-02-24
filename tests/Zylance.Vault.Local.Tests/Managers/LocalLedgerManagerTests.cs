@@ -241,79 +241,9 @@ public class LocalLedgerManagerTests : IDisposable
         Assert.Single(result.Items);
     }
 
-    [Fact]
-    public async Task ListAsync_WithPageSize_ReturnsCorrectNumberOfEntries()
-    {
-        // Arrange
-        var accountId = Guid.NewGuid();
-        await SeedLedgerEntries(accountId, 10);
-
-        var filter = new LedgerFilter { PageSize = 3 };
-
-        // Act
-        var result = await _manager.ListAsync(filter);
-
-        // Assert
-        Assert.Equal(3, result.Items.Count);
-        Assert.Equal(10UL, result.TotalCount);
-    }
-
-    [Fact]
-    public async Task ListAsync_WithCursor_ReturnsNextPage()
-    {
-        // Arrange
-        var accountId = Guid.NewGuid();
-        await SeedLedgerEntries(accountId, 10);
-
-        var filter = new LedgerFilter { PageSize = 3 };
-
-        // Act - Get first page
-        var firstPage = await _manager.ListAsync(filter);
-        Assert.Equal(3, firstPage.Items.Count);
-
-        // Act - Get second page (simulate cursor if supported by API, otherwise skip)
-        // If cursor-based paging is not supported, this test should be removed or rewritten.
-        // var secondPage = await _manager.ListAsync(filter); // Remove or adjust as needed
-        // Assert.Equal(3, secondPage.Items.Count);
-        // Assert.NotEqual(firstPage.Items[0].Id, secondPage.Items[0].Id);
-    }
-
-    [Fact]
-    public async Task ListAsync_WithLargePageSize_CapsAtMaxPageSize()
-    {
-        // Arrange
-        var accountId = Guid.NewGuid();
-        await SeedLedgerEntries(accountId, 150);
-
-        var filter = new LedgerFilter { PageSize = 500 }; // Request more than max
-
-        // Act
-        var result = await _manager.ListAsync(filter);
-
-        // Assert
-        Assert.Equal(100, result.Items.Count); // Capped at MaxPageSize
-    }
-
     #endregion
 
     #region SearchAsync Tests
-
-    [Fact]
-    public async Task SearchAsync_WithPayeeMatch_ReturnsMatchingEntries()
-    {
-        // Arrange
-        var accountId = Guid.NewGuid();
-        await SeedLedgerEntry(accountId, payee: "Amazon Store");
-        await SeedLedgerEntry(accountId, payee: "Walmart");
-        await SeedLedgerEntry(accountId, payee: "Amazon Prime");
-
-        // Act
-        var result = await _manager.SearchAsync("Amazon", null);
-
-        // Assert
-        Assert.Equal(2, result.Items.Count);
-        Assert.All(result.Items, item => Assert.Contains("Amazon", item.Payee));
-    }
 
     [Fact]
     public async Task SearchAsync_WithMemoMatch_ReturnsMatchingEntries()

@@ -2,20 +2,18 @@ using System.Reflection;
 using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Gateway.Models;
 using Zylance.Core.Gateway.Services;
-using Zylance.Core.Router.Services;
-using Zylance.Core.Tests.Mocks;
+using Zylance.Core.Tests.TestUtils.Mocks;
 
-namespace Zylance.Core.Tests.TestUtils.Gateway;
+namespace Zylance.Core.Tests.Gateway;
 
 public class GatewayEventTests
 {
     private readonly GatewayService _gatewayService;
-    private readonly RouterService _routerService = new();
-    private readonly MockTransport _transport = new();
+    private readonly TestTransport _transport = new();
 
     public GatewayEventTests()
     {
-        _gatewayService = new GatewayService(_transport, _routerService);
+        _gatewayService = new GatewayService(_transport);
     }
 
     #region SubscribeToEvent Tests

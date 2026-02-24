@@ -1,14 +1,12 @@
 using Microsoft.Playwright;
 using Zylance.Core;
 using Zylance.Desktop.Configuration;
+using Zylance.Desktop.Tests.TestUtils.Fixtures;
 
 namespace Zylance.Desktop.Tests.TestUtils;
 
 public record ZylanceTestHarness : IAsyncDisposable
 {
-    private string FixturesDir { get; } =
-        Path.Combine(FindSolutionRoot(), "tests", "Zylance.Desktop.Tests", "Fixtures");
-
     public required ZylanceDesktop Desktop { get; init; }
     public required HeadlessFileProvider FileProvider { get; init; }
     public required IBrowser Browser { get; init; }
@@ -144,16 +142,14 @@ public record ZylanceTestHarness : IAsyncDisposable
     ///     Copies a fixture file from the Fixtures directory to a target path.
     /// </summary>
     /// <param name="relativeFixturePath">
-    ///     Path relative to Fixtures/
-    ///     (e.g. "Vaults/EmptyVault.zlv")
+    ///     Path relative to Fixtures/ (e.g. "Vaults/EmptyVault.zlv")
     /// </param>
     /// <param name="relativeDestinationPath">
-    ///     Path relative to the AppData/
-    ///     (e.g. "user-documents/vault.zlv")
+    ///     Path relative to the AppData/ (e.g. "user-documents/vault.zlv")
     /// </param>
     public string CopyFixtureToAppData(string relativeFixturePath, string relativeDestinationPath)
     {
-        var fixturePath = Path.Combine(FixturesDir, relativeFixturePath);
+        var fixturePath = FixtureUtils.GetFixturePath(relativeFixturePath);
         var destinationPath = Path.Combine(AppDataDir, relativeDestinationPath);
 
         if (!File.Exists(fixturePath))
@@ -168,16 +164,14 @@ public record ZylanceTestHarness : IAsyncDisposable
     ///     Copies a fixture file from the Fixtures directory to a target path.
     /// </summary>
     /// <param name="relativeFixturePath">
-    ///     Path relative to Fixtures/
-    ///     (e.g. "Vaults/EmptyVault.zlv")
+    ///     Path relative to Fixtures/ (e.g. "Vaults/EmptyVault.zlv")
     /// </param>
     /// <param name="relativeDestinationPath">
-    ///     Path relative to the TempData/
-    ///     (e.g. "user-documents/vault.zlv")
+    ///     Path relative to the TempData/ (e.g. "user-documents/vault.zlv")
     /// </param>
     public string CopyFixtureToTempData(string relativeFixturePath, string relativeDestinationPath)
     {
-        var fixturePath = Path.Combine(FixturesDir, relativeFixturePath);
+        var fixturePath = FixtureUtils.GetFixturePath(relativeFixturePath);
         var destinationPath = Path.Combine(TempDataDir, relativeDestinationPath);
 
         if (!File.Exists(fixturePath))
