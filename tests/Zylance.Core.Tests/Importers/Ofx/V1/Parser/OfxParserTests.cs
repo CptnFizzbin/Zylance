@@ -210,4 +210,31 @@ public class OfxV1ParserTests
         Assert.Null(transaction.Memo); // Memo should be null if missing
         return Task.CompletedTask;
     }
+
+    [Fact]
+    public Task ParseAsync_WithSingleLineQfx_ParsesCorrectly()
+    {
+        // Arrange
+        using var reader = FixtureUtils.LoadFixture("Importers/Ofx/V1/single-line.qfx");
+
+        // Act
+        var statements = OfxV1Parser.Parse(reader);
+
+        // Assert
+        Assert.Single(statements);
+        var statement = statements[0];
+        Assert.NotNull(statement.Account);
+        Assert.Equal("123456789", statement.Account.BankId);
+        Assert.Equal("9876543210", statement.Account.AccountId);
+        Assert.Equal("CHECKING", statement.Account.AccountType);
+        Assert.Equal("USD", statement.Account.Currency);
+        Assert.Equal(10, statement.Transactions.Count);
+        Assert.NotNull(statement.LedgerBalance);
+        Assert.Equal(1411.81m, statement.LedgerBalance.Amount);
+        Assert.Equal("LEDGER", statement.LedgerBalance.Type);
+        Assert.NotNull(statement.AvailableBalance);
+        Assert.Equal(1411.81m, statement.AvailableBalance.Amount);
+        Assert.Equal("AVAIL", statement.AvailableBalance.Type);
+        return Task.CompletedTask;
+    }
 }
