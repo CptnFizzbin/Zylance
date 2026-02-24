@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Development": {
+    "Vite Server": {
       "commandName": "Project",
       "environmentVariables": {
         "ZYLANCE_UI_SERVER_ENABLED": "false",
@@ -9,7 +9,7 @@
         "ZYLANCE_WS_PORT": "3001"
       }
     },
-    "Production": {
+    "Internal Server": {
       "commandName": "Project"
     }
   }

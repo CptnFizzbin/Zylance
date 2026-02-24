@@ -1,5 +1,4 @@
 using Serilog;
-using Zylance.Contract.Models.Vault;
 using Zylance.Core.Logging;
 using Zylance.Core.Platform.Interfaces;
 using Zylance.Core.Vault.Interfaces;
@@ -54,14 +53,5 @@ public class DesktopVaultProvider(ILocalFileProvider fileSystem) : IVaultProvide
 
         Log.Information("User selected vault file: {Path}", path);
         return await LocalVault.FromFile(path);
-    }
-
-    private List<VaultRef> LoadRecentVaults()
-    {
-    }
-
-    private void SaveRecentVaults(List<VaultRef> vaults)
-    {
-        fileSystem.
     }
 }

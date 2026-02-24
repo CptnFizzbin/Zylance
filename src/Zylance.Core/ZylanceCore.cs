@@ -5,6 +5,7 @@ using Zylance.Core.Lib.Gateway.Extensions;
 using Zylance.Core.Logging;
 using Zylance.Core.Platform.Interfaces;
 using Zylance.Core.Router.Services;
+using Zylance.Core.Settings.Services;
 using Zylance.Core.System.Services;
 using Zylance.Core.Vault.Context;
 using Zylance.Core.Vault.Interfaces;
@@ -45,6 +46,7 @@ public class ZylanceCore
         services.AddSingleton<BackgroundTaskService>();
         services.AddSingleton<VaultContext>();
         services.AddSingleton<VaultService>();
+        services.AddSingleton<SettingsService>();
         services.AddZylanceRouter();
 
         Log.Information("Building service provider...");
