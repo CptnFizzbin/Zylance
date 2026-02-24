@@ -7,7 +7,8 @@ using Zylance.Vault.Local.Tests.Factories;
 namespace Zylance.Vault.Local.Tests.Managers;
 
 /// <summary>
-///     Tests for LocalLedgerManager to ensure CRUD operations, filtering, and pagination work correctly.
+///     Tests for LocalLedgerManager to ensure CRUD operations, filtering, and
+///     pagination work correctly.
 /// </summary>
 public class LocalLedgerManagerTests : IDisposable
 {
@@ -224,15 +225,17 @@ public class LocalLedgerManagerTests : IDisposable
     {
         // Arrange
         var accountId = Guid.NewGuid();
-        var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        var hourAgo = now - 3600000;
-        var hourFromNow = now + 3600000;
+        var now = DateTimeOffset.UtcNow;
 
-        await SeedLedgerEntry(accountId, hourAgo - 1000); // Before range
+        await SeedLedgerEntry(accountId, now.AddDays(-1)); // Before range
         await SeedLedgerEntry(accountId, now); // In range
-        await SeedLedgerEntry(accountId, hourFromNow + 1000); // After range
+        await SeedLedgerEntry(accountId, now.AddDays(1)); // After range
 
-        var filter = new LedgerFilter { StartTimestamp = hourAgo, EndTimestamp = hourFromNow };
+        var filter = new LedgerFilter
+        {
+            StartTimestamp = now.AddHours(-1).ToString("O"),
+            EndTimestamp = now.AddHours(1).ToString("O"),
+        };
 
         // Act
         var result = await _manager.ListAsync(filter);
@@ -327,7 +330,7 @@ public class LocalLedgerManagerTests : IDisposable
 
     private async Task SeedLedgerEntry(
         Guid accountId,
-        long? timestamp = null,
+        DateTimeOffset? timestamp = null,
         string payee = "Test Payee",
         string memo = "Test Memo"
     )
@@ -336,8 +339,7 @@ public class LocalLedgerManagerTests : IDisposable
         {
             Id = Guid.NewGuid(),
             AccountId = accountId.ToString(),
-            Timestamp =
-                timestamp != null ? DateTimeOffset.FromUnixTimeMilliseconds((long)timestamp) : DateTimeOffset.UtcNow,
+            Timestamp = timestamp ?? DateTimeOffset.UtcNow,
             Payee = payee,
             Memo = memo,
             Amount = 100.00M,

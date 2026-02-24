@@ -55,7 +55,7 @@ public record LedgerEntryModel
         {
             Id = model.Id.ToString(),
             AccountId = model.AccountId,
-            Timestamp = model.Timestamp.ToUnixTimeMilliseconds(),
+            Timestamp = model.Timestamp.ToString("O"),
             Payee = model.Payee,
             Memo = model.Memo,
             Amount = model.Amount.ToString(CultureInfo.InvariantCulture),
@@ -75,7 +75,7 @@ public record LedgerEntryModel
         {
             Id = new Guid(data.Id),
             AccountId = data.AccountId,
-            Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(data.Timestamp),
+            Timestamp = DateTimeOffset.Parse(data.Timestamp),
             Payee = data.Payee,
             Memo = data.Memo,
             Amount = decimal.Parse(data.Amount, CultureInfo.InvariantCulture),

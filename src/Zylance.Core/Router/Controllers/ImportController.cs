@@ -2,7 +2,6 @@ using Serilog;
 using Zylance.Contract;
 using Zylance.Contract.Api.File;
 using Zylance.Core.Gateway.Models;
-using Zylance.Core.Gateway.Services;
 using Zylance.Core.Gateway.Utils;
 using Zylance.Core.Importers.Models;
 using Zylance.Core.Importers.Ofx;
@@ -18,7 +17,7 @@ namespace Zylance.Core.Router.Controllers;
 ///     Controller handling import actions (e.g., Import:Start).
 /// </summary>
 [Controller]
-public class ImportController(FileService fileService, VaultContext vaultContext, GatewayService gateway)
+public class ImportController(FileService fileService, ZylanceCore zylance, VaultContext vaultContext)
 {
     private static readonly ILogger Log = ZyLogger.ForContext<ImportController>();
 
@@ -39,8 +38,8 @@ public class ImportController(FileService fileService, VaultContext vaultContext
         res.SetData(new StartImportRes { ImportId = importId });
         res.Send();
 
-        _ = gateway
-            .ObserveEvent<ImportCancelledEvt>(ZylanceEvents.Import_Cancelled)
+        _ = zylance
+            .Gateway.ObserveEvent<ImportCancelledEvt>(ZylanceEvents.Import_Cancelled)
             .Select(evt => evt.ImportId == importId)
             .TakeFirstAsync(cancellationSource.Token)
             .ContinueWith(
@@ -66,9 +65,9 @@ public class ImportController(FileService fileService, VaultContext vaultContext
 
         try
         {
-            gateway.SendEvent(new ImportStartedEvt { ImportId = importId });
+            zylance.Gateway.SendEvent(new ImportStartedEvt { ImportId = importId });
             var result = await PerformImport(importId, accounts, transactions);
-            gateway.SendEvent(
+            zylance.Gateway.SendEvent(
                 new ImportFinishedEvt
                 {
                     ImportId = importId,
@@ -82,7 +81,7 @@ public class ImportController(FileService fileService, VaultContext vaultContext
         catch (Exception e)
         {
             Log.Error(e, "Import {ImportId} failed", importId);
-            gateway.SendEvent(new ImportErrorEvt { ImportId = importId, ErrorMessage = e.Message });
+            zylance.Gateway.SendEvent(new ImportErrorEvt { ImportId = importId, ErrorMessage = e.Message });
             throw;
         }
     }
@@ -122,10 +121,10 @@ public class ImportController(FileService fileService, VaultContext vaultContext
                 importId,
                 accounts.Count()
             );
-            gateway.Send(MessageUtils.ToEventPayload(evtData));
+            zylance.Gateway.Send(MessageUtils.ToEventPayload(evtData));
 
-            accounts = await gateway
-                .ObserveEvent<ImportSetAccountsEvt>(ZylanceEvents.Import_SetAccounts)
+            accounts = await zylance
+                .Gateway.ObserveEvent<ImportSetAccountsEvt>(ZylanceEvents.Import_SetAccounts)
                 .Where(evt => evt.ImportId == importId)
                 .Select(evt => evt.Accounts)
                 .TakeFirstAsync(cancellationToken);
@@ -142,7 +141,7 @@ public class ImportController(FileService fileService, VaultContext vaultContext
         var percent = (float)progress / total * 100;
         var evt = new ImportProgressEvt { ImportId = importId, Progress = percent };
         Log.Debug("Import {ImportId} progress {Progress}/{Total} ({Percent}%)", importId, progress, total, percent);
-        gateway.Send(MessageUtils.ToEventPayload(evt));
+        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     private async Task<ImportResult> PerformImport(

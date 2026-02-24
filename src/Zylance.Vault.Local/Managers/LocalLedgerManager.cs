@@ -25,16 +25,10 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
 
         var totalCount = (ulong)await query.CountAsync();
 
-        var pageSize =
-            filter is not null && filter.PageSize > 0
-                ? Math.Min((int)filter.PageSize, LedgerCursor.MaxPageSize)
-                : LedgerCursor.DefaultPageSize;
-
-        var entities = await query.Take(pageSize + 1).ToListAsync();
-
-        var hasNextPage = entities.Count > pageSize;
-        if (hasNextPage)
-            entities = entities.Take(pageSize).ToList();
+        // TODO: Apply pagination using filter.PageSize and filter.Cursor
+        // TODO: update LedgerGrid to support infinite scrolling and pass appropriate filter parameters
+        var entities = await query.ToListAsync();
+        var hasNextPage = false;
 
         var items = entities.Select(LedgerEntryEntity.ToModel).ToList();
 
@@ -228,17 +222,11 @@ public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
         if (filter is not null && !string.IsNullOrEmpty(filter.AccountId))
             query = query.Where(e => e.AccountId == filter.AccountId);
 
-        if (filter?.StartTimestamp > 0)
-        {
-            var startTimestamp = DateTimeOffset.FromUnixTimeMilliseconds(filter.StartTimestamp);
+        if (DateTimeOffset.TryParse(filter?.StartTimestamp, out var startTimestamp))
             query = query.Where(e => e.Timestamp >= startTimestamp);
-        }
 
-        if (filter?.EndTimestamp > 0)
-        {
-            var endTimestamp = DateTimeOffset.FromUnixTimeMilliseconds(filter.EndTimestamp);
+        if (DateTimeOffset.TryParse(filter?.EndTimestamp, out var endTimestamp))
             query = query.Where(e => e.Timestamp <= endTimestamp);
-        }
 
         var cursor = LedgerCursor.Decode(filter?.Cursor);
         if (cursor is not null)
