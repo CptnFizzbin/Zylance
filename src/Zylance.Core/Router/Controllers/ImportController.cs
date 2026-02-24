@@ -20,7 +20,7 @@ namespace Zylance.Core.Router.Controllers;
 [Controller]
 public class ImportController(FileService fileService, VaultContext vaultContext, GatewayService gateway)
 {
-    private readonly static ILogger Log = ZyLogger.ForContext<ImportController>();
+    private static readonly ILogger Log = ZyLogger.ForContext<ImportController>();
 
     /// <summary>
     ///     Handles the Import:Start action, starting a new import process.

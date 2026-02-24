@@ -16,7 +16,7 @@ namespace Zylance.Core.Router.Controllers;
 [Controller]
 public class AccountsController(VaultContext vaultContext)
 {
-    private readonly static ILogger Log = ZyLogger.ForContext<AccountsController>();
+    private static readonly ILogger Log = ZyLogger.ForContext<AccountsController>();
 
     /// <summary>
     ///     Lists all accounts in the active vault.
