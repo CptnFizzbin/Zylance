@@ -32,7 +32,6 @@ NEWFILEUID:NONE
             <TRNAMT>-50.00
             <FITID>2026010201
             <NAME>NO MEMO TRANSACTION
-            <!-- No <MEMO> tag here -->
           </STMTTRN>
         </BANKTRANLIST>
         <LEDGERBAL>
