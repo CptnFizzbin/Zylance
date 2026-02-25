@@ -95,29 +95,29 @@ public class HeadlessFileProvider(string appDataPath, string tempDataPath)
         OnSelectFile((_, _, _) => handler());
     }
 
-    public override async Task<FileRef> SelectFile(
+    public override async Task<FileRef> SelectFileAsync(
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
-        bool readOnly = FileRefFlags.ReadOnly
+        bool readOnly = FileRefFlags.ReadOnly,
+        CancellationToken token = default
     )
     {
         var selectedPath = await _onSelectFile(title, filters, readOnly);
-        if (string.IsNullOrEmpty(selectedPath))
-            throw new OperationCanceledException("File selection was cancelled by the user.");
-
-        return await CreateFileReference(selectedPath, readOnly);
+        return string.IsNullOrEmpty(selectedPath)
+            ? throw new OperationCanceledException("File selection was cancelled by the user.")
+            : CreateFileReference(selectedPath, readOnly);
     }
 
-    public override async Task<FileRef> CreateFile(
+    public override async Task<FileRef> CreateFileAsync(
         string? title = null,
         string? defaultPath = null,
-        (string Name, string[] Extensions)[]? filters = null
+        (string Name, string[] Extensions)[]? filters = null,
+        CancellationToken token = default
     )
     {
         var selectedPath = await _onCreateFile(title, defaultPath, filters);
-        if (string.IsNullOrEmpty(selectedPath))
-            throw new OperationCanceledException("File selection was cancelled by the user.");
-
-        return await CreateFileReference(selectedPath, FileRefFlags.ReadWrite);
+        return string.IsNullOrEmpty(selectedPath)
+            ? throw new OperationCanceledException("File selection was cancelled by the user.")
+            : CreateFileReference(selectedPath, FileRefFlags.ReadWrite);
     }
 }

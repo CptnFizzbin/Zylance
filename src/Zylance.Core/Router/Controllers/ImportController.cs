@@ -33,7 +33,7 @@ public class ImportController(FileService fileService, GatewayService gateway, V
 
         var fileRef = req.Data.FileRef;
         Log.Information("StartImport called for FileRef={FileRef}", fileRef);
-        if (!await fileService.Exists(fileRef))
+        if (!fileService.Exists(fileRef))
             throw new FileNotFoundException($"File not found: {fileRef}");
 
         var importId = Guid.CreateVersion7().ToString();

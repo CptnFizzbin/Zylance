@@ -21,7 +21,11 @@ public static class FileServiceTestFactory
     {
         providerMock
             .Setup(p =>
-                p.SelectFile(It.IsAny<string>(), It.IsAny<(string Name, string[] Extensions)[]>(), It.IsAny<bool>())
+                p.SelectFileAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<(string Name, string[] Extensions)[]>(),
+                    It.IsAny<bool>()
+                )
             )
             .ReturnsAsync(fileRef);
         return providerMock;
@@ -31,7 +35,11 @@ public static class FileServiceTestFactory
     {
         providerMock
             .Setup(p =>
-                p.CreateFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<(string Name, string[] Extensions)[]>())
+                p.CreateFileAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<(string Name, string[] Extensions)[]>()
+                )
             )
             .ReturnsAsync(fileRef);
         return providerMock;
@@ -39,7 +47,7 @@ public static class FileServiceTestFactory
 
     public static Mock<IFileProvider> SetupExists(Mock<IFileProvider> providerMock, FileRef fileRef, bool exists)
     {
-        providerMock.Setup(p => p.Exists(fileRef)).ReturnsAsync(exists);
+        providerMock.Setup(p => p.Exists(fileRef)).Returns(exists);
         return providerMock;
     }
 }

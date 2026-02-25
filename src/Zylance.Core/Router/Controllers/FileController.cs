@@ -30,7 +30,7 @@ public class FileController(FileService fileService)
 
         var filters = data.Filters?.Select(f => (f.Name, f.Extensions.ToArray())).ToArray();
 
-        var fileRef = await fileService.SelectFile(data.Title, filters, data.ReadOnly);
+        var fileRef = await fileService.SelectFileAsync(data.Title, filters, data.ReadOnly);
 
         res.SetData(new SelectFileRes { FileRef = fileRef });
         Log.Debug("SelectFile returned FileRef={FileRef}", fileRef);
@@ -50,7 +50,7 @@ public class FileController(FileService fileService)
 
         var filters = data.Filters?.Select(f => (f.Name, f.Extensions.ToArray())).ToArray();
 
-        var fileRef = await fileService.CreateFile(data.Title, data.Filename, filters);
+        var fileRef = await fileService.CreateFileAsync(data.Title, data.Filename, filters);
 
         res.SetData(new CreateFileRes { FileRef = fileRef });
         Log.Debug("CreateFile returned FileRef={FileRef}", fileRef);

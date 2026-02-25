@@ -11,5 +11,5 @@ public interface ILocalFileProvider : IFileProvider
     ///     Returns a local filesystem path for the given FileRef.
     /// </summary>
     /// <param name="fileRef">The file reference.</param>
-    public Task<string> GetFilePath(FileRef fileRef);
+    public string GetFilePath(FileRef fileRef);
 }

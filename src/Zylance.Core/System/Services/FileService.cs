@@ -1,3 +1,4 @@
+using System.Text;
 using Serilog;
 using Zylance.Contract.Models.File;
 using Zylance.Core.Logging;
@@ -15,13 +16,13 @@ public class FileService(IFileProvider fileProvider)
 {
     private static readonly ILogger Log = ZyLogger.ForContext<FileService>();
     private readonly Lock _lock = new();
-    private readonly Dictionary<string, bool> _readOnlyRegistry = new();
+    private readonly Dictionary<string, bool> _readOnlyRegistry = [];
 
     /// <summary>
     ///     Checks whether a file exists at the given path.
     /// </summary>
     /// <param name="fileRef">File ref to check.</param>
-    public Task<bool> Exists(FileRef fileRef)
+    public bool Exists(FileRef fileRef)
     {
         Log.Information("Checking if file exists: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         return fileProvider.Exists(fileRef);
@@ -33,10 +34,12 @@ public class FileService(IFileProvider fileProvider)
     /// <param name="title">Optional dialog title.</param>
     /// <param name="filters">Optional file extension filters.</param>
     /// <param name="readOnly">Whether the selected file should be opened read-only.</param>
-    public async Task<FileRef> SelectFile(
+    /// <param name="token">Cancellation token.</param>
+    public async Task<FileRef> SelectFileAsync(
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
-        bool readOnly = true
+        bool readOnly = true,
+        CancellationToken token = default
     )
     {
         Log.Information(
@@ -47,7 +50,7 @@ public class FileService(IFileProvider fileProvider)
                 : "None",
             readOnly
         );
-        var fileRef = await fileProvider.SelectFile(title, filters, readOnly);
+        var fileRef = await fileProvider.SelectFileAsync(title, filters, readOnly, token);
         RegisterFileRef(fileRef);
 
         return fileRef;
@@ -59,10 +62,12 @@ public class FileService(IFileProvider fileProvider)
     /// <param name="title">Optional dialog title.</param>
     /// <param name="filename">Optional default file name.</param>
     /// <param name="filters">Optional file extension filters.</param>
-    public async Task<FileRef> CreateFile(
+    /// <param name="token">Cancellation token.</param>
+    public async Task<FileRef> CreateFileAsync(
         string? title = null,
         string? filename = null,
-        (string Name, string[] Extensions)[]? filters = null
+        (string Name, string[] Extensions)[]? filters = null,
+        CancellationToken token = default
     )
     {
         Log.Information(
@@ -73,7 +78,7 @@ public class FileService(IFileProvider fileProvider)
                 ? string.Join(", ", filters.Select(f => $"{f.Name} ({string.Join(", ", f.Extensions)})"))
                 : "None"
         );
-        var fileRef = await fileProvider.CreateFile(title, filename, filters);
+        var fileRef = await fileProvider.CreateFileAsync(title, filename, filters, token);
         RegisterFileRef(fileRef);
 
         return fileRef;
@@ -83,12 +88,27 @@ public class FileService(IFileProvider fileProvider)
     ///     Opens a stream for the specified FileRef.
     /// </summary>
     /// <param name="fileRef">The file reference to open.</param>
-    public async Task<Stream> OpenFileAsync(FileRef fileRef)
+    public Stream OpenFile(FileRef fileRef)
     {
         Log.Information("Opening file: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         AssertFileRegistered(fileRef);
 
-        return await fileProvider.OpenFile(fileRef);
+        return fileProvider.OpenFile(fileRef);
+    }
+
+    /// <summary>
+    ///     Reads the contents of the specified FileRef as a UTF-8 string.
+    /// </summary>
+    /// <param name="fileRef">The file reference to read from.</param>
+    /// <param name="token">Cancellation token.</param>
+    public async Task<string> ReadFileAsync(FileRef fileRef, CancellationToken token = default)
+    {
+        Log.Information("Reading file as text: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
+        AssertFileRegistered(fileRef);
+
+        await using var stream = fileProvider.OpenFile(fileRef);
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+        return await reader.ReadToEndAsync(token);
     }
 
     /// <summary>
@@ -97,12 +117,17 @@ public class FileService(IFileProvider fileProvider)
     /// </summary>
     /// <param name="fileRef">The file reference to open.</param>
     /// <param name="action">A callback to perform with the file stream</param>
-    public async Task<TResult> WithFileAsync<TResult>(FileRef fileRef, Func<Stream, Task<TResult>> action)
+    /// <param name="token">Cancellation token.</param>
+    public async Task<TResult> WithFileAsync<TResult>(
+        FileRef fileRef,
+        Func<Stream, Task<TResult>> action,
+        CancellationToken token = default
+    )
     {
         Log.Information("Opening file with action: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         AssertFileRegistered(fileRef);
 
-        await using var stream = await fileProvider.OpenFile(fileRef);
+        await using var stream = fileProvider.OpenFile(fileRef);
         return await action(stream);
     }
 
@@ -111,26 +136,40 @@ public class FileService(IFileProvider fileProvider)
     /// </summary>
     /// <param name="fileRef">The file reference to save to.</param>
     /// <param name="content">Stream content to write.</param>
-    public async Task SaveFile(FileRef fileRef, Stream content)
+    /// <param name="token">Cancellation token.</param>
+    public async Task SaveFileAsync(FileRef fileRef, Stream content, CancellationToken token = default)
     {
         Log.Information("Saving file: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         AssertFileRegistered(fileRef);
         AssertFileWritable(fileRef);
 
-        await fileProvider.SaveFile(fileRef, content);
+        await fileProvider.SaveFileAsync(fileRef, content, token);
+    }
+
+    /// <summary>
+    ///     Saves string content to the specified FileRef.
+    /// </summary>
+    /// <param name="fileRef">The file reference to save to.</param>
+    /// <param name="content">String content to write.</param>
+    /// <param name="token">Cancellation token.</param>
+    public async Task SaveFileAsync(FileRef fileRef, string content, CancellationToken token = default)
+    {
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+        await fileProvider.SaveFileAsync(fileRef, stream, token);
     }
 
     /// <summary>
     ///     Deletes the specified FileRef and removes it from the registry.
     /// </summary>
     /// <param name="fileRef">The file reference to delete.</param>
-    public async Task DeleteFile(FileRef fileRef)
+    /// <param name="token">Cancellation token.</param>
+    public async Task DeleteFileAsync(FileRef fileRef, CancellationToken token = default)
     {
         Log.Information("Deleting file: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         AssertFileRegistered(fileRef);
         AssertFileWritable(fileRef);
 
-        await fileProvider.DeleteFile(fileRef);
+        await fileProvider.DeleteFileAsync(fileRef, token);
 
         lock (_lock)
         {
@@ -142,10 +181,10 @@ public class FileService(IFileProvider fileProvider)
     ///     Returns a temporary file reference for the provided path.
     /// </summary>
     /// <param name="path">Relative path for the temporary file.</param>
-    public async Task<FileRef> GetTempFile(string path)
+    public FileRef GetTempFile(string path)
     {
         Log.Information("Getting temporary file: {path}", path);
-        var fileRef = await fileProvider.GetTempFile(path);
+        var fileRef = fileProvider.GetTempFile(path);
         RegisterFileRef(fileRef);
         return fileRef;
     }
@@ -154,10 +193,10 @@ public class FileService(IFileProvider fileProvider)
     ///     Returns a file reference located in the application's data directory.
     /// </summary>
     /// <param name="path">Relative path within the application data folder.</param>
-    public async Task<FileRef> GetAppDataFile(string path)
+    public FileRef GetAppDataFile(string path)
     {
         Log.Information("Getting app data file: {path}", path);
-        var fileRef = await fileProvider.GetAppDataFile(path);
+        var fileRef = fileProvider.GetAppDataFile(path);
         RegisterFileRef(fileRef);
         return fileRef;
     }

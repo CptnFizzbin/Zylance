@@ -12,7 +12,7 @@ public interface IFileProvider
     ///     Checks whether the backing file for a fileRef exists.
     /// </summary>
     /// <param name="fileRef">ref to check.</param>
-    public Task<bool> Exists(FileRef fileRef);
+    public bool Exists(FileRef fileRef);
 
     /// <summary>
     ///     Prompts the user to select a file.
@@ -20,10 +20,12 @@ public interface IFileProvider
     /// <param name="title">Optional dialog title.</param>
     /// <param name="filters">Optional file filters.</param>
     /// <param name="readOnly">Whether the selected file should be read-only.</param>
-    public Task<FileRef> SelectFile(
+    /// <param name="token">Cancellation token.</param>
+    public Task<FileRef> SelectFileAsync(
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
-        bool readOnly = true
+        bool readOnly = true,
+        CancellationToken token = default
     );
 
     /// <summary>
@@ -32,37 +34,42 @@ public interface IFileProvider
     /// <param name="title">Optional dialog title.</param>
     /// <param name="defaultPath">Optional default path or file name.</param>
     /// <param name="filters">Optional file filters.</param>
-    public Task<FileRef> CreateFile(
+    /// <param name="token">Cancellation token.</param>
+    public Task<FileRef> CreateFileAsync(
         string? title = null,
         string? defaultPath = null,
-        (string Name, string[] Extensions)[]? filters = null
+        (string Name, string[] Extensions)[]? filters = null,
+        CancellationToken token = default
     );
 
     /// <summary>
     ///     Opens a stream for the provided FileRef.
     /// </summary>
     /// <param name="fileRef">The file reference to open.</param>
-    public Task<Stream> OpenFile(FileRef fileRef);
+    public Stream OpenFile(FileRef fileRef);
 
     /// <summary>
     ///     Updates the last-access time for the given file reference
     ///     (platform-specific).
     /// </summary>
     /// <param name="fileRef">The file reference to touch.</param>
-    public Task TouchFile(FileRef fileRef);
+    /// <param name="token">Cancellation token.</param>
+    public Task TouchFileAsync(FileRef fileRef, CancellationToken token = default);
 
     /// <summary>
     ///     Saves the provided stream content to the given file reference.
     /// </summary>
     /// <param name="fileRef">Target file reference.</param>
     /// <param name="content">Stream content to save.</param>
-    public Task SaveFile(FileRef fileRef, Stream content);
+    /// <param name="token">Cancellation token.</param>
+    public Task SaveFileAsync(FileRef fileRef, Stream content, CancellationToken token = default);
 
     /// <summary>
     ///     Deletes the specified file reference.
     /// </summary>
     /// <param name="fileRef">File reference to delete.</param>
-    public Task DeleteFile(FileRef fileRef);
+    /// <param name="token">Cancellation token.</param>
+    public Task DeleteFileAsync(FileRef fileRef, CancellationToken token = default);
 
     /// <summary>
     ///     Returns a FileRef representing a temporary file for the specified path.
@@ -70,7 +77,7 @@ public interface IFileProvider
     ///     be used for intermediate storage or processing.
     /// </summary>
     /// <param name="path">The temporary path to use.</param>
-    public Task<FileRef> GetTempFile(string path);
+    public FileRef GetTempFile(string path);
 
     /// <summary>
     ///     Returns a FileRef located inside the application's data directory.
@@ -78,5 +85,5 @@ public interface IFileProvider
     ///     storing application data such as settings or cache files.
     /// </summary>
     /// <param name="path">Relative path inside the application data directory.</param>
-    public Task<FileRef> GetAppDataFile(string path);
+    public FileRef GetAppDataFile(string path);
 }
