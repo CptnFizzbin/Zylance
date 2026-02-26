@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Serilog;
-using Zylance.Core.Logging;
 using Zylance.Vault.Local.Entities;
 
 namespace Zylance.Vault.Local.Context;
@@ -13,8 +11,6 @@ namespace Zylance.Vault.Local.Context;
 /// </summary>
 public class LocalVaultDbContext(DbContextOptions<LocalVaultDbContext> options) : DbContext(options)
 {
-    private static readonly ILogger Log = ZyLogger.ForContext<LocalVaultDbContext>();
-
     /// <summary>
     ///     Accounts table mapping.
     /// </summary>

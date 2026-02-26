@@ -6,6 +6,8 @@ namespace Zylance.Core.Gateway.Models;
 /// </summary>
 public record Subscription : IDisposable
 {
+    private bool _disposed;
+
     /// <summary>
     ///     Identifier of the subscription.
     /// </summary>
@@ -21,6 +23,10 @@ public record Subscription : IDisposable
     /// </summary>
     public void Dispose()
     {
+        if (_disposed)
+            return;
+
+        _disposed = true;
         Unsubscribe();
         GC.SuppressFinalize(this);
     }

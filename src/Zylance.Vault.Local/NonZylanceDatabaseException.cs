@@ -1,6 +1,3 @@
-using Serilog;
-using Zylance.Core.Logging;
-
 namespace Zylance.Vault.Local;
 
 /// <summary>
@@ -11,8 +8,6 @@ namespace Zylance.Vault.Local;
 /// </summary>
 public class NonZylanceDatabaseException : Exception
 {
-    private static readonly ILogger Log = ZyLogger.ForContext<NonZylanceDatabaseException>();
-
     /// <summary>
     ///     Creates an exception for non-Zylance database errors.
     /// </summary>

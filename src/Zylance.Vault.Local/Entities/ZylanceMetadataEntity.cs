@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Serilog;
-using Zylance.Core.Logging;
 
 namespace Zylance.Vault.Local.Entities;
 
@@ -14,8 +12,6 @@ namespace Zylance.Vault.Local.Entities;
 [Table("_zylance_")]
 public class ZylanceMetadataEntity
 {
-    private static readonly ILogger Log = ZyLogger.ForContext<ZylanceMetadataEntity>();
-
     /// <summary>
     ///     Metadata key name.
     /// </summary>

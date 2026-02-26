@@ -1,5 +1,3 @@
-using Serilog;
-using Zylance.Core.Logging;
 using Zylance.Core.Vault.Managers;
 using Zylance.Vault.Local.Context;
 using Zylance.Vault.Local.Entities;
@@ -11,8 +9,6 @@ namespace Zylance.Vault.Local.Managers;
 /// </summary>
 public class LocalMetadataManager(LocalVaultDbContext dbContext) : IMetadataManager
 {
-    private static readonly ILogger Log = ZyLogger.ForContext<LocalMetadataManager>();
-
     /// <summary>
     ///     Gets a metadata value by key from the marker table.
     /// </summary>

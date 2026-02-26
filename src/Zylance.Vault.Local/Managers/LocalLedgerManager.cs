@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Zylance.Contract.Api.Ledger;
-using Zylance.Core.Logging;
 using Zylance.Core.Vault.Managers;
 using Zylance.Core.Vault.Models;
 using Zylance.Vault.Local.Context;
@@ -14,8 +12,6 @@ namespace Zylance.Vault.Local.Managers;
 /// </summary>
 public class LocalLedgerManager(LocalVaultDbContext dbContext) : ILedgerManager
 {
-    private static readonly ILogger Log = ZyLogger.ForContext<LocalLedgerManager>();
-
     /// <inheritdoc />
     public async Task<CursorList<LedgerEntryModel>> ListAsync(LedgerFilter? filter)
     {

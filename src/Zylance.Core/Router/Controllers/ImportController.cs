@@ -115,11 +115,12 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
         while (!accountsValid)
         {
             var evtData = new ImportGetAccountsEvt { ImportId = importId };
-            evtData.Accounts.AddRange(accounts);
+            var accountData = accounts.ToList();
+            evtData.Accounts.AddRange(accountData);
             Log.Debug(
                 "Requesting account selection for ImportId={ImportId} with {Count} candidate accounts",
                 importId,
-                accounts.Count()
+                accountData.Count
             );
             zylance.Gateway.Send(MessageUtils.ToEventPayload(evtData));
 

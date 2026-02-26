@@ -2,7 +2,7 @@ using Zylance.Contract.Api.Ledger;
 using Zylance.Core.Vault.Models;
 using Zylance.Vault.Local.Context;
 using Zylance.Vault.Local.Managers;
-using Zylance.Vault.Local.Tests.Factories;
+using Zylance.Vault.Local.Tests.TestUtils.Factories;
 
 namespace Zylance.Vault.Local.Tests.Managers;
 

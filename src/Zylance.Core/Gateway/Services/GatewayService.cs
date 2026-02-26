@@ -16,7 +16,7 @@ namespace Zylance.Core.Gateway.Services;
 /// </summary>
 public class GatewayService : IDisposable
 {
-    private readonly ConcurrentDictionary<string, List<ZyEventSubscription>> _eventListeners = new();
+    private readonly ConcurrentDictionary<string, HashSet<ZyEventSubscription>> _eventListeners = new();
     private readonly List<IObserver<EventPayload>> _eventObservers = [];
     private readonly List<IObserver<RequestPayload>> _requestObservers = [];
     private readonly ITransport _transport;
@@ -42,14 +42,13 @@ public class GatewayService : IDisposable
     /// </summary>
     public void Dispose()
     {
-        foreach (var eventObserver in _eventObservers)
+        foreach (var eventObserver in _eventObservers.ToArray())
             eventObserver.OnCompleted();
 
-        foreach (var requestObserver in _requestObservers)
+        foreach (var requestObserver in _requestObservers.ToArray())
             requestObserver.OnCompleted();
 
-        foreach (var listener in _eventListeners.Values.SelectMany(l => l))
-            listener.Unsubscribe();
+        _eventListeners.Clear();
 
         GC.SuppressFinalize(this);
     }
@@ -174,11 +173,11 @@ public class GatewayService : IDisposable
     {
         _eventListeners.AddOrUpdate(
             eventName,
-            _ => [listener],
-            (_, list) =>
+            _ => new HashSet<ZyEventSubscription> { listener },
+            (_, set) =>
             {
-                list.Add(listener);
-                return list;
+                set.Add(listener);
+                return set;
             }
         );
     }
@@ -188,10 +187,10 @@ public class GatewayService : IDisposable
         _eventListeners.AddOrUpdate(
             eventName,
             _ => [],
-            (_, list) =>
+            (_, set) =>
             {
-                list.RemoveAll(l => l.Id == listenerId);
-                return list;
+                set.RemoveWhere(l => l.Id == listenerId);
+                return set;
             }
         );
     }
@@ -259,7 +258,6 @@ public class GatewayService : IDisposable
             return;
 
         // Iterate over a copy to avoid collection modified exception
-        // when handlers unsubscribe during invocation (e.g., ObserveEvent().TakeTakeFirstAsync())
         foreach (var listener in listeners.ToList())
             listener.Handler(evt);
     }

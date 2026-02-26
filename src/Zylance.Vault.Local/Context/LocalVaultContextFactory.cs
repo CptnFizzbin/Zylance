@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Serilog;
-using Zylance.Core.Logging;
 
 namespace Zylance.Vault.Local.Context;
 
@@ -11,8 +9,6 @@ namespace Zylance.Vault.Local.Context;
 /// </summary>
 public class LocalVaultContextFactory : IDesignTimeDbContextFactory<LocalVaultDbContext>
 {
-    private static readonly ILogger Log = ZyLogger.ForContext<LocalVaultContextFactory>();
-
     /// <summary>
     ///     Creates a new DbContext using the provided command-line args (first arg is
     ///     file path).

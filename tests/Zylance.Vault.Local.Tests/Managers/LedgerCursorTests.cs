@@ -21,7 +21,7 @@ public class LedgerCursorTests
 
         // Assert
         Assert.NotNull(decoded);
-        Assert.Equal(timestamp, decoded!.Timestamp);
+        Assert.Equal(timestamp, decoded.Timestamp);
         Assert.Equal(id, decoded.Id);
     }
 }

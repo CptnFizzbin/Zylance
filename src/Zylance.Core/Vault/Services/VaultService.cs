@@ -1,6 +1,4 @@
-using Serilog;
 using Zylance.Contract.Models.Vault;
-using Zylance.Core.Logging;
 using Zylance.Core.System.Services;
 using Zylance.Core.Vault.Context;
 using Zylance.Core.Vault.Interfaces;
@@ -18,8 +16,6 @@ public class VaultService(
     BackgroundTaskService backgroundTaskService
 )
 {
-    private static readonly ILogger Log = ZyLogger.ForContext<VaultService>();
-
     /// <summary>
     ///     Opens the active vault and returns its reference.
     /// </summary>

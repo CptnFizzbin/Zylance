@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Serilog;
-using Zylance.Core.Logging;
 using Zylance.Core.Vault.Models;
 
 namespace Zylance.Vault.Local.Entities;
@@ -10,8 +8,6 @@ namespace Zylance.Vault.Local.Entities;
 /// </summary>
 public class LedgerEntryEntity
 {
-    private static readonly ILogger Log = ZyLogger.ForContext<LedgerEntryEntity>();
-
     /// <summary>
     ///     Unique identifier for the ledger entry.
     /// </summary>
@@ -21,6 +17,7 @@ public class LedgerEntryEntity
     /// <summary>
     ///     Identifier of the account associated with this ledger entry.
     /// </summary>
+    [MaxLength(255)]
     public required string AccountId { get; set; }
 
     /// <summary>
