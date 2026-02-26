@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Reactive.Linq;
 using Google.Protobuf;
 using Serilog;
@@ -16,9 +15,9 @@ namespace Zylance.Core.Gateway.Services;
 /// </summary>
 public class GatewayService : IDisposable
 {
-    private readonly ConcurrentDictionary<string, HashSet<ZyEventSubscription>> _eventListeners = new();
     private readonly List<IObserver<EventPayload>> _eventObservers = [];
     private readonly List<IObserver<RequestPayload>> _requestObservers = [];
+
     private readonly ITransport _transport;
 
     /// <summary>
@@ -47,8 +46,6 @@ public class GatewayService : IDisposable
 
         foreach (var requestObserver in _requestObservers.ToArray())
             requestObserver.OnCompleted();
-
-        _eventListeners.Clear();
 
         GC.SuppressFinalize(this);
     }
@@ -130,69 +127,19 @@ public class GatewayService : IDisposable
     }
 
     /// <summary>
-    ///     Creates an observable that listens for events with the specified name.
+    ///     Creates an observable that listens for incoming events that match
+    ///     the provided event type. This is a strongly-typed wrapper around
+    ///     ObserveEvents that filters by event name and deserializes the
+    ///     payload into the specified type.
     /// </summary>
-    public EventObservable ObserveEvent(string eventName)
+    /// <returns>Observable of ZyEvents</returns>
+    public IObservable<ZyEvent<TEvt>> ObserveEvent<TEvt>()
+        where TEvt : IMessage, new()
     {
-        return new EventObservable(this, eventName);
-    }
-
-    /// <summary>
-    ///     Creates an observable that listens for events with the specified name.
-    /// </summary>
-    public EventObservable<TData> ObserveEvent<TData>(string eventName)
-        where TData : IMessage, new()
-    {
-        return ObserveEvent(eventName)
-            .Select(evt => new ZyEvent<TData> { Payload = evt.Payload })
-            .Select(evt => evt.Data);
-    }
-
-    /// <summary>
-    ///     Subscribes the given handler to events with the specified name and returns
-    ///     a subscription that can be disposed.
-    /// </summary>
-    public Subscription SubscribeToEvent(string eventName, Action<ZyEvent> handler)
-    {
-        var listenerId = Guid.NewGuid();
-
-        var listener = new ZyEventSubscription
-        {
-            Id = listenerId,
-            EventName = eventName,
-            Handler = handler,
-            Unsubscribe = () => RemoveEventListener(eventName, listenerId),
-        };
-
-        AddEventListener(eventName, listener);
-
-        return listener;
-    }
-
-    private void AddEventListener(string eventName, ZyEventSubscription listener)
-    {
-        _eventListeners.AddOrUpdate(
-            eventName,
-            _ => new HashSet<ZyEventSubscription> { listener },
-            (_, set) =>
-            {
-                set.Add(listener);
-                return set;
-            }
-        );
-    }
-
-    private void RemoveEventListener(string eventName, Guid listenerId)
-    {
-        _eventListeners.AddOrUpdate(
-            eventName,
-            _ => [],
-            (_, set) =>
-            {
-                set.RemoveWhere(l => l.Id == listenerId);
-                return set;
-            }
-        );
+        var eventName = ProtoActionUtils.GetEventName<TEvt>();
+        return ObserveEvents()
+            .Where(payload => payload.EventName == eventName)
+            .Select(payload => new ZyEvent<TEvt> { Payload = payload });
     }
 
     private void HandleMessage(string json)
@@ -252,14 +199,6 @@ public class GatewayService : IDisposable
 
         foreach (var observer in _eventObservers)
             observer.OnNext(evtPayload);
-
-        var evt = new ZyEvent { Payload = evtPayload };
-        if (!_eventListeners.TryGetValue(evtPayload.EventName, out var listeners))
-            return;
-
-        // Iterate over a copy to avoid collection modified exception
-        foreach (var listener in listeners.ToList())
-            listener.Handler(evt);
     }
 
     private void Send(GatewayEnvelope envelope)

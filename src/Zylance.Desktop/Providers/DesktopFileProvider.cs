@@ -66,6 +66,6 @@ public class DesktopFileProvider(PhotinoWindow window, string appDataPath, strin
             throw new OperationCanceledException("File creation was cancelled by the user.");
 
         Log.Information("User selected file path: {FilePath}", filePath);
-        return await CreateFileReference(filePath, FileRefFlags.READ_WRITE);
+        return await CreateFileReference(filePath, FileRefFlags.ReadWrite);
     }
 }

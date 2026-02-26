@@ -1,7 +1,9 @@
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using Serilog;
-using Zylance.Contract;
 using Zylance.Contract.Api.File;
 using Zylance.Core.Gateway.Models;
+using Zylance.Core.Gateway.Services;
 using Zylance.Core.Gateway.Utils;
 using Zylance.Core.Importers.Models;
 using Zylance.Core.Importers.Ofx;
@@ -17,7 +19,7 @@ namespace Zylance.Core.Router.Controllers;
 ///     Controller handling import actions (e.g., Import:Start).
 /// </summary>
 [Controller]
-public class ImportController(FileService fileService, ZylanceCore zylance, VaultContext vaultContext)
+public class ImportController(FileService fileService, GatewayService gateway, VaultContext vaultContext)
 {
     private static readonly ILogger Log = ZyLogger.ForContext<ImportController>();
 
@@ -38,10 +40,11 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
         res.SetData(new StartImportRes { ImportId = importId });
         res.Send();
 
-        _ = zylance
-            .Gateway.ObserveEvent<ImportCancelledEvt>(ZylanceEvents.Import_Cancelled)
+        _ = gateway
+            .ObserveEvent<ImportCancelledEvt>()
+            .Select(zyEvt => zyEvt.Data)
             .Select(evt => evt.ImportId == importId)
-            .TakeFirstAsync(cancellationSource.Token)
+            .ToTask(cancellationSource.Token)
             .ContinueWith(
                 _ =>
                 {
@@ -65,9 +68,9 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
 
         try
         {
-            zylance.Gateway.SendEvent(new ImportStartedEvt { ImportId = importId });
+            gateway.SendEvent(new ImportStartedEvt { ImportId = importId });
             var result = await PerformImport(importId, accounts, transactions);
-            zylance.Gateway.SendEvent(
+            gateway.SendEvent(
                 new ImportFinishedEvt
                 {
                     ImportId = importId,
@@ -81,7 +84,7 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
         catch (Exception e)
         {
             Log.Error(e, "Import {ImportId} failed", importId);
-            zylance.Gateway.SendEvent(new ImportErrorEvt { ImportId = importId, ErrorMessage = e.Message });
+            gateway.SendEvent(new ImportErrorEvt { ImportId = importId, ErrorMessage = e.Message });
             throw;
         }
     }
@@ -122,13 +125,15 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
                 importId,
                 accountData.Count
             );
-            zylance.Gateway.Send(MessageUtils.ToEventPayload(evtData));
+            gateway.Send(MessageUtils.ToEventPayload(evtData));
 
-            accounts = await zylance
-                .Gateway.ObserveEvent<ImportSetAccountsEvt>(ZylanceEvents.Import_SetAccounts)
+            accounts = await gateway
+                .ObserveEvent<ImportSetAccountsEvt>()
+                .Select(zyEvt => zyEvt.Data)
                 .Where(evt => evt.ImportId == importId)
+                .Take(1)
                 .Select(evt => evt.Accounts)
-                .TakeFirstAsync(cancellationToken);
+                .ToTask(cancellationToken);
 
             // TODO: validate accounts (e.g., missing required fields, etc.)
             accountsValid = true;
@@ -142,7 +147,7 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
         var percent = (float)progress / total * 100;
         var evt = new ImportProgressEvt { ImportId = importId, Progress = percent };
         Log.Debug("Import {ImportId} progress {Progress}/{Total} ({Percent}%)", importId, progress, total, percent);
-        zylance.Gateway.Send(MessageUtils.ToEventPayload(evt));
+        gateway.Send(MessageUtils.ToEventPayload(evt));
     }
 
     private async Task<ImportResult> PerformImport(
@@ -194,7 +199,7 @@ public class ImportController(FileService fileService, ZylanceCore zylance, Vaul
             }
         });
 
-        return new()
+        return new ImportResult
         {
             NumAccountsImported = accounts.Count,
             NumTransactionsImported = transactionsImported,

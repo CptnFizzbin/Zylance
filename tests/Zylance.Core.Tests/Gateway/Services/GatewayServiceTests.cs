@@ -1,5 +1,4 @@
 using Zylance.Contract.Lib.Envelope;
-using Zylance.Core.Gateway.Models;
 using Zylance.Core.Gateway.Services;
 using Zylance.Core.Tests.TestUtils.Mocks;
 
@@ -96,24 +95,6 @@ public class GatewayServiceTests
         // Assert
         Assert.Single(observed);
         Assert.Equal("TestEvent", observed[0].EventName);
-        subscription.Dispose();
-        _service.Dispose();
-    }
-
-    [Fact]
-    public void SubscribeToEvent_HandlerIsCalled()
-    {
-        // Arrange
-        ZyEvent? received = null;
-        var subscription = _service.SubscribeToEvent("TestEvent", evt => received = evt);
-        var payload = new EventPayload { EventName = "TestEvent", DataJson = "{}" };
-
-        // Act
-        _transport.SendToGateway(payload);
-
-        // Assert
-        Assert.NotNull(received);
-        Assert.Equal("TestEvent", received.Payload.EventName);
         subscription.Dispose();
         _service.Dispose();
     }

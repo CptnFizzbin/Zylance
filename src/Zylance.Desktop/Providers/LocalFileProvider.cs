@@ -61,7 +61,7 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
         // by DesktopFileProvider, or HeadlessFileProvider in tests
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
-        bool readOnly = FileRefFlags.READ_ONLY
+        bool readOnly = FileRefFlags.ReadOnly
     );
 
     /// <summary>
@@ -177,7 +177,7 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
         if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
             Directory.CreateDirectory(directory);
 
-        return CreateFileReference(tempPath, FileRefFlags.READ_WRITE);
+        return CreateFileReference(tempPath, FileRefFlags.ReadWrite);
     }
 
     /// <summary>
@@ -194,7 +194,7 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
         if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
             Directory.CreateDirectory(directory);
 
-        return CreateFileReference(fullPath, FileRefFlags.READ_WRITE);
+        return CreateFileReference(fullPath, FileRefFlags.ReadWrite);
     }
 
     /// <summary>

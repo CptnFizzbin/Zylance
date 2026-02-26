@@ -98,7 +98,7 @@ public class HeadlessFileProvider(string appDataPath, string tempDataPath)
     public override async Task<FileRef> SelectFile(
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
-        bool readOnly = FileRefFlags.READ_ONLY
+        bool readOnly = FileRefFlags.ReadOnly
     )
     {
         var selectedPath = await _onSelectFile(title, filters, readOnly);
@@ -118,6 +118,6 @@ public class HeadlessFileProvider(string appDataPath, string tempDataPath)
         if (string.IsNullOrEmpty(selectedPath))
             throw new OperationCanceledException("File selection was cancelled by the user.");
 
-        return await CreateFileReference(selectedPath, FileRefFlags.READ_WRITE);
+        return await CreateFileReference(selectedPath, FileRefFlags.ReadWrite);
     }
 }
