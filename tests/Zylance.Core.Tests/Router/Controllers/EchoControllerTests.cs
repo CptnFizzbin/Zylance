@@ -1,6 +1,7 @@
 using Zylance.Contract.Api.Echo;
 using Zylance.Core.Router.Controllers;
 using Zylance.Core.Tests.TestUtils.Factories;
+using Zylance.Core.Tests.TestUtils.Factories.Models;
 
 namespace Zylance.Core.Tests.Router.Controllers;
 

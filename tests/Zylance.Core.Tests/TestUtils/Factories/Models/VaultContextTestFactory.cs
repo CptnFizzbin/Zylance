@@ -4,7 +4,7 @@ using Zylance.Core.Platform.Interfaces;
 using Zylance.Core.Vault.Context;
 using Zylance.Core.Vault.Interfaces;
 
-namespace Zylance.Core.Tests.TestUtils.Factories;
+namespace Zylance.Core.Tests.TestUtils.Factories.Models;
 
 public static class VaultContextTestFactory
 {

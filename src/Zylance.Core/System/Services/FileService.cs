@@ -12,7 +12,7 @@ namespace Zylance.Core.System.Services;
 ///     Provides an additional security layer by tracking file access permissions
 ///     independently.
 /// </summary>
-public class FileService(IFileProvider fileProvider)
+public class FileService(IFileProvider fileProvider) : IFileProvider
 {
     private static readonly ILogger Log = ZyLogger.ForContext<FileService>();
     private readonly Lock _lock = new();
@@ -97,41 +97,6 @@ public class FileService(IFileProvider fileProvider)
     }
 
     /// <summary>
-    ///     Reads the contents of the specified FileRef as a UTF-8 string.
-    /// </summary>
-    /// <param name="fileRef">The file reference to read from.</param>
-    /// <param name="token">Cancellation token.</param>
-    public async Task<string> ReadFileAsync(FileRef fileRef, CancellationToken token = default)
-    {
-        Log.Information("Reading file as text: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
-        AssertFileRegistered(fileRef);
-
-        await using var stream = fileProvider.OpenFile(fileRef);
-        using var reader = new StreamReader(stream, Encoding.UTF8);
-        return await reader.ReadToEndAsync(token);
-    }
-
-    /// <summary>
-    ///     Opens a stream for the specified FileRef and executes the provided action,
-    ///     ensuring proper disposal.
-    /// </summary>
-    /// <param name="fileRef">The file reference to open.</param>
-    /// <param name="action">A callback to perform with the file stream</param>
-    /// <param name="token">Cancellation token.</param>
-    public async Task<TResult> WithFileAsync<TResult>(
-        FileRef fileRef,
-        Func<Stream, Task<TResult>> action,
-        CancellationToken token = default
-    )
-    {
-        Log.Information("Opening file with action: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
-        AssertFileRegistered(fileRef);
-
-        await using var stream = fileProvider.OpenFile(fileRef);
-        return await action(stream);
-    }
-
-    /// <summary>
     ///     Saves content to the specified FileRef.
     /// </summary>
     /// <param name="fileRef">The file reference to save to.</param>
@@ -144,18 +109,6 @@ public class FileService(IFileProvider fileProvider)
         AssertFileWritable(fileRef);
 
         await fileProvider.SaveFileAsync(fileRef, content, token);
-    }
-
-    /// <summary>
-    ///     Saves string content to the specified FileRef.
-    /// </summary>
-    /// <param name="fileRef">The file reference to save to.</param>
-    /// <param name="content">String content to write.</param>
-    /// <param name="token">Cancellation token.</param>
-    public async Task SaveFileAsync(FileRef fileRef, string content, CancellationToken token = default)
-    {
-        var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-        await fileProvider.SaveFileAsync(fileRef, stream, token);
     }
 
     /// <summary>
@@ -199,6 +152,53 @@ public class FileService(IFileProvider fileProvider)
         var fileRef = fileProvider.GetAppDataFile(path);
         RegisterFileRef(fileRef);
         return fileRef;
+    }
+
+    /// <summary>
+    ///     Reads the contents of the specified FileRef as a UTF-8 string.
+    /// </summary>
+    /// <param name="fileRef">The file reference to read from.</param>
+    /// <param name="token">Cancellation token.</param>
+    public async Task<string> ReadFileAsync(FileRef fileRef, CancellationToken token = default)
+    {
+        Log.Information("Reading file as text: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
+        AssertFileRegistered(fileRef);
+
+        await using var stream = fileProvider.OpenFile(fileRef);
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+        return await reader.ReadToEndAsync(token);
+    }
+
+    /// <summary>
+    ///     Opens a stream for the specified FileRef and executes the provided action,
+    ///     ensuring proper disposal.
+    /// </summary>
+    /// <param name="fileRef">The file reference to open.</param>
+    /// <param name="action">A callback to perform with the file stream</param>
+    /// <param name="token">Cancellation token.</param>
+    public async Task<TResult> WithFileAsync<TResult>(
+        FileRef fileRef,
+        Func<Stream, Task<TResult>> action,
+        CancellationToken token = default
+    )
+    {
+        Log.Information("Opening file with action: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
+        AssertFileRegistered(fileRef);
+
+        await using var stream = fileProvider.OpenFile(fileRef);
+        return await action(stream);
+    }
+
+    /// <summary>
+    ///     Saves string content to the specified FileRef.
+    /// </summary>
+    /// <param name="fileRef">The file reference to save to.</param>
+    /// <param name="content">String content to write.</param>
+    /// <param name="token">Cancellation token.</param>
+    public async Task SaveFileAsync(FileRef fileRef, string content, CancellationToken token = default)
+    {
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+        await fileProvider.SaveFileAsync(fileRef, stream, token);
     }
 
     /// <summary>

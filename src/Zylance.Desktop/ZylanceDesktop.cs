@@ -95,9 +95,11 @@ public class ZylanceDesktop(
         }
 
         _transport ??= new WebsocketTransport(config.WsPort);
-        _vaultProvider ??= new DesktopVaultProvider(_fileProvider);
 
-        _zylanceCore = new ZylanceCore(_transport, _fileProvider, _vaultProvider);
+        var fileService = new LocalFileService(_fileProvider);
+        _vaultProvider ??= new DesktopVaultProvider(fileService);
+
+        _zylanceCore = new ZylanceCore(_transport, fileService, _vaultProvider);
         _zylanceCore.Gateway.ObserveEvent<DesktopExitEvt>().Subscribe(_ => Exit());
 
         return this;

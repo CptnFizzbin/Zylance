@@ -3,7 +3,7 @@ using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Gateway.Models;
 using Zylance.Core.Gateway.Utils;
 
-namespace Zylance.Core.Tests.TestUtils.Factories;
+namespace Zylance.Core.Tests.TestUtils.Factories.Models;
 
 public static class ZyRequestTestFactory
 {

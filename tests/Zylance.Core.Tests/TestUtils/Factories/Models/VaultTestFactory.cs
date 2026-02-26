@@ -2,7 +2,7 @@ using Moq;
 using Zylance.Core.Vault.Interfaces;
 using Zylance.Core.Vault.Managers;
 
-namespace Zylance.Core.Tests.TestUtils.Factories;
+namespace Zylance.Core.Tests.TestUtils.Factories.Models;
 
 public static class VaultTestFactory
 {

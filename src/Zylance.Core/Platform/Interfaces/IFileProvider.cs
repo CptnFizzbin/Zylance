@@ -49,14 +49,6 @@ public interface IFileProvider
     public Stream OpenFile(FileRef fileRef);
 
     /// <summary>
-    ///     Updates the last-access time for the given file reference
-    ///     (platform-specific).
-    /// </summary>
-    /// <param name="fileRef">The file reference to touch.</param>
-    /// <param name="token">Cancellation token.</param>
-    public Task TouchFileAsync(FileRef fileRef, CancellationToken token = default);
-
-    /// <summary>
     ///     Saves the provided stream content to the given file reference.
     /// </summary>
     /// <param name="fileRef">Target file reference.</param>
@@ -72,7 +64,8 @@ public interface IFileProvider
     public Task DeleteFileAsync(FileRef fileRef, CancellationToken token = default);
 
     /// <summary>
-    ///     Returns a FileRef representing a temporary file for the specified path.
+    ///     Returns a writable FileRef representing a temporary file for the specified
+    ///     path.
     ///     This creates a temporary file if it doesn't already exist, that can
     ///     be used for intermediate storage or processing.
     /// </summary>
@@ -80,7 +73,7 @@ public interface IFileProvider
     public FileRef GetTempFile(string path);
 
     /// <summary>
-    ///     Returns a FileRef located inside the application's data directory.
+    ///     Returns a writable FileRef located inside the application's data directory.
     ///     This creates the file if it doesn't already exist, and is used for
     ///     storing application data such as settings or cache files.
     /// </summary>

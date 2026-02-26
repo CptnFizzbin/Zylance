@@ -2,6 +2,7 @@ using Moq;
 using Zylance.Core.Gateway.Services;
 using Zylance.Core.Platform.Interfaces;
 using Zylance.Core.Tests.TestUtils.Factories;
+using Zylance.Core.Tests.TestUtils.Factories.Models;
 using Zylance.Core.Vault.Context;
 
 namespace Zylance.Core.Tests.Vault.Context;

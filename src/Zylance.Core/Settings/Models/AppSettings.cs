@@ -4,12 +4,12 @@ namespace Zylance.Core.Settings.Models;
 ///     Represents the application settings model, containing user preferences and
 ///     configuration options.
 /// </summary>
-public record SettingsModel
+public record AppSettings
 {
     /// <summary>
     ///     Default settings model instance with default values for all properties.
     /// </summary>
-    public static readonly SettingsModel Default = new();
+    public static readonly AppSettings Default = new();
 
     /// <summary>
     ///     Date and time formatting and localization settings for the application.

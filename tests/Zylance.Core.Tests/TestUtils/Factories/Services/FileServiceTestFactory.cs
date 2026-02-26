@@ -3,7 +3,7 @@ using Zylance.Contract.Models.File;
 using Zylance.Core.Platform.Interfaces;
 using Zylance.Core.System.Services;
 
-namespace Zylance.Core.Tests.TestUtils.Factories;
+namespace Zylance.Core.Tests.TestUtils.Factories.Services;
 
 public static class FileServiceTestFactory
 {

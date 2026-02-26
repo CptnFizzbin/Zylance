@@ -26,7 +26,7 @@ public static class ZyLoggerConfiguration
 
         var logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
-            .WriteTo.Console(new CompactJsonFormatter())
+            .WriteTo.Console()
             .WriteTo.File(new CompactJsonFormatter(), logPath, LogEventLevel.Information, shared: true)
             .WriteTo.File(new CompactJsonFormatter(), errorLogPath, LogEventLevel.Error, shared: true)
             .CreateLogger();

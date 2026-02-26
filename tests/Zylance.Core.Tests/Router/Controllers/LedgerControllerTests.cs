@@ -3,6 +3,7 @@ using Zylance.Contract.Api.Ledger;
 using Zylance.Contract.Models.Ledger;
 using Zylance.Core.Router.Controllers;
 using Zylance.Core.Tests.TestUtils.Factories;
+using Zylance.Core.Tests.TestUtils.Factories.Models;
 using Zylance.Core.Vault.Managers;
 using Zylance.Core.Vault.Models;
 

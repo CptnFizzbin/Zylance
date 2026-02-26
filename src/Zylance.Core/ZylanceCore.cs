@@ -38,11 +38,10 @@ public class ZylanceCore
         services.AddSingleton(this);
 
         services.AddSingleton(transport);
-        services.AddSingleton(fileProvider);
+        services.AddSingleton(fileProvider as FileService ?? new FileService(fileProvider));
         services.AddSingleton(vaultProvider);
 
         services.AddSingleton<GatewayService>();
-        services.AddSingleton<FileService>();
         services.AddSingleton<BackgroundTaskService>();
         services.AddSingleton<VaultContext>();
         services.AddSingleton<VaultService>();

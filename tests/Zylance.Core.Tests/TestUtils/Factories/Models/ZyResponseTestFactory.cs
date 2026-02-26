@@ -2,7 +2,7 @@ using Google.Protobuf;
 using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Gateway.Models;
 
-namespace Zylance.Core.Tests.TestUtils.Factories;
+namespace Zylance.Core.Tests.TestUtils.Factories.Models;
 
 public static class ZyResponseTestFactory
 {

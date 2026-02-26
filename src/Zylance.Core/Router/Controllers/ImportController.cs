@@ -57,10 +57,8 @@ public class ImportController(FileService fileService, GatewayService gateway, V
         // TODO: find the right importer based on the file extension and call it to process the file
         var importer = new OfxImportParser();
 
-        var results = await fileService.WithFileAsync(
-            fileRef,
-            fileStream => importer.ParseAsync(fileStream, cancellationSource.Token)
-        );
+        await using var fileStream = fileService.OpenFile(fileRef);
+        var results = await importer.ParseAsync(fileStream, cancellationSource.Token);
 
         var accounts = await GetAccountData(importId, results.Statements, cancellationSource.Token);
 

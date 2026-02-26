@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Zylance.UI: Start" type="js.build_tools.npm">
+  <configuration default="false" name="Zylance.UI: Vite Server" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/src/Zylance.UI/package.json" />
     <command value="start" />
     <node-interpreter value="project" />
