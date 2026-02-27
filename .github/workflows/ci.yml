@@ -61,20 +61,18 @@ jobs:
         run: pwsh tests/Zylance.Desktop.Tests/bin/Release/net10.0/playwright.ps1 install --with-deps chromium
 
       - name: Test
-        run: dotnet test -c Release --no-restore --no-build --results-directory coverage --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+        run: |
+          dotnet test -c Release --no-restore --no-build --coverage --results-directory ./coverage
+          dotnet coverage merge --output coverage/merged.cobertura.xml --output-format cobertura coverage/*.coverage
 
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: coverage/**/coverage.cobertura.xml
+          filename: '**/*.cobertura.xml'
           badge: true
-          fail_below_min: false # need to add more tests to increase coverage
           format: markdown
-          hide_branch_rate: false
-          hide_complexity: true
           indicators: true
           output: both
-          thresholds: '60 80'
 
   build-runtimes:
     name: Build for ${{ matrix.runtime }}
