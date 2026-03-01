@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Zylance.SourceGenerators.Models;
 using Zylance.SourceGenerators.Roslyn;
@@ -7,7 +5,7 @@ using Zylance.SourceGenerators.Roslyn;
 namespace Zylance.SourceGenerators.Analyzers;
 
 /// <summary>
-/// Helper methods for analyzing controller types during source generation.
+///     Helper methods for analyzing controller types during source generation.
 /// </summary>
 public static class ControllerAnalyzer
 {

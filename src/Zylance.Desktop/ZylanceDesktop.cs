@@ -1,6 +1,6 @@
 using Photino.NET;
 using Serilog;
-using Zylance.Contract;
+using Zylance.Contract.Api.Desktop;
 using Zylance.Core;
 using Zylance.Core.Logging;
 using Zylance.Core.Platform.Interfaces;
@@ -98,7 +98,7 @@ public class ZylanceDesktop(
         _vaultProvider ??= new DesktopVaultProvider(_fileProvider);
 
         _zylanceCore = new ZylanceCore(_transport, _fileProvider, _vaultProvider);
-        _zylanceCore.Gateway.ObserveEvent(ZylanceEvents.Desktop_Exit).Subscribe(_ => Exit());
+        _zylanceCore.Gateway.ObserveEvent<DesktopExitEvt>().Subscribe(_ => Exit());
 
         return this;
     }

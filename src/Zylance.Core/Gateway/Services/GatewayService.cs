@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+using System.Reactive.Linq;
 using Google.Protobuf;
 using Serilog;
 using Zylance.Contract;
@@ -7,37 +7,47 @@ using Zylance.Core.Gateway.Handlers;
 using Zylance.Core.Gateway.Models;
 using Zylance.Core.Gateway.Utils;
 using Zylance.Core.Platform.Interfaces;
-using Zylance.Core.Router.Services;
 
 namespace Zylance.Core.Gateway.Services;
 
 /// <summary>
-///     Service that sends and receives messages and routes them to controllers.
+///     Service that sends and receives messages
 /// </summary>
-public class GatewayService
+public class GatewayService : IDisposable
 {
-    private readonly ConcurrentDictionary<string, List<ZyEventSubscription>> _eventListeners = new();
-    private readonly RouterService _routerService;
+    private readonly List<IObserver<EventPayload>> _eventObservers = [];
+    private readonly List<IObserver<RequestPayload>> _requestObservers = [];
+
     private readonly ITransport _transport;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="GatewayService" /> with the
     ///     specified transport and router.
     /// </summary>
-    public GatewayService(ITransport transport, RouterService routerService)
+    public GatewayService(ITransport transport)
     {
         _transport = transport;
-        _routerService = routerService;
-        _transport.Receive(message => _ = HandleMessage(message));
+        _transport.Receive(HandleMessage);
 
-        SubscribeToEvent(
-            ZylanceEvents.Vault_VaultClosed,
-            _ =>
-            {
-                Log.Information("Vault closed. Clearing event listeners.");
-                _eventListeners.Clear();
-            }
-        );
+        ObserveEvents()
+            .Where(evt => evt.EventName == ZylanceEvents.Vault_VaultClosed)
+            .Take(1)
+            .Subscribe(_ => Dispose());
+    }
+
+    /// <summary>
+    ///     Cleans up resources used by the gateway, such as open connections and
+    ///     subscriptions.
+    /// </summary>
+    public void Dispose()
+    {
+        foreach (var eventObserver in _eventObservers.ToArray())
+            eventObserver.OnCompleted();
+
+        foreach (var requestObserver in _requestObservers.ToArray())
+            requestObserver.OnCompleted();
+
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -89,72 +99,50 @@ public class GatewayService
     }
 
     /// <summary>
-    ///     Creates an observable that listens for events with the specified name.
+    ///     Creates an observable that listens for all incoming requests. Consumers can
+    ///     filter by action name or payload content as needed.
     /// </summary>
-    public EventObservable ObserveEvent(string eventName)
+    /// <returns>Observable of RequestPayloads</returns>
+    public IObservable<RequestPayload> ObserveRequests()
     {
-        return new EventObservable(this, eventName);
-    }
-
-    /// <summary>
-    ///     Creates an observable that listens for events with the specified name.
-    /// </summary>
-    public EventObservable<TData> ObserveEvent<TData>(string eventName)
-        where TData : IMessage, new()
-    {
-        return ObserveEvent(eventName)
-            .Select(evt => new ZyEvent<TData> { Payload = evt.Payload })
-            .Select(evt => evt.Data);
-    }
-
-    /// <summary>
-    ///     Subscribes the given handler to events with the specified name and returns
-    ///     a subscription that can be disposed.
-    /// </summary>
-    public Subscription SubscribeToEvent(string eventName, Action<ZyEvent> handler)
-    {
-        var listenerId = Guid.NewGuid();
-
-        var listener = new ZyEventSubscription
+        return Observable.Create<RequestPayload>(observer =>
         {
-            Id = listenerId,
-            EventName = eventName,
-            Handler = handler,
-            Unsubscribe = () => RemoveEventListener(eventName, listenerId),
-        };
-
-        AddEventListener(eventName, listener);
-
-        return listener;
+            _requestObservers.Add(observer);
+            return () => _requestObservers.Remove(observer);
+        });
     }
 
-    private void AddEventListener(string eventName, ZyEventSubscription listener)
+    /// <summary>
+    ///     Creates an observable that listens for all incoming events. Consumers can
+    ///     filter by event name or payload content as needed.
+    /// </summary>
+    /// <returns>Observable of EventPayloads</returns>
+    public IObservable<EventPayload> ObserveEvents()
     {
-        _eventListeners.AddOrUpdate(
-            eventName,
-            _ => [listener],
-            (_, list) =>
-            {
-                list.Add(listener);
-                return list;
-            }
-        );
+        return Observable.Create<EventPayload>(observer =>
+        {
+            _eventObservers.Add(observer);
+            return () => _eventObservers.Remove(observer);
+        });
     }
 
-    private void RemoveEventListener(string eventName, Guid listenerId)
+    /// <summary>
+    ///     Creates an observable that listens for incoming events that match
+    ///     the provided event type. This is a strongly-typed wrapper around
+    ///     ObserveEvents that filters by event name and deserializes the
+    ///     payload into the specified type.
+    /// </summary>
+    /// <returns>Observable of ZyEvents</returns>
+    public IObservable<ZyEvent<TEvt>> ObserveEvent<TEvt>()
+        where TEvt : IMessage, new()
     {
-        _eventListeners.AddOrUpdate(
-            eventName,
-            _ => [],
-            (_, list) =>
-            {
-                list.RemoveAll(l => l.Id == listenerId);
-                return list;
-            }
-        );
+        var eventName = ProtoActionUtils.GetEventName<TEvt>();
+        return ObserveEvents()
+            .Where(payload => payload.EventName == eventName)
+            .Select(payload => new ZyEvent<TEvt> { Payload = payload });
     }
 
-    private async Task HandleMessage(string json)
+    private void HandleMessage(string json)
     {
         var message = GatewayEnvelope.Parser.ParseJson(json);
         try
@@ -162,56 +150,55 @@ public class GatewayService
             switch (message.PayloadCase)
             {
                 case GatewayEnvelope.PayloadOneofCase.Request:
-                    await HandleMessage(message.Request);
+                    HandleMessage(message.Request);
                     break;
                 case GatewayEnvelope.PayloadOneofCase.Event:
-                    await HandleMessage(message.Event);
+                    HandleMessage(message.Event);
                     break;
                 case GatewayEnvelope.PayloadOneofCase.Response:
                 case GatewayEnvelope.PayloadOneofCase.Error:
                 case GatewayEnvelope.PayloadOneofCase.None:
+                case GatewayEnvelope.PayloadOneofCase.Stream:
                 default:
                     throw new NotSupportedException("Unsupported message type received.");
             }
         }
         catch (Exception ex)
         {
-            var requestId =
-                message.PayloadCase == GatewayEnvelope.PayloadOneofCase.Request ? message.Request.RequestId : null;
-
-            var error = ExceptionHandler.WrapException(ex, requestId);
-            Send(error);
+            HandleError(ex, message.Request?.RequestId);
         }
     }
 
-    private async Task HandleMessage(RequestPayload reqPayload)
+    /// <summary>
+    ///     Handles exceptions that occur during message processing by wrapping them in
+    ///     an
+    ///     ErrorPayload and sending them over the transport. If a requestId is
+    ///     provided,
+    ///     it will be included in the error payload to correlate with the original
+    ///     request.
+    /// </summary>
+    /// <param name="ex">The exception to handle</param>
+    /// <param name="requestId">The related request id</param>
+    public void HandleError(Exception ex, string? requestId = null)
     {
-        Log.Information($"==> Req[{reqPayload.RequestId}]: {reqPayload.Action} - {reqPayload.DataJson}");
-
-        var req = new ZyRequest { Payload = reqPayload };
-
-        var resPayload = new ResponsePayload { RequestId = reqPayload.RequestId };
-        var res = new ZyResponse { Payload = resPayload, OnSend = res => Send(res.Payload) };
-
-        res = await _routerService.HandleRequest(req, res);
-
-        if (!res.ResponseSent)
-            res.Send();
+        var error = ExceptionHandler.WrapException(ex, requestId);
+        Send(error);
     }
 
-    private async Task HandleMessage(EventPayload payload)
+    private void HandleMessage(RequestPayload reqPayload)
     {
-        Log.Information($"==> Evt: {payload.EventName} - {payload.DataJson}");
+        Log.Information("==> Req: {Action} - {DataJson}", reqPayload.Action, reqPayload.DataJson);
 
-        var evt = new ZyEvent { Payload = payload };
+        foreach (var observer in _requestObservers)
+            observer.OnNext(reqPayload);
+    }
 
-        if (_eventListeners.TryGetValue(payload.EventName, out var listeners))
-            // Iterate over a copy to avoid collection modified exception
-            // when handlers unsubscribe during invocation (e.g., ObserveEvent().TakeTakeFirstAsync())
-            foreach (var listener in listeners.ToList())
-                listener.Handler(evt);
+    private void HandleMessage(EventPayload evtPayload)
+    {
+        Log.Information("==> Evt: {EventName} - {DataJson}", evtPayload.EventName, evtPayload.DataJson);
 
-        await _routerService.HandleEvent(evt);
+        foreach (var observer in _eventObservers)
+            observer.OnNext(evtPayload);
     }
 
     private void Send(GatewayEnvelope envelope)

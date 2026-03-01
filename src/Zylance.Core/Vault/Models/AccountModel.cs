@@ -52,7 +52,9 @@ public record AccountModel
             Type = account.Type,
             Balance = decimal.Parse(account.Balance),
             Currency = account.Currency,
-            AvailableBalance = account.AvailableBalance != null ? decimal.Parse(account.AvailableBalance) : null,
+            AvailableBalance = decimal.TryParse(account.AvailableBalance, out var availableBalance)
+                ? availableBalance
+                : null,
         };
     }
 
@@ -70,7 +72,7 @@ public record AccountModel
             Type = account.Type,
             Balance = account.Balance.ToString(CultureInfo.InvariantCulture),
             Currency = account.Currency,
-            AvailableBalance = account.AvailableBalance?.ToString(CultureInfo.InvariantCulture),
+            AvailableBalance = account.AvailableBalance?.ToString(CultureInfo.InvariantCulture) ?? "",
         };
     }
 }

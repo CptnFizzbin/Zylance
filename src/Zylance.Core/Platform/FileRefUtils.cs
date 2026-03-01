@@ -8,10 +8,10 @@ public static class FileRefFlags
     /// <summary>
     ///     Indicates read-only access to a file reference.
     /// </summary>
-    public const bool READ_ONLY = true;
+    public const bool ReadOnly = true;
 
     /// <summary>
     ///     Indicates read-write access to a file reference.
     /// </summary>
-    public const bool READ_WRITE = false;
+    public const bool ReadWrite = false;
 }

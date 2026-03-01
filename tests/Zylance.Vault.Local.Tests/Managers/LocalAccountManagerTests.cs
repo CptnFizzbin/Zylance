@@ -1,12 +1,13 @@
 using Zylance.Core.Vault.Models;
 using Zylance.Vault.Local.Context;
 using Zylance.Vault.Local.Managers;
-using Zylance.Vault.Local.Tests.Factories;
+using Zylance.Vault.Local.Tests.TestUtils.Factories;
 
 namespace Zylance.Vault.Local.Tests.Managers;
 
 /// <summary>
-///     Tests for LocalAccountManager to ensure CRUD operations and listing work correctly.
+///     Tests for LocalAccountManager to ensure CRUD operations and listing work
+///     correctly.
 /// </summary>
 public class LocalAccountManagerTests : IDisposable
 {

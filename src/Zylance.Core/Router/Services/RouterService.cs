@@ -1,8 +1,9 @@
 using JetBrains.Annotations;
 using Serilog;
+using Zylance.Contract.Lib.Envelope;
 using Zylance.Core.Gateway.Handlers;
 using Zylance.Core.Gateway.Models;
-using Zylance.Core.Logging;
+using Zylance.Core.Gateway.Services;
 
 namespace Zylance.Core.Router.Services;
 
@@ -14,9 +15,52 @@ namespace Zylance.Core.Router.Services;
 /// </summary>
 public class RouterService
 {
-    private static readonly ILogger Log = ZyLogger.ForContext<RouterService>();
     private readonly Dictionary<string, AsyncZyEventHandler> _eventHandlers = [];
+    private readonly GatewayService _gateway;
     private readonly Dictionary<string, AsyncZyRequestHandler> _requestHandlers = [];
+
+    /// <summary>
+    ///     Lightweight routing service used by the gateway to map actions and event
+    ///     names to handler delegates.
+    ///     Generated registration code calls into this service to register
+    ///     controllers.
+    /// </summary>
+    public RouterService(GatewayService gateway)
+    {
+        _gateway = gateway;
+
+        _gateway
+            .ObserveRequests()
+            .Subscribe(
+                async void (req) =>
+                {
+                    try
+                    {
+                        await HandleRequest(req);
+                    }
+                    catch (Exception e)
+                    {
+                        gateway.HandleError(e, req.RequestId);
+                    }
+                }
+            );
+
+        _gateway
+            .ObserveEvents()
+            .Subscribe(
+                async void (evt) =>
+                {
+                    try
+                    {
+                        await HandleEvent(evt);
+                    }
+                    catch (Exception e)
+                    {
+                        gateway.HandleError(e);
+                    }
+                }
+            );
+    }
 
     /// <summary>
     ///     Registers an async request handler for the specified action.
@@ -24,6 +68,7 @@ public class RouterService
     [UsedImplicitly(Reason = "Called by generated code.")]
     public RouterService Use(string action, AsyncZyRequestHandler handler)
     {
+        Log.Information("Registering event handler for action {action}", action);
         _requestHandlers.Add(action, handler);
         return this;
     }
@@ -34,29 +79,29 @@ public class RouterService
     [UsedImplicitly(Reason = "Called by generated code.")]
     public RouterService Use(string eventName, AsyncZyEventHandler handler)
     {
+        Log.Information("Registering event handler for event {EventName}", eventName);
         _eventHandlers.Add(eventName, handler);
         return this;
     }
 
-    /// <summary>
-    ///     Handles an incoming ZyRequest by routing it to a registered handler.
-    /// </summary>
-    /// <param name="zyRequest">The incoming request.</param>
-    /// <param name="zyResponse">The response object to populate.</param>
-    public async Task<ZyResponse> HandleRequest(ZyRequest zyRequest, ZyResponse zyResponse)
+    private async Task HandleRequest(RequestPayload reqPayload)
     {
-        if (_requestHandlers.TryGetValue(zyRequest.Action, out var handler))
-            return await handler(zyRequest, zyResponse);
+        var zyRequest = new ZyRequest { Payload = reqPayload };
 
-        return zyResponse;
+        var resPayload = new ResponsePayload { RequestId = reqPayload.RequestId };
+        var zyResponse = new ZyResponse { Payload = resPayload, OnSend = res => _gateway.Send(res.Payload) };
+
+        if (_requestHandlers.TryGetValue(zyRequest.Action, out var handler))
+            await handler(zyRequest, zyResponse);
+
+        if (!zyResponse.ResponseSent)
+            zyResponse.Send();
     }
 
-    /// <summary>
-    ///     Handles an incoming ZyEvent by invoking registered event handlers.
-    /// </summary>
-    /// <param name="zyEvent">The incoming event.</param>
-    public async Task HandleEvent(ZyEvent zyEvent)
+    private async Task HandleEvent(EventPayload evtPayload)
     {
+        var zyEvent = new ZyEvent { Payload = evtPayload };
+
         if (_eventHandlers.TryGetValue(zyEvent.Name, out var handler))
             await handler(zyEvent);
     }

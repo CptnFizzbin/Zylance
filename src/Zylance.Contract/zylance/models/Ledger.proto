@@ -6,7 +6,7 @@ option csharp_namespace = "Zylance.Contract.Models.Ledger";
 message LedgerEntryData {
   string id = 1;
   string account_id = 2;
-  int64 timestamp = 6;
+  string timestamp = 6; // ISO 8601 format
   string amount = 5;
   optional string payee = 3;
   optional string memo = 4;

@@ -1,5 +1,4 @@
-using Zylance.Core.Tests.Extensions;
-using Zylance.Core.Tests.Fixtures;
+using Zylance.Core.Tests.TestUtils.Fixtures;
 using OfxRawElement = Zylance.Core.Importers.Ofx.V1.Raw.OfxRawElement;
 using OfxRawFile = Zylance.Core.Importers.Ofx.V1.Raw.OfxRawFile;
 using OfxRawToken = Zylance.Core.Importers.Ofx.V1.Raw.OfxRawToken;
@@ -129,7 +128,7 @@ DATA:OFXSGML
         // Assert
         Assert.Equal("DTPOSTED", token.Name);
         Assert.Equal("20260202120000[0:GMT]", token.Value);
-        Assert.Equal("2026-02-02T12:00:00.000+00:00", token.DateTimeValue.ToIso8601());
+        Assert.Equal("2026-02-02T12:00:00.0000000+00:00", token.DateTimeValue.ToString("O"));
     }
 
     [Fact]

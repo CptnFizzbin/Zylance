@@ -3,14 +3,13 @@ package zylance.contract;
 
 import "zylance/extensions/Zylance.proto";
 import "zylance/models/Ledger.proto";
-import "zylance/models/Vault.proto";
 
 option csharp_namespace = "Zylance.Contract.Api.Ledger";
 
 message LedgerFilter {
   optional string account_id = 1;
-  optional int64 start_timestamp = 2;
-  optional int64 end_timestamp = 3;
+  optional string start_timestamp = 2; // ISO 8601 format
+  optional string end_timestamp = 3; // ISO 8601 format
   optional string cursor = 5;
   optional uint32 page_size = 6;
 }
@@ -19,7 +18,6 @@ message LedgerFilter {
 // Create a new ledger entry
 message CreateLedgerEntryReq {
   option (action) = "Ledger:CreateLedgerEntry";
-  VaultRef vault_ref = 1;
   LedgerEntryData entry = 2;
 }
 
@@ -31,7 +29,6 @@ message CreateLedgerEntryRes {
 // Get a single ledger entry by ID
 message GetLedgerEntryReq {
   option (action) = "Ledger:GetLedgerEntry";
-  VaultRef vault_ref = 1;
   string id = 2;
 }
 
@@ -43,7 +40,6 @@ message GetLedgerEntryRes {
 // List ledger entries with pagination
 message ListLedgerEntriesReq {
   option (action) = "Ledger:ListLedgerEntries";
-  VaultRef vault_ref = 1;
   optional LedgerFilter filter = 2;
 }
 

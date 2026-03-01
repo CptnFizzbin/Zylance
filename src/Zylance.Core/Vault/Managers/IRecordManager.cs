@@ -9,6 +9,15 @@ namespace Zylance.Core.Vault.Managers;
 public interface IRecordManager<in TId, TRecord>
 {
     /// <summary>
+    ///     Asserts that a record with the specified id exists, throwing if not found.
+    /// </summary>
+    /// <returns>The record with the specified id, or throws if not found.</returns>
+    public async Task AssertExists(TId recordId)
+    {
+        await GetAsync(recordId);
+    }
+
+    /// <summary>
     ///     Retrieves a record by id.
     /// </summary>
     /// <param name="recordId">The identifier of the record to retrieve.</param>

@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Serilog;
-using Zylance.Core.Logging;
 using Zylance.Core.Vault.Managers;
 using Zylance.Core.Vault.Models;
 using Zylance.Vault.Local.Context;
@@ -13,8 +11,6 @@ namespace Zylance.Vault.Local.Managers;
 /// </summary>
 public class LocalAccountManager(LocalVaultDbContext dbContext) : IAccountManager
 {
-    private static readonly ILogger Log = ZyLogger.ForContext<LocalAccountManager>();
-
     /// <summary>
     ///     Gets an account by its string ID.
     /// </summary>

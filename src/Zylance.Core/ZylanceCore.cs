@@ -4,6 +4,7 @@ using Zylance.Core.Gateway.Services;
 using Zylance.Core.Lib.Gateway.Extensions;
 using Zylance.Core.Logging;
 using Zylance.Core.Platform.Interfaces;
+using Zylance.Core.Router.Services;
 using Zylance.Core.System.Services;
 using Zylance.Core.Vault.Context;
 using Zylance.Core.Vault.Interfaces;
@@ -39,17 +40,19 @@ public class ZylanceCore
         services.AddSingleton(fileProvider);
         services.AddSingleton(vaultProvider);
 
-        services.AddSingleton<FileService>();
-        services.AddSingleton<VaultService>();
-        services.AddSingleton<VaultContext>();
-        services.AddSingleton<BackgroundTaskService>();
-        services.AddZylanceRouter();
         services.AddSingleton<GatewayService>();
+        services.AddSingleton<FileService>();
+        services.AddSingleton<BackgroundTaskService>();
+        services.AddSingleton<VaultContext>();
+        services.AddSingleton<VaultService>();
+        services.AddZylanceRouter();
 
         Log.Information("Building service provider...");
         IServiceProvider serviceProvider = services.BuildServiceProvider();
 
-        // Resolve and cache the vault context
+        Log.Information("Initializing Router...");
+        serviceProvider.GetRequiredService<RouterService>();
+
         Log.Information("Initializing Gateway...");
         Gateway = serviceProvider.GetRequiredService<GatewayService>();
 

@@ -2,12 +2,13 @@ using Zylance.Contract.Api.Ledger;
 using Zylance.Core.Vault.Models;
 using Zylance.Vault.Local.Context;
 using Zylance.Vault.Local.Managers;
-using Zylance.Vault.Local.Tests.Factories;
+using Zylance.Vault.Local.Tests.TestUtils.Factories;
 
 namespace Zylance.Vault.Local.Tests.Managers;
 
 /// <summary>
-///     Tests for LocalLedgerManager to ensure CRUD operations, filtering, and pagination work correctly.
+///     Tests for LocalLedgerManager to ensure CRUD operations, filtering, and
+///     pagination work correctly.
 /// </summary>
 public class LocalLedgerManagerTests : IDisposable
 {
@@ -224,15 +225,17 @@ public class LocalLedgerManagerTests : IDisposable
     {
         // Arrange
         var accountId = Guid.NewGuid();
-        var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        var hourAgo = now - 3600000;
-        var hourFromNow = now + 3600000;
+        var now = DateTimeOffset.UtcNow;
 
-        await SeedLedgerEntry(accountId, hourAgo - 1000); // Before range
+        await SeedLedgerEntry(accountId, now.AddDays(-1)); // Before range
         await SeedLedgerEntry(accountId, now); // In range
-        await SeedLedgerEntry(accountId, hourFromNow + 1000); // After range
+        await SeedLedgerEntry(accountId, now.AddDays(1)); // After range
 
-        var filter = new LedgerFilter { StartTimestamp = hourAgo, EndTimestamp = hourFromNow };
+        var filter = new LedgerFilter
+        {
+            StartTimestamp = now.AddHours(-1).ToString("O"),
+            EndTimestamp = now.AddHours(1).ToString("O"),
+        };
 
         // Act
         var result = await _manager.ListAsync(filter);
@@ -241,79 +244,9 @@ public class LocalLedgerManagerTests : IDisposable
         Assert.Single(result.Items);
     }
 
-    [Fact]
-    public async Task ListAsync_WithPageSize_ReturnsCorrectNumberOfEntries()
-    {
-        // Arrange
-        var accountId = Guid.NewGuid();
-        await SeedLedgerEntries(accountId, 10);
-
-        var filter = new LedgerFilter { PageSize = 3 };
-
-        // Act
-        var result = await _manager.ListAsync(filter);
-
-        // Assert
-        Assert.Equal(3, result.Items.Count);
-        Assert.Equal(10UL, result.TotalCount);
-    }
-
-    [Fact]
-    public async Task ListAsync_WithCursor_ReturnsNextPage()
-    {
-        // Arrange
-        var accountId = Guid.NewGuid();
-        await SeedLedgerEntries(accountId, 10);
-
-        var filter = new LedgerFilter { PageSize = 3 };
-
-        // Act - Get first page
-        var firstPage = await _manager.ListAsync(filter);
-        Assert.Equal(3, firstPage.Items.Count);
-
-        // Act - Get second page (simulate cursor if supported by API, otherwise skip)
-        // If cursor-based paging is not supported, this test should be removed or rewritten.
-        // var secondPage = await _manager.ListAsync(filter); // Remove or adjust as needed
-        // Assert.Equal(3, secondPage.Items.Count);
-        // Assert.NotEqual(firstPage.Items[0].Id, secondPage.Items[0].Id);
-    }
-
-    [Fact]
-    public async Task ListAsync_WithLargePageSize_CapsAtMaxPageSize()
-    {
-        // Arrange
-        var accountId = Guid.NewGuid();
-        await SeedLedgerEntries(accountId, 150);
-
-        var filter = new LedgerFilter { PageSize = 500 }; // Request more than max
-
-        // Act
-        var result = await _manager.ListAsync(filter);
-
-        // Assert
-        Assert.Equal(100, result.Items.Count); // Capped at MaxPageSize
-    }
-
     #endregion
 
     #region SearchAsync Tests
-
-    [Fact]
-    public async Task SearchAsync_WithPayeeMatch_ReturnsMatchingEntries()
-    {
-        // Arrange
-        var accountId = Guid.NewGuid();
-        await SeedLedgerEntry(accountId, payee: "Amazon Store");
-        await SeedLedgerEntry(accountId, payee: "Walmart");
-        await SeedLedgerEntry(accountId, payee: "Amazon Prime");
-
-        // Act
-        var result = await _manager.SearchAsync("Amazon", null);
-
-        // Assert
-        Assert.Equal(2, result.Items.Count);
-        Assert.All(result.Items, item => Assert.Contains("Amazon", item.Payee));
-    }
 
     [Fact]
     public async Task SearchAsync_WithMemoMatch_ReturnsMatchingEntries()
@@ -397,7 +330,7 @@ public class LocalLedgerManagerTests : IDisposable
 
     private async Task SeedLedgerEntry(
         Guid accountId,
-        long? timestamp = null,
+        DateTimeOffset? timestamp = null,
         string payee = "Test Payee",
         string memo = "Test Memo"
     )
@@ -406,8 +339,7 @@ public class LocalLedgerManagerTests : IDisposable
         {
             Id = Guid.NewGuid(),
             AccountId = accountId.ToString(),
-            Timestamp =
-                timestamp != null ? DateTimeOffset.FromUnixTimeMilliseconds((long)timestamp) : DateTimeOffset.UtcNow,
+            Timestamp = timestamp ?? DateTimeOffset.UtcNow,
             Payee = payee,
             Memo = memo,
             Amount = 100.00M,

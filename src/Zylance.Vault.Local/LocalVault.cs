@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Serilog;
-using Zylance.Core.Logging;
 using Zylance.Core.Vault.Interfaces;
 using Zylance.Core.Vault.Managers;
 using Zylance.Vault.Local.Context;
@@ -12,10 +10,8 @@ namespace Zylance.Vault.Local;
 ///     Local vault implementation using SQLite database through Entity Framework
 ///     Core.
 /// </summary>
-public class LocalVault(LocalVaultDbContext dbContext) : IVault, IAsyncDisposable
+public class LocalVault(LocalVaultDbContext dbContext) : IVault
 {
-    private static readonly ILogger Log = ZyLogger.ForContext<LocalVault>();
-
     /// <summary>
     ///     Dispose the local vault and its underlying database context.
     /// </summary>
