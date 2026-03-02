@@ -91,16 +91,6 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     );
 
     /// <summary>
-    ///     Ensures the file exists by saving an empty content string to it.
-    /// </summary>
-    /// <param name="fileRef">Reference to the file to touch.</param>
-    /// <param name="token">Cancellation token.</param>
-    public Task TouchFileAsync(FileRef fileRef, CancellationToken token = default)
-    {
-        return Exists(fileRef) ? Task.CompletedTask : SaveFileAsync(fileRef, new MemoryStream(), token);
-    }
-
-    /// <summary>
     ///     Saves the provided stream content to the file referenced by the FileRef.
     /// </summary>
     /// <param name="fileRef">Reference to the file to save.</param>
@@ -196,8 +186,10 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     public Stream OpenFile(FileRef fileRef)
     {
         var filePath = GetFilePath(fileRef);
+        var fileAccess = fileRef.ReadOnly ? FileAccess.Read : FileAccess.ReadWrite;
+
         return File.Exists(filePath)
-            ? File.Open(filePath, FileMode.Open)
+            ? File.Open(filePath, FileMode.Open, fileAccess)
             : throw new FileNotFoundException($"File not found: {filePath}", filePath);
     }
 
@@ -215,6 +207,16 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
             Directory.CreateDirectory(directory);
 
         return CreateFileReference(fullPath, FileRefFlags.ReadWrite);
+    }
+
+    /// <summary>
+    ///     Ensures the file exists by saving an empty content string to it.
+    /// </summary>
+    /// <param name="fileRef">Reference to the file to touch.</param>
+    /// <param name="token">Cancellation token.</param>
+    public Task TouchFileAsync(FileRef fileRef, CancellationToken token = default)
+    {
+        return Exists(fileRef) ? Task.CompletedTask : SaveFileAsync(fileRef, new MemoryStream(), token);
     }
 
     /// <summary>

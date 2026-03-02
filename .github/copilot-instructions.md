@@ -626,3 +626,11 @@ export const ComponentName: FC<ComponentProps> = (props) => {
     instead of a type; use `import type { FC } from 'react'` when needed.
   - If you add a new component file, follow this pattern to reduce churn during
     reviews and keep CI/linting green.
+
+- prefer ISO-8601 strings for timestamps (UTC, using `ToString("o")`).
+
+Why ISO strings?
+
+- Simpler interop for TypeScript/JS frontends (native Date parsing via
+  `new Date()` or date libs).
+- Avoids depending on protobuf timestamp messages across languages.

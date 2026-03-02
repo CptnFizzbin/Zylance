@@ -33,6 +33,16 @@ message VaultCloseRes {
   option (action) = "Vault:CloseVault";
 }
 
+message ListRecentVaultsReq {
+  option (action) = "Vault:ListRecentVaults";
+  string provider = 1;
+}
+
+message ListRecentVaultsRes {
+  option (action) = "Vault:ListRecentVaults";
+  repeated RecentVaultRef recent_vaults = 1;
+}
+
 // === Events ===
 message VaultOpenedEvt {
   option (eventName) = "Vault:VaultOpened";
@@ -61,4 +71,3 @@ message VaultGetStatusRes {
   option (action) = "Vault:GetStatus";
   optional VaultRef vault_ref = 1;
 }
-

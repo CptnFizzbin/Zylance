@@ -18,7 +18,7 @@ public record DateAndTimeSettings
         // "05/24/2026",
         "MM/dd/yyyy",
         // "24/05/2026"
-        "dd/MM/yyyy HH:mm:ss",
+        "dd/MM/yyyy",
         // "May 24, 2026"
         "MMM d, yyyy",
         // "24 May 2026"

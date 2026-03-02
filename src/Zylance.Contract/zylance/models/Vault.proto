@@ -7,6 +7,11 @@ option csharp_namespace = "Zylance.Contract.Models.Vault";
 message VaultRef {
   string id = 1;
   string name = 2;
-
   bool locked = 3;
+}
+
+message RecentVaultRef {
+  string name = 1;
+  string location = 2;
+  string last_accessed = 3; // ISO-8601
 }

@@ -18,23 +18,14 @@ public class FileService(IFileProvider fileProvider) : IFileProvider
     private readonly Lock _lock = new();
     private readonly Dictionary<string, bool> _readOnlyRegistry = [];
 
-    /// <summary>
-    ///     Checks whether a file exists at the given path.
-    /// </summary>
-    /// <param name="fileRef">File ref to check.</param>
+    /// <inheritdoc />
     public bool Exists(FileRef fileRef)
     {
         Log.Information("Checking if file exists: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         return fileProvider.Exists(fileRef);
     }
 
-    /// <summary>
-    ///     Prompts the platform file picker and returns the selected FileRef.
-    /// </summary>
-    /// <param name="title">Optional dialog title.</param>
-    /// <param name="filters">Optional file extension filters.</param>
-    /// <param name="readOnly">Whether the selected file should be opened read-only.</param>
-    /// <param name="token">Cancellation token.</param>
+    /// <inheritdoc />
     public async Task<FileRef> SelectFileAsync(
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
@@ -56,13 +47,7 @@ public class FileService(IFileProvider fileProvider) : IFileProvider
         return fileRef;
     }
 
-    /// <summary>
-    ///     Prompts the platform create-file dialog and returns the created FileRef.
-    /// </summary>
-    /// <param name="title">Optional dialog title.</param>
-    /// <param name="filename">Optional default file name.</param>
-    /// <param name="filters">Optional file extension filters.</param>
-    /// <param name="token">Cancellation token.</param>
+    /// <inheritdoc />
     public async Task<FileRef> CreateFileAsync(
         string? title = null,
         string? filename = null,
@@ -84,10 +69,7 @@ public class FileService(IFileProvider fileProvider) : IFileProvider
         return fileRef;
     }
 
-    /// <summary>
-    ///     Opens a stream for the specified FileRef.
-    /// </summary>
-    /// <param name="fileRef">The file reference to open.</param>
+    /// <inheritdoc />
     public Stream OpenFile(FileRef fileRef)
     {
         Log.Information("Opening file: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
@@ -96,12 +78,7 @@ public class FileService(IFileProvider fileProvider) : IFileProvider
         return fileProvider.OpenFile(fileRef);
     }
 
-    /// <summary>
-    ///     Saves content to the specified FileRef.
-    /// </summary>
-    /// <param name="fileRef">The file reference to save to.</param>
-    /// <param name="content">Stream content to write.</param>
-    /// <param name="token">Cancellation token.</param>
+    /// <inheritdoc />
     public async Task SaveFileAsync(FileRef fileRef, Stream content, CancellationToken token = default)
     {
         Log.Information("Saving file: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
@@ -111,11 +88,7 @@ public class FileService(IFileProvider fileProvider) : IFileProvider
         await fileProvider.SaveFileAsync(fileRef, content, token);
     }
 
-    /// <summary>
-    ///     Deletes the specified FileRef and removes it from the registry.
-    /// </summary>
-    /// <param name="fileRef">The file reference to delete.</param>
-    /// <param name="token">Cancellation token.</param>
+    /// <inheritdoc />
     public async Task DeleteFileAsync(FileRef fileRef, CancellationToken token = default)
     {
         Log.Information("Deleting file: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
@@ -130,10 +103,7 @@ public class FileService(IFileProvider fileProvider) : IFileProvider
         }
     }
 
-    /// <summary>
-    ///     Returns a temporary file reference for the provided path.
-    /// </summary>
-    /// <param name="path">Relative path for the temporary file.</param>
+    /// <inheritdoc />
     public FileRef GetTempFile(string path)
     {
         Log.Information("Getting temporary file: {path}", path);
@@ -142,10 +112,7 @@ public class FileService(IFileProvider fileProvider) : IFileProvider
         return fileRef;
     }
 
-    /// <summary>
-    ///     Returns a file reference located in the application's data directory.
-    /// </summary>
-    /// <param name="path">Relative path within the application data folder.</param>
+    /// <inheritdoc />
     public FileRef GetAppDataFile(string path)
     {
         Log.Information("Getting app data file: {path}", path);
@@ -175,12 +142,7 @@ public class FileService(IFileProvider fileProvider) : IFileProvider
     /// </summary>
     /// <param name="fileRef">The file reference to open.</param>
     /// <param name="action">A callback to perform with the file stream</param>
-    /// <param name="token">Cancellation token.</param>
-    public async Task<TResult> WithFileAsync<TResult>(
-        FileRef fileRef,
-        Func<Stream, Task<TResult>> action,
-        CancellationToken token = default
-    )
+    public async Task<TResult> WithFileAsync<TResult>(FileRef fileRef, Func<Stream, Task<TResult>> action)
     {
         Log.Information("Opening file with action: {filename} (ID: {id})", fileRef.Filename, fileRef.Id);
         AssertFileRegistered(fileRef);

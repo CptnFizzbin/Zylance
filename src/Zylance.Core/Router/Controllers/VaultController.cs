@@ -1,5 +1,6 @@
 using Serilog;
 using Zylance.Contract.Api.Vault;
+using Zylance.Contract.Models.Vault;
 using Zylance.Core.Gateway.Models;
 using Zylance.Core.Logging;
 using Zylance.Core.Router.Attributes;
@@ -11,7 +12,7 @@ namespace Zylance.Core.Router.Controllers;
 ///     Controller exposing vault lifecycle operations (open/create/close/status).
 /// </summary>
 [Controller]
-public class VaultController(VaultService vaultService)
+public class VaultController(VaultService vaultService, RecentVaultsService recentVaultsService)
 {
     private static readonly ILogger Log = ZyLogger.ForContext<VaultController>();
 
@@ -68,5 +69,30 @@ public class VaultController(VaultService vaultService)
         Log.Debug("Vault GetStatus called");
         res.SetData(new VaultGetStatusRes { VaultRef = vaultService.GetActiveVaultRef() });
         Log.Debug("Vault GetStatus responded");
+    }
+
+    /// <summary>
+    ///     Returns recent vaults for a provider (defaults to "desktop").
+    /// </summary>
+    [RequestHandler]
+    public async Task ListRecentVaults(ZyRequest<ListRecentVaultsReq> req, ZyResponse<ListRecentVaultsRes> res)
+    {
+        var provider = string.IsNullOrWhiteSpace(req.Data?.Provider) ? "desktop" : req.Data.Provider;
+        Log.Debug("ListRecentVaults called for provider {Provider}", provider);
+
+        var recent = await recentVaultsService.GetRecentVaultsAsync(provider, CancellationToken.None);
+
+        var resp = new ListRecentVaultsRes();
+        resp.RecentVaults.AddRange(
+            recent.Select(v => new RecentVaultRef
+            {
+                Name = v.Name,
+                Location = v.Location,
+                LastAccessed = v.LastAccessed.ToString("O"),
+            })
+        );
+
+        res.SetData(resp);
+        Log.Debug("ListRecentVaults responded with {Count} entries", resp.RecentVaults.Count);
     }
 }
