@@ -23,8 +23,8 @@ public class DesktopVaultProvider(ILocalFileProvider fileSystem) : IVaultProvide
         Log.Information("Prompting user to select a vault file to open.");
         var filters = new List<(string Name, string[] Extensions)> { ("Zylance Vault", [".zlv"]) };
 
-        var fileRef = await fileSystem.SelectFile("Open Vault", filters.ToArray(), false);
-        var path = await fileSystem.GetFilePath(fileRef);
+        var fileRef = await fileSystem.SelectFileAsync("Open Vault", filters.ToArray(), false);
+        var path = fileSystem.GetFilePath(fileRef);
 
         if (!path.EndsWith(".zlv", StringComparison.OrdinalIgnoreCase))
             throw new InvalidDataException("Selected file is not a valid Zylance Vault (.zlv) file.");
@@ -41,12 +41,12 @@ public class DesktopVaultProvider(ILocalFileProvider fileSystem) : IVaultProvide
         Log.Information("Prompting user to select a location to create a new vault file.");
         var filters = new List<(string Name, string[] Extensions)> { ("Zylance Vault", [".zlv"]) };
 
-        var fileRef = await fileSystem.CreateFile(
+        var fileRef = await fileSystem.CreateFileAsync(
             "Create Vault",
             Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             filters.ToArray()
         );
-        var path = await fileSystem.GetFilePath(fileRef);
+        var path = fileSystem.GetFilePath(fileRef);
 
         if (!path.EndsWith(".zlv", StringComparison.OrdinalIgnoreCase))
             path += ".zlv";

@@ -14,7 +14,7 @@ public class AccountsControllerTests
 
     public AccountsControllerTests()
     {
-        _accountsMangerMock = new();
+        _accountsMangerMock = new Mock<IAccountManager>();
 
         var vaultMock = VaultTestFactory.Create(_accountsMangerMock);
         var vaultContext = VaultContextTestFactory.Create(vaultMock);
@@ -47,7 +47,7 @@ public class AccountsControllerTests
         };
         _accountsMangerMock.Setup(m => m.ListAsync()).Returns(Task.FromResult(accounts));
 
-        var req = ZyRequestTestFactory.Create<ListAccountsReq>(new());
+        var req = ZyRequestTestFactory.Create<ListAccountsReq>(new ListAccountsReq());
         var res = ZyResponseTestFactory.Create<ListAccountsRes>();
 
         // Act
@@ -68,7 +68,7 @@ public class AccountsControllerTests
         var accounts = new List<AccountModel>();
         _accountsMangerMock.Setup(m => m.ListAsync()).Returns(Task.FromResult(accounts));
 
-        var req = ZyRequestTestFactory.Create<ListAccountsReq>(new());
+        var req = ZyRequestTestFactory.Create<ListAccountsReq>(new ListAccountsReq());
         var res = ZyResponseTestFactory.Create<ListAccountsRes>();
 
         // Act
@@ -191,7 +191,7 @@ public class AccountsControllerTests
         _accountsMangerMock.Setup(m => m.AssertExists("acc1")).ThrowsAsync(new Exception("Account not found"));
 
         var req = ZyRequestTestFactory.Create<UpdateAccountReq>(
-            new() { AccountId = "acc1", Account = AccountModel.ToData(updatedAccount) }
+            new UpdateAccountReq { AccountId = "acc1", Account = AccountModel.ToData(updatedAccount) }
         );
         var res = ZyResponseTestFactory.Create<UpdateAccountRes>();
 

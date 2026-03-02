@@ -1,45 +1,17 @@
-using Moq;
-using Zylance.Contract.Models.File;
-using Zylance.Core.Platform.Interfaces;
 using Zylance.Core.System.Services;
+using Zylance.Core.Tests.TestUtils.Mocks;
 
 namespace Zylance.Core.Tests.TestUtils.Factories;
 
 public static class FileServiceTestFactory
 {
-    public static Mock<IFileProvider> CreateMockProvider()
+    public static TestFileProvider CreateProvider()
     {
-        return new Mock<IFileProvider>(MockBehavior.Strict);
+        return new TestFileProvider();
     }
 
-    public static FileService CreateFileService(Mock<IFileProvider> providerMock)
+    public static FileService CreateFileService(TestFileProvider provider)
     {
-        return new FileService(providerMock.Object);
-    }
-
-    public static Mock<IFileProvider> SetupSelectFile(Mock<IFileProvider> providerMock, FileRef fileRef)
-    {
-        providerMock
-            .Setup(p =>
-                p.SelectFile(It.IsAny<string>(), It.IsAny<(string Name, string[] Extensions)[]>(), It.IsAny<bool>())
-            )
-            .ReturnsAsync(fileRef);
-        return providerMock;
-    }
-
-    public static Mock<IFileProvider> SetupCreateFile(Mock<IFileProvider> providerMock, FileRef fileRef)
-    {
-        providerMock
-            .Setup(p =>
-                p.CreateFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<(string Name, string[] Extensions)[]>())
-            )
-            .ReturnsAsync(fileRef);
-        return providerMock;
-    }
-
-    public static Mock<IFileProvider> SetupExists(Mock<IFileProvider> providerMock, FileRef fileRef, bool exists)
-    {
-        providerMock.Setup(p => p.Exists(fileRef)).ReturnsAsync(exists);
-        return providerMock;
+        return new FileService(provider);
     }
 }

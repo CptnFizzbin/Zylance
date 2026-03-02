@@ -23,7 +23,7 @@ public class DesktopFileProvider(PhotinoWindow window, string appDataPath, strin
     /// <param name="title">Optional dialog title.</param>
     /// <param name="filters">File filter options.</param>
     /// <param name="readOnly">Whether the file should be treated as read-only.</param>
-    public override async Task<FileRef> SelectFile(
+    public override async Task<FileRef> SelectFileAsync(
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
         bool readOnly = true
@@ -40,7 +40,7 @@ public class DesktopFileProvider(PhotinoWindow window, string appDataPath, strin
             throw new OperationCanceledException("File selection was cancelled by the user.");
 
         Log.Information("User selected file: {FilePath}", selectedFiles[0]);
-        return await CreateFileReference(selectedFiles[0], readOnly);
+        return CreateFileReference(selectedFiles[0], readOnly);
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public class DesktopFileProvider(PhotinoWindow window, string appDataPath, strin
     /// <param name="title">Optional dialog title.</param>
     /// <param name="defaultPath">Suggested default path.</param>
     /// <param name="filters">File filter options.</param>
-    public override async Task<FileRef> CreateFile(
+    public override async Task<FileRef> CreateFileAsync(
         string? title = null,
         string? defaultPath = null,
         (string Name, string[] Extensions)[]? filters = null
@@ -66,6 +66,6 @@ public class DesktopFileProvider(PhotinoWindow window, string appDataPath, strin
             throw new OperationCanceledException("File creation was cancelled by the user.");
 
         Log.Information("User selected file path: {FilePath}", filePath);
-        return await CreateFileReference(filePath, FileRefFlags.ReadWrite);
+        return CreateFileReference(filePath, FileRefFlags.ReadWrite);
     }
 }
