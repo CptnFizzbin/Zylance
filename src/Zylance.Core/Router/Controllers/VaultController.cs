@@ -1,6 +1,5 @@
 using Serilog;
 using Zylance.Contract.Api.Vault;
-using Zylance.Contract.Models.Vault;
 using Zylance.Core.Gateway.Models;
 using Zylance.Core.Logging;
 using Zylance.Core.Router.Attributes;
@@ -77,22 +76,15 @@ public class VaultController(VaultService vaultService, RecentVaultsService rece
     [RequestHandler]
     public async Task ListRecentVaults(ZyRequest<ListRecentVaultsReq> req, ZyResponse<ListRecentVaultsRes> res)
     {
-        var provider = string.IsNullOrWhiteSpace(req.Data?.Provider) ? "desktop" : req.Data.Provider;
+        var provider = string.IsNullOrWhiteSpace(req.Data.Provider) ? "desktop" : req.Data.Provider;
         Log.Debug("ListRecentVaults called for provider {Provider}", provider);
 
-        var recent = await recentVaultsService.GetRecentVaultsAsync(provider, CancellationToken.None);
+        var recent = await recentVaultsService.GetRecentVaultsAsync(provider);
 
         var resp = new ListRecentVaultsRes();
-        resp.RecentVaults.AddRange(
-            recent.Select(v => new RecentVaultRef
-            {
-                Name = v.Name,
-                Location = v.Location,
-                LastAccessed = v.LastAccessed.ToString("O"),
-            })
-        );
-
+        resp.RecentVaults.AddRange(recent);
         res.SetData(resp);
+
         Log.Debug("ListRecentVaults responded with {Count} entries", resp.RecentVaults.Count);
     }
 }

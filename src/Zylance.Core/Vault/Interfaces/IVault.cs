@@ -14,6 +14,12 @@ public interface IVault : IAsyncDisposable
     /// </summary>
     public Guid VaultId { get; }
 
+    public string ProviderId { get; }
+
+    public string Name { get; }
+
+    public string Location { get; }
+
     /// <summary>
     ///     Whether the vault is currently locked.
     /// </summary>
