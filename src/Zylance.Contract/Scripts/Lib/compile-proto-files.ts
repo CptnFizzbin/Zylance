@@ -20,11 +20,12 @@ export async function compileProtoFiles (): Promise<void> {
   const grpcInclude = findGrpcToolsInclude()
 
   for (const protoFile of protoFiles) {
-    const relativePath = relative(CONTRACT_DIR, protoFile)
+    // Use a path relative to CONTRACT_DIR so protoc accepts it with the --proto_path
+    const relativePath = relative(CONTRACT_DIR, protoFile).replace(/\\/g, "/")
     console.log(`Compiling ${relativePath}...`)
 
     const args = buildProtocArgs(
-      protoFile,
+      relativePath,
       pluginPath,
       grpcInclude,
     )

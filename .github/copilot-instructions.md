@@ -634,3 +634,23 @@ Why ISO strings?
 - Simpler interop for TypeScript/JS frontends (native Date parsing via
   `new Date()` or date libs).
 - Avoids depending on protobuf timestamp messages across languages.
+
+## Notes (added 2026-03-04)
+
+- Fix: proto build script must pass proto file paths relative to the declared
+  `--proto_path`.
+  - Symptom: `protoc` fails with "File does not reside within any path specified
+    using --proto_path" when absolute paths are passed.
+  - Cause: `protoc` requires the input .proto file path to be under one of the
+    `--proto_path` roots and the provided path must be an exact prefix match;
+    absolute paths can confuse resolution across platforms.
+  - Action taken: `src/Zylance.Contract/Scripts/Lib/compile-proto-files.ts` was
+    updated to pass proto file paths relative to `CONTRACT_DIR` (and normalize
+    slashes) before invoking `protoc`.
+  - How to reproduce: run `dotnet build` at repo root; the contract project runs
+    `yarn build:code` which calls the script.
+  - Notes: If you still see errors, ensure `protoc` is on PATH or the
+    `grpc.tools` NuGet package is restored, and that `node` and `yarn` are
+    available for the TS script.
+
+(End of note)

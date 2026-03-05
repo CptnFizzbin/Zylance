@@ -1,0 +1,43 @@
+syntax = "proto3";
+package zylance.contract;
+
+import "zylance/extensions/Zylance.proto";
+
+option csharp_namespace = "Zylance.Contract.Api.Settings";
+
+// === Models ===
+message DateTimeAvailableFormats {
+  repeated string date = 1;
+  repeated string time = 2;
+}
+
+message DateTimeCurrentFormats {
+  string date = 1;
+  string time = 2;
+}
+
+// === Actions ===
+message GetDateTimeSettingsReq {
+  option (action) = "Settings:GetDateTimeSettings";
+}
+
+message GetDateTimeSettingsRes {
+  option (action) = "Settings:GetDateTimeSettings";
+  DateTimeAvailableFormats available = 1;
+  DateTimeCurrentFormats current = 2;
+  string timezone = 3; // offset (e.g. '+02:00')
+}
+
+message UpdateDateTimeSettingsReq {
+  option (action) = "Settings:UpdateDateTimeSettings";
+  optional string date = 1;
+  optional string time = 2;
+  optional string timezone = 3;
+}
+
+message UpdateDateTimeSettingsRes {
+  option (action) = "Settings:UpdateDateTimeSettings";
+  DateTimeCurrentFormats current = 1;
+  string timezone = 2; // offset (e.g. '+02:00')
+}
+
