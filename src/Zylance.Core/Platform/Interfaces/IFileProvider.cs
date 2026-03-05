@@ -66,16 +66,13 @@ public interface IFileProvider
     /// <summary>
     ///     Returns a writable FileRef representing a temporary file for the specified
     ///     path.
-    ///     This creates a temporary file if it doesn't already exist, that can
-    ///     be used for intermediate storage or processing.
     /// </summary>
     /// <param name="path">The temporary path to use.</param>
     public FileRef GetTempFile(string path);
 
     /// <summary>
     ///     Returns a writable FileRef located inside the application's data directory.
-    ///     This creates the file if it doesn't already exist, and is used for
-    ///     storing application data such as settings or cache files.
+    ///     This is used for storing application data such as settings.
     /// </summary>
     /// <param name="path">Relative path inside the application data directory.</param>
     public FileRef GetAppDataFile(string path);

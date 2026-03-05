@@ -3,13 +3,15 @@ using System.Globalization;
 namespace Zylance.Core.Settings.Models;
 
 /// <summary>
-///     Settings for date and time display formatting, including format patterns and timezone preferences.
+///     Settings for date and time display formatting, including format patterns
+///     and timezone preferences.
 /// </summary>
 public record DateAndTimeSettings
 {
     /// <summary>
     ///     Available date format patterns that users can choose from.
-    ///     Includes ISO format (yyyy-MM-dd), US format (MM/dd/yyyy), European format (dd/MM/yyyy),
+    ///     Includes ISO format (yyyy-MM-dd), US format (MM/dd/yyyy), European format
+    ///     (dd/MM/yyyy),
     ///     and textual formats like "May 24, 2026".
     /// </summary>
     public static readonly List<string> DateFormats =
@@ -18,7 +20,7 @@ public record DateAndTimeSettings
         // "05/24/2026",
         "MM/dd/yyyy",
         // "24/05/2026"
-        "dd/MM/yyyy HH:mm:ss",
+        "dd/MM/yyyy",
         // "May 24, 2026"
         "MMM d, yyyy",
         // "24 May 2026"
@@ -27,7 +29,8 @@ public record DateAndTimeSettings
 
     /// <summary>
     ///     Available time format patterns that users can choose from.
-    ///     Includes 12-hour formats with AM/PM and 24-hour formats, with optional seconds display.
+    ///     Includes 12-hour formats with AM/PM and 24-hour formats, with optional
+    ///     seconds display.
     /// </summary>
     public static readonly List<string> TimeFormats =
     [
@@ -42,7 +45,8 @@ public record DateAndTimeSettings
 
     /// <summary>
     ///     Gets the format pattern used for displaying dates.
-    ///     Defaults to the system culture's short date pattern if it's in <see cref="DateFormats" />,
+    ///     Defaults to the system culture's short date pattern if it's in
+    ///     <see cref="DateFormats" />,
     ///     otherwise defaults to "yyyy-MM-dd".
     /// </summary>
     public string DateFormat { get; init; } = GetDefaultDateFormat();

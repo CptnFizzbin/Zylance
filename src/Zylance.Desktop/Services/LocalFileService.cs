@@ -9,7 +9,7 @@ namespace Zylance.Desktop.Services;
 ///     extending the core FileService with platform-specific file path handling.
 /// </summary>
 /// <param name="fileProvider">The local file provider implementation.</param>
-public class LocalFileService(ILocalFileProvider fileProvider) : FileService(fileProvider)
+public class LocalFileService(ILocalFileProvider fileProvider) : FileService(fileProvider), ILocalFileProvider
 {
     /// <summary>
     ///     Returns a local filesystem path for the given FileRef.

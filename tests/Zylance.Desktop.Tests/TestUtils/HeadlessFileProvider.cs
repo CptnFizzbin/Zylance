@@ -99,7 +99,7 @@ public class HeadlessFileProvider(string appDataPath, string tempDataPath)
         string? title = null,
         (string Name, string[] Extensions)[]? filters = null,
         bool readOnly = FileRefFlags.ReadOnly,
-        CancellationToken token = default
+        CancellationToken cancellation = default
     )
     {
         var selectedPath = await _onSelectFile(title, filters, readOnly);
@@ -112,7 +112,7 @@ public class HeadlessFileProvider(string appDataPath, string tempDataPath)
         string? title = null,
         string? defaultPath = null,
         (string Name, string[] Extensions)[]? filters = null,
-        CancellationToken token = default
+        CancellationToken cancellation = default
     )
     {
         var selectedPath = await _onCreateFile(title, defaultPath, filters);
