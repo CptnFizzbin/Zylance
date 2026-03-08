@@ -71,7 +71,7 @@ public record AccountModel
             Name = account.Name,
             Type = account.Type,
             Balance = account.Balance.ToString(CultureInfo.InvariantCulture),
-            Currency = account.Currency,
+            Currency = account.Currency ?? "CAD",
             AvailableBalance = account.AvailableBalance?.ToString(CultureInfo.InvariantCulture) ?? "",
         };
     }

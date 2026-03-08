@@ -1,8 +1,9 @@
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { sort } from "fast-sort"
 import { useMemo } from "react"
+import { useZylanceQueries } from "@/Apis/Zylance/ZylanceQueryKeys"
 import { useAccounts } from "@/Components/Accounts/AccountQueries"
-import { useLedgerEntries } from "@/Components/Ledger/LedgerEntryQueries"
 import { LedgerGrid } from "@/Components/Ledger/LedgerGrid/LedgerGrid"
 
 export const Route = createFileRoute("/vault/ledger/")({
@@ -10,7 +11,11 @@ export const Route = createFileRoute("/vault/ledger/")({
 })
 
 function RouteComponent () {
-  const ledgerEntriesQuery = useLedgerEntries()
+  const zylanceQueries = useZylanceQueries()
+
+  const ledgerEntriesQuery = useQuery({
+    ...zylanceQueries.ledger.list(),
+  })
   const accountsQuery = useAccounts()
   const entries = ledgerEntriesQuery.data || []
   const accounts = accountsQuery.data || []

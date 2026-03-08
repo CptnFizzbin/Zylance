@@ -1,6 +1,6 @@
 import { createQueryKeys } from "@lukemorales/query-key-factory"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useZylanceApi } from "@/Apis/Zylance/UseZylance"
+import { useZylanceApi } from "@/Apis/UseZylanceApi"
 import type * as AccountTypes from "$Contract/api/Account"
 
 // Query Key Factory for account queries
