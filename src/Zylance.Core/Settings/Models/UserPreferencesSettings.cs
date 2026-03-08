@@ -16,7 +16,9 @@ public record UserPreferencesSettings
     public const string FilePath = "config/user-preferences.yaml";
 
     /// <summary>
-    ///     Default settings instance.
+    ///     Singleton default settings instance returned when no user preferences
+    ///     file exists or when loading fails. This instance contains default
+    ///     values and is safe to use as a fallback.
     /// </summary>
     public static readonly UserPreferencesSettings Default = new();
 
@@ -25,11 +27,27 @@ public record UserPreferencesSettings
     /// </summary>
     public DateTimeSettings DateTime { get; init; } = new();
 
+    /// <summary>
+    ///     Convert this settings model into the transport/data contract used by the
+    ///     settings persistence layer (<see cref="UserPreferencesData"/>).
+    /// </summary>
+    /// <returns>
+    ///     A <see cref="UserPreferencesData"/> instance containing the serialized
+    ///     representation of this settings object.
+    /// </returns>
     public UserPreferencesData ToData()
     {
         return new() { DateTimeFormat = DateTime.ToData() };
     }
 
+    /// <summary>
+    ///     Create a <see cref="UserPreferencesSettings"/> instance from a
+    ///     <see cref="UserPreferencesData"/> transport object.
+    /// </summary>
+    /// <param name="data">The data object deserialized from persistent storage.</param>
+    /// <returns>
+    ///     A new <see cref="UserPreferencesSettings"/> populated from <paramref name="data"/>.
+    /// </returns>
     public static UserPreferencesSettings FromData(UserPreferencesData data)
     {
         return new() { DateTime = DateTimeSettings.FromData(data.DateTimeFormat) };
