@@ -3,27 +3,20 @@ import CloseIcon from "@mui/icons-material/Close"
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
 import FolderOpenIcon from "@mui/icons-material/FolderOpen"
 import InputIcon from "@mui/icons-material/Input"
-import {
-  Divider,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Typography,
-} from "@mui/material"
+import { Divider, ListItemIcon, ListItemText, MenuItem, Typography } from "@mui/material"
 import type { FC } from "react"
-import {
-  FileBarMenu,
-  type MenuBarMenuProps,
-} from "@/Components/Desktop/FileBar/Menus/MenuBase"
+import { useZylanceApi } from "@/Apis/UseZylanceApi"
+import { useZylance } from "@/Components/Application/UseZylance"
+import { FileBarMenu, type MenuBarMenuProps } from "@/Components/Desktop/FileBar/Menus/MenuBase"
 import { useImportService } from "@/Components/Import/ImportContext"
-import { useZylance } from "@/Hooks/UseZylance"
 
 export const FileMenu: FC<Omit<MenuBarMenuProps, "label">> = ({
   onClose,
   ...props
 }) => {
   const importService = useImportService()
-  const { currentVault, zylanceApi } = useZylance()
+  const zylanceApi = useZylanceApi()
+  const { currentVault } = useZylance()
 
   const onMenuClick = (handler: () => void) => {
     return () => {

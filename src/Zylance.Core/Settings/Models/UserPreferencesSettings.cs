@@ -1,3 +1,5 @@
+using Zylance.Contract.Api.Settings;
+
 namespace Zylance.Core.Settings.Models;
 
 /// <summary>
@@ -21,5 +23,15 @@ public record UserPreferencesSettings
     /// <summary>
     ///     Date and time formatting and localization settings.
     /// </summary>
-    public DateAndTimeSettings DateTime { get; init; } = new();
+    public DateTimeSettings DateTime { get; init; } = new();
+
+    public UserPreferencesData ToData()
+    {
+        return new() { DateTimeFormat = DateTime.ToData() };
+    }
+
+    public static UserPreferencesSettings FromData(UserPreferencesData data)
+    {
+        return new() { DateTime = DateTimeSettings.FromData(data.DateTimeFormat) };
+    }
 }

@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <None Remove="tsconfig.tsbuildinfo" />
+    <None Remove="yarn.lock" />
   </ItemGroup>
 
   <ItemGroup>

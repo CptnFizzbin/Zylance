@@ -635,7 +635,7 @@ Why ISO strings?
   `new Date()` or date libs).
 - Avoids depending on protobuf timestamp messages across languages.
 
-## Notes (added 2026-03-04)
+## Notes
 
 - Fix: proto build script must pass proto file paths relative to the declared
   `--proto_path`.
@@ -653,4 +653,3 @@ Why ISO strings?
     `grpc.tools` NuGet package is restored, and that `node` and `yarn` are
     available for the TS script.
 
-(End of note)

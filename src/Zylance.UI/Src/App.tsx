@@ -1,11 +1,11 @@
 import { Stack } from "@mui/material"
 import { createRouter, RouterProvider } from "@tanstack/react-router"
 import type { FC } from "react"
+import { useZylance } from "@/Components/Application/UseZylance"
 import { BackgroundProgressBar } from "@/Components/Background/BackgroundProgressBar"
 import { DesktopMenuBar } from "@/Components/Desktop/FileBar/DesktopMenuBar"
 import { ImportProvider } from "@/Components/Import/ImportContext"
 import { useIsDesktop } from "@/Components/Runtime/Hooks/UseRuntime"
-import { useZylance } from "@/Hooks/UseZylance"
 import * as TanStackQueryProvider from "@/Integrations/tanstack-query/root-provider"
 import { routeTree } from "@/routeTree.gen"
 

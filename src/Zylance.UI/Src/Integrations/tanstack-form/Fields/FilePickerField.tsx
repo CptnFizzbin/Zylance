@@ -1,7 +1,7 @@
 import type { FileFilter, FileRef } from "@Contract/models/File"
 import { Button, Stack, TextField } from "@mui/material"
 import type { FC } from "react"
-import { useZylanceApi } from "@/Hooks/UseZylance"
+import { useZylanceApi } from "@/Apis/UseZylanceApi"
 import { useFieldContext } from "../AppFormContext"
 
 interface SelectFileProps {
@@ -34,17 +34,17 @@ export const FilePickerField: FC<FilePickerFieldProps> = ({
       const fileRef =
         props.mode === "create"
           ? (
-              await zylanceApi.files.createFile({
-                filters,
-                filename: props.filename,
-              })
-            ).fileRef
+            await zylanceApi.files.createFile({
+              filters,
+              filename: props.filename,
+            })
+          ).fileRef
           : (
-              await zylanceApi.files.selectFile({
-                filters,
-                readOnly: props.readonly ?? true,
-              })
-            ).fileRef
+            await zylanceApi.files.selectFile({
+              filters,
+              readOnly: props.readonly ?? true,
+            })
+          ).fileRef
       if (fileRef) {
         field.handleChange(fileRef)
       }

@@ -4,11 +4,11 @@ import { ThemeProvider } from "@mui/system"
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import { App, TanStackQueryProviderContext } from "@/App"
+import { ZylanceProvider } from "@/Components/Application/ZylanceProvider"
 import { theme } from "./Integrations/mui/Theme"
 import * as TanStackQueryProvider from "./Integrations/tanstack-query/root-provider"
 
 import "./styles.css"
-import { ZylanceProvider } from "@/Contexts/ZylanceContext"
 
 // Render the app
 const rootElement = document.getElementById("app")

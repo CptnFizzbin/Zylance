@@ -2,7 +2,7 @@ import { getTransport } from "@/Apis/Zylance/Transports/ITransport"
 import { ZylanceClient } from "@/Apis/Zylance/ZylanceClient"
 import * as Endpoints from "./Endpoints"
 
-export async function createZylanceApi() {
+export async function createZylanceApi () {
   const transport = await getTransport()
   const client = new ZylanceClient(transport)
 
@@ -18,9 +18,8 @@ export async function createZylanceApi() {
     account: Endpoints.createAccountApi(client),
     ledger: Endpoints.createLedgerApi(client),
     import: Endpoints.createImportApi(client),
+    settings: Endpoints.createSettingsApi(client),
   }
 }
 
-export const zylanceApiPromise = createZylanceApi()
-
-export type ZylanceApi = Awaited<typeof zylanceApiPromise>
+export type ZylanceApi = Awaited<ReturnType<typeof createZylanceApi>>

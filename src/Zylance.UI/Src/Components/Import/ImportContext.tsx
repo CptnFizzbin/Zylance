@@ -20,9 +20,9 @@ import {
   useState,
 } from "react"
 import { catchError, EMPTY, filter } from "rxjs"
+import { useZylanceApi } from "@/Apis/UseZylanceApi"
 import { ImportDialog } from "@/Components/Import/ImportDialog"
 import { type ImportForm, useImportForm } from "@/Components/Import/UseImportForm"
-import { useZylanceApi } from "@/Hooks/UseZylance"
 import { ZylanceEvents } from "$Generated/ZylanceConstants"
 
 export type ImportStep =

@@ -6,38 +6,48 @@ import "zylance/extensions/Zylance.proto";
 option csharp_namespace = "Zylance.Contract.Api.Settings";
 
 // === Models ===
-message DateTimeAvailableFormats {
-  repeated string date = 1;
-  repeated string time = 2;
+message UserPreferencesData {
+  DateTimeFormatData dateTimeFormat = 1;
 }
 
-message DateTimeCurrentFormats {
-  string date = 1;
-  string time = 2;
+message DateTimeOptionsData {
+  repeated string datePatterns = 1;
+  repeated string timePatterns = 2;
+}
+
+message DateTimeFormatData {
+  bool dateFollowSystem = 1; // if true, datePattern is the same as system settings
+  string datePattern = 2;
+
+  bool timeFollowSystem = 3; // if true, timePattern is the same as system settings
+  string timePattern = 4;
 }
 
 // === Actions ===
-message GetDateTimeSettingsReq {
-  option (action) = "Settings:GetDateTimeSettings";
+message GetUserPreferencesReq {
+  option (action) = "Settings:GetUserPreferences";
 }
 
-message GetDateTimeSettingsRes {
-  option (action) = "Settings:GetDateTimeSettings";
-  DateTimeAvailableFormats available = 1;
-  DateTimeCurrentFormats current = 2;
-  string timezone = 3; // offset (e.g. '+02:00')
+message GetUserPreferencesRes {
+  option (action) = "Settings:GetUserPreferences";
+  UserPreferencesData preferences = 1;
 }
 
-message UpdateDateTimeSettingsReq {
-  option (action) = "Settings:UpdateDateTimeSettings";
-  optional string date = 1;
-  optional string time = 2;
-  optional string timezone = 3;
+message SetUserPreferencesReq {
+  option (action) = "Settings:SetUserPreferences";
+  UserPreferencesData preferences = 1;
 }
 
-message UpdateDateTimeSettingsRes {
-  option (action) = "Settings:UpdateDateTimeSettings";
-  DateTimeCurrentFormats current = 1;
-  string timezone = 2; // offset (e.g. '+02:00')
+message SetUserPreferencesRes {
+  option (action) = "Settings:SetUserPreferences";
+  UserPreferencesData preferences = 1;
 }
 
+message GetDateTimeOptionsReq {
+  option (action) = "Settings:GetDateTimeOptions";
+}
+
+message GetDateTimeOptionsRes {
+  option (action) = "Settings:GetDateTimeOptions";
+  DateTimeOptionsData options = 1;
+}

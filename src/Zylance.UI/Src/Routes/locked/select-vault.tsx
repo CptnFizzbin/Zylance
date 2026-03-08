@@ -1,27 +1,17 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Container,
-  Divider,
-  Stack,
-  Typography,
-} from "@mui/material"
+import { Alert, Box, Button, Card, CardContent, Container, Divider, Stack, Typography } from "@mui/material"
 import { useMutation } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import { useZylance } from "@/Hooks/UseZylance"
+import { useZylanceApi } from "@/Apis/UseZylanceApi"
 
 export const Route = createFileRoute("/locked/select-vault")({
   component: RouteComponent,
 })
 
-function RouteComponent() {
+function RouteComponent () {
   console.log("Rendering /_locked/vault/select route")
 
   const navigate = Route.useNavigate()
-  const { zylanceApi } = useZylance()
+  const zylanceApi = useZylanceApi()
 
   const openVaultMutation = useMutation({
     mutationFn: async () => zylanceApi.vault.openVault(),

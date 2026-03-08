@@ -1,6 +1,5 @@
 import { useContext } from "react"
-import type { ZylanceApi } from "@/Apis/Zylance/ZylanceApi"
-import { ZylanceContext } from "@/Contexts/ZylanceContext"
+import { ZylanceContext } from "./ZylanceContext"
 
 export const useZylance = () => {
   const zylance = useContext(ZylanceContext)
@@ -10,7 +9,4 @@ export const useZylance = () => {
   }
 
   return zylance
-}
-export const useZylanceApi = (): ZylanceApi => {
-  return useZylance().zylanceApi
 }

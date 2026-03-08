@@ -1,0 +1,16 @@
+{
+  "name": "@zylance/monorepo",
+  "version": "0.1.0",
+  "workspaces": [
+    "src/*",
+    "tools/*",
+    "tests/*"
+  ],
+  "scripts": {
+    "test": "npm-run-all -ls 'test:*'",
+    "test:ui": "yarn workspace @zylance/ui test"
+  },
+  "dependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}

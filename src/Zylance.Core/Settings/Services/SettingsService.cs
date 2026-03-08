@@ -40,12 +40,11 @@ public class UserPreferencesService
                 async stream =>
                 {
                     using var reader = new StreamReader(stream, Encoding.UTF8);
-                    return await reader.ReadToEndAsync();
+                    return await reader.ReadToEndAsync(cancellationToken);
                 }
             );
 
-            var obj = SettingsUtils.YamlDeserializer.Deserialize<UserPreferencesSettings>(yaml);
-            return obj ?? UserPreferencesSettings.Default;
+            return SettingsUtils.YamlDeserializer.Deserialize<UserPreferencesSettings>(yaml);
         }
         catch (Exception ex)
         {
@@ -58,7 +57,7 @@ public class UserPreferencesService
     ///     Saves the provided <see cref="UserPreferencesSettings" /> to the app data
     ///     folder using <see cref="FileService" />.
     /// </summary>
-    public async Task SaveUserPreferencesAsync(
+    public async Task<UserPreferencesSettings> SaveUserPreferencesAsync(
         UserPreferencesSettings settings,
         CancellationToken cancellationToken = default
     )
@@ -72,6 +71,8 @@ public class UserPreferencesService
 
             var fileRef = _fileService.GetAppDataFile(UserPreferencesSettings.FilePath);
             await _fileService.SaveFileAsync(fileRef, ms, cancellationToken);
+
+            return await LoadUserPreferencesAsync(cancellationToken);
         }
         catch (Exception ex)
         {
