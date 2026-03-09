@@ -74,4 +74,3 @@ export const EditLedgerEntryDialog: FC<EditLedgerEntryDialogProps> = ({
     </Dialog>
   )
 }
-

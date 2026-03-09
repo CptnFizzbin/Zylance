@@ -18,7 +18,7 @@ export function useCreateLedgerEntry () {
   })
 }
 
-// Update a ledger entry (vaultRef not required)
+// Update a ledger entry
 export function useUpdateLedgerEntry () {
   const zylanceQueries = useZylanceQueries()
   const zylanceApi = useZylanceApi()
@@ -33,7 +33,7 @@ export function useUpdateLedgerEntry () {
   })
 }
 
-// Delete a ledger entry (vaultRef not required)
+// Delete a ledger entry
 export function useDeleteLedgerEntry () {
   const zylanceQueries = useZylanceQueries()
   const zylanceApi = useZylanceApi()
