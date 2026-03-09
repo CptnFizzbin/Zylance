@@ -11,7 +11,7 @@ export interface TimestampProps {
 function convertCSharpToDateFns (
   pattern: string | undefined,
 ): string | undefined {
-  if (!pattern) return undefined
+  if (!pattern || pattern === "system") return undefined
 
   return pattern
     .replace(/tt/g, "a")

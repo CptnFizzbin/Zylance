@@ -96,7 +96,7 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
     /// <param name="fileRef">Reference to the file to save.</param>
     /// <param name="content">Content stream to write to disk.</param>
     /// <param name="token">Cancellation token.</param>
-    public Task SaveFileAsync(FileRef fileRef, Stream content, CancellationToken token = default)
+    public async Task SaveFileAsync(FileRef fileRef, Stream content, CancellationToken token = default)
     {
         if (fileRef.ReadOnly)
             throw new UnauthorizedAccessException($"Cannot save to read-only file reference: {fileRef.Id}");
@@ -115,7 +115,7 @@ public abstract class LocalFileProvider(string appDataPath, string tempDataPath)
 
         using var fileStream = File.Create(filePath);
 
-        return content.CopyToAsync(fileStream, token);
+        await content.CopyToAsync(fileStream, token);
     }
 
     /// <summary>

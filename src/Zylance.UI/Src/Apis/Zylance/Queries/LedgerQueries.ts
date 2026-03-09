@@ -7,7 +7,7 @@ export const ledgerQueries = (zylanceApi: ZylanceApi) => {
     list: (filter?: LedgerFilter) => ({
       queryKey: [filter],
       queryFn: async () => {
-        const res = await zylanceApi.ledger.listLedgerEntries({})
+        const res = await zylanceApi.ledger.listLedgerEntries({ filter })
         return res.entries
       },
     }),
