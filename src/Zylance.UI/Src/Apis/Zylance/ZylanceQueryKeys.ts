@@ -5,12 +5,14 @@ import { ledgerQueries } from "@/Apis/Zylance/Queries/LedgerQueries"
 import { settingsQueries } from "@/Apis/Zylance/Queries/SettingsQueries"
 import { vaultQueries } from "@/Apis/Zylance/Queries/VaultQueries"
 import type { ZylanceApi } from "@/Apis/Zylance/ZylanceApi"
+import { accountsQueries } from "@/Apis/Zylance/Queries/AccountsQueries"
 
 export const zylanceQueries = (zylanceApi: ZylanceApi) => {
   return mergeQueryKeys(
     settingsQueries(zylanceApi),
     vaultQueries(zylanceApi),
     ledgerQueries(zylanceApi),
+    accountsQueries(zylanceApi),
   )
 }
 

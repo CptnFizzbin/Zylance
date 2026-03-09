@@ -1,14 +1,15 @@
 import { Box } from "@mui/material"
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { useVirtualizer } from "@tanstack/react-virtual"
-import { type FC, useEffect, useRef } from "react"
+import { type FC, useEffect, useRef, useState } from "react"
 import { useLedgerGridColumns } from "@/Components/Ledger/LedgerGrid/LedgerGridColumns"
 import type { AccountData } from "$Contract/models/Account"
 import type { LedgerEntryData } from "$Contract/models/Ledger"
 import { LedgerGridRow } from "./LedgerGridRow"
 import { getColumnStyle } from "./LedgerGridUtils"
+import { EditLedgerEntryDialog } from "@/Components/Ledger/Dialogs/EditLedgerEntryDialog"
 
-const LEDGER_ROW_HEIGHT = 35
+const LEDGER_ROW_HEIGHT = 30
 
 export interface LedgerGridProps {
   entries: LedgerEntryData[]
@@ -18,6 +19,8 @@ export interface LedgerGridProps {
 export const LedgerGrid: FC<LedgerGridProps> = ({ entries, accounts }) => {
   const ledgerGridColumns = useLedgerGridColumns(accounts)
   const wrapperRef = useRef(null)
+  const [editingEntry, setEditingEntry] = useState<LedgerEntryData | null>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   const rowVirtualizer = useVirtualizer({
     count: entries.length,
@@ -31,6 +34,11 @@ export const LedgerGrid: FC<LedgerGridProps> = ({ entries, accounts }) => {
     data: entries,
     columns: ledgerGridColumns,
     getCoreRowModel: getCoreRowModel(),
+    initialState: {
+      columnVisibility: {
+        trxId: false,
+      },
+    },
   })
 
   useEffect(() => {
@@ -42,8 +50,13 @@ export const LedgerGrid: FC<LedgerGridProps> = ({ entries, accounts }) => {
   const { headers } = table.getHeaderGroups()[0]
   const { rows } = table.getRowModel()
 
-  const onEdit = (rowData: LedgerEntryData) => {
-    console.log("Editing row:", rowData)
+  const onEdit = (entry: LedgerEntryData) => {
+    setEditingEntry(entry)
+    setDialogOpen(true)
+  }
+
+  const onSaved = () => {
+    setDialogOpen(false)
   }
 
   return (
@@ -52,6 +65,7 @@ export const LedgerGrid: FC<LedgerGridProps> = ({ entries, accounts }) => {
       sx={{
         overflowX: "auto",
         overflowY: "scroll",
+        fontSize: "10pt",
       }}
     >
       <Box
@@ -64,7 +78,6 @@ export const LedgerGrid: FC<LedgerGridProps> = ({ entries, accounts }) => {
           sx={{
             position: "sticky",
             top: 0,
-            backgroundColor: "background.paper",
             zIndex: 1,
             display: "flex",
             flexDirection: "row",
@@ -76,8 +89,7 @@ export const LedgerGrid: FC<LedgerGridProps> = ({ entries, accounts }) => {
               sx={{
                 padding: 1,
                 fontWeight: 600,
-                display: "flex",
-                alignItems: "center",
+                backgroundColor: "background.paper",
               }}
               style={getColumnStyle(header.column)}
             >
@@ -90,6 +102,7 @@ export const LedgerGrid: FC<LedgerGridProps> = ({ entries, accounts }) => {
             </Box>
           ))}
         </Box>
+
         {rowVirtualizer.getVirtualItems().map((virtualRow, index) => {
           const row = rows[virtualRow.index]
           return (
@@ -105,6 +118,16 @@ export const LedgerGrid: FC<LedgerGridProps> = ({ entries, accounts }) => {
           )
         })}
       </Box>
+
+      {editingEntry && (
+        <EditLedgerEntryDialog
+          open={dialogOpen}
+          ledgerEntry={editingEntry}
+          onClose={() => setDialogOpen(false)}
+          onClosed={() => setEditingEntry(null)}
+          onSaved={onSaved}
+        />
+      )}
     </Box>
   )
 }

@@ -21,14 +21,14 @@ export const theme = createTheme({
       contrastText: "#1a1a1a",
     },
     secondary: {
-      main: "#8c8c8c", // Elegant gray (dark mode)
+      main: "#8c8c8c",
       light: "#a8a8a8",
       dark: "#5a5a5a",
       contrastText: "#ffffff",
     },
     background: {
-      default: "#1a1a1a", // Deep charcoal
-      paper: alpha("#2a2a2a", 0.7), // Translucent dark gray
+      default: "#1a1a1a",
+      paper: "#2a2a2a",
     },
     error: {
       main: "#d32f2f",
@@ -44,8 +44,8 @@ export const theme = createTheme({
     },
     text: {
       primary: "#e8e8e8",
-      secondary: alpha("#ffffff", 0.7),
-      disabled: alpha("#ffffff", 0.5),
+      secondary: alpha("#e8e8e8", 0.7),
+      disabled: alpha("#e8e8e8", 0.5),
     },
     divider: alpha("#d4af37", 0.12),
   },
@@ -53,9 +53,9 @@ export const theme = createTheme({
     fontFamily: [
       "-apple-system",
       "BlinkMacSystemFont",
-      '"Segoe UI"',
+      "\"Segoe UI\"",
       "Roboto",
-      '"Helvetica Neue"',
+      "\"Helvetica Neue\"",
       "Arial",
       "sans-serif",
     ].join(","),

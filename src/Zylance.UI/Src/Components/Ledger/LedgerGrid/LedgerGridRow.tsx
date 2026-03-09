@@ -21,13 +21,15 @@ export const LedgerGridRow: FC<LedgerGridRowProps> = ({
 }) => {
   return (
     <Box
-      sx={mergeSxProps({ display: "flex", flexDirection: "row" }, sx)}
+      sx={mergeSxProps(
+        { display: "flex", flexDirection: "row" }, sx, { "&:hover .ledgerCell": { backgroundColor: "action.hover" } })}
       style={style}
       onDoubleClick={() => onEdit(row.original)}
     >
       {row.getVisibleCells().map((cell) => (
         <Box
           key={cell.id}
+          className={"ledgerCell"}
           sx={{
             padding: 0.5,
             borderBottom: "1px solid",
@@ -36,6 +38,7 @@ export const LedgerGridRow: FC<LedgerGridRowProps> = ({
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
             overflow: "hidden",
+            cursor: "default",
           }}
           style={getColumnStyle(cell.column)}
         >

@@ -31,8 +31,7 @@ export const useLedgerGridColumns = (accounts: AccountData[]) => {
     }),
     columnHelper.accessor("accountId", {
       header: "Account",
-      minSize: 250,
-      meta: { flexGrow: 1 },
+      size: 150,
       cell: (cell) => {
         const account = accountMap[cell.getValue()]
         return account ? account.name : "Unknown Account"

@@ -1,9 +1,10 @@
 import { createFormHook } from "@tanstack/react-form"
-import { fieldContext, formContext } from "@/Integrations/tanstack-form/AppFormContext"
-import { FilePickerField } from "@/Integrations/tanstack-form/Fields/FilePickerField"
-import { SelectField } from "@/Integrations/tanstack-form/Fields/SelectField"
-import { TextField } from "@/Integrations/tanstack-form/Fields/TextField"
+import { fieldContext, formContext } from "./AppFormContext"
+import { FilePickerField } from "./Fields/FilePickerField"
+import { SelectField } from "./Fields/SelectField"
+import { TextField } from "./Fields/TextField"
 import { CheckboxField } from "./Fields/CheckboxField"
+import { CurrencyField } from "./Fields/CurrencyField"
 
 export const { useAppForm } = createFormHook({
   fieldContext,
@@ -13,6 +14,7 @@ export const { useAppForm } = createFormHook({
     SelectField,
     CheckboxField,
     TextField,
+    CurrencyField,
   },
   formComponents: {},
 })
