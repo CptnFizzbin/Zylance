@@ -6,7 +6,6 @@ option csharp_namespace = "Zylance.Contract.Models.Vault";
 // === Models ===
 message VaultRef {
   string id = 1;
-  string name = 2;
-
-  bool locked = 3;
+  bool locked = 2;
+  string name = 3;
 }

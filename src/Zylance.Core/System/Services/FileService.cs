@@ -159,8 +159,8 @@ public class FileService(IFileProvider fileProvider) : IFileProvider
     /// <param name="token">Cancellation token.</param>
     public async Task SaveFileAsync(FileRef fileRef, string content, CancellationToken token = default)
     {
-        var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-        await fileProvider.SaveFileAsync(fileRef, stream, token);
+        await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+        await SaveFileAsync(fileRef, stream, token);
     }
 
     /// <summary>

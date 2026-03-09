@@ -1,7 +1,7 @@
 import { CssBaseline } from "@mui/material"
 import GlobalStyles from "@mui/material/GlobalStyles"
 import { ThemeProvider } from "@mui/system"
-import { StrictMode } from "react"
+import { StrictMode, Suspense } from "react"
 import ReactDOM from "react-dom/client"
 import { App, TanStackQueryProviderContext } from "@/App"
 import { ZylanceProvider } from "@/Components/Application/ZylanceProvider"
@@ -18,14 +18,16 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-        <ZylanceProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <GlobalStyles styles="@layer theme,base,mui,components,utilities;" />
+        <Suspense>
+          <ZylanceProvider>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <GlobalStyles styles="@layer theme,base,mui,components,utilities;" />
 
-            <App />
-          </ThemeProvider>
-        </ZylanceProvider>
+              <App />
+            </ThemeProvider>
+          </ZylanceProvider>
+        </Suspense>
       </TanStackQueryProvider.Provider>
     </StrictMode>,
   )

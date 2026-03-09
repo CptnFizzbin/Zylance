@@ -18,10 +18,10 @@ export const createSettingsApi = (client: ZylanceClient) => {
       >(ZylanceActions.Settings_GetUserPreferences),
 
       set: client.createRequestEndpoint<
-        typeof ZylanceActions.Settings_GetUserPreferences,
+        typeof ZylanceActions.Settings_SetUserPreferences,
         SettingsTypes.SetUserPreferencesReq,
         SettingsTypes.SetUserPreferencesRes
-      >(ZylanceActions.Settings_GetUserPreferences),
+      >(ZylanceActions.Settings_SetUserPreferences),
     },
   }
 }
