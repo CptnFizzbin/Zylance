@@ -9,6 +9,7 @@ import { theme } from "./Integrations/mui/Theme"
 import * as TanStackQueryProvider from "./Integrations/tanstack-query/root-provider"
 
 import "./styles.css"
+import { LoadingScreen } from "@/Components/UI/LoadingScreen"
 
 // Render the app
 const rootElement = document.getElementById("app")
@@ -18,16 +19,16 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-        <Suspense>
-          <ZylanceProvider>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              <GlobalStyles styles="@layer theme,base,mui,components,utilities;" />
+        <ZylanceProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <GlobalStyles styles="@layer theme,base,mui,components,utilities;" />
 
+            <Suspense fallback={<LoadingScreen />}>
               <App />
-            </ThemeProvider>
-          </ZylanceProvider>
-        </Suspense>
+            </Suspense>
+          </ThemeProvider>
+        </ZylanceProvider>
       </TanStackQueryProvider.Provider>
     </StrictMode>,
   )

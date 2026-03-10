@@ -2,9 +2,10 @@ import { TanStackDevtools } from "@tanstack/react-devtools"
 import type { QueryClient } from "@tanstack/react-query"
 import { createRootRouteWithContext, Navigate, Outlet, useLocation } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
-import { useEffect } from "react"
+import { Suspense, useEffect } from "react"
 import { useZylance } from "@/Components/Application/UseZylance"
 import type { ZylanceState } from "@/Components/Application/ZylanceContext"
+import { LoadingScreen } from "@/Components/UI/LoadingScreen"
 import TanStackQueryDevtools from "@/Integrations/tanstack-query/devtools"
 
 interface ZylanceRouterContext {
@@ -40,7 +41,9 @@ function RootComponent () {
 
   return (
     <>
-      <Outlet />
+      <Suspense fallback={<LoadingScreen />}>
+        <Outlet />
+      </Suspense>
       <TanStackDevtools
         config={{
           position: "bottom-left",

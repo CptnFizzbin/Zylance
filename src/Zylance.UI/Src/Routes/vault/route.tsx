@@ -1,7 +1,9 @@
 import { Box, Stack } from "@mui/material"
 import { createFileRoute, Outlet } from "@tanstack/react-router"
+import { Suspense } from "react"
 import { AccountsPanel } from "@/Components/Accounts/AccountsPanel"
 import { MenuRibbon } from "@/Components/MenuRibbon/MenuRibbon"
+import { LoadingScreen } from "@/Components/UI/LoadingScreen"
 
 export const Route = createFileRoute("/vault")({
   component: RouteComponent,
@@ -17,10 +19,8 @@ function RouteComponent () {
         overflow: "hidden",
       }}
     >
-      {/* Top MenuRibbon spanning full width */}
       <MenuRibbon />
 
-      {/* Main content area with AccountsPanel on left and Outlet for pages */}
       <Box
         sx={{
           display: "flex",
@@ -28,10 +28,8 @@ function RouteComponent () {
           overflow: "hidden",
         }}
       >
-        {/* Left panel with accounts list */}
         <AccountsPanel />
 
-        {/* Main content area (Outlet) */}
         <Stack
           component="main"
           sx={{
@@ -40,7 +38,9 @@ function RouteComponent () {
             position: "relative",
           }}
         >
-          <Outlet />
+          <Suspense fallback={<LoadingScreen />}>
+            <Outlet />
+          </Suspense>
         </Stack>
       </Box>
     </Box>
