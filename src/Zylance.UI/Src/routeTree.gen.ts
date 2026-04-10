@@ -15,6 +15,7 @@ import { Route as LockedIndexRouteImport } from './Routes/locked/index'
 import { Route as LockedUnlockVaultRouteImport } from './Routes/locked/unlock-vault'
 import { Route as LockedSelectVaultRouteImport } from './Routes/locked/select-vault'
 import { Route as VaultLedgerIndexRouteImport } from './Routes/vault/ledger/index'
+import { Route as VaultNotesIndexRouteImport } from './Routes/vault/notes/index'
 
 const VaultRouteRoute = VaultRouteRouteImport.update({
   id: '/vault',
@@ -46,6 +47,11 @@ const VaultLedgerIndexRoute = VaultLedgerIndexRouteImport.update({
   path: '/ledger/',
   getParentRoute: () => VaultRouteRoute,
 } as any)
+const VaultNotesIndexRoute = VaultNotesIndexRouteImport.update({
+  id: '/notes/',
+  path: '/notes/',
+  getParentRoute: () => VaultRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/vault': typeof VaultRouteRouteWithChildren
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/locked/': typeof LockedIndexRoute
   '/vault/': typeof VaultIndexRoute
   '/vault/ledger/': typeof VaultLedgerIndexRoute
+  '/vault/notes/': typeof VaultNotesIndexRoute
 }
 export interface FileRoutesByTo {
   '/locked/select-vault': typeof LockedSelectVaultRoute
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/locked': typeof LockedIndexRoute
   '/vault': typeof VaultIndexRoute
   '/vault/ledger': typeof VaultLedgerIndexRoute
+  '/vault/notes': typeof VaultNotesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/locked/': typeof LockedIndexRoute
   '/vault/': typeof VaultIndexRoute
   '/vault/ledger/': typeof VaultLedgerIndexRoute
+  '/vault/notes/': typeof VaultNotesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/locked/'
     | '/vault/'
     | '/vault/ledger/'
+    | '/vault/notes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/locked/select-vault'
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/locked'
     | '/vault'
     | '/vault/ledger'
+    | '/vault/notes'
   id:
     | '__root__'
     | '/vault'
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/locked/'
     | '/vault/'
     | '/vault/ledger/'
+    | '/vault/notes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -148,17 +160,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VaultLedgerIndexRouteImport
       parentRoute: typeof VaultRouteRoute
     }
+    '/vault/notes/': {
+      id: '/vault/notes/'
+      path: '/notes'
+      fullPath: '/vault/notes/'
+      preLoaderRoute: typeof VaultNotesIndexRouteImport
+      parentRoute: typeof VaultRouteRoute
+    }
   }
 }
 
 interface VaultRouteRouteChildren {
   VaultIndexRoute: typeof VaultIndexRoute
   VaultLedgerIndexRoute: typeof VaultLedgerIndexRoute
+  VaultNotesIndexRoute: typeof VaultNotesIndexRoute
 }
 
 const VaultRouteRouteChildren: VaultRouteRouteChildren = {
   VaultIndexRoute: VaultIndexRoute,
   VaultLedgerIndexRoute: VaultLedgerIndexRoute,
+  VaultNotesIndexRoute: VaultNotesIndexRoute,
 }
 
 const VaultRouteRouteWithChildren = VaultRouteRoute._addFileChildren(
