@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "^24.13.0"
+    "node": "^26.0.0"
   },
   "scripts": {
     "start": "yarn build:contract && vite --port 3000",
@@ -58,5 +58,5 @@
     "vitest": "^4.0.18",
     "web-vitals": "^5.1.0"
   },
-  "packageManager": "yarn@4.12.0"
+  "packageManager": "yarn@4.16.0"
 }

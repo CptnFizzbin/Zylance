@@ -21,11 +21,11 @@ steps:
           regex: "^10\\.0\\.\\d+"
           message: ".NET 10.0 SDK is required. Install from https://dotnet.microsoft.com/download"
 
-      - description: Check Node.js version (requires Node.js 24.13.0 or higher)
+      - description: Check Node.js version (requires Node.js 26.0.0 or higher)
         command: node --version
         expect:
-          regex: "^v24\\.(1[3-9]|[2-9][0-9])\\."
-          message: "Node.js 24.13.0 or higher is required. Install from https://nodejs.org/ or use fnm"
+          regex: "^v26\\."
+          message: "Node.js 26.0.0 or higher is required. Install from https://nodejs.org/ or use fnm"
 
   # Step 2: Restore .NET dependencies
   - name: Restore .NET Dependencies
@@ -159,8 +159,8 @@ project_info:
     - issue: "Build fails with 'NODE_HOME not set'"
       solution: |
         Set the NODE_HOME environment variable to your Node.js installation directory.
-        For FNM users on Windows: $env:NODE_HOME = "$env:APPDATA\fnm\node-versions\v24.13.0\installation"
-        For FNM users on Linux/macOS: export NODE_HOME="$HOME/.local/share/fnm/node-versions/v24.13.0/installation"
+        For FNM users on Windows: $env:NODE_HOME = "$env:APPDATA\fnm\node-versions\v26.0.0\installation"
+        For FNM users on Linux/macOS: export NODE_HOME="$HOME/.local/share/fnm/node-versions/v26.0.0/installation"
     
     - issue: "Yarn command not found"
       solution: |
