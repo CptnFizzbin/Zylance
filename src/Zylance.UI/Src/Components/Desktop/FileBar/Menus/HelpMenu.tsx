@@ -1,4 +1,4 @@
-import InfoOutlineIcon from "@mui/icons-material/InfoOutline"
+import InfoOutlineIcon from "@mui/icons-material/InfoOutlined"
 import { ListItemIcon, ListItemText, MenuItem } from "@mui/material"
 import { type FC, useState } from "react"
 import { AboutDialog } from "@/Components/About/AboutDialog.tsx"

@@ -55,7 +55,7 @@ export const FilePickerField: FC<FilePickerFieldProps> = ({
   }
 
   return (
-    <Stack direction="row" alignItems="center">
+    <Stack direction="row" sx={{ alignItems: "center" }}>
       <Button
         variant="outlined"
         onClick={handleButtonClick}

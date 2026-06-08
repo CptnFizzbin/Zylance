@@ -37,9 +37,9 @@ export const App: FC = () => {
 
   return (
     <ImportProvider>
-      <Stack height={"100vh"}>
+      <Stack sx={{ height: "100vh" }}>
         {isDesktop && <DesktopMenuBar />}
-        <Stack flexGrow={1} overflow="auto" sx={{ position: "relative" }}>
+        <Stack sx={{ flexGrow: 1, overflow: "auto", position: "relative" }}>
           <BackgroundProgressBar />
 
           <RouterProvider router={router} context={{ zylance }} />
