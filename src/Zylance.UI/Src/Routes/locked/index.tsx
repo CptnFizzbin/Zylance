@@ -9,7 +9,7 @@ function RouteComponent() {
   console.log("Rendering /_locked route")
 
   return (
-    <Box flexGrow={1} overflow="auto">
+    <Box sx={{ flexGrow: 1, overflow: "auto" }}>
       <Outlet />
     </Box>
   )

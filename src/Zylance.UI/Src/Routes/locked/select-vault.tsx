@@ -71,14 +71,14 @@ function RouteComponent() {
       }}
     >
       <Container maxWidth="sm">
-        <Stack spacing={4} alignItems="center">
+        <Stack spacing={4} sx={{ alignItems: "center" }}>
           {/* Logo and Title Section */}
-          <Stack spacing={2} alignItems="center" sx={{ textAlign: "center" }}>
+          <Stack spacing={2} sx={{ alignItems: "center", textAlign: "center" }}>
             <Typography
               variant="h2"
               component="h1"
-              fontWeight="bold"
               sx={{
+                fontWeight: "bold",
                 background: "linear-gradient(135deg, #d4af37 0%, #c0c0c0 100%)",
                 backgroundClip: "text",
                 WebkitBackgroundClip: "text",
@@ -97,11 +97,9 @@ function RouteComponent() {
               <Typography
                 variant="h5"
                 component="h2"
-                fontWeight="600"
-                textAlign="center"
                 gutterBottom
                 role={"heading"}
-                sx={{ mb: 3 }}
+                sx={{ fontWeight: "600", textAlign: "center", mb: 3 }}
               >
                 Select Your Vault
               </Typography>
@@ -150,8 +148,7 @@ function RouteComponent() {
               <Typography
                 variant="body2"
                 color="text.secondary"
-                textAlign="center"
-                sx={{ mt: 3 }}
+                sx={{ textAlign: "center", mt: 3 }}
               >
                 All data is stored locally.
               </Typography>
@@ -161,7 +158,7 @@ function RouteComponent() {
           <Typography
             variant="caption"
             color="text.disabled"
-            textAlign="center"
+            sx={{ textAlign: "center" }}
           >
             © 2026 CptnFizzbin
           </Typography>
