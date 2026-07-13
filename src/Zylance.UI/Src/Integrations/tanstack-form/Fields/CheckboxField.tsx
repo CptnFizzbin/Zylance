@@ -1,4 +1,9 @@
-import { Checkbox, type CheckboxProps, FormControlLabel, FormHelperText } from "@mui/material"
+import {
+  Checkbox,
+  type CheckboxProps,
+  FormControlLabel,
+  FormHelperText,
+} from "@mui/material"
 import type { FC } from "react"
 import { useFieldContext } from "../AppFormContext"
 
