@@ -1,6 +1,6 @@
 {
   "name": "@cptnfizzbin/zylance-contract",
-  "packageManager": "yarn@4.16.0",
+  "packageManager": "yarn@4.17.1",
   "scripts": {
     "build": "dotnet build ./Zylance.Contract.csproj",
     "build:code": "vite-node Scripts/build-code.ts"
