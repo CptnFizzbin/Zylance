@@ -7,10 +7,14 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)\yarn.cmd</YarnExe>
-    <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn.cmd</YarnExe>
-    <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)/bin/yarn</YarnExe>
-    <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn</YarnExe>
+    <!-- Invoke yarn through corepack rather than a bare yarn/yarn.cmd lookup: Windows
+         runner images ship a global Yarn Classic that shadows the corepack shim on PATH,
+         which silently ignores this repo's pinned "packageManager" (yarn@4.17.1). -->
+    <CorepackExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)\corepack.cmd</CorepackExe>
+    <CorepackExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">corepack.cmd</CorepackExe>
+    <CorepackExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)/bin/corepack</CorepackExe>
+    <CorepackExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">corepack</CorepackExe>
+    <YarnExe>$(CorepackExe) yarn</YarnExe>
   </PropertyGroup>
 
   <PropertyGroup>

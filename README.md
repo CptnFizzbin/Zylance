@@ -25,8 +25,8 @@ An OpenSource finance and budgeting app
 4. Install Node.js and Yarn using FNM (or your preferred Node.js version
    manager):
    ```pwsh
-   fnm install 24.13.0
-   fnm use 24.13.0
+   fnm install 26
+   fnm use 26
    corepack enable
    corepack prepare yarn@stable --activate
    ```
@@ -39,16 +39,16 @@ An OpenSource finance and budgeting app
    **Windows (PowerShell):**
    ```pwsh
    # For FNM users - set in current session:
-   $env:NODE_HOME = "$env:APPDATA\fnm\node-versions\v24.13.0\installation"
+   $env:NODE_HOME = "$env:APPDATA\fnm\node-versions\v26.5.0\installation"
    
    # Or set permanently (requires restart):
-   [System.Environment]::SetEnvironmentVariable('NODE_HOME', "$env:APPDATA\fnm\node-versions\v24.13.0\installation", 'User')
+   [System.Environment]::SetEnvironmentVariable('NODE_HOME', "$env:APPDATA\fnm\node-versions\v26.5.0\installation", 'User')
    ```
 
    **Linux/macOS:**
    ```bash
    # For FNM users - add to your shell profile (~/.bashrc, ~/.zshrc, etc.):
-   export NODE_HOME="$HOME/.local/share/fnm/node-versions/v24.13.0/installation"
+   export NODE_HOME="$HOME/.local/share/fnm/node-versions/v26.5.0/installation"
    ```
 6. build the solution:
    ```pwsh
