@@ -7,10 +7,15 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <!-- NODE_HOME set (local dev): use the yarn binary installed alongside that Node,
+         which is already the version pinned by "packageManager". NODE_HOME unset (CI):
+         resolve yarn.cmd/yarn via corepack instead of a bare PATH lookup - Windows runner
+         images ship a global Yarn Classic that shadows the corepack shim on PATH and
+         silently ignores the pinned version, so a bare "yarn.cmd" would run the wrong yarn. -->
     <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)\yarn.cmd</YarnExe>
-    <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn.cmd</YarnExe>
+    <YarnExe Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">corepack.cmd yarn</YarnExe>
     <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' != ''">$(NODE_HOME)/bin/yarn</YarnExe>
-    <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">yarn</YarnExe>
+    <YarnExe Condition="!$([MSBuild]::IsOSPlatform('Windows')) and '$(NODE_HOME)' == ''">corepack yarn</YarnExe>
   </PropertyGroup>
 
   <PropertyGroup>
