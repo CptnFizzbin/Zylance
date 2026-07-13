@@ -1,6 +1,6 @@
 {
   "name": "@cptnfizzbin/zylance-contract",
-  "packageManager": "yarn@4.16.0",
+  "packageManager": "yarn@4.17.1",
   "scripts": {
     "build": "dotnet build ./Zylance.Contract.csproj",
     "build:code": "vite-node Scripts/build-code.ts"
@@ -16,5 +16,10 @@
     "ts-proto": "^2.11.2",
     "vite-node": "^5.3.0",
     "yargs": "^18.0.0"
+  },
+  "dependenciesMeta": {
+    "esbuild": {
+      "built": true
+    }
   }
 }
