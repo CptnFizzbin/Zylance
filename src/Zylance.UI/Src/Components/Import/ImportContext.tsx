@@ -21,7 +21,10 @@ import {
 } from "react"
 import { catchError, EMPTY, filter } from "rxjs"
 import { ImportDialog } from "@/Components/Import/ImportDialog"
-import { type ImportForm, useImportForm } from "@/Components/Import/UseImportForm"
+import {
+  type ImportForm,
+  useImportForm,
+} from "@/Components/Import/UseImportForm"
 import { useZylanceApi } from "@/Hooks/UseZylance"
 import { ZylanceEvents } from "$Generated/ZylanceConstants"
 
@@ -115,7 +118,7 @@ export const ImportProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     if (!importId) return
 
-    function observeImportEvents<TEvt extends { importId: string }> (
+    function observeImportEvents<TEvt extends { importId: string }>(
       eventName: string,
     ) {
       return zylanceApi

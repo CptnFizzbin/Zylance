@@ -1,7 +1,8 @@
 import * as path from "node:path"
+import babel from "@rolldown/plugin-babel"
 import { devtools } from "@tanstack/devtools-vite"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
-import viteReact from "@vitejs/plugin-react"
+import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 
 const ZYLANCE_UI_DIR = import.meta.dirname
@@ -33,11 +34,8 @@ export default defineConfig({
       routesDirectory: path.join(ZYLANCE_UI_DIR, "Src", "Routes"),
       generatedRouteTree: path.join(ZYLANCE_UI_DIR, "Src", "routeTree.gen.ts"),
     }),
-    viteReact({
-      babel: {
-        plugins: ["babel-plugin-react-compiler"],
-      },
-    }),
+    viteReact(),
+    babel({ presets: [reactCompilerPreset()] }),
   ],
 
   root: ZYLANCE_UI_DIR,

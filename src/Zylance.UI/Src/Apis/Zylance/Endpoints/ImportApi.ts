@@ -2,7 +2,7 @@ import type * as ImportTypes from "@Contract/api/Import"
 import { ZylanceActions, ZylanceEvents } from "$Generated/ZylanceConstants"
 import type { ZylanceClient } from "../ZylanceClient"
 
-export function createImportApi (client: ZylanceClient) {
+export function createImportApi(client: ZylanceClient) {
   return {
     uploadFile: client.createRequestEndpoint<
       typeof ZylanceActions.Import_Start,
