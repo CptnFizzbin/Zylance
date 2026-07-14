@@ -42,3 +42,15 @@ dotnet tool restore
 # --- Build everything (also runs `yarn install` + protobuf/TS codegen for
 #     Zylance.Contract and Zylance.UI via their MSBuild targets) ---
 dotnet build --no-restore
+
+# --- Runtime deps for running/screenshotting Zylance.Desktop (Photino.NET) ---
+# Photino.NET embeds a WebView backed by WebKitGTK on Linux, and its native
+# lib also links libnotify; the base image doesn't ship either. scrot
+# captures the Xvfb framebuffer for screenshots. xdotool resizes/positions
+# the window: with SetUseOsDefaultSize/Location and no window manager on
+# Xvfb, Photino's window opens tiny (~200x200) in the top-left corner.
+# Xvfb itself is already present on the base image.
+if ! ldconfig -p | grep -q libwebkit2gtk-4.1; then
+  apt-get update -qq
+  apt-get install -y -qq libwebkit2gtk-4.1-0 libnotify4 scrot xdotool
+fi
