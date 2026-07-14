@@ -42,3 +42,11 @@ dotnet tool restore
 # --- Build everything (also runs `yarn install` + protobuf/TS codegen for
 #     Zylance.Contract and Zylance.UI via their MSBuild targets) ---
 dotnet build --no-restore
+
+# --- Playwright browsers (Zylance.Desktop.Tests E2E/smoke tests) ---
+# Invoke the driver bundled in the restored NuGet package directly (rather than
+# the generated bin/**/playwright.ps1) since this environment has no pwsh.
+PLAYWRIGHT_PKG_DIR="$(find "$HOME/.nuget/packages/microsoft.playwright" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | sort -V | tail -1)"
+if [ -n "$PLAYWRIGHT_PKG_DIR" ]; then
+  "$PLAYWRIGHT_PKG_DIR/.playwright/node/linux-x64/node" "$PLAYWRIGHT_PKG_DIR/.playwright/package/cli.js" install --with-deps chromium
+fi
