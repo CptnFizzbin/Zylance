@@ -26,14 +26,10 @@ echo "export PATH=\"$NODE_HOME/bin:\$PATH\"" >> "$CLAUDE_ENV_FILE"
 export PATH="$NODE_HOME/bin:$PATH"
 
 # --- Yarn (pinned per package.json "packageManager") ---
-# Corepack's default download host (repo.yarnpkg.com) is blocked by this
-# environment's egress policy, so install the pinned Yarn release directly
-# from npm instead of going through corepack.
-YARN_VERSION="$(node -pe "require('./src/Zylance.UI/package.json').packageManager.split('@')[1]")"
-if [ "$(yarn --version 2>/dev/null || true)" != "$YARN_VERSION" ]; then
-  rm -f "$NODE_HOME/bin/yarn" "$NODE_HOME/bin/yarnpkg"
-  npm install -g "@yarnpkg/cli-dist@$YARN_VERSION" --silent
-fi
+# The base image's bundled corepack (0.34.x) fails to fetch through this
+# environment's proxy (undici ProxyAgent bug), so upgrade it first.
+npm install -g corepack@latest --silent
+corepack enable
 
 # --- .NET dependencies and tools ---
 dotnet restore
