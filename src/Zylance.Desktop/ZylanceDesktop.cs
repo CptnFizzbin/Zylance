@@ -117,13 +117,18 @@ public class ZylanceDesktop(
 
     private PhotinoWindow CreateWindow()
     {
-        return new PhotinoWindow()
+        var window = new PhotinoWindow()
             .SetTitle(ZyConfiguration.AppName)
             .SetUseOsDefaultLocation(true)
-            .SetUseOsDefaultSize(true)
             .SetResizable(true)
-            .SetDevToolsEnabled(config.DevToolsEnabled)
-            .Load(config.UiServerUrl);
+            .SetDevToolsEnabled(config.DevToolsEnabled);
+
+        if (config.WindowWidth is { } width && config.WindowHeight is { } height)
+            window.SetUseOsDefaultSize(false).SetSize(width, height);
+        else
+            window.SetUseOsDefaultSize(true);
+
+        return window.Load(config.UiServerUrl);
     }
 
     private WebServerService StartWebServer()

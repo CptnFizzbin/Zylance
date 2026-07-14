@@ -35,6 +35,12 @@ public record ZyConfiguration
     /// <summary>Enable developer tools in the native window.</summary>
     public bool DevToolsEnabled { get; init; } = GetBool("DEVTOOLS_ENABLED") ?? false;
 
+    /// <summary>Explicit native window width, overriding the OS default size.</summary>
+    public int? WindowWidth { get; init; } = GetInt("WINDOW_WIDTH");
+
+    /// <summary>Explicit native window height, overriding the OS default size.</summary>
+    public int? WindowHeight { get; init; } = GetInt("WINDOW_HEIGHT");
+
     /// <summary>URL to the local UI server.</summary>
     public string UiServerUrl => $"http://localhost:{UiPort}";
 
